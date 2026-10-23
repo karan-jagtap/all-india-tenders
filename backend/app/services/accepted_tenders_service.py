@@ -23,6 +23,13 @@ from reportlab.platypus import (
     TableStyle
 )
 from app.services.accepted_tenders_history import HISTORICAL_ACCEPTED_TENDERS_2017_2024
+from app.services.current_tenders_service import (
+    STATUTORY_PORTAL_STATE_BINDINGS,
+    find_statutory_portal_binding,
+    _city_matches,
+    STATE_CITY_MAP,
+    detect_state_and_city
+)
 
 ACCEPTED_TENDERS_CATALOG: List[Dict[str, Any]] = [
     # =========================================================================
@@ -1485,6 +1492,45 @@ for _t in ACCEPTED_TENDERS_CATALOG:
         _seen_catalog_ids.add(_tid)
         _deduped_catalog.append(_t)
 ACCEPTED_TENDERS_CATALOG = _deduped_catalog
+
+# Normalize state and city for all accepted tenders and enforce statutory portal bindings
+for _t in ACCEPTED_TENDERS_CATALOG:
+    og = _t.setdefault("og_tender", {})
+    portal = og.get("portal") or _t.get("portal") or ""
+    binding = find_statutory_portal_binding(portal)
+
+    st = _t.get("state") or og.get("state")
+    ct = _t.get("city") or og.get("city")
+
+    if binding:
+        p_state, p_default_city = binding
+        st = p_state
+
+        valid_cities = STATE_CITY_MAP.get(p_state, [])
+        city_valid = bool(ct and (ct in valid_cities or any(ct.lower() == vc.lower() for vc in valid_cities)))
+        if not city_valid or (ct.lower() in ("new delhi", "delhi", "all india") and p_state != "Delhi"):
+            full_text = f"{_t.get('title', '')} {og.get('scope_summary', '')} {og.get('authority', '')} {_t.get('winning_company', {}).get('registered_office', '')}".lower()
+            detected_city = None
+            for c in valid_cities:
+                if _city_matches(c, full_text):
+                    detected_city = c
+                    break
+            ct = detected_city or p_default_city
+    else:
+        if not st or not ct:
+            s, c = detect_state_and_city(
+                _t.get("title", ""),
+                og.get("scope_summary", ""),
+                og.get("authority", ""),
+                portal
+            )
+            st = st or s
+            ct = ct or c
+
+    _t["state"] = st
+    _t["city"] = ct
+    og["state"] = st
+    og["city"] = ct
 
 
 def list_accepted_tenders(category: Optional[str] = None, year: Optional[int] = None) -> List[Dict[str, Any]]:

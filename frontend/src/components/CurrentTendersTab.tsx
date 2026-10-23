@@ -30,6 +30,17 @@ import {
   CompetitorPredictionSubTab,
   DeepRAGClauseSubTab
 } from './CurrentTenders';
+import {
+  ALL_STATUTORY_PORTAL_SOURCES,
+  canonicalizePortalSource,
+  ALL_CANONICAL_CATEGORIES,
+  ALL_CANONICAL_STATES,
+  ALL_MASTER_ORGANIZATIONS,
+  ALL_MASTER_CITIES,
+  canonicalizeCategory,
+  canonicalizeState,
+  canonicalizeCity
+} from '../constants';
 
 export const CurrentTendersTab: React.FC = () => {
   const [tenders, setTenders] = useState<EnrichedCurrentTender[]>([]);
@@ -149,11 +160,21 @@ export const CurrentTendersTab: React.FC = () => {
           return isNotFilled && isNotAwarded && isDue && notAwardedStatus;
         });
 
-        const enriched: EnrichedCurrentTender[] = strictlyUnfilled.map((t) => ({
-          ...t,
-          _sourceLabel: t.source_portal.split('(')[0].trim(),
-          _searchBlob: `${t.title} ${t.organization} ${t.nit_number} ${t.state || ''} ${t.city || ''} ${t.source_portal} ${t.scope_summary || ''} ${t.ogd_resource_id || ''} ${t.departmental_channel || ''}`.toLowerCase()
-        }));
+        const enriched: EnrichedCurrentTender[] = strictlyUnfilled.map((t) => {
+          const canonicalSource = canonicalizePortalSource(t.source_portal);
+          const canonicalSt = canonicalizeState(t.state, t.title, t.scope_summary, t.organization, canonicalSource);
+          const canonicalCt = canonicalizeCity(t.city, canonicalSt, t.title, t.scope_summary, t.organization, canonicalSource);
+          const canonicalCat = canonicalizeCategory(t.category, t.title, t.scope_summary);
+          return {
+            ...t,
+            source_portal: canonicalSource,
+            state: canonicalSt,
+            city: canonicalCt,
+            category: canonicalCat,
+            _sourceLabel: canonicalSource.split('(')[0].trim(),
+            _searchBlob: `${t.title} ${t.organization} ${t.nit_number} ${canonicalSt} ${canonicalCt} ${canonicalSource} ${canonicalCat} ${t.scope_summary || ''} ${t.ogd_resource_id || ''} ${t.departmental_channel || ''}`.toLowerCase()
+          };
+        });
         setTenders(enriched);
         if (enriched.length > 0 && (!selectedTenderId || !enriched.some(t => t.id === selectedTenderId))) {
           setSelectedTenderId(enriched[0].id);
@@ -234,13 +255,15 @@ export const CurrentTendersTab: React.FC = () => {
   }, [contextForSource]);
 
   const availableSources = useMemo(() => {
-    const list = Array.from(sourceCounts.keys()).sort();
-    if (selectedSource !== 'ALL' && !list.includes(selectedSource)) {
-      list.push(selectedSource);
-      list.sort();
+    const set = new Set<string>(ALL_STATUTORY_PORTAL_SOURCES);
+    for (const t of tenders) {
+      if (t.source_portal) set.add(t.source_portal);
     }
-    return list;
-  }, [sourceCounts, selectedSource]);
+    if (selectedSource !== 'ALL') {
+      set.add(selectedSource);
+    }
+    return Array.from(set).sort();
+  }, [tenders, selectedSource]);
 
   const contextForOrg = useMemo(() => tenders.filter((t) => matchesFilter(t, 'org')), [tenders, matchesFilter]);
   const orgCounts = useMemo(() => {
@@ -252,13 +275,15 @@ export const CurrentTendersTab: React.FC = () => {
   }, [contextForOrg]);
 
   const availableOrgs = useMemo(() => {
-    const list = Array.from(orgCounts.keys()).sort();
-    if (selectedOrg !== 'ALL' && !list.includes(selectedOrg)) {
-      list.push(selectedOrg);
-      list.sort();
+    const set = new Set<string>(ALL_MASTER_ORGANIZATIONS);
+    for (const t of tenders) {
+      if (t.organization) set.add(t.organization);
     }
-    return list;
-  }, [orgCounts, selectedOrg]);
+    if (selectedOrg !== 'ALL') {
+      set.add(selectedOrg);
+    }
+    return Array.from(set).sort();
+  }, [tenders, selectedOrg]);
 
   const contextForState = useMemo(() => tenders.filter((t) => matchesFilter(t, 'state')), [tenders, matchesFilter]);
   const stateCounts = useMemo(() => {
@@ -270,13 +295,15 @@ export const CurrentTendersTab: React.FC = () => {
   }, [contextForState]);
 
   const availableStates = useMemo(() => {
-    const list = Array.from(stateCounts.keys()).sort();
-    if (selectedState !== 'ALL' && !list.includes(selectedState)) {
-      list.push(selectedState);
-      list.sort();
+    const set = new Set<string>(ALL_CANONICAL_STATES);
+    for (const t of tenders) {
+      if (t.state) set.add(t.state);
     }
-    return list;
-  }, [stateCounts, selectedState]);
+    if (selectedState !== 'ALL') {
+      set.add(selectedState);
+    }
+    return Array.from(set).sort();
+  }, [tenders, selectedState]);
 
   const contextForCity = useMemo(() => tenders.filter((t) => matchesFilter(t, 'city')), [tenders, matchesFilter]);
   const cityCounts = useMemo(() => {
@@ -288,13 +315,15 @@ export const CurrentTendersTab: React.FC = () => {
   }, [contextForCity]);
 
   const availableCities = useMemo(() => {
-    const list = Array.from(cityCounts.keys()).sort();
-    if (selectedCity !== 'ALL' && !list.includes(selectedCity)) {
-      list.push(selectedCity);
-      list.sort();
+    const set = new Set<string>(ALL_MASTER_CITIES);
+    for (const t of tenders) {
+      if (t.city) set.add(t.city);
     }
-    return list;
-  }, [cityCounts, selectedCity]);
+    if (selectedCity !== 'ALL') {
+      set.add(selectedCity);
+    }
+    return Array.from(set).sort();
+  }, [tenders, selectedCity]);
 
   const contextForCategory = useMemo(() => tenders.filter((t) => matchesFilter(t, 'category')), [tenders, matchesFilter]);
   const categoryCounts = useMemo(() => {
@@ -306,13 +335,15 @@ export const CurrentTendersTab: React.FC = () => {
   }, [contextForCategory]);
 
   const availableCategories = useMemo(() => {
-    const list = Array.from(categoryCounts.keys()).sort();
-    if (selectedCategory !== 'ALL' && !list.includes(selectedCategory)) {
-      list.push(selectedCategory);
-      list.sort();
+    const set = new Set<string>(ALL_CANONICAL_CATEGORIES);
+    for (const t of tenders) {
+      if (t.category) set.add(t.category);
     }
-    return list;
-  }, [categoryCounts, selectedCategory]);
+    if (selectedCategory !== 'ALL') {
+      set.add(selectedCategory);
+    }
+    return Array.from(set).sort();
+  }, [tenders, selectedCategory]);
 
   // Final intersection of all active filters
   const filteredTenders = useMemo(() => tenders.filter((t) => matchesFilter(t)), [tenders, matchesFilter]);

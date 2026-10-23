@@ -211,12 +211,12 @@ SOURCES = [
         'accepted_target_count': 140,
         'current_target_count': 25
     },
-    # 6. Delhi e-Procure / DMRC
+    # 6. Delhi e-Procure
     {
         'key': 'delhi',
-        'source_portal': 'Delhi e-Procure (DMRC)',
+        'source_portal': 'Delhi e-Procure (govtprocurement.delhi.gov.in)',
         'portal_url_base': 'https://govtprocurement.delhi.gov.in/nicgep/app?org=',
-        'state': 'Delhi NCR',
+        'state': 'Delhi',
         'cities': ['Dwarka', 'Rohini', 'Narela', 'Jasola', 'Central Delhi', 'South Delhi', 'Pitampura', 'Siri Fort'],
         'orgs': [
             'Delhi Metro Rail Corporation Ltd (DMRC)',
@@ -332,7 +332,7 @@ SOURCES = [
         'key': 'wbtenders',
         'source_portal': 'West Bengal Tenders (wbtenders.gov.in)',
         'portal_url_base': 'https://wbtenders.gov.in/nicgep/app?org=',
-        'state': 'West Bengal & East',
+        'state': 'West Bengal',
         'cities': ['Kolkata', 'Siliguri', 'Howrah', 'Asansol', 'Durgapur', 'Haldia', 'Kharagpur'],
         'orgs': [
             'Public Works Department, Govt of West Bengal (WB PWD)',
@@ -361,7 +361,7 @@ SOURCES = [
         'key': 'gujarat',
         'source_portal': 'Gujarat (n)Procure (tender.nprocure.com)',
         'portal_url_base': 'https://tender.nprocure.com/viewNotice?id=',
-        'state': 'Rajasthan & Gujarat',
+        'state': 'Gujarat',
         'cities': ['Ahmedabad', 'Surat', 'Vadodara', 'Gandhinagar', 'Rajkot', 'Bhavnagar', 'GIFT City'],
         'orgs': [
             'Roads & Buildings Department, Govt of Gujarat (Gujarat R&B)',
@@ -390,7 +390,7 @@ SOURCES = [
         'key': 'rajasthan',
         'source_portal': 'Rajasthan e-Procure (eproc.rajasthan.gov.in)',
         'portal_url_base': 'https://eproc.rajasthan.gov.in/nicgep/app?org=',
-        'state': 'Rajasthan & Gujarat',
+        'state': 'Rajasthan',
         'cities': ['Jaipur', 'Jodhpur', 'Udaipur', 'Kota', 'Bikaner', 'Ajmer', 'Alwar'],
         'orgs': [
             'Public Works Department, Govt of Rajasthan (Rajasthan PWD)',
@@ -418,7 +418,7 @@ SOURCES = [
         'key': 'kerala',
         'source_portal': 'Kerala e-Tenders (etenders.kerala.gov.in)',
         'portal_url_base': 'https://etenders.kerala.gov.in/nicgep/app?org=',
-        'state': 'Southern States (TN, TG, KL, AP)',
+        'state': 'Kerala',
         'cities': ['Kochi', 'Thiruvananthapuram', 'Kozhikode', 'Thrissur', 'Kollam', 'Kannur', 'Palakkad'],
         'orgs': [
             'Public Works Department, Govt of Kerala (Kerala PWD)',
@@ -446,7 +446,7 @@ SOURCES = [
         'key': 'telangana',
         'source_portal': 'Telangana e-Procurement (tender.telangana.gov.in)',
         'portal_url_base': 'https://tender.telangana.gov.in/viewNotice?id=',
-        'state': 'Southern States (TN, TG, KL, AP)',
+        'state': 'Telangana',
         'cities': ['Hyderabad', 'Warangal', 'Nizamabad', 'Karimnagar', 'Khammam', 'Ramagundam', 'Secunderabad'],
         'orgs': [
             'Greater Hyderabad Municipal Corporation (GHMC)',
@@ -474,7 +474,7 @@ SOURCES = [
         'key': 'andhra',
         'source_portal': 'Andhra Pradesh e-Procure (tender.apeprocurement.gov.in)',
         'portal_url_base': 'https://tender.apeprocurement.gov.in/viewNotice?id=',
-        'state': 'Southern States (TN, TG, KL, AP)',
+        'state': 'Andhra Pradesh',
         'cities': ['Visakhapatnam', 'Vijayawada', 'Amaravati', 'Guntur', 'Tirupati', 'Nellore', 'Kakinada'],
         'orgs': [
             'Andhra Pradesh Capital Region Dev Authority (AP CRDA)',
@@ -502,7 +502,7 @@ SOURCES = [
         'key': 'mptenders',
         'source_portal': 'MP Tenders (mptenders.gov.in)',
         'portal_url_base': 'https://mptenders.gov.in/nicgep/app?org=',
-        'state': 'Madhya Pradesh & CG',
+        'state': 'Madhya Pradesh',
         'cities': ['Bhopal', 'Indore', 'Jabalpur', 'Gwalior', 'Ujjain', 'Sagar', 'Rewa'],
         'orgs': [
             'Public Works Department, Govt of Madhya Pradesh (MP PWD)',
@@ -530,7 +530,7 @@ SOURCES = [
         'key': 'odisha',
         'source_portal': 'Odisha Tenders (tendersodisha.gov.in)',
         'portal_url_base': 'https://tendersodisha.gov.in/nicgep/app?org=',
-        'state': 'West Bengal & East',
+        'state': 'Odisha',
         'cities': ['Bhubaneswar', 'Cuttack', 'Rourkela', 'Puri', 'Sambalpur', 'Berhampur', 'Balasore'],
         'orgs': [
             'Works Department, Govt of Odisha (Odisha Works)',
@@ -558,7 +558,7 @@ SOURCES = [
         'key': 'bihar',
         'source_portal': 'Bihar e-Procure (eproc2.bihar.gov.in)',
         'portal_url_base': 'https://eproc2.bihar.gov.in/viewNotice?id=',
-        'state': 'West Bengal & East',
+        'state': 'Bihar',
         'cities': ['Patna', 'Gaya', 'Bhagalpur', 'Muzaffarpur', 'Darbhanga', 'Purnia', 'Begusarai'],
         'orgs': [
             'Road Construction Department, Govt of Bihar (RCD Bihar)',
@@ -586,7 +586,7 @@ SOURCES = [
         'key': 'haryana',
         'source_portal': 'Haryana e-Procurement (etenders.hry.nic.in)',
         'portal_url_base': 'https://etenders.hry.nic.in/nicgep/app?org=',
-        'state': 'Punjab & Haryana',
+        'state': 'Haryana',
         'cities': ['Gurugram', 'Faridabad', 'Panipat', 'Ambala', 'Karnal', 'Hisar', 'Panchkula', 'Rohtak'],
         'orgs': [
             'Public Works Department, Govt of Haryana (Haryana B&R)',
@@ -614,7 +614,7 @@ SOURCES = [
         'key': 'punjab',
         'source_portal': 'Punjab e-Procurement (eproc.punjab.gov.in)',
         'portal_url_base': 'https://eproc.punjab.gov.in/viewNotice?id=',
-        'state': 'Punjab & Haryana',
+        'state': 'Punjab',
         'cities': ['Amritsar', 'Ludhiana', 'Jalandhar', 'Patiala', 'Bathinda', 'Mohali (SAS Nagar)', 'Ropar'],
         'orgs': [
             'Public Works Department, Govt of Punjab (Punjab PWD B&R)',
@@ -642,7 +642,7 @@ SOURCES = [
         'key': 'assam',
         'source_portal': 'Assam Tenders (assamtenders.gov.in)',
         'portal_url_base': 'https://assamtenders.gov.in/nicgep/app?org=',
-        'state': 'Assam & North East',
+        'state': 'Assam',
         'cities': ['Guwahati', 'Silchar', 'Dibrugarh', 'Jorhat', 'Tezpur', 'Nagaon', 'Tinsukia'],
         'orgs': [
             'Public Works Roads Department, Govt of Assam (PWRD Assam)',
@@ -670,13 +670,13 @@ SOURCES = [
         'key': 'jktenders',
         'source_portal': 'J&K e-Procurement (jktenders.gov.in)',
         'portal_url_base': 'https://jktenders.gov.in/nicgep/app?org=',
-        'state': 'Jammu & Kashmir / Ladakh',
-        'cities': ['Srinagar', 'Jammu', 'Leh-Ladakh', 'Baramulla', 'Anantnag', 'Kupwara', 'Udhampur'],
+        'state': 'Jammu & Kashmir',
+        'cities': ['Srinagar', 'Jammu', 'Baramulla', 'Anantnag', 'Kupwara', 'Udhampur', 'Kathua'],
         'orgs': [
             'Public Works (R&B) Department, Govt of J&K',
             'J&K Economic Reconstruction Agency (ERA J&K)',
             'J&K Projects Construction Corporation (JKPCC)',
-            'Ladakh Autonomous Hill Development Council (LAHDC)'
+            'J&K Housing & Urban Development Department'
         ],
         'categories': ['Strategic Alpine Tunnels', 'Avalanche Protection Shelters', 'River Jhelum Flood Spillways', 'Cold-Weather Concrete Roads'],
         'project_templates': [
@@ -698,13 +698,13 @@ SOURCES = [
         'key': 'uktenders',
         'source_portal': 'Uttarakhand e-Tenders (uktenders.gov.in)',
         'portal_url_base': 'https://uktenders.gov.in/nicgep/app?org=',
-        'state': 'Uttarakhand & Himachal',
-        'cities': ['Dehradun', 'Rishikesh', 'Haridwar', 'Shimla', 'Bilaspur', 'Kullu', 'Dharamshala'],
+        'state': 'Uttarakhand',
+        'cities': ['Dehradun', 'Rishikesh', 'Haridwar', 'Roorkee', 'Haldwani', 'Nainital', 'Rudrapur'],
         'orgs': [
             'Public Works Department, Govt of Uttarakhand (UK PWD)',
             'Uttarakhand Jal Sansthan (Drinking Water)',
-            'Himachal Pradesh Public Works Department (HP PWD)',
-            'H.P. Power Corporation Limited (HPPCL Hydro)'
+            'Uttarakhand State Infrastructure Dev Corp (UUSDA)',
+            'Uttarakhand Power Corporation Limited (UPCL)'
         ],
         'categories': ['Char Dham All-Weather Roadway', 'Slope Stabilization & Rockfall Fencing', 'Hydro Power Dams', 'Mountain Ropeways'],
         'project_templates': [
@@ -820,11 +820,15 @@ for src in SOURCES:
             "year": year,
             "status": "AWARDED / ACCEPTED",
             "award_date": award_dt,
+            "state": state,
+            "city": city,
             "og_tender": {
                 "authority": org,
                 "ministry": org,
                 "nit_number": nit_code,
                 "portal": src['source_portal'],
+                "state": state,
+                "city": city,
                 "estimated_cost_inr": est_cost,
                 "emd_amount_inr": emd_amt,
                 "pbg_required_pct": 5.0,
@@ -951,14 +955,9 @@ for src in SOURCES:
             "emd_exemption_eligible": True
         })
 
-# Save catalogs to JSON
+# Save accepted tenders catalog to JSON (current active catalog is managed by populate_255_cppp_catalog.py)
 acc_path = os.path.join(DATA_DIR, "all_sources_accepted_catalog.json")
 with open(acc_path, "w", encoding="utf-8") as f:
     json.dump(all_accepted, f, indent=2, ensure_ascii=False)
 
-curr_path = os.path.join(DATA_DIR, "all_sources_current_catalog.json")
-with open(curr_path, "w", encoding="utf-8") as f:
-    json.dump(all_current, f, indent=2, ensure_ascii=False)
-
 print(f"Successfully generated {len(all_accepted)} previously accepted tenders across {len(SOURCES)} real portals.")
-print(f"Successfully generated {len(all_current)} in-progress current active tenders across {len(SOURCES)} real portals.")

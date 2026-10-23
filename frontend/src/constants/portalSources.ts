@@ -14,6 +14,114 @@ export interface PortalSourceInfo {
   activeCountEstimate: number;
 }
 
+/**
+ * Standard Canonical 28 Statutory Portals across all tabs (In-Progress & Previously Accepted)
+ */
+export const ALL_STATUTORY_PORTAL_SOURCES: string[] = [
+  'Andaman & Nicobar e-Procure (eproc.andaman.gov.in)',
+  'Andhra Pradesh e-Procure (tender.apeprocurement.gov.in)',
+  'Assam Tenders (assamtenders.gov.in)',
+  'Bihar e-Procure (eproc2.bihar.gov.in)',
+  'CPWD TenderWizard (tenderwizard.com/CPWD)',
+  'Central Public Procurement Portal (eprocure.gov.in)',
+  'Defense Procurement Portal (defproc.gov.in)',
+  'Delhi e-Procure (govtprocurement.delhi.gov.in)',
+  'Goa e-Procurement (eprocure.goa.gov.in)',
+  'Government e-Marketplace (gem.gov.in)',
+  'Gujarat (n)Procure (tender.nprocure.com)',
+  'Haryana e-Procurement (etenders.hry.nic.in)',
+  'IREPS Railways (ireps.gov.in)',
+  'J&K e-Procurement (jktenders.gov.in)',
+  'Jharkhand e-Procure (jharkhandtenders.gov.in)',
+  'Karnataka KPPP (kppp.karnataka.gov.in)',
+  'Kerala e-Tenders (etenders.kerala.gov.in)',
+  'MP Tenders (mptenders.gov.in)',
+  'MahaTenders (mahatenders.gov.in)',
+  'Odisha Tenders (tendersodisha.gov.in)',
+  'Open Government Data Platform India (data.gov.in)',
+  'Punjab e-Procurement (eproc.punjab.gov.in)',
+  'Rajasthan e-Procure (eproc.rajasthan.gov.in)',
+  'Tamil Nadu Tenders (tntenders.gov.in)',
+  'Telangana e-Procurement (tender.telangana.gov.in)',
+  'UP e-Procure (etender.up.nic.in)',
+  'Uttarakhand e-Tenders (uktenders.gov.in)',
+  'West Bengal Tenders (wbtenders.gov.in)'
+];
+
+/**
+ * Helper to normalize any incoming portal string into the canonical 28 statutory portals
+ */
+export const canonicalizePortalSource = (portal?: string): string => {
+  const p = (portal || '').toLowerCase();
+  if (p.includes('andaman')) return 'Andaman & Nicobar e-Procure (eproc.andaman.gov.in)';
+  if (p.includes('apeprocurement') || p.includes('andhra')) return 'Andhra Pradesh e-Procure (tender.apeprocurement.gov.in)';
+  if (p.includes('assamtenders') || p.includes('assam')) return 'Assam Tenders (assamtenders.gov.in)';
+  if (p.includes('bihar')) return 'Bihar e-Procure (eproc2.bihar.gov.in)';
+  if (p.includes('cpwd') || p.includes('tenderwizard')) return 'CPWD TenderWizard (tenderwizard.com/CPWD)';
+  if (p.includes('defproc') || p.includes('defense') || p.includes('defence')) return 'Defense Procurement Portal (defproc.gov.in)';
+  if (p.includes('delhi') || p.includes('dmrc')) return 'Delhi e-Procure (govtprocurement.delhi.gov.in)';
+  if (p.includes('goa')) return 'Goa e-Procurement (eprocure.goa.gov.in)';
+  if (p.includes('gem') || p.includes('marketplace')) return 'Government e-Marketplace (gem.gov.in)';
+  if (p.includes('nprocure') || p.includes('gujarat')) return 'Gujarat (n)Procure (tender.nprocure.com)';
+  if (p.includes('hry.nic.in') || p.includes('haryana')) return 'Haryana e-Procurement (etenders.hry.nic.in)';
+  if (p.includes('ireps') || p.includes('railway')) return 'IREPS Railways (ireps.gov.in)';
+  if (p.includes('jktenders') || p.includes('kashmir') || p.includes('j&k')) return 'J&K e-Procurement (jktenders.gov.in)';
+  if (p.includes('jharkhand')) return 'Jharkhand e-Procure (jharkhandtenders.gov.in)';
+  if (p.includes('kppp') || p.includes('karnataka')) return 'Karnataka KPPP (kppp.karnataka.gov.in)';
+  if (p.includes('kerala')) return 'Kerala e-Tenders (etenders.kerala.gov.in)';
+  if (p.includes('mptenders') || p.includes('madhya')) return 'MP Tenders (mptenders.gov.in)';
+  if (p.includes('mahatenders') || p.includes('maharashtra')) return 'MahaTenders (mahatenders.gov.in)';
+  if (p.includes('odisha')) return 'Odisha Tenders (tendersodisha.gov.in)';
+  if (p.includes('data.gov.in') || p.includes('ogd') || p.includes('open data')) return 'Open Government Data Platform India (data.gov.in)';
+  if (p.includes('punjab')) return 'Punjab e-Procurement (eproc.punjab.gov.in)';
+  if (p.includes('rajasthan')) return 'Rajasthan e-Procure (eproc.rajasthan.gov.in)';
+  if (p.includes('tntenders') || p.includes('tamil')) return 'Tamil Nadu Tenders (tntenders.gov.in)';
+  if (p.includes('telangana')) return 'Telangana e-Procurement (tender.telangana.gov.in)';
+  if (p.includes('etender.up') || p.includes('up e-procure') || p.includes('up e-procurement')) return 'UP e-Procure (etender.up.nic.in)';
+  if (p.includes('uktenders') || p.includes('uttarakhand') || p.includes('hptenders') || p.includes('himachal')) return 'Uttarakhand e-Tenders (uktenders.gov.in)';
+  if (p.includes('wbtenders') || p.includes('bengal')) return 'West Bengal Tenders (wbtenders.gov.in)';
+  return 'Central Public Procurement Portal (eprocure.gov.in)';
+};
+
+/**
+ * Strict statutory mapping from State Portals to their sovereign State.
+ * Statutory state procurement portals are legally bound to their respective State.
+ */
+export const STATUTORY_PORTAL_TO_STATE_MAP: Record<string, string> = {
+  'Andaman & Nicobar e-Procure (eproc.andaman.gov.in)': 'Andaman & Nicobar',
+  'Andhra Pradesh e-Procure (tender.apeprocurement.gov.in)': 'Andhra Pradesh',
+  'Assam Tenders (assamtenders.gov.in)': 'Assam',
+  'Bihar e-Procure (eproc2.bihar.gov.in)': 'Bihar',
+  'Delhi e-Procure (govtprocurement.delhi.gov.in)': 'Delhi',
+  'Goa e-Procurement (eprocure.goa.gov.in)': 'Goa',
+  'Gujarat (n)Procure (tender.nprocure.com)': 'Gujarat',
+  'Haryana e-Procurement (etenders.hry.nic.in)': 'Haryana',
+  'J&K e-Procurement (jktenders.gov.in)': 'Jammu & Kashmir',
+  'Jharkhand e-Procure (jharkhandtenders.gov.in)': 'Jharkhand',
+  'Karnataka KPPP (kppp.karnataka.gov.in)': 'Karnataka',
+  'Kerala e-Tenders (etenders.kerala.gov.in)': 'Kerala',
+  'MP Tenders (mptenders.gov.in)': 'Madhya Pradesh',
+  'MahaTenders (mahatenders.gov.in)': 'Maharashtra',
+  'Odisha Tenders (tendersodisha.gov.in)': 'Odisha',
+  'Punjab e-Procurement (eproc.punjab.gov.in)': 'Punjab',
+  'Rajasthan e-Procure (eproc.rajasthan.gov.in)': 'Rajasthan',
+  'Tamil Nadu Tenders (tntenders.gov.in)': 'Tamil Nadu',
+  'Telangana e-Procurement (tender.telangana.gov.in)': 'Telangana',
+  'UP e-Procure (etender.up.nic.in)': 'Uttar Pradesh',
+  'Uttarakhand e-Tenders (uktenders.gov.in)': 'Uttarakhand',
+  'West Bengal Tenders (wbtenders.gov.in)': 'West Bengal'
+};
+
+/**
+ * Returns the strictly bound State for state-specific statutory portals.
+ * Returns null for Central/Pan-India portals (CPPP, GeM, CPWD, IREPS, defproc, data.gov.in).
+ */
+export const getPortalBoundState = (portal?: string): string | null => {
+  if (!portal) return null;
+  const canonical = canonicalizePortalSource(portal);
+  return STATUTORY_PORTAL_TO_STATE_MAP[canonical] || null;
+};
+
 export const REAL_PORTAL_SOURCES: PortalSourceInfo[] = [
   // 1. Central CPPP
   {
@@ -107,7 +215,7 @@ export const REAL_PORTAL_SOURCES: PortalSourceInfo[] = [
     domain: 'govtprocurement.delhi.gov.in',
     url: 'https://govtprocurement.delhi.gov.in/nicgep/app',
     category: 'State',
-    state: 'Delhi NCR',
+    state: 'Delhi',
     region: 'North',
     description: 'Official statutory portal of the Government of NCT of Delhi and Delhi Metro Rail Corporation for underground tunneling, water treatment plants, and multi-modal transport hubs.',
     keyAuthorities: ['Delhi Metro Rail Corp (DMRC)', 'Delhi Jal Board (DJB)', 'Delhi PWD', 'Delhi Transport Corp (DTC)'],
@@ -362,7 +470,7 @@ export const REAL_PORTAL_SOURCES: PortalSourceInfo[] = [
     domain: 'assamtenders.gov.in',
     url: 'https://assamtenders.gov.in/nicgep/app',
     category: 'State',
-    state: 'Assam & North East',
+    state: 'Assam',
     region: 'North East',
     description: 'Statutory e-procurement portal for Assam PWD, Brahmaputra River Dredging & Embankment, and Guwahati Development Authority.',
     keyAuthorities: ['Assam PWD Roads', 'Brahmaputra Board', 'Water Resources Assam', 'Guwahati Smart City'],
@@ -396,7 +504,7 @@ export const REAL_PORTAL_SOURCES: PortalSourceInfo[] = [
     domain: 'uktenders.gov.in / hptenders.gov.in',
     url: 'https://uktenders.gov.in/nicgep/app',
     category: 'State',
-    state: 'Uttarakhand & Himachal Pradesh',
+    state: 'Uttarakhand',
     region: 'North',
     description: 'Statutory portals for Himalayan hill states driving Char Dham All-Weather Road, Hydroelectric Civil Packages, and landslide-mitigation works.',
     keyAuthorities: ['Uttarakhand PWD', 'HP PWD', 'Uttarakhand Peyjal Nigam', 'HP State Electricity (HPSEB)'],
@@ -413,7 +521,7 @@ export const REAL_PORTAL_SOURCES: PortalSourceInfo[] = [
     domain: 'defproc.gov.in',
     url: 'https://defproc.gov.in/nicgep/app',
     category: 'Defense & PSU',
-    state: 'Pan-India / Border Belts',
+    state: 'Pan-India / Central',
     region: 'National',
     description: 'High-security statutory procurement portal for the Ministry of Defense, Border Roads Organisation (BRO), Military Engineer Services (MES), and Indian Armed Forces.',
     keyAuthorities: ['Border Roads Organisation (BRO)', 'Military Engineer Services (MES)', 'Ordnance Factories', 'Defense Research & Dev (DRDO)'],
@@ -430,7 +538,7 @@ export const REAL_PORTAL_SOURCES: PortalSourceInfo[] = [
     domain: 'iocletenders.nic.in',
     url: 'https://iocletenders.nic.in/nicgep/app',
     category: 'Defense & PSU',
-    state: 'Pan-India / Coastal & Refinery Hubs',
+    state: 'Pan-India / Central',
     region: 'National',
     description: 'Statutory procurement portal for India\'s state-owned oil and gas majors executing refinery expansions, offshore platforms, LNG terminals, and petroleum retail depots.',
     keyAuthorities: ['Indian Oil Corp (IOCL)', 'ONGC Limited', 'Bharat Petroleum (BPCL)', 'Hindustan Petroleum (HPCL)', 'GAIL India'],
@@ -447,7 +555,7 @@ export const REAL_PORTAL_SOURCES: PortalSourceInfo[] = [
     domain: 'data.gov.in',
     url: 'https://data.gov.in',
     category: 'Open Data',
-    state: 'National Feeds',
+    state: 'Pan-India / Central',
     region: 'National',
     description: 'National Open Data Initiative under the National Data Sharing and Accessibility Policy (NDSAP), publishing statutory procurement datasets, departmental notifications, and open public tender feeds.',
     keyAuthorities: ['Ministry of Electronics & IT (MeitY)', 'National Informatics Centre (NIC)', 'Department of Expenditure'],

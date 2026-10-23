@@ -16,58 +16,38 @@ import {
   TrendingDown,
   Layers,
   MapPin,
-  RotateCcw,
-  RefreshCw,
   Globe,
-  Mic,
-  MicOff,
   Wrench,
   Scale,
   Clock,
   DollarSign,
   Truck,
   FileSpreadsheet,
-  SlidersHorizontal,
+  Tag,
   X
 } from 'lucide-react';
+import {
+  FilterSearchBar,
+  TopFilterActionBar,
+  ActiveFilterChipsBar,
+  TenderFilterDrawer,
+  FilterChipItem
+} from './common';
 import {
   AcceptedTender,
   listAcceptedTenders,
   getAcceptedTenderPdfUrl
 } from '../services/api';
+import { AllBidsEvaluationSubTab } from './AcceptedTenders/AllBidsEvaluationSubTab';
+import {
+  ALL_CANONICAL_CATEGORIES,
+  canonicalizeCategory,
+  ALL_STATUTORY_PORTAL_SOURCES,
+  canonicalizePortalSource
+} from '../constants';
 
 const getTenderSource = (tender: AcceptedTender): string => {
-  const portal = tender.og_tender?.portal || '';
-  const p = portal.toLowerCase();
-
-  if (p.includes('mahatenders') || p.includes('maharashtra')) return 'MahaTenders (mahatenders.gov.in)';
-  if (p.includes('ireps') || p.includes('railway')) return 'IREPS (ireps.gov.in)';
-  if (p.includes('cpwd') || p.includes('tenderwizard')) return 'CPWD TenderWizard / CPPP';
-  if (p.includes('gem')) return 'GeM (gem.gov.in)';
-  if (p.includes('delhi') || p.includes('dmrc')) return 'Delhi e-Procure (DMRC)';
-  if (p.includes('etender.up') || (p.includes('up') && p.includes('procure'))) return 'UP e-Procure (etender.up.nic.in)';
-  if (p.includes('tntenders') || p.includes('tamil nadu')) return 'Tamil Nadu Tenders (tntenders.gov.in)';
-  if (p.includes('kppp') || p.includes('karnataka')) return 'Karnataka KPPP (kppp.karnataka.gov.in)';
-  if (p.includes('wbtenders') || p.includes('bengal')) return 'West Bengal Tenders (wbtenders.gov.in)';
-  if (p.includes('nprocure') || p.includes('gujarat')) return 'Gujarat (n)Procure (tender.nprocure.com)';
-  if (p.includes('rajasthan')) return 'Rajasthan e-Procure (eproc.rajasthan.gov.in)';
-  if (p.includes('kerala')) return 'Kerala e-Tenders (etenders.kerala.gov.in)';
-  if (p.includes('telangana')) return 'Telangana e-Procurement (tender.telangana.gov.in)';
-  if (p.includes('apeprocurement') || p.includes('andhra')) return 'Andhra Pradesh e-Procure (tender.apeprocurement.gov.in)';
-  if (p.includes('mptenders') || p.includes('madhya pradesh')) return 'MP Tenders (mptenders.gov.in)';
-  if (p.includes('odisha')) return 'Odisha Tenders (tendersodisha.gov.in)';
-  if (p.includes('bihar')) return 'Bihar e-Procure (eproc2.bihar.gov.in)';
-  if (p.includes('hry.nic.in') || p.includes('haryana')) return 'Haryana e-Procurement (etenders.hry.nic.in)';
-  if (p.includes('punjab')) return 'Punjab e-Procurement (eproc.punjab.gov.in)';
-  if (p.includes('assamtenders') || p.includes('assam')) return 'Assam Tenders (assamtenders.gov.in)';
-  if (p.includes('jktenders') || p.includes('kashmir') || p.includes('j&k')) return 'J&K e-Procurement (jktenders.gov.in)';
-  if (p.includes('uktenders') || p.includes('uttarakhand')) return 'Uttarakhand e-Tenders (uktenders.gov.in)';
-  if (p.includes('hptenders') || p.includes('himachal')) return 'Himachal e-Procurement (hptenders.gov.in)';
-  if (p.includes('defproc') || p.includes('defense') || p.includes('defence')) return 'Defense Procurement Portal (defproc.gov.in)';
-  if (p.includes('iocletenders') || p.includes('oil & gas') || p.includes('ongc')) return 'Oil & Gas e-Procurement (iocletenders.nic.in)';
-  if (p.includes('eprocure') || p.includes('cppp')) return 'Central CPPP (eprocure.gov.in)';
-
-  return portal.trim() || 'Central CPPP (eprocure.gov.in)';
+  return canonicalizePortalSource(tender.og_tender?.portal);
 };
 
 const getTenderOrg = (tender: AcceptedTender): string => {
@@ -272,6 +252,7 @@ const getTenderCity = (tender: AcceptedTender): string => {
 interface EnrichedAcceptedTender extends AcceptedTender {
   _source: string;
   _sourceLabel: string;
+  _category: string;
   _org: string;
   _state: string;
   _city: string;
@@ -285,9 +266,10 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
 
   const [selectedTenderId, setSelectedTenderId] = useState<string>('');
   const [activeSubTab, setActiveSubTab] = useState<
-    'comparison' | 'company' | 'covers' | 'pqc' | 'boq' | 'compliance' | 'milestones' | 'loa' | 'pdf'
+    'comparison' | 'company' | 'covers' | 'pqc' | 'boq' | 'compliance' | 'milestones' | 'loa' | 'pdf' | 'all_bids'
   >('comparison');
   const [searchQuery, setSearchQuery] = useState<string>('');
+  const [selectedCategory, setSelectedCategory] = useState<string>('ALL');
   const [selectedSource, setSelectedSource] = useState<string>('ALL');
   const [selectedOrg, setSelectedOrg] = useState<string>('ALL');
   const [selectedState, setSelectedState] = useState<string>('ALL');
@@ -298,7 +280,6 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
 
   // Overlapping Filter Sidebar Drawer State
   const [isFilterSidebarOpen, setIsFilterSidebarOpen] = useState<boolean>(false);
-  const [drawerOrgSearch, setDrawerOrgSearch] = useState<string>('');
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -368,14 +349,16 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
         const enriched: EnrichedAcceptedTender[] = data.map((t) => {
           const source = getTenderSource(t);
           const sourceLabel = source.split('(')[0].trim();
+          const category = canonicalizeCategory(t.category, t.title, t.og_tender?.scope_summary);
           const org = getTenderOrg(t);
           const state = getTenderState(t);
           const city = getTenderCity(t);
-          const searchBlob = `${t.title} ${t.winning_company?.name || ''} ${t.og_tender?.authority || ''} ${t.og_tender?.nit_number || ''} ${source} ${org} ${state} ${city}`.toLowerCase();
+          const searchBlob = `${t.title} ${t.winning_company?.name || ''} ${t.og_tender?.authority || ''} ${t.og_tender?.nit_number || ''} ${source} ${category} ${org} ${state} ${city}`.toLowerCase();
           return {
             ...t,
             _source: source,
             _sourceLabel: sourceLabel,
+            _category: category,
             _org: org,
             _state: state,
             _city: city,
@@ -414,6 +397,9 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
     (t: EnrichedAcceptedTender, excludeDimension?: string) => {
       if (query && !t._searchBlob.includes(query)) return false;
 
+      if (excludeDimension !== 'category' && selectedCategory !== 'ALL' && t._category !== selectedCategory) {
+        return false;
+      }
       if (excludeDimension !== 'source' && selectedSource !== 'ALL' && t._source !== selectedSource) {
         return false;
       }
@@ -431,8 +417,34 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
       }
       return true;
     },
-    [query, selectedSource, selectedOrg, selectedState, selectedCity, selectedYear]
+    [query, selectedCategory, selectedSource, selectedOrg, selectedState, selectedCity, selectedYear]
   );
+
+  // 0. Faceted context & counts for Categories
+  const contextForCategory = useMemo(() => {
+    return tenders.filter((t) => matchesFilter(t, 'category'));
+  }, [tenders, matchesFilter]);
+
+  const categoryCounts = useMemo(() => {
+    const map = new Map<string, number>();
+    for (const t of contextForCategory) {
+      if (t._category) {
+        map.set(t._category, (map.get(t._category) || 0) + 1);
+      }
+    }
+    return map;
+  }, [contextForCategory]);
+
+  const availableCategories = useMemo(() => {
+    const set = new Set<string>(ALL_CANONICAL_CATEGORIES);
+    for (const t of tenders) {
+      if (t._category) set.add(t._category);
+    }
+    if (selectedCategory !== 'ALL') {
+      set.add(selectedCategory);
+    }
+    return Array.from(set).sort();
+  }, [tenders, selectedCategory]);
 
   // 1. Faceted context & counts for Sources
   const contextForSource = useMemo(() => {
@@ -448,13 +460,15 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
   }, [contextForSource]);
 
   const availableSources = useMemo(() => {
-    const list = Array.from(sourceCounts.keys()).sort();
-    if (selectedSource !== 'ALL' && !list.includes(selectedSource)) {
-      list.push(selectedSource);
-      list.sort();
+    const set = new Set<string>(ALL_STATUTORY_PORTAL_SOURCES);
+    for (const t of tenders) {
+      if (t._source) set.add(t._source);
     }
-    return list;
-  }, [sourceCounts, selectedSource]);
+    if (selectedSource !== 'ALL') {
+      set.add(selectedSource);
+    }
+    return Array.from(set).sort();
+  }, [tenders, selectedSource]);
 
   // 2. Faceted context & counts for Organisations
   const contextForOrg = useMemo(() => {
@@ -570,6 +584,7 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
   }, [selectedTender?.id]);
 
   const hasActiveFilters =
+    selectedCategory !== 'ALL' ||
     selectedSource !== 'ALL' ||
     selectedOrg !== 'ALL' ||
     selectedState !== 'ALL' ||
@@ -579,6 +594,7 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
 
   const activeFiltersCount = useMemo(() => {
     let count = 0;
+    if (selectedCategory !== 'ALL') count++;
     if (selectedSource !== 'ALL') count++;
     if (selectedOrg !== 'ALL') count++;
     if (selectedState !== 'ALL') count++;
@@ -586,9 +602,10 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
     if (selectedYear !== 'ALL') count++;
     if (searchQuery.trim() !== '') count++;
     return count;
-  }, [selectedSource, selectedOrg, selectedState, selectedCity, selectedYear, searchQuery]);
+  }, [selectedCategory, selectedSource, selectedOrg, selectedState, selectedCity, selectedYear, searchQuery]);
 
   const resetAllFilters = () => {
+    setSelectedCategory('ALL');
     setSelectedSource('ALL');
     setSelectedOrg('ALL');
     setSelectedState('ALL');
@@ -630,7 +647,7 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
     if (listContainerRef.current) {
       listContainerRef.current.scrollTop = 0;
     }
-  }, [selectedSource, selectedOrg, selectedState, selectedCity, selectedYear, searchQuery]);
+  }, [selectedCategory, selectedSource, selectedOrg, selectedState, selectedCity, selectedYear, searchQuery]);
 
   useEffect(() => {
     const sentinel = sentinelRef.current;
@@ -655,6 +672,100 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
       loadMore();
     }
   };
+
+  // Memoized chips for ActiveFilterChipsBar (MUST be before any early return)
+  const activeChips: FilterChipItem[] = useMemo(() => {
+    const list: FilterChipItem[] = [];
+
+    if (selectedCategory !== 'ALL') {
+      list.push({
+        id: 'category',
+        label: 'Category',
+        value: selectedCategory,
+        icon: <Tag className="w-3 h-3 text-emerald-600" />,
+        color: 'emerald',
+        onRemove: () => setSelectedCategory('ALL')
+      });
+    }
+
+    if (selectedSource !== 'ALL') {
+      list.push({
+        id: 'source',
+        label: 'Source',
+        value: selectedSource,
+        icon: <Globe className="w-3 h-3 text-orange-600" />,
+        color: 'orange',
+        onRemove: () => setSelectedSource('ALL')
+      });
+    }
+
+    if (selectedOrg !== 'ALL') {
+      list.push({
+        id: 'org',
+        label: 'Org',
+        value: selectedOrg,
+        icon: <Building2 className="w-3 h-3 text-blue-600" />,
+        color: 'blue',
+        onRemove: () => setSelectedOrg('ALL')
+      });
+    }
+
+    if (selectedState !== 'ALL') {
+      list.push({
+        id: 'state',
+        label: 'State',
+        value: selectedState,
+        icon: <MapPin className="w-3 h-3 text-rose-600" />,
+        color: 'rose',
+        onRemove: () => {
+          setSelectedState('ALL');
+          setSelectedCity('ALL');
+        }
+      });
+    }
+
+    if (selectedCity !== 'ALL') {
+      list.push({
+        id: 'city',
+        label: 'City',
+        value: selectedCity,
+        icon: <MapPin className="w-3 h-3 text-amber-600" />,
+        color: 'amber',
+        onRemove: () => setSelectedCity('ALL')
+      });
+    }
+
+    if (selectedYear !== 'ALL') {
+      list.push({
+        id: 'year',
+        label: 'Year',
+        value: `FY ${selectedYear}`,
+        icon: <Calendar className="w-3 h-3 text-amber-600" />,
+        color: 'amber',
+        onRemove: () => setSelectedYear('ALL')
+      });
+    }
+
+    if (searchQuery.trim() !== '') {
+      list.push({
+        id: 'query',
+        label: 'Query',
+        value: `"${searchQuery}"`,
+        color: 'slate',
+        onRemove: () => setSearchQuery('')
+      });
+    }
+
+    return list;
+  }, [
+    selectedCategory,
+    selectedSource,
+    selectedOrg,
+    selectedState,
+    selectedCity,
+    selectedYear,
+    searchQuery
+  ]);
 
   if (loading && tenders.length === 0) {
     return (
@@ -726,444 +837,135 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
             </div>
           </div>
         </div>
-
-        {/* Filter Bar: Source, Organisation, State, City, Year + Reset + Voice Search */}
-        <div className="mt-4 pt-4 border-t border-slate-800 space-y-3">
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
-            {/* Filter Dropdowns Grid */}
-            <div className="flex flex-wrap items-center gap-2">
-              {/* PRIMARY FILTER BUTTON: Opens Right Overlapping Sidebar */}
-              <button
-                onClick={() => setIsFilterSidebarOpen(true)}
-                className={`px-3.5 py-2 rounded-lg text-xs font-bold flex items-center gap-2 transition-all cursor-pointer shadow-sm ${
-                  activeFiltersCount > 0
-                    ? 'bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 text-white ring-2 ring-emerald-400/50 hover:brightness-110'
-                    : 'bg-slate-800 hover:bg-slate-700 text-white border border-slate-700 hover:border-slate-600'
-                }`}
-                title="Open comprehensive filters in right sidebar"
-              >
-                <SlidersHorizontal className="w-4 h-4 text-emerald-400 shrink-0" />
-                <span>Filters</span>
-                {activeFiltersCount > 0 ? (
-                  <span className="px-1.5 py-0.2 rounded-full text-[10px] font-mono bg-white text-emerald-950 font-black shadow-2xs">
-                    {activeFiltersCount}
-                  </span>
-                ) : (
-                  <span className="text-[10px] text-slate-400 font-normal">
-                    (All 5)
-                  </span>
-                )}
-              </button>
-
-              {/* Quick Source Portal Selector */}
-              <div className="hidden lg:flex items-center gap-1.5 bg-slate-800/95 border border-slate-700 hover:border-slate-600 rounded-lg px-2.5 py-1.5 shadow-2xs transition-colors">
-                <Globe className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                <span className="text-xs font-semibold text-slate-300 shrink-0">Source:</span>
-                <select
-                  value={selectedSource}
-                  onChange={(e) => setSelectedSource(e.target.value)}
-                  className="text-xs bg-transparent font-medium text-white focus:outline-none cursor-pointer max-w-[160px] truncate"
-                >
-                  <option value="ALL" className="bg-slate-900 text-white">All Sources ({contextForSource.length})</option>
-                  {availableSources.map(src => (
-                    <option key={src} value={src} className="bg-slate-900 text-white">
-                      {src} ({sourceCounts.get(src) || 0})
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Quick Year Selector */}
-              <div className="hidden md:flex items-center gap-1.5 bg-slate-800/95 border border-slate-700 hover:border-slate-600 rounded-lg px-2.5 py-1.5 shadow-2xs transition-colors">
-                <Calendar className="w-3.5 h-3.5 text-orange-400 shrink-0" />
-                <span className="text-xs font-semibold text-slate-300 shrink-0">Year:</span>
-                <select
-                  value={selectedYear}
-                  onChange={(e) => setSelectedYear(e.target.value)}
-                  className="text-xs bg-transparent font-medium text-white focus:outline-none cursor-pointer pr-1"
-                >
-                  <option value="ALL" className="bg-slate-900 text-white">All Years ({contextForYear.length})</option>
-                  {availableYears.map(yr => (
-                    <option key={yr} value={yr} className="bg-slate-900 text-white">
-                      FY {yr} ({yearCounts.get(yr) || 0})
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Reset Filters Button */}
-              {hasActiveFilters && (
-                <button
-                  onClick={resetAllFilters}
-                  className="px-2.5 py-1.5 rounded-lg text-xs font-medium text-slate-300 hover:text-white bg-slate-800/80 hover:bg-slate-700 border border-slate-700 flex items-center gap-1 transition-all cursor-pointer"
-                  title="Reset all filters and search query"
-                >
-                  <RotateCcw className="w-3 h-3 text-slate-400" />
-                  <span>Reset</span>
-                </button>
-              )}
-
-              {/* Reload Catalog Button */}
-              <button
-                onClick={loadData}
-                className="px-2.5 py-1.5 rounded-lg text-xs font-medium text-slate-300 hover:text-white bg-slate-800/80 hover:bg-slate-700 border border-slate-700 flex items-center gap-1 transition-all cursor-pointer"
-                title="Reload tenders archive from server"
-              >
-                <RefreshCw className={`w-3 h-3 text-emerald-400 ${loading ? 'animate-spin' : ''}`} />
-                <span>Reload ({tenders.length})</span>
-              </button>
-            </div>
-
-            {/* Right side: Search Box with Voice Search */}
-            <div className="relative w-full sm:w-72 shrink-0">
-              <Search className="w-3.5 h-3.5 absolute left-3 top-2.5 text-slate-400" />
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder={isVoiceSearching ? '🎙️ Listening to voice query...' : 'Search tender, org, city, state...'}
-                className={`w-full bg-slate-800/90 border text-xs rounded-lg pl-8 pr-8 py-1.5 text-white placeholder-slate-400 focus:outline-none focus:ring-1 transition-colors ${
-                  isVoiceSearching
-                    ? 'border-red-400 ring-1 ring-red-400 bg-red-950/20'
-                    : 'border-slate-700 focus:ring-emerald-500'
-                }`}
-              />
-              <button
-                type="button"
-                onClick={toggleVoiceSearch}
-                title={isVoiceSearching ? 'Listening... click to stop' : 'Click to speak search query'}
-                className={`absolute right-2 top-2 p-0.5 rounded transition-colors ${
-                  isVoiceSearching
-                    ? 'text-red-400 animate-pulse'
-                    : 'text-slate-400 hover:text-white'
-                }`}
-              >
-                {isVoiceSearching ? <MicOff className="w-3.5 h-3.5" /> : <Mic className="w-3.5 h-3.5" />}
-              </button>
-            </div>
-          </div>
-
-          {/* Active Filter Chips / Pills Bar */}
-          {hasActiveFilters && (
-            <div className="pt-2 flex flex-wrap items-center gap-1.5 text-xs">
-              <span className="text-[11px] text-slate-400 font-medium">Applied Filters:</span>
-
-              {selectedSource !== 'ALL' && (
-                <span className="inline-flex items-center gap-1 bg-emerald-950/80 text-emerald-200 border border-emerald-700/60 px-2 py-0.5 rounded-full text-[11px]">
-                  <span>Source: {selectedSource}</span>
-                  <button onClick={() => setSelectedSource('ALL')} className="hover:text-white cursor-pointer"><X className="w-3 h-3" /></button>
-                </span>
-              )}
-
-              {selectedOrg !== 'ALL' && (
-                <span className="inline-flex items-center gap-1 bg-blue-950/80 text-blue-200 border border-blue-700/60 px-2 py-0.5 rounded-full text-[11px]">
-                  <span>Org: {selectedOrg}</span>
-                  <button onClick={() => setSelectedOrg('ALL')} className="hover:text-white cursor-pointer"><X className="w-3 h-3" /></button>
-                </span>
-              )}
-
-              {selectedState !== 'ALL' && (
-                <span className="inline-flex items-center gap-1 bg-rose-950/80 text-rose-200 border border-rose-700/60 px-2 py-0.5 rounded-full text-[11px]">
-                  <span>State: {selectedState}</span>
-                  <button onClick={() => { setSelectedState('ALL'); setSelectedCity('ALL'); }} className="hover:text-white cursor-pointer"><X className="w-3 h-3" /></button>
-                </span>
-              )}
-
-              {selectedCity !== 'ALL' && (
-                <span className="inline-flex items-center gap-1 bg-amber-950/80 text-amber-200 border border-amber-700/60 px-2 py-0.5 rounded-full text-[11px]">
-                  <span>City: {selectedCity}</span>
-                  <button onClick={() => setSelectedCity('ALL')} className="hover:text-white cursor-pointer"><X className="w-3 h-3" /></button>
-                </span>
-              )}
-
-              {selectedYear !== 'ALL' && (
-                <span className="inline-flex items-center gap-1 bg-orange-950/80 text-orange-200 border border-orange-700/60 px-2 py-0.5 rounded-full text-[11px]">
-                  <span>Year: FY {selectedYear}</span>
-                  <button onClick={() => setSelectedYear('ALL')} className="hover:text-white cursor-pointer"><X className="w-3 h-3" /></button>
-                </span>
-              )}
-
-              {searchQuery.trim() !== '' && (
-                <span className="inline-flex items-center gap-1 bg-slate-800 text-slate-200 border border-slate-700 px-2 py-0.5 rounded-full text-[11px]">
-                  <span>Query: "{searchQuery}"</span>
-                  <button onClick={() => setSearchQuery('')} className="hover:text-white cursor-pointer"><X className="w-3 h-3" /></button>
-                </span>
-              )}
-
-              <button
-                onClick={resetAllFilters}
-                className="text-emerald-400 hover:text-emerald-300 font-semibold text-[11px] underline ml-1 cursor-pointer"
-              >
-                Clear All
-              </button>
-
-              <button
-                onClick={() => setIsFilterSidebarOpen(true)}
-                className="text-slate-400 hover:text-white text-[11px] font-medium flex items-center gap-0.5 ml-auto cursor-pointer"
-              >
-                <span>Edit All in Sidebar</span>
-                <ChevronRight className="w-3 h-3" />
-              </button>
-            </div>
-          )}
-        </div>
       </div>
 
-      {/* OVERLAPPING FILTER SIDEBAR DRAWER FROM RIGHT */}
-      {isFilterSidebarOpen && (
-        <div className="fixed inset-0 z-50 overflow-hidden">
-          {/* Backdrop overlay */}
-          <div
-            className="fixed inset-0 bg-slate-950/70 backdrop-blur-xs transition-opacity animate-fadeIn cursor-pointer"
-            onClick={() => setIsFilterSidebarOpen(false)}
+      {/* Top Filter and Search Bar: Search on LEFT, Filters on RIGHT */}
+      <div className="bg-white border border-slate-200 rounded-xl p-3 shadow-xs space-y-2.5">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+          <FilterSearchBar
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+            placeholder="Search awarded tenders, contractor, authority, city..."
+            isVoiceSearching={isVoiceSearching}
+            toggleVoiceSearch={toggleVoiceSearch}
+            accentColor="emerald"
+            className="max-w-xl"
           />
 
-          {/* Drawer Sliding Container */}
-          <div className="fixed inset-y-0 right-0 max-w-full flex pl-6 sm:pl-10">
-            <div className="w-screen max-w-md bg-slate-900 border-l border-slate-800 shadow-2xl flex flex-col text-slate-100 z-10 animate-slideInRight">
-              {/* Drawer Header */}
-              <div className="p-4 sm:p-5 border-b border-slate-800 flex items-center justify-between bg-slate-900/95 sticky top-0 z-20">
-                <div className="flex items-center gap-2.5">
-                  <div className="w-9 h-9 rounded-xl bg-emerald-600/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400">
-                    <SlidersHorizontal className="w-4 h-4" />
-                  </div>
-                  <div>
-                    <h3 className="text-sm font-bold text-white flex items-center gap-2">
-                      <span>Awarded Tender Filters</span>
-                      {activeFiltersCount > 0 && (
-                        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500 text-white">
-                          {activeFiltersCount} Active
-                        </span>
-                      )}
-                    </h3>
-                    <p className="text-[11px] text-slate-400">
-                      Refine historical government awarded contracts
-                    </p>
-                  </div>
-                </div>
+          <TopFilterActionBar
+            onOpenFilters={() => setIsFilterSidebarOpen(true)}
+            activeFiltersCount={activeFiltersCount}
+            hasActiveFilters={hasActiveFilters}
+            onResetFilters={resetAllFilters}
+            onReload={loadData}
+            isLoading={loading}
+            totalCount={tenders.length}
+            reloadLabel="Reload"
+            accentColor="emerald"
+          />
+        </div>
 
-                <div className="flex items-center gap-2">
-                  {hasActiveFilters && (
-                    <button
-                      onClick={resetAllFilters}
-                      className="text-xs text-emerald-400 hover:text-emerald-300 font-semibold px-2 py-1 rounded hover:bg-slate-800 transition-colors cursor-pointer"
-                    >
-                      Reset All
-                    </button>
-                  )}
-                  <button
-                    onClick={() => setIsFilterSidebarOpen(false)}
-                    className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer"
-                    title="Close filter drawer (Esc)"
-                  >
-                    <X className="w-5 h-5" />
-                  </button>
-                </div>
+        <ActiveFilterChipsBar
+          chips={activeChips}
+          onClearAll={resetAllFilters}
+          hasActiveFilters={hasActiveFilters}
+        />
+      </div>
+
+      {/* Overlapping Filter Drawer (Slides from Right) */}
+      <TenderFilterDrawer
+        isOpen={isFilterSidebarOpen}
+        onClose={() => setIsFilterSidebarOpen(false)}
+        title="Awarded Tender Filters"
+        subtitle="Refine historical government awarded contracts"
+        accentColor="emerald"
+        activeFiltersCount={activeFiltersCount}
+        hasActiveFilters={hasActiveFilters}
+        resetAllFilters={resetAllFilters}
+        totalFilteredCount={filteredTenders.length}
+        selectedCategory={selectedCategory}
+        setSelectedCategory={setSelectedCategory}
+        availableCategories={availableCategories}
+        categoryCounts={categoryCounts}
+        contextCategoryCount={contextForCategory.length}
+        selectedSource={selectedSource}
+        setSelectedSource={setSelectedSource}
+        availableSources={availableSources}
+        sourceCounts={sourceCounts}
+        contextSourceCount={contextForSource.length}
+        selectedOrg={selectedOrg}
+        setSelectedOrg={setSelectedOrg}
+        availableOrgs={availableOrgs}
+        orgCounts={orgCounts}
+        contextOrgCount={contextForOrg.length}
+        selectedState={selectedState}
+        setSelectedState={setSelectedState}
+        availableStates={availableStates}
+        stateCounts={stateCounts}
+        contextStateCount={contextForState.length}
+        selectedCity={selectedCity}
+        setSelectedCity={setSelectedCity}
+        availableCities={availableCities}
+        cityCounts={cityCounts}
+        contextCityCount={contextForCity.length}
+        extraFilters={
+          <>
+            {/* Award Financial Year */}
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between">
+                <label className="text-xs font-bold text-slate-200 flex items-center gap-1.5">
+                  <Calendar className="w-3.5 h-3.5 text-orange-400" />
+                  <span>Award Year (Fiscal Period)</span>
+                </label>
+                <span className="text-[10px] text-slate-400 font-mono">
+                  {availableYears.length} Years
+                </span>
               </div>
+              <select
+                value={selectedYear}
+                onChange={(e) => setSelectedYear(e.target.value)}
+                className="w-full bg-slate-800 border border-slate-700 hover:border-slate-600 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-emerald-500 cursor-pointer"
+              >
+                <option value="ALL" className="bg-slate-900 text-white font-medium">
+                  All Award Years ({contextForYear.length})
+                </option>
+                {availableYears.map((yr) => (
+                  <option key={yr} value={yr} className="bg-slate-900 text-white">
+                    Financial Year {yr} ({yearCounts.get(yr) || 0} awards)
+                  </option>
+                ))}
+              </select>
+            </div>
 
-              {/* Scrollable Filters Content */}
-              <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-5">
-                {/* 1. Procurement Portal / Source */}
-                <div className="space-y-1.5">
-                  <div className="flex items-center justify-between">
-                    <label className="text-xs font-bold text-slate-200 flex items-center gap-1.5">
-                      <Globe className="w-3.5 h-3.5 text-emerald-400" />
-                      <span>Procurement Portal (Source)</span>
-                    </label>
-                    <span className="text-[10px] text-slate-400 font-mono">
-                      {availableSources.length} Portals
-                    </span>
-                  </div>
-                  <select
-                    value={selectedSource}
-                    onChange={(e) => setSelectedSource(e.target.value)}
-                    className="w-full bg-slate-800 border border-slate-700 hover:border-slate-600 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-emerald-500 cursor-pointer"
-                  >
-                    <option value="ALL" className="bg-slate-900 text-white font-medium">
-                      All Procurement Portals ({contextForSource.length})
-                    </option>
-                    {availableSources.map(src => (
-                      <option key={src} value={src} className="bg-slate-900 text-white">
-                        {src} ({sourceCounts.get(src) || 0} awards)
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                {/* 2. Procuring Organisation / Ministry */}
-                <div className="space-y-1.5">
-                  <div className="flex items-center justify-between">
-                    <label className="text-xs font-bold text-slate-200 flex items-center gap-1.5">
-                      <Building2 className="w-3.5 h-3.5 text-blue-400" />
-                      <span>Procuring Authority / Ministry</span>
-                    </label>
-                    <span className="text-[10px] text-slate-400 font-mono">
-                      {availableOrgs.length} Entities
-                    </span>
-                  </div>
-
-                  {availableOrgs.length > 8 && (
-                    <div className="relative mb-1">
-                      <Search className="w-3 h-3 absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-500" />
-                      <input
-                        type="text"
-                        value={drawerOrgSearch}
-                        onChange={(e) => setDrawerOrgSearch(e.target.value)}
-                        placeholder="Search authority name..."
-                        className="w-full bg-slate-800/60 border border-slate-700 rounded-md pl-7 pr-2.5 py-1 text-[11px] text-slate-200 placeholder-slate-500 focus:outline-none focus:border-blue-500"
-                      />
-                    </div>
-                  )}
-
-                  <select
-                    value={selectedOrg}
-                    onChange={(e) => setSelectedOrg(e.target.value)}
-                    className="w-full bg-slate-800 border border-slate-700 hover:border-slate-600 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-emerald-500 cursor-pointer"
-                  >
-                    <option value="ALL" className="bg-slate-900 text-white font-medium">
-                      All Procuring Entities ({contextForOrg.length})
-                    </option>
-                    {availableOrgs
-                      .filter(org => !drawerOrgSearch || org.toLowerCase().includes(drawerOrgSearch.toLowerCase()))
-                      .map(org => (
-                        <option key={org} value={org} className="bg-slate-900 text-white">
-                          {org} ({orgCounts.get(org) || 0} awards)
-                        </option>
-                      ))}
-                  </select>
-                </div>
-
-                {/* 3. State & Location */}
-                <div className="space-y-1.5">
-                  <div className="flex items-center justify-between">
-                    <label className="text-xs font-bold text-slate-200 flex items-center gap-1.5">
-                      <MapPin className="w-3.5 h-3.5 text-rose-400" />
-                      <span>State / Territory</span>
-                    </label>
-                    <span className="text-[10px] text-slate-400 font-mono">
-                      {availableStates.length} States
-                    </span>
-                  </div>
-                  <select
-                    value={selectedState}
-                    onChange={(e) => {
-                      setSelectedState(e.target.value);
-                      setSelectedCity('ALL');
-                    }}
-                    className="w-full bg-slate-800 border border-slate-700 hover:border-slate-600 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-emerald-500 cursor-pointer"
-                  >
-                    <option value="ALL" className="bg-slate-900 text-white font-medium">
-                      All States & Union Territories ({contextForState.length})
-                    </option>
-                    {availableStates.map(state => (
-                      <option key={state} value={state} className="bg-slate-900 text-white">
-                        {state} ({stateCounts.get(state) || 0} awards)
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                {/* 4. City / District */}
-                <div className="space-y-1.5">
-                  <div className="flex items-center justify-between">
-                    <label className="text-xs font-bold text-slate-200 flex items-center gap-1.5">
-                      <MapPin className="w-3.5 h-3.5 text-amber-400" />
-                      <span>City / District</span>
-                    </label>
-                    <span className="text-[10px] text-slate-400 font-mono">
-                      {availableCities.length} Cities
-                    </span>
-                  </div>
-                  <select
-                    value={selectedCity}
-                    onChange={(e) => setSelectedCity(e.target.value)}
-                    className="w-full bg-slate-800 border border-slate-700 hover:border-slate-600 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-emerald-500 cursor-pointer"
-                  >
-                    <option value="ALL" className="bg-slate-900 text-white font-medium">
-                      All Cities / Districts ({contextForCity.length})
-                    </option>
-                    {availableCities.map(city => (
-                      <option key={city} value={city} className="bg-slate-900 text-white">
-                        {city} ({cityCounts.get(city) || 0} awards)
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                {/* 5. Award Financial Year */}
-                <div className="space-y-1.5">
-                  <div className="flex items-center justify-between">
-                    <label className="text-xs font-bold text-slate-200 flex items-center gap-1.5">
-                      <Calendar className="w-3.5 h-3.5 text-orange-400" />
-                      <span>Award Year (Fiscal Period)</span>
-                    </label>
-                    <span className="text-[10px] text-slate-400 font-mono">
-                      {availableYears.length} Years
-                    </span>
-                  </div>
-                  <select
-                    value={selectedYear}
-                    onChange={(e) => setSelectedYear(e.target.value)}
-                    className="w-full bg-slate-800 border border-slate-700 hover:border-slate-600 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-emerald-500 cursor-pointer"
-                  >
-                    <option value="ALL" className="bg-slate-900 text-white font-medium">
-                      All Award Years ({contextForYear.length})
-                    </option>
-                    {availableYears.map(yr => (
-                      <option key={yr} value={yr} className="bg-slate-900 text-white">
-                        Financial Year {yr} ({yearCounts.get(yr) || 0} awards)
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                {/* 6. Free-Text Keyword / Ref Filter */}
-                <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-slate-200 flex items-center gap-1.5">
-                    <Search className="w-3.5 h-3.5 text-sky-400" />
-                    <span>Keyword or Award ID</span>
-                  </label>
-                  <input
-                    type="text"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Filter by contractor, NIT, authority..."
-                    className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white placeholder-slate-400 focus:outline-none focus:border-emerald-500"
-                  />
-                </div>
-              </div>
-
-              {/* Drawer Sticky Footer */}
-              <div className="p-4 border-t border-slate-800 bg-slate-900/95 flex items-center justify-between gap-3 sticky bottom-0">
-                <div className="text-xs">
-                  <span className="text-slate-400 block text-[10px]">Filtered Results</span>
-                  <strong className="text-sm text-white font-mono font-bold">
-                    {filteredTenders.length} <span className="text-xs font-normal text-slate-400">of {tenders.length}</span>
-                  </strong>
-                </div>
-
-                <div className="flex items-center gap-2">
-                  {hasActiveFilters && (
-                    <button
-                      onClick={resetAllFilters}
-                      className="px-3 py-2 rounded-lg text-xs font-semibold text-slate-300 hover:text-white bg-slate-800 hover:bg-slate-700 transition-colors cursor-pointer"
-                    >
-                      Reset
-                    </button>
-                  )}
+            {/* Keyword / Award ID Search */}
+            <div className="space-y-1.5">
+              <label className="text-xs font-bold text-slate-200 flex items-center gap-1.5">
+                <Search className="w-3.5 h-3.5 text-sky-400" />
+                <span>Keyword or Award ID</span>
+              </label>
+              <div className="relative">
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Filter by contractor, NIT, authority..."
+                  className="w-full bg-slate-800 border border-slate-700 rounded-lg pl-3 pr-8 py-2 text-xs text-white placeholder-slate-400 focus:outline-none focus:border-emerald-500"
+                />
+                {searchQuery && (
                   <button
-                    onClick={() => setIsFilterSidebarOpen(false)}
-                    className="px-4 py-2 rounded-lg text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-500 shadow-sm transition-all cursor-pointer flex items-center gap-1"
+                    type="button"
+                    onClick={() => setSearchQuery('')}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-white rounded transition-colors cursor-pointer"
+                    title="Clear keyword"
                   >
-                    <span>View {filteredTenders.length} Awards</span>
-                    <ChevronRight className="w-3.5 h-3.5" />
+                    <X className="w-3.5 h-3.5" />
                   </button>
-                </div>
+                )}
               </div>
             </div>
-          </div>
-        </div>
-      )}
+          </>
+        }
+      />
 
       {/* Main Grid: Left Tender List (35%) | Right Deep-Dive Dossier (65%) */}
       <div className="grid grid-cols-1 lg:grid-cols-[35fr_65fr] gap-5">
@@ -1504,6 +1306,18 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
                   >
                     <FileText className="w-3.5 h-3.5 text-cyan-500" />
                     <span>9. Official Dossier PDF</span>
+                  </button>
+
+                  <button
+                    onClick={() => setActiveSubTab('all_bids')}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
+                      activeSubTab === 'all_bids'
+                        ? 'bg-slate-900 text-white shadow-xs'
+                        : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                    }`}
+                  >
+                    <Users className="w-3.5 h-3.5 text-amber-500" />
+                    <span>10. All Evaluated Bids (L1, L2, L3...)</span>
                   </button>
                 </div>
               </div>
@@ -2294,6 +2108,11 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
                     />
                   </div>
                 </div>
+              )}
+
+              {/* Sub-tab 10: Form 49 Comparative Bid Evaluation Statement (L1, L2, L3, L4, L5) */}
+              {activeSubTab === 'all_bids' && (
+                <AllBidsEvaluationSubTab tender={selectedTender} />
               )}
             </>
           )}

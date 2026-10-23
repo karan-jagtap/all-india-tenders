@@ -337,12 +337,110 @@ LOCATION_MAP = {
     'Tripura': ('Tripura', 'Agartala'),
     'Pondicherry': ('Puducherry', 'Puducherry'),
     'Mormugao': ('Goa', 'Vasco da Gama'),
+    'Thiruvananthapuram': ('Kerala', 'Thiruvananthapuram'),
+    'Kozhikode': ('Kerala', 'Kozhikode'),
+    'Kochi': ('Kerala', 'Kochi'),
+    'Kurnool': ('Andhra Pradesh', 'Kurnool'),
+    'Bodh Gaya': ('Bihar', 'Bodh Gaya'),
+    'Sagar': ('Madhya Pradesh', 'Sagar'),
+    'Berhampur': ('Odisha', 'Berhampur'),
+    'Shibpur': ('West Bengal', 'Howrah'),
+    'Santiniketan': ('West Bengal', 'Santiniketan'),
+    'Panchkula': ('Haryana', 'Panchkula'),
+    'Dehradun': ('Uttarakhand', 'Dehradun'),
+    'Kalpakkam': ('Tamil Nadu', 'Kalpakkam'),
+    'Tamilnadu': ('Tamil Nadu', 'Chennai'),
 }
 
-def detect_loc(org_name):
-    for key, (st, ct) in LOCATION_MAP.items():
-        if key.lower() in org_name.lower():
+SPECIFIC_ORG_MAP = {
+    'Automotive Research Association of India': ('Maharashtra', 'Pune'),
+    'Tata Institute of Social Sciences': ('Maharashtra', 'Mumbai'),
+    'Tata Memorial Centre': ('Maharashtra', 'Mumbai'),
+    'Bhabha Atomic Research Centre': ('Maharashtra', 'Mumbai'),
+    'Santacruz Electronic Export Processing Zone': ('Maharashtra', 'Mumbai'),
+    'Mumbai Port Trust': ('Maharashtra', 'Mumbai'),
+    'Spices Board': ('Kerala', 'Kochi'),
+    'The Fertilisers And Chemicals Travancore Ltd.': ('Kerala', 'Kochi'),
+    'New Mangalore Port Trust': ('Karnataka', 'Mangalore'),
+    'Coffee Board': ('Karnataka', 'Bengaluru'),
+    'Visakhapatnam Special Economic Zone Authority': ('Andhra Pradesh', 'Visakhapatnam'),
+    'Indian Institute of Management Visakhapatnam': ('Andhra Pradesh', 'Visakhapatnam'),
+    'Andhra Pradesh MSME Developement Corporation': ('Andhra Pradesh', 'Vijayawada'),
+    'School of Planning and Architecture - Vijayawada': ('Andhra Pradesh', 'Vijayawada'),
+    'Indian Institute Of Information Technology Design and Manufacturing Kurnool': ('Andhra Pradesh', 'Kurnool'),
+    'Hindustan Salts Limited': ('Gujarat', 'Gandhinagar'),
+    'SINDHU RESETTLEMENT CORPORATION LIMITED': ('Gujarat', 'Gandhinagar'),
+    'Hindustan Urvarak and Rasayan Limited': ('Uttar Pradesh', 'Lucknow'),
+    'Regional Centre for Urban and Environmental Studies': ('Uttar Pradesh', 'Lucknow'),
+    'Indira Gandhi Centre for Atomic Research': ('Tamil Nadu', 'Chennai'),
+    'Tamilnadu Trade Promotion Organisation': ('Tamil Nadu', 'Chennai'),
+    'National Institute of Technical Teachers Training and Research': ('Tamil Nadu', 'Chennai'),
+    'National Aluminium Company Limited,NALCO': ('Odisha', 'Bhubaneswar'),
+    'IISER Berhampur': ('Odisha', 'Berhampur'),
+    'Variable Energy Cyclotron Centre': ('West Bengal', 'Kolkata'),
+    'Visva-Bharati': ('West Bengal', 'Kolkata'),
+    'Indian Institute of Engineering Science and Technology - Shibpur': ('West Bengal', 'Howrah'),
+    'Dr. Ram Manohar Lohia Hospital': ('Delhi', 'New Delhi'),
+    'Delhi Development Authority': ('Delhi', 'New Delhi'),
+    'Delhi Metro Rail Corporation Limited': ('Delhi', 'New Delhi'),
+    'Delhi University': ('Delhi', 'New Delhi'),
+    'Dr. Harisingh Gour Vishwavidyalaya': ('Madhya Pradesh', 'Sagar'),
+    'Guru Ghasidas Vishwavidyalaya': ('Chhattisgarh', 'Bilaspur'),
+    'North East Centre for Technology Application and Reach(NECTAR)': ('Meghalaya', 'Shillong'),
+    'North-Eastern Hill University (NEHU)': ('Meghalaya', 'Shillong'),
+    'Indian Institute of Management Bodh Gaya': ('Bihar', 'Bodh Gaya'),
+}
+
+PORTAL_STATE_BINDINGS = {
+    "MahaTenders (mahatenders.gov.in)": ("Maharashtra", "Mumbai"),
+    "Delhi e-Procure (govtprocurement.delhi.gov.in)": ("Delhi", "New Delhi"),
+    "UP e-Procure (etender.up.nic.in)": ("Uttar Pradesh", "Lucknow"),
+    "Tamil Nadu Tenders (tntenders.gov.in)": ("Tamil Nadu", "Chennai"),
+    "Karnataka KPPP (kppp.karnataka.gov.in)": ("Karnataka", "Bengaluru"),
+    "Kerala e-Tenders (etenders.kerala.gov.in)": ("Kerala", "Thiruvananthapuram"),
+    "Gujarat (n)Procure (tender.nprocure.com)": ("Gujarat", "Gandhinagar"),
+    "Odisha Tenders (tendersodisha.gov.in)": ("Odisha", "Bhubaneswar"),
+    "Rajasthan e-Procure (eproc.rajasthan.gov.in)": ("Rajasthan", "Jaipur"),
+    "West Bengal Tenders (wbtenders.gov.in)": ("West Bengal", "Kolkata"),
+    "Punjab e-Procurement (eproc.punjab.gov.in)": ("Punjab", "Chandigarh"),
+    "Haryana e-Procurement (etenders.hry.nic.in)": ("Haryana", "Panchkula"),
+    "J&K e-Procurement (jktenders.gov.in)": ("Jammu & Kashmir", "Srinagar"),
+    "Assam Tenders (assamtenders.gov.in)": ("Assam", "Guwahati"),
+    "Telangana e-Procurement (tender.telangana.gov.in)": ("Telangana", "Hyderabad"),
+    "Andhra Pradesh e-Procure (tender.apeprocurement.gov.in)": ("Andhra Pradesh", "Vijayawada"),
+    "MP Tenders (mptenders.gov.in)": ("Madhya Pradesh", "Bhopal"),
+    "Uttarakhand e-Tenders (uktenders.gov.in)": ("Uttarakhand", "Dehradun"),
+    "Bihar e-Procure (eproc2.bihar.gov.in)": ("Bihar", "Patna"),
+    "Jharkhand e-Procure (jharkhandtenders.gov.in)": ("Jharkhand", "Ranchi"),
+    "Goa e-Procurement (eprocure.goa.gov.in)": ("Goa", "Panaji"),
+    "Andaman & Nicobar e-Procure (eproc.andaman.gov.in)": ("Andaman & Nicobar", "Port Blair"),
+}
+
+def detect_loc(text: str, portal_name: str = "") -> tuple[str, str]:
+    for org_k, (st, ct) in SPECIFIC_ORG_MAP.items():
+        if org_k.lower() in text.lower():
+            if portal_name in PORTAL_STATE_BINDINGS:
+                p_state, p_default_city = PORTAL_STATE_BINDINGS[portal_name]
+                if st == p_state:
+                    return st, ct
+                return p_state, p_default_city
             return st, ct
+
+    sorted_loc_keys = sorted(LOCATION_MAP.keys(), key=len, reverse=True)
+    for key in sorted_loc_keys:
+        pattern = r'\b' + re.escape(key.lower()) + r'\b'
+        if re.search(pattern, text.lower()):
+            st, ct = LOCATION_MAP[key]
+            if portal_name in PORTAL_STATE_BINDINGS:
+                p_state, p_default_city = PORTAL_STATE_BINDINGS[portal_name]
+                if st == p_state:
+                    return st, ct
+                return p_state, ct if ct else p_default_city
+            return st, ct
+
+    if portal_name in PORTAL_STATE_BINDINGS:
+        return PORTAL_STATE_BINDINGS[portal_name]
+
     return 'Pan-India / Central', 'New Delhi'
 
 def detect_category(org):
@@ -397,21 +495,21 @@ def get_org_portal(org_name: str) -> str:
         return "Rajasthan e-Procure (eproc.rajasthan.gov.in)"
     if any(k in o for k in ['kolkata', 'calcutta', 'kharagpur', 'shibpur', 'visva-bharati', 'variable energy']):
         return "West Bengal Tenders (wbtenders.gov.in)"
-    if any(k in o for k in ['jalandhar', 'ropar', 'chandigarh', 'bathinda']):
+    if any(k in o for k in ['jalandhar', 'ropar', 'bathinda']):
         return "Punjab e-Procurement (eproc.punjab.gov.in)"
     if any(k in o for k in ['haryana', 'kurukshetra', 'rewari']):
         return "Haryana e-Procurement (etenders.hry.nic.in)"
     if any(k in o for k in ['jammu', 'srinagar']):
         return "J&K e-Procurement (jktenders.gov.in)"
-    if any(k in o for k in ['assam', 'silchar', 'guwahati', 'meghalaya', 'tripura', 'nectar', 'nehu']):
+    if any(k in o for k in ['assam', 'silchar', 'guwahati']):
         return "Assam Tenders (assamtenders.gov.in)"
     if any(k in o for k in ['hyderabad', 'bibinagar', 'warangal']):
         return "Telangana e-Procurement (tender.telangana.gov.in)"
     if any(k in o for k in ['andhra pradesh', 'visakhapatnam', 'mangalagiri', 'kurnool', 'vijayawada']):
         return "Andhra Pradesh e-Procure (tender.apeprocurement.gov.in)"
-    if any(k in o for k in ['bhopal', 'indore', 'raipur', 'bhilai', 'guru ghasidas', 'harisingh gour']):
+    if any(k in o for k in ['bhopal', 'indore', 'harisingh gour']):
         return "MP Tenders (mptenders.gov.in)"
-    if any(k in o for k in ['rishikesh', 'roorkee', 'bilaspur', 'mandi', 'hamirpur']):
+    if any(k in o for k in ['rishikesh', 'roorkee']):
         return "Uttarakhand e-Tenders (uktenders.gov.in)"
     if any(k in o for k in ['patna', 'bodh gaya']):
         return "Bihar e-Procure (eproc2.bihar.gov.in)"
@@ -568,7 +666,7 @@ for row in lines:
         cost = round(5000000 + (seed_val % 450000000), 2)
         days_left = 6 + (seed_val % 28)
         
-        st, ct = detect_loc(org_name + " " + s.get("title", ""))
+        st, ct = detect_loc(org_name + " " + s.get("title", ""), portal_name)
         cat = detect_category(org_name)
         
         t = {
@@ -610,7 +708,7 @@ for row in lines:
         
     # 2. For remaining required tenders, generate faithful domain-specific notices
     remaining = target_count - used_scraped
-    st, ct = detect_loc(org_name)
+    st, ct = detect_loc(org_name, portal_name)
     cat = detect_category(org_name)
     
     TEMPLATES = {

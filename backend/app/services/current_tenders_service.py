@@ -16,104 +16,282 @@ import re
 import json
 import time
 from datetime import datetime, date, timedelta
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any, Optional, Tuple
 from reportlab.lib.pagesizes import letter
 from reportlab.lib import colors
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, PageBreak, KeepTogether
 
-# State & City mapping rules
-STATE_CITY_MAP = {
-    'Karnataka': ['Bengaluru', 'Belur', 'Hassan', 'Mudigere', 'Mysuru', 'Mangalore', 'Hubli-Dharwad', 'Belagavi'],
-    'Maharashtra': ['Pune', 'Mumbai', 'Thane', 'Navi Mumbai', 'Chakan', 'Baramati', 'Nagpur', 'Nashik', 'Pimpri-Chinchwad'],
-    'Delhi NCR': ['Dwarka', 'Narela', 'Rohini', 'Jasola', 'Pitampura', 'Central Delhi', 'South Delhi', 'Siri Fort'],
-    'Assam & North East': ['Guwahati', 'Agartala', 'Silchar', 'Shillong', 'Imphal', 'Dibrugarh', 'Aizawl', 'Kohima'],
-    'Jammu & Kashmir / Ladakh': ['Srinagar', 'Jammu', 'Leh-Ladakh', 'Baramulla', 'Rajouri'],
-    'Uttar Pradesh': ['Noida / NCR', 'Lucknow', 'Varanasi', 'Kanpur', 'Prayagraj', 'Ayodhya', 'Agra', 'Ghaziabad'],
-    'West Bengal & East': ['Kolkata', 'Siliguri', 'Howrah', 'Patna', 'Bhubaneswar', 'Ranchi'],
-    'Uttarakhand & Himachal': ['Dehradun', 'Rishikesh', 'Shimla', 'Bilaspur', 'Dharamshala'],
-    'Punjab & Haryana': ['Chandigarh', 'Gurugram', 'Faridabad', 'Ropar', 'Amritsar', 'Ludhiana'],
-    'Rajasthan & Gujarat': ['Ahmedabad', 'Jaipur', 'Surat', 'Jodhpur', 'Vadodara', 'Gandhinagar'],
-    'Southern States (TN, TG, KL, AP)': ['Chennai', 'Hyderabad', 'Kochi', 'Visakhapatnam', 'Coimbatore'],
-    'Madhya Pradesh & CG': ['Bhopal', 'Indore', 'Raipur', 'Gwalior', 'Jabalpur']
+# Statutory state portals bound to sovereign states
+STATUTORY_PORTAL_STATE_BINDINGS = {
+    "mahatenders.gov.in": ("Maharashtra", "Mumbai"),
+    "govtprocurement.delhi.gov.in": ("Delhi", "New Delhi"),
+    "etender.up.nic.in": ("Uttar Pradesh", "Lucknow"),
+    "tntenders.gov.in": ("Tamil Nadu", "Chennai"),
+    "kppp.karnataka.gov.in": ("Karnataka", "Bengaluru"),
+    "etenders.kerala.gov.in": ("Kerala", "Thiruvananthapuram"),
+    "tender.nprocure.com": ("Gujarat", "Gandhinagar"),
+    "tendersodisha.gov.in": ("Odisha", "Bhubaneswar"),
+    "eproc.rajasthan.gov.in": ("Rajasthan", "Jaipur"),
+    "wbtenders.gov.in": ("West Bengal", "Kolkata"),
+    "eproc.punjab.gov.in": ("Punjab", "Chandigarh"),
+    "etenders.hry.nic.in": ("Haryana", "Panchkula"),
+    "jktenders.gov.in": ("Jammu & Kashmir", "Srinagar"),
+    "assamtenders.gov.in": ("Assam", "Guwahati"),
+    "tender.telangana.gov.in": ("Telangana", "Hyderabad"),
+    "tender.apeprocurement.gov.in": ("Andhra Pradesh", "Vijayawada"),
+    "mptenders.gov.in": ("Madhya Pradesh", "Bhopal"),
+    "uktenders.gov.in": ("Uttarakhand", "Dehradun"),
+    "eproc2.bihar.gov.in": ("Bihar", "Patna"),
+    "jharkhandtenders.gov.in": ("Jharkhand", "Ranchi"),
+    "eprocure.goa.gov.in": ("Goa", "Panaji"),
+    "eproc.andaman.gov.in": ("Andaman & Nicobar", "Port Blair"),
 }
 
-def detect_state_and_city(title: str, scope: str, authority: str) -> tuple[str, str]:
+STATUTORY_PORTAL_PATTERNS = [
+    (["mahatenders", "maharashtra state e-procurement"], "Maharashtra", "Mumbai"),
+    (["govtprocurement.delhi", "delhi e-procure", "nct of delhi / dmrc", "delhi dmrc"], "Delhi", "New Delhi"),
+    (["etender.up", "up e-procure", "up e-procurement"], "Uttar Pradesh", "Lucknow"),
+    (["tntenders", "tamil nadu tenders", "tamil nadu state tenders"], "Tamil Nadu", "Chennai"),
+    (["kppp", "karnataka public procurement", "kppp.karnataka"], "Karnataka", "Bengaluru"),
+    (["etenders.kerala", "kerala e-tenders", "kerala e-procure"], "Kerala", "Thiruvananthapuram"),
+    (["nprocure", "tender.nprocure", "gujarat (n)procure"], "Gujarat", "Gandhinagar"),
+    (["tendersodisha", "odisha tenders"], "Odisha", "Bhubaneswar"),
+    (["eproc.rajasthan", "rajasthan e-procure"], "Rajasthan", "Jaipur"),
+    (["wbtenders", "west bengal tenders"], "West Bengal", "Kolkata"),
+    (["eproc.punjab", "punjab e-procurement"], "Punjab", "Chandigarh"),
+    (["etenders.hry", "haryana e-procurement"], "Haryana", "Panchkula"),
+    (["jktenders", "j&k e-procurement"], "Jammu & Kashmir", "Srinagar"),
+    (["assamtenders", "assam tenders"], "Assam", "Guwahati"),
+    (["tender.telangana", "telangana e-procurement"], "Telangana", "Hyderabad"),
+    (["tender.apeprocurement", "apeprocurement", "andhra pradesh e-procure"], "Andhra Pradesh", "Vijayawada"),
+    (["mptenders", "mp tenders"], "Madhya Pradesh", "Bhopal"),
+    (["uktenders", "uttarakhand e-tenders"], "Uttarakhand", "Dehradun"),
+    (["eproc2.bihar", "bihar e-procure"], "Bihar", "Patna"),
+    (["jharkhandtenders", "jharkhand e-procure"], "Jharkhand", "Ranchi"),
+    (["eprocure.goa", "goa e-procurement"], "Goa", "Panaji"),
+    (["eproc.andaman", "andaman & nicobar e-procure"], "Andaman & Nicobar", "Port Blair"),
+]
+
+def find_statutory_portal_binding(portal_str: str) -> Optional[Tuple[str, str]]:
+    if not portal_str:
+        return None
+    p_lower = portal_str.lower()
+    is_central = any(k in p_lower for k in [
+        "central public procurement portal",
+        "eprocure.gov.in/eprocure/app",
+        "central cppp",
+        "government e-marketplace",
+        "gem.gov.in",
+        "ireps (ireps.gov.in)",
+        "ireps railways",
+        "cpwd tenderwizard",
+        "tenderwizard.com/cpwd",
+        "defense procurement portal",
+        "defproc.gov.in",
+        "data.gov.in",
+        "iocletenders.nic.in"
+    ])
+    has_state_partner = any(k in p_lower for k in ["mahatenders", "mmrda", "dmrc", "delhi e-procure", "etender.up", "tntenders", "kppp"])
+    if is_central and not has_state_partner:
+        return None
+
+    for patterns, st, def_ct in STATUTORY_PORTAL_PATTERNS:
+        if any(pat in p_lower for pat in patterns):
+            return st, def_ct
+    return None
+
+# State & City mapping rules
+STATE_CITY_MAP = {
+    'Karnataka': ['Bengaluru', 'Belur', 'Hassan', 'Mudigere', 'Mysuru', 'Mangalore', 'Hubli-Dharwad', 'Belagavi', 'Dharwad'],
+    'Maharashtra': ['Pune', 'Mumbai', 'Thane', 'Navi Mumbai', 'Chakan', 'Baramati', 'Nagpur', 'Nashik', 'Pimpri-Chinchwad'],
+    'Delhi': ['Dwarka', 'Narela', 'Rohini', 'Jasola', 'Pitampura', 'Central Delhi', 'South Delhi', 'Siri Fort', 'New Delhi'],
+    'Assam': ['Guwahati', 'Silchar', 'Dibrugarh', 'Jorhat', 'Tezpur', 'Nagaon', 'Tinsukia'],
+    'Meghalaya': ['Shillong'],
+    'Tripura': ['Agartala'],
+    'Jammu & Kashmir': ['Srinagar', 'Jammu', 'Leh-Ladakh', 'Baramulla', 'Rajouri', 'Anantnag', 'Kupwara', 'Udhampur'],
+    'Uttar Pradesh': ['Noida / NCR', 'Lucknow', 'Varanasi', 'Kanpur', 'Prayagraj', 'Ayodhya', 'Agra', 'Ghaziabad', 'Aligarh', 'Raebareli'],
+    'West Bengal': ['Kolkata', 'Siliguri', 'Howrah', 'Asansol', 'Durgapur', 'Haldia', 'Kharagpur'],
+    'Uttarakhand': ['Dehradun', 'Rishikesh', 'Haridwar', 'Roorkee', 'Haldwani'],
+    'Himachal Pradesh': ['Shimla', 'Bilaspur', 'Hamirpur', 'Mandi', 'Dharamshala'],
+    'Punjab': ['Chandigarh', 'Ludhiana', 'Amritsar', 'Jalandhar', 'Patiala', 'Bathinda', 'Mohali (SAS Nagar)', 'Ropar'],
+    'Haryana': ['Gurugram', 'Faridabad', 'Panipat', 'Ambala', 'Karnal', 'Hisar', 'Panchkula', 'Rohtak', 'Rewari', 'Kurukshetra'],
+    'Gujarat': ['Ahmedabad', 'Surat', 'Vadodara', 'Gandhinagar', 'Rajkot', 'Bhavnagar', 'GIFT City'],
+    'Rajasthan': ['Jaipur', 'Jodhpur', 'Udaipur', 'Kota', 'Bikaner', 'Ajmer', 'Alwar'],
+    'Tamil Nadu': ['Chennai', 'Coimbatore', 'Madurai', 'Tiruchirappalli', 'Salem', 'Tirunelveli', 'Kalpakkam'],
+    'Kerala': ['Kochi', 'Thiruvananthapuram', 'Kozhikode', 'Thrissur', 'Kollam', 'Kannur', 'Palakkad'],
+    'Telangana': ['Hyderabad', 'Warangal', 'Nizamabad', 'Karimnagar', 'Khammam', 'Ramagundam', 'Secunderabad'],
+    'Andhra Pradesh': ['Visakhapatnam', 'Vijayawada', 'Amaravati', 'Guntur', 'Tirupati', 'Nellore', 'Kakinada', 'Kurnool'],
+    'Madhya Pradesh': ['Bhopal', 'Indore', 'Jabalpur', 'Gwalior', 'Ujjain', 'Sagar', 'Rewa'],
+    'Chhattisgarh': ['Raipur', 'Bhilai', 'Bilaspur'],
+    'Odisha': ['Bhubaneswar', 'Cuttack', 'Rourkela', 'Puri', 'Sambalpur', 'Berhampur', 'Balasore'],
+    'Bihar': ['Patna', 'Gaya', 'Bhagalpur', 'Muzaffarpur', 'Darbhanga', 'Purnia', 'Begusarai', 'Bodh Gaya'],
+    'Jharkhand': ['Ranchi', 'Dhanbad', 'Jamshedpur', 'Bokaro'],
+    'Goa': ['Panaji', 'Vasco da Gama', 'Margao'],
+    'Andaman & Nicobar': ['Port Blair'],
+    'Chandigarh': ['Chandigarh'],
+    'Pan-India / Central': ['New Delhi', 'All India', 'National / Multi-State', 'Regional / Other'],
+}
+
+def _city_matches(city_candidate: str, text: str) -> bool:
+    parts = [city_candidate]
+    if '/' in city_candidate:
+        parts.extend([p.strip() for p in city_candidate.split('/') if p.strip()])
+    if '(' in city_candidate:
+        base = city_candidate.split('(')[0].strip()
+        parts.append(base)
+        inside = city_candidate.split('(')[1].split(')')[0].strip()
+        parts.append(inside)
+    if '-' in city_candidate:
+        parts.extend([p.strip() for p in city_candidate.split('-') if p.strip()])
+    for p in parts:
+        if len(p) >= 3 and re.search(r'\b' + re.escape(p.lower()) + r'\b', text.lower()):
+            return True
+    return False
+
+def detect_state_and_city(title: str, scope: str = "", authority: str = "", source_portal: str = "") -> tuple[str, str]:
+    binding = find_statutory_portal_binding(source_portal)
     full = f"{title} {scope} {authority}".lower()
     
-    if any(k in full for k in ['karnataka', 'bangalore', 'bengaluru', 'mudigere', 'belur', 'hassan', 'mysuru', 'mysore', 'mangalore', 'mangaluru', 'hubli', 'dharwad', 'belagavi', 'ro bangalore']):
-        for c in ['Bengaluru', 'Hassan', 'Belur', 'Mudigere', 'Mysuru', 'Mangalore', 'Hubli-Dharwad', 'Belagavi']:
-            if c.lower() in full:
-                return 'Karnataka', c
-        return 'Karnataka', 'Statewide / Other'
+    if binding:
+        p_state, p_default_city = binding
+        
+        # Sovereign state city detection
+        valid_cities = STATE_CITY_MAP.get(p_state, [])
+        for c in valid_cities:
+            if _city_matches(c, full):
+                return p_state, c
+                
+        # Organization-specific city heuristics within sovereign state
+        if p_state == 'Maharashtra':
+            if any(k in full for k in ['automotive research', 'arai', 'pune', 'pmc', 'pcmc', 'pmrda']):
+                return 'Maharashtra', 'Pune'
+            if any(k in full for k in ['tata institute of social sciences', 'tiss', 'tata memorial', 'tmc', 'bhabha', 'barc', 'santacruz', 'mumbai port', 'mmrda']):
+                return 'Maharashtra', 'Mumbai'
+            if any(k in full for k in ['cidco', 'navi mumbai']):
+                return 'Maharashtra', 'Navi Mumbai'
+            if 'nagpur' in full:
+                return 'Maharashtra', 'Nagpur'
+            if 'nashik' in full:
+                return 'Maharashtra', 'Nashik'
+            if 'thane' in full:
+                return 'Maharashtra', 'Thane'
+            if 'chakan' in full:
+                return 'Maharashtra', 'Chakan'
+        elif p_state == 'Uttar Pradesh':
+            if any(k in full for k in ['noida', 'greater noida']):
+                return 'Uttar Pradesh', 'Noida / NCR'
+            if any(k in full for k in ['hindustan urvarak', 'hurl', 'urban and environmental', 'lucknow']):
+                return 'Uttar Pradesh', 'Lucknow'
+            if any(k in full for k in ['varanasi', 'bhu', 'banaras']):
+                return 'Uttar Pradesh', 'Varanasi'
+            if any(k in full for k in ['kanpur', 'iitk']):
+                return 'Uttar Pradesh', 'Kanpur'
+            if any(k in full for k in ['allahabad', 'prayagraj', 'mnnit']):
+                return 'Uttar Pradesh', 'Prayagraj'
+            if 'aligarh' in full:
+                return 'Uttar Pradesh', 'Aligarh'
+            if 'raebareli' in full:
+                return 'Uttar Pradesh', 'Raebareli'
+        elif p_state == 'Kerala':
+            if any(k in full for k in ['spices board', 'fertilisers and chemicals travancore', 'fact', 'cochin', 'kochi']):
+                return 'Kerala', 'Kochi'
+            if any(k in full for k in ['thiruvananthapuram', 'iisertvm']):
+                return 'Kerala', 'Thiruvananthapuram'
+            if any(k in full for k in ['calicut', 'kozhikode', 'nitc']):
+                return 'Kerala', 'Kozhikode'
+        elif p_state == 'Karnataka':
+            if any(k in full for k in ['new mangalore port', 'mangalore']):
+                return 'Karnataka', 'Mangalore'
+            if any(k in full for k in ['coffee board', 'bengaluru', 'bangalore', 'iisc']):
+                return 'Karnataka', 'Bengaluru'
+            if 'dharwad' in full:
+                return 'Karnataka', 'Dharwad'
+        elif p_state == 'Andhra Pradesh':
+            if any(k in full for k in ['visakhapatnam', 'vsez', 'vizag']):
+                return 'Andhra Pradesh', 'Visakhapatnam'
+            if any(k in full for k in ['vijayawada', 'planning and architecture']):
+                return 'Andhra Pradesh', 'Vijayawada'
+            if 'kurnool' in full:
+                return 'Andhra Pradesh', 'Kurnool'
+        elif p_state == 'Gujarat':
+            if any(k in full for k in ['hindustan salts', 'sindhu', 'gandhinagar']):
+                return 'Gujarat', 'Gandhinagar'
+            if any(k in full for k in ['ahmedabad', 'amc']):
+                return 'Gujarat', 'Ahmedabad'
+            if 'surat' in full:
+                return 'Gujarat', 'Surat'
+        elif p_state == 'West Bengal':
+            if any(k in full for k in ['cyclotron', 'visva-bharati', 'kolkata', 'calcutta', 'iiser']):
+                return 'West Bengal', 'Kolkata'
+            if any(k in full for k in ['shibpur', 'iiest', 'howrah']):
+                return 'West Bengal', 'Howrah'
+            if any(k in full for k in ['kharagpur', 'iit kgp']):
+                return 'West Bengal', 'Kharagpur'
+        elif p_state == 'Odisha':
+            if any(k in full for k in ['aluminium', 'nalco', 'bhubaneswar', 'aiims']):
+                return 'Odisha', 'Bhubaneswar'
+            if 'berhampur' in full:
+                return 'Odisha', 'Berhampur'
+            if 'rourkela' in full:
+                return 'Odisha', 'Rourkela'
+                
+        return p_state, p_default_city
 
-    if any(k in full for k in ['maharashtra', 'pune', 'mumbai', 'thane', 'navi mumbai', 'chakan', 'baramati', 'nagpur', 'nashik', 'pcmc', 'pmc', 'pmrda', 'msrdc', 'mmrda', 'aurangabad', 'kolhapur', 'solapur', 'vidarbha', 'samruddhi']):
-        for c in ['Pune', 'Mumbai', 'Thane', 'Navi Mumbai', 'Chakan', 'Baramati', 'Nagpur', 'Nashik', 'Pimpri-Chinchwad']:
-            if c.lower() in full:
-                return 'Maharashtra', c
-        return 'Maharashtra', 'Statewide / Other'
+    # Central / Pan-India / general portals
+    # 1. State acronyms with word boundaries
+    state_acronyms = {
+        r'\b\(?up\)?\b': 'Uttar Pradesh',
+        r'\b\(?mh\)?\b': 'Maharashtra',
+        r'\b\(?ka\)?\b': 'Karnataka',
+        r'\b\(?tn\)?\b': 'Tamil Nadu',
+        r'\b\(?gj\)?\b': 'Gujarat',
+        r'\b\(?rj\)?\b': 'Rajasthan',
+        r'\b\(?mp\)?\b': 'Madhya Pradesh',
+        r'\b\(?wb\)?\b': 'West Bengal',
+        r'\b\(?kl\)?\b': 'Kerala',
+        r'\b\(?ap\)?\b': 'Andhra Pradesh',
+        r'\b\(?ts\)?\b': 'Telangana',
+        r'\b\(?pb\)?\b': 'Punjab',
+        r'\b\(?hr\)?\b': 'Haryana',
+        r'\b\(?ch\)?\b': 'Chandigarh',
+        r'\b\(?cg\)?\b': 'Chhattisgarh',
+        r'\b\(?hp\)?\b': 'Himachal Pradesh',
+        r'\b\(?uk\)?\b': 'Uttarakhand',
+        r'\b\(?jk\)?\b': 'Jammu & Kashmir',
+        r'\b\(?br\)?\b': 'Bihar',
+        r'\b\(?jh\)?\b': 'Jharkhand',
+        r'\b\(?as\)?\b': 'Assam',
+        r'\b\(?ga\)?\b': 'Goa',
+    }
+    for pat, st_name in state_acronyms.items():
+        if re.search(pat, full):
+            cities = STATE_CITY_MAP.get(st_name, [])
+            for c in cities:
+                if _city_matches(c, full):
+                    return st_name, c
+            return st_name, cities[0] if cities else "All India"
 
-    if any(k in full for k in ['assam', 'guwahati', 'silchar', 'dibrugarh', 'shillong', 'meghalaya', 'manipur', 'imphal', 'tripura', 'agartala', 'mizoram', 'aizawl', 'nagaland', 'kohima', 'sikkim', 'gangtok', 'arunachal']):
-        for c in ['Guwahati', 'Agartala', 'Silchar', 'Shillong', 'Imphal', 'Dibrugarh', 'Aizawl', 'Kohima']:
-            if c.lower() in full:
-                return 'Assam & North East', c
-        return 'Assam & North East', 'Regional / Border'
+    # 2. Full state name matching
+    for state_name, cities in STATE_CITY_MAP.items():
+        if state_name == 'Pan-India / Central':
+            continue
+        state_key = state_name.lower()
+        if re.search(r'\b' + re.escape(state_key) + r'\b', full):
+            for c in cities:
+                if _city_matches(c, full):
+                    return state_name, c
+            return state_name, cities[0]
 
-    if any(k in full for k in ['jammu', 'kashmir', 'srinagar', 'ladakh', 'leh', 'zojila', 'baramulla', 'kupwara', 'rajouri', 'udhampur']):
-        for c in ['Srinagar', 'Jammu', 'Leh-Ladakh', 'Baramulla', 'Rajouri']:
-            if c.lower() in full:
-                return 'Jammu & Kashmir / Ladakh', c
-        return 'Jammu & Kashmir / Ladakh', 'Border Sectors'
+    # 3. City-only detection across all states
+    for state_name, cities in STATE_CITY_MAP.items():
+        if state_name == 'Pan-India / Central':
+            continue
+        for c in cities:
+            if _city_matches(c, full):
+                return state_name, c
 
-    if any(k in full for k in ['uttar pradesh', 'up pwd', 'lucknow', 'noida', 'greater noida', 'varanasi', 'kanpur', 'prayagraj', 'ayodhya', 'gorakhpur', 'ghaziabad', 'agra', 'aligarh', 'meerut', 'bareilly']):
-        for c in ['Noida / NCR', 'Lucknow', 'Varanasi', 'Kanpur', 'Prayagraj', 'Ayodhya', 'Agra', 'Ghaziabad']:
-            if c.lower() in full:
-                return 'Uttar Pradesh', c
-        return 'Uttar Pradesh', 'Statewide / Other'
-
-    if any(k in full for k in ['west bengal', 'kolkata', 'howrah', 'siliguri', 'darjeeling', 'durgapur', 'asansol', 'bihar', 'patna', 'odisha', 'bhubaneswar', 'ranchi', 'jharkhand']):
-        for c in ['Kolkata', 'Siliguri', 'Howrah', 'Patna', 'Bhubaneswar', 'Ranchi']:
-            if c.lower() in full:
-                return 'West Bengal & East', c
-        return 'West Bengal & East', 'Regional / Other'
-
-    if any(k in full for k in ['uttarakhand', 'himachal', 'dehradun', 'rishikesh', 'haridwar', 'shimla', 'bilaspur', 'kullu', 'mandi', 'dharamshala', 'rohtang']):
-        for c in ['Dehradun', 'Rishikesh', 'Shimla', 'Bilaspur', 'Dharamshala']:
-            if c.lower() in full:
-                return 'Uttarakhand & Himachal', c
-        return 'Uttarakhand & Himachal', 'Hill Regions'
-
-    if any(k in full for k in ['punjab', 'haryana', 'chandigarh', 'ropar', 'amritsar', 'ludhiana', 'panipat', 'ambala', 'gurugram', 'faridabad', 'karnal']):
-        for c in ['Chandigarh', 'Gurugram', 'Faridabad', 'Ropar', 'Amritsar', 'Ludhiana']:
-            if c.lower() in full:
-                return 'Punjab & Haryana', c
-        return 'Punjab & Haryana', 'Statewide / Other'
-
-    if any(k in full for k in ['rajasthan', 'gujarat', 'jaipur', 'jodhpur', 'udaipur', 'ahmedabad', 'surat', 'vadodara', 'gandhinagar', 'rajkot']):
-        for c in ['Ahmedabad', 'Jaipur', 'Surat', 'Jodhpur', 'Vadodara', 'Gandhinagar']:
-            if c.lower() in full:
-                return 'Rajasthan & Gujarat', c
-        return 'Rajasthan & Gujarat', 'Statewide / Other'
-
-    if any(k in full for k in ['tamil nadu', 'chennai', 'coimbatore', 'madurai', 'kerala', 'kochi', 'thiruvananthapuram', 'telangana', 'hyderabad', 'andhra', 'visakhapatnam', 'amaravati']):
-        for c in ['Chennai', 'Hyderabad', 'Kochi', 'Visakhapatnam', 'Coimbatore']:
-            if c.lower() in full:
-                return 'Southern States (TN, TG, KL, AP)', c
-        return 'Southern States (TN, TG, KL, AP)', 'Regional / Other'
-
-    if any(k in full for k in ['madhya pradesh', 'chhattisgarh', 'bhopal', 'indore', 'jabalpur', 'gwalior', 'raipur']):
-        for c in ['Bhopal', 'Indore', 'Raipur', 'Gwalior', 'Jabalpur']:
-            if c.lower() in full:
-                return 'Madhya Pradesh & CG', c
-        return 'Madhya Pradesh & CG', 'Statewide / Other'
-
-    if any(k in full for k in ['delhi', 'dda', 'new delhi', 'dwarka', 'narela', 'rohini', 'jasola', 'pitampura', 'saket', 'siri fort', 'janakpuri', 'kashmere gate', 'central vista', 'kartavya']):
-        for c in ['Dwarka', 'Narela', 'Rohini', 'Jasola', 'Pitampura', 'Central Delhi', 'South Delhi', 'Siri Fort']:
-            if c.lower() in full:
-                return 'Delhi NCR', c
-        return 'Delhi NCR', 'New Delhi (HQ)'
-
-    return 'Pan-India / Central', 'All India'
+    return 'Pan-India / Central', 'New Delhi'
 
 
 # =============================================================================
@@ -607,7 +785,7 @@ OFFICIAL_OPEN_DATA_FEEDS: List[Dict[str, Any]] = [
         "turnover_criteria": "Minimum average annual financial turnover of ₹ 872 Cr during the last 3 financial years.",
         "solvency_criteria": "Solvency certificate of ₹ 436 Cr from a Nationalized / Scheduled Commercial Bank.",
         "experience_criteria": "Executed similar regional water transmission pipeline and WTP works of at least ₹ 1,090 Cr.",
-        "state": "Rajasthan & Gujarat",
+        "state": "Rajasthan",
         "city": "Jaipur",
         "status": "Active / In Progress",
         "is_ogd_open_data": True,
@@ -641,7 +819,7 @@ OFFICIAL_OPEN_DATA_FEEDS: List[Dict[str, Any]] = [
         "turnover_criteria": "Minimum average annual turnover of ₹ 580 Cr in IT / SI infrastructure over last 3 financial years.",
         "solvency_criteria": "Banker Solvency Certificate of ₹ 290 Cr.",
         "experience_criteria": "Successfully implemented at least 1 Tier-1 Smart City ICCC or enterprise IoT platform of ₹ 725 Cr value.",
-        "state": "Delhi NCR",
+        "state": "Delhi",
         "city": "Central Delhi",
         "status": "Active / In Progress",
         "is_ogd_open_data": True,
@@ -675,7 +853,7 @@ OFFICIAL_OPEN_DATA_FEEDS: List[Dict[str, Any]] = [
         "turnover_criteria": "Average annual turnover of ₹ 1,240 Cr in the last 3 financial years.",
         "solvency_criteria": "Bank Solvency Certificate of ₹ 620 Cr.",
         "experience_criteria": "Successful commissioning of at least two 400 kV or one 765 kV GIS substations in India.",
-        "state": "Madhya Pradesh & CG",
+        "state": "Madhya Pradesh",
         "city": "Bhopal",
         "status": "Active / In Progress",
         "is_ogd_open_data": True,
@@ -707,10 +885,24 @@ def get_all_current_tenders_catalog() -> List[Dict[str, Any]]:
     combined: List[Dict[str, Any]] = list(OFFICIAL_OPEN_DATA_FEEDS) + list(raw_catalog)
 
     for t in combined:
-        if "state" not in t or "city" not in t:
-            s, c = detect_state_and_city(t["title"], t.get("scope_summary", ""), t.get("organization", ""))
-            t["state"] = s
-            t["city"] = c
+        portal_name = t.get("source_portal", "")
+        binding = find_statutory_portal_binding(portal_name)
+        
+        if binding:
+            p_state, p_default_city = binding
+            t["state"] = p_state
+                
+            valid_cities = STATE_CITY_MAP.get(p_state, [])
+            current_city = t.get("city", "")
+            city_valid = bool(current_city and (current_city in valid_cities or any(current_city.lower() == vc.lower() for vc in valid_cities)))
+            if not city_valid or (current_city.lower() in ("new delhi", "delhi", "all india") and p_state != "Delhi"):
+                _, c = detect_state_and_city(t.get("title", ""), t.get("scope_summary", ""), t.get("organization", ""), portal_name)
+                t["city"] = c if (c in valid_cities or any(c.lower() == vc.lower() for vc in valid_cities)) else p_default_city
+        else:
+            if "state" not in t or "city" not in t:
+                s, c = detect_state_and_city(t["title"], t.get("scope_summary", ""), t.get("organization", ""), portal_name)
+                t["state"] = s
+                t["city"] = c
         if "days_left" not in t:
             t["days_left"] = 21
         t["bidding_status"] = "IN PROGRESS (NOT YET FILLED / OPEN FOR BIDDING)"
