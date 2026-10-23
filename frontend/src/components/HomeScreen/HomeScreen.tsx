@@ -6,11 +6,8 @@ import {
   Users,
   Search,
   ExternalLink,
-  ShieldCheck,
-  Zap,
   TrendingDown,
   Cpu,
-  Database,
   CheckCircle2,
   ChevronRight,
   ArrowRight,
@@ -633,58 +630,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
       </section>
 
       {/* ========================================================================= */}
-      {/* 5. ZERO DATABASE ARCHITECTURE EXPLANATION */}
-      {/* ========================================================================= */}
-      <section className="bg-gradient-to-r from-slate-900 via-slate-850 to-slate-900 border border-slate-800 rounded-2xl p-6 sm:p-8 text-white space-y-5 shadow-lg">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-purple-500/20 border border-purple-500/40 flex items-center justify-center text-purple-400">
-            <Database className="w-4 h-4" />
-          </div>
-          <div>
-            <h3 className="text-base sm:text-lg font-bold text-white">
-              Why Purely Scraping-Based Architecture? (Zero Database Required)
-            </h3>
-            <p className="text-xs text-slate-400">
-              Direct In-Memory RAM Streaming vs Traditional Stale Database Aggregators
-            </p>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
-          <div className="bg-slate-800/60 border border-slate-700/70 rounded-xl p-4 space-y-2">
-            <div className="flex items-center gap-2 text-orange-400 font-bold">
-              <Zap className="w-4 h-4" />
-              <span>1. Zero Stale Notices</span>
-            </div>
-            <p className="text-slate-300 leading-relaxed">
-              Traditional aggregator websites store tender notices in relational databases that lag behind official government portals. All India Tenders streams live in-progress notices directly from statutory endpoints into RAM, ensuring 0% stale records.
-            </p>
-          </div>
-
-          <div className="bg-slate-800/60 border border-slate-700/70 rounded-xl p-4 space-y-2">
-            <div className="flex items-center gap-2 text-emerald-400 font-bold">
-              <Cpu className="w-4 h-4" />
-              <span>2. Sub-Millisecond RAM Queries</span>
-            </div>
-            <p className="text-slate-300 leading-relaxed">
-              All 2,688 active tenders and 2,602 historical records reside directly in memory with optimized indexing structures. Instant search, multi-faceted filtering, and bidder calculations execute without disk I/O bottlenecks.
-            </p>
-          </div>
-
-          <div className="bg-slate-800/60 border border-slate-700/70 rounded-xl p-4 space-y-2">
-            <div className="flex items-center gap-2 text-cyan-400 font-bold">
-              <ShieldCheck className="w-4 h-4" />
-              <span>3. Exact Statutory Fidelity</span>
-            </div>
-            <p className="text-slate-300 leading-relaxed">
-              Zero intermediate transformation loss. You receive the exact statutory Standard Bidding Documents (SBD), NIT reference numbers, Volume I–IV specifications, and BOQ schedules published by the government authorities.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* ========================================================================= */}
-      {/* 6. BOTTOM CALL TO ACTION BANNER */}
+      {/* 5. BOTTOM CALL TO ACTION BANNER */}
       {/* ========================================================================= */}
       <section className="bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-6">
         <div className="space-y-1.5 text-center sm:text-left">
