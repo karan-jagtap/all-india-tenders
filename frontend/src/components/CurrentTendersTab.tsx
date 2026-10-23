@@ -58,6 +58,7 @@ export const CurrentTendersTab: React.FC = () => {
   const [selectedValueRange, setSelectedValueRange] = useState<string>('ALL');
   const [isVoiceSearching, setIsVoiceSearching] = useState<boolean>(false);
   const voiceSearchRef = useRef<any>(null);
+  const dossierRef = useRef<HTMLDivElement>(null);
 
   // Overlapping Filter Sidebar Drawer State
   const [isFilterSidebarOpen, setIsFilterSidebarOpen] = useState<boolean>(false);
@@ -574,6 +575,9 @@ export const CurrentTendersTab: React.FC = () => {
                   onSelect={() => {
                     setSelectedTenderId(tender.id);
                     setActiveSubTab('specs');
+                    if (window.innerWidth < 1024) {
+                      dossierRef.current?.scrollIntoView({ behavior: 'smooth' });
+                    }
                   }}
                   onCopyNit={handleCopyNit}
                   copiedNit={copiedNit}
@@ -616,7 +620,7 @@ export const CurrentTendersTab: React.FC = () => {
         </div>
 
         {/* Right Column: Deep-Dive Dossier (65%) */}
-        <div className="space-y-4">
+        <div ref={dossierRef} className="space-y-4">
           {!selectedTender || filteredTenders.length === 0 ? (
             <div className="bg-white rounded-xl border border-slate-200 p-12 text-center shadow-xs">
               <Radio className="w-10 h-10 text-slate-300 mx-auto mb-3" />

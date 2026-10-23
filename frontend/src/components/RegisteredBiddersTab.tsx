@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { Building2, AlertCircle } from 'lucide-react';
 import { RegisteredBidder, BidderWonContract } from '../types';
 import { listRegisteredBidders } from '../services/api';
@@ -25,6 +25,7 @@ export const RegisteredBiddersTab: React.FC = () => {
   const [copiedText, setCopiedText] = useState<string | null>(null);
 
   const [contractSearchQuery, setContractSearchQuery] = useState<string>('');
+  const dossierRef = useRef<HTMLDivElement>(null);
 
   const loadData = () => {
     setLoading(true);
@@ -223,6 +224,9 @@ export const RegisteredBiddersTab: React.FC = () => {
                   onSelect={() => {
                     setSelectedBidderId(b.id);
                     setContractSearchQuery('');
+                    if (window.innerWidth < 1024) {
+                      dossierRef.current?.scrollIntoView({ behavior: 'smooth' });
+                    }
                   }}
                 />
               );
@@ -231,7 +235,7 @@ export const RegisteredBiddersTab: React.FC = () => {
         </div>
 
         {/* Right Column: Complete Contractor Profile Dossier (65% -> col-span-8) */}
-        <div className="lg:col-span-8 xl:col-span-8">
+        <div ref={dossierRef} className="lg:col-span-8 xl:col-span-8">
           {selectedBidder ? (
             <div className="space-y-4">
               {/* Header Dossier Card */}

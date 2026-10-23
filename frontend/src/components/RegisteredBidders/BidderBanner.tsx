@@ -36,7 +36,7 @@ export const BidderBanner: React.FC<BidderBannerProps> = ({
           </p>
         </div>
 
-        <div className="flex items-center gap-3 shrink-0 flex-wrap">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 shrink-0 w-full md:w-auto">
           <div className="bg-slate-800/80 border border-slate-700/80 px-4 py-2.5 rounded-lg text-center">
             <span className="text-[10px] uppercase font-semibold text-slate-400 block">Registered Bidders</span>
             <span className="text-base font-bold text-blue-400 font-mono">

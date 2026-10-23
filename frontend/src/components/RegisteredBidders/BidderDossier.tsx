@@ -47,7 +47,7 @@ export const BidderDossier: React.FC<BidderDossierProps> = ({
           </div>
         </div>
 
-        <div className="text-right shrink-0 bg-blue-50/60 p-3 rounded-xl border border-blue-200 text-xs">
+        <div className="text-left sm:text-right shrink-0 bg-blue-50/60 p-3 rounded-xl border border-blue-200 text-xs">
           <span className="text-[10px] text-blue-700 uppercase font-semibold block">Total Portfolio Won</span>
           <strong className="text-lg font-bold text-blue-950 font-mono block">
             {formatCr(selectedBidder.total_awarded_value_inr)}
@@ -65,8 +65,8 @@ export const BidderDossier: React.FC<BidderDossierProps> = ({
           <strong className="text-sm font-bold text-slate-900 block mt-0.5 font-mono">
             {formatCr(selectedBidder.audited_turnover_inr)}
           </strong>
-          <span className="text-[9px] text-slate-500 block truncate mt-1" title={selectedBidder.ca_udin}>
-            UDIN: {selectedBidder.ca_udin.slice(0, 15)}...
+          <span className="text-[9px] text-slate-500 block break-all mt-1" title={selectedBidder.ca_udin}>
+            UDIN: {selectedBidder.ca_udin}
           </span>
         </div>
 
@@ -75,8 +75,8 @@ export const BidderDossier: React.FC<BidderDossierProps> = ({
           <strong className="text-sm font-bold text-purple-700 block mt-0.5 font-mono">
             {formatCr(selectedBidder.solvency_certificate_inr)}
           </strong>
-          <span className="text-[9px] text-slate-500 block truncate mt-1" title={selectedBidder.solvency_bank}>
-            {selectedBidder.solvency_bank.slice(0, 20)}...
+          <span className="text-[9px] text-slate-500 block break-words mt-1" title={selectedBidder.solvency_bank}>
+            {selectedBidder.solvency_bank}
           </span>
         </div>
 
@@ -92,10 +92,10 @@ export const BidderDossier: React.FC<BidderDossierProps> = ({
 
         <div className="bg-slate-50 p-3 rounded-xl border border-slate-100">
           <span className="text-[10px] text-slate-400 uppercase font-semibold block">Project Leadership</span>
-          <strong className="text-xs font-bold text-slate-800 block mt-0.5 truncate" title={selectedBidder.project_lead}>
+          <strong className="text-xs font-bold text-slate-800 block mt-0.5 break-words" title={selectedBidder.project_lead}>
             {selectedBidder.project_lead.split(',')[0]}
           </strong>
-          <span className="text-[9px] text-slate-500 block mt-1 truncate">
+          <span className="text-[9px] text-slate-500 block mt-1 break-words">
             {selectedBidder.project_lead.split(',')[1] || 'Authorized Lead'}
           </span>
         </div>
@@ -105,10 +105,10 @@ export const BidderDossier: React.FC<BidderDossierProps> = ({
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-xs">
         <div className="bg-blue-50/60 p-3 rounded-xl border border-blue-200">
           <span className="text-[10px] text-blue-700 uppercase font-semibold block">Credit Rating</span>
-          <strong className="text-xs font-bold text-blue-950 block mt-0.5 truncate" title={selectedBidder.credit_rating}>
+          <strong className="text-xs font-bold text-blue-950 block mt-0.5 break-words" title={selectedBidder.credit_rating}>
             {selectedBidder.credit_rating?.split('(')[0]?.trim() || 'CRISIL AAA'}
           </strong>
-          <span className="text-[9px] text-blue-700 block truncate mt-0.5">
+          <span className="text-[9px] text-blue-700 block break-words mt-0.5">
             Agency: {selectedBidder.credit_rating_agency || 'CRISIL / ICRA'}
           </span>
         </div>
@@ -128,14 +128,14 @@ export const BidderDossier: React.FC<BidderDossierProps> = ({
           <strong className="text-xs font-bold text-amber-950 block mt-0.5 font-mono">
             {formatCr(selectedBidder.unexecuted_order_book_inr)}
           </strong>
-          <span className="text-[9px] text-amber-800 block truncate mt-0.5">
+          <span className="text-[9px] text-amber-800 block break-words mt-0.5">
             Fleet Asset: {formatCr(selectedBidder.equipment_fleet_val_inr)}
           </span>
         </div>
 
         <div className="bg-purple-50/60 p-3 rounded-xl border border-purple-200">
           <span className="text-[10px] text-purple-700 uppercase font-semibold block">PQC Standing Tier</span>
-          <strong className="text-xs font-bold text-purple-950 block mt-0.5 truncate" title={selectedBidder.pqc_clearance_rating}>
+          <strong className="text-xs font-bold text-purple-950 block mt-0.5 break-words" title={selectedBidder.pqc_clearance_rating}>
             {selectedBidder.pqc_clearance_rating || 'Super Class-I National'}
           </strong>
           <span className="text-[9px] text-purple-700 block mt-0.5 font-mono">

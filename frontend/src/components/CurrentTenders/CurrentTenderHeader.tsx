@@ -267,10 +267,10 @@ export const CurrentTenderHeader: React.FC<CurrentTenderHeaderProps> = ({
       </div>
 
       {/* Sub-Tabs Navigation */}
-      <div className="flex flex-wrap items-center gap-1.5 mt-4 pt-3 border-t border-slate-100">
+      <div className="flex overflow-x-auto pb-1 no-scrollbar sm:flex-wrap items-center gap-1.5 mt-4 pt-3 border-t border-slate-100">
         <button
           onClick={() => setActiveSubTab('specs')}
-          className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all ${
+          className={`shrink-0 whitespace-nowrap px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
             activeSubTab === 'specs'
               ? 'bg-slate-900 text-white shadow-xs'
               : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
@@ -282,7 +282,7 @@ export const CurrentTenderHeader: React.FC<CurrentTenderHeaderProps> = ({
 
         <button
           onClick={() => setActiveSubTab('pqc')}
-          className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all ${
+          className={`shrink-0 whitespace-nowrap px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
             activeSubTab === 'pqc'
               ? 'bg-slate-900 text-white shadow-xs'
               : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
@@ -294,7 +294,7 @@ export const CurrentTenderHeader: React.FC<CurrentTenderHeaderProps> = ({
 
         <button
           onClick={() => setActiveSubTab('msme')}
-          className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all ${
+          className={`shrink-0 whitespace-nowrap px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
             activeSubTab === 'msme'
               ? 'bg-slate-900 text-white shadow-xs'
               : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
@@ -306,7 +306,7 @@ export const CurrentTenderHeader: React.FC<CurrentTenderHeaderProps> = ({
 
         <button
           onClick={() => setActiveSubTab('pdf')}
-          className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all ${
+          className={`shrink-0 whitespace-nowrap px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
             activeSubTab === 'pdf'
               ? 'bg-indigo-900 text-white shadow-xs'
               : 'bg-indigo-50/70 text-indigo-900 hover:bg-indigo-100 border border-indigo-200'
@@ -321,7 +321,7 @@ export const CurrentTenderHeader: React.FC<CurrentTenderHeaderProps> = ({
 
         <button
           onClick={() => setActiveSubTab('scraping')}
-          className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all ${
+          className={`shrink-0 whitespace-nowrap px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
             activeSubTab === 'scraping'
               ? 'bg-slate-900 text-white shadow-xs'
               : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
@@ -333,7 +333,7 @@ export const CurrentTenderHeader: React.FC<CurrentTenderHeaderProps> = ({
 
         <button
           onClick={() => setActiveSubTab('prediction')}
-          className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
+          className={`shrink-0 whitespace-nowrap px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
             activeSubTab === 'prediction'
               ? 'bg-gradient-to-r from-orange-600 via-amber-600 to-amber-700 text-white shadow-sm ring-1 ring-amber-400'
               : 'bg-amber-50 text-amber-900 border border-amber-300 hover:bg-amber-100 font-bold'
@@ -345,7 +345,7 @@ export const CurrentTenderHeader: React.FC<CurrentTenderHeaderProps> = ({
 
         <button
           onClick={() => setActiveSubTab('rag_analysis')}
-          className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
+          className={`shrink-0 whitespace-nowrap px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
             activeSubTab === 'rag_analysis'
               ? 'bg-gradient-to-r from-blue-700 via-indigo-700 to-indigo-800 text-white shadow-sm ring-1 ring-indigo-400'
               : 'bg-indigo-50 text-indigo-900 border border-indigo-300 hover:bg-indigo-100 font-bold'

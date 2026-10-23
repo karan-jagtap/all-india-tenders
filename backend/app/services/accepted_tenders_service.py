@@ -1533,12 +1533,75 @@ for _t in ACCEPTED_TENDERS_CATALOG:
     og["city"] = ct
 
 
-def list_accepted_tenders(category: Optional[str] = None, year: Optional[int] = None) -> List[Dict[str, Any]]:
+from app.services.filter_utils import matches_keyword_search, matches_exact_or_all
+
+
+def list_accepted_tenders(
+    category: Optional[str] = None,
+    year: Optional[int] = None,
+    source_portal: Optional[str] = None,
+    organization: Optional[str] = None,
+    state: Optional[str] = None,
+    city: Optional[str] = None,
+    search: Optional[str] = None
+) -> List[Dict[str, Any]]:
+    """Filters accepted tenders across sector, fiscal year, portal, authority, state, and search terms."""
     results = ACCEPTED_TENDERS_CATALOG
-    if category:
-        results = [t for t in results if t["category"].lower() == category.lower()]
+
+    if category and category.upper() != "ALL":
+        results = [t for t in results if matches_exact_or_all(t.get("category"), category)]
+
     if year:
         results = [t for t in results if t.get("year") == year]
+
+    if source_portal and source_portal.upper() != "ALL":
+        results = [
+            t for t in results
+            if matches_exact_or_all(t.get("og_tender", {}).get("portal"), source_portal)
+            or matches_exact_or_all(t.get("source_portal"), source_portal)
+        ]
+
+    if organization and organization.upper() != "ALL":
+        results = [
+            t for t in results
+            if matches_exact_or_all(t.get("og_tender", {}).get("authority"), organization)
+            or matches_exact_or_all(t.get("organization"), organization)
+        ]
+
+    if state and state.upper() != "ALL":
+        results = [
+            t for t in results
+            if matches_exact_or_all(t.get("state"), state)
+            or matches_exact_or_all(t.get("og_tender", {}).get("state"), state)
+        ]
+
+    if city and city.upper() != "ALL":
+        results = [
+            t for t in results
+            if matches_exact_or_all(t.get("city"), city)
+            or matches_exact_or_all(t.get("og_tender", {}).get("city"), city)
+        ]
+
+    if search and search.strip():
+        results = [
+            t for t in results
+            if matches_keyword_search(
+                [
+                    t.get("title"),
+                    t.get("winning_company", {}).get("name"),
+                    t.get("winning_company", {}).get("cin"),
+                    t.get("winning_company", {}).get("gstin"),
+                    t.get("winning_company", {}).get("pan"),
+                    t.get("og_tender", {}).get("nit_number"),
+                    t.get("og_tender", {}).get("authority"),
+                    t.get("og_tender", {}).get("portal"),
+                    t.get("state"),
+                    t.get("city")
+                ],
+                search
+            )
+        ]
+
     return results
 
 

@@ -18,12 +18,25 @@ router = APIRouter(tags=["Accepted Tenders"])
 @router.get("/accepted-tenders")
 async def get_accepted_tenders(
     category: Optional[str] = Query(None, description="Tender category filter"),
-    year: Optional[int] = Query(None, description="Tender year filter")
+    year: Optional[int] = Query(None, description="Tender year filter"),
+    source_portal: Optional[str] = Query(None, description="Procurement portal filter"),
+    organization: Optional[str] = Query(None, description="Procuring authority filter"),
+    state: Optional[str] = Query(None, description="State / geography filter"),
+    city: Optional[str] = Query(None, description="City / municipal district filter"),
+    search: Optional[str] = Query(None, description="Full-text keyword search")
 ):
     """
-    Returns all previously awarded tenders and winning bid dossiers.
+    Returns all previously awarded tenders and winning bid dossiers with optional multi-dimensional filtering.
     """
-    tenders = list_accepted_tenders(category=category, year=year)
+    tenders = list_accepted_tenders(
+        category=category,
+        year=year,
+        source_portal=source_portal,
+        organization=organization,
+        state=state,
+        city=city,
+        search=search
+    )
     return JSONResponse(
         content=tenders,
         headers={

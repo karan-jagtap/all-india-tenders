@@ -1,7 +1,8 @@
 import React, { useState, useMemo } from 'react';
-import { Globe, Search, Filter, RefreshCw } from 'lucide-react';
+import { Globe, Filter, RefreshCw } from 'lucide-react';
 import { REAL_PORTAL_SOURCES } from '../../../constants/portalSources';
 import { PortalSourceCard } from './PortalSourceCard';
+import { FilterSearchBar } from '../../common';
 
 export interface HomeSourcesDirectoryProps {
   onNavigate: (tab: 'current' | 'accepted' | 'bidders') => void;
@@ -75,17 +76,15 @@ export const HomeSourcesDirectory: React.FC<HomeSourcesDirectoryProps> = ({
       {/* Search & Category Filter Toolbar */}
       <div className="bg-white border border-slate-200 rounded-xl p-3 sm:p-4 shadow-2xs space-y-3">
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
-          {/* Search input */}
-          <div className="relative flex-1 max-w-lg">
-            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-            <input
-              type="text"
-              value={portalSearch}
-              onChange={(e) => setPortalSearch(e.target.value)}
-              placeholder="Search portal name, domain (e.g. eprocure.gov.in), state, or authority (NHAI, DMRC)..."
-              className="w-full bg-slate-50 border border-slate-200 rounded-lg pl-9 pr-4 py-2 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500"
-            />
-          </div>
+          {/* Reusable Search Bar Component */}
+          <FilterSearchBar
+            searchQuery={portalSearch}
+            setSearchQuery={setPortalSearch}
+            placeholder="Search portal name, domain (e.g. eprocure.gov.in), state, or authority (NHAI, DMRC)..."
+            variant="light"
+            accentColor="blue"
+            className="flex-1 max-w-lg"
+          />
 
           {/* Region Select */}
           <div className="flex items-center gap-2 shrink-0">

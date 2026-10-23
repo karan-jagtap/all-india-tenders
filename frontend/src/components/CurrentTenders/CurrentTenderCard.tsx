@@ -29,54 +29,56 @@ export const CurrentTenderCard: React.FC<CurrentTenderCardProps> = ({
           : 'bg-white border-slate-200 hover:border-slate-300 hover:bg-slate-50/70 shadow-2xs'
       }`}
     >
-      {/* 1. Line 1: In Progress & Days Left badges (Left) + Close Date (Right Aligned) */}
-      <div className="flex items-center justify-between gap-2 mb-1.5">
-        <div className="flex items-center gap-1.5 shrink-0">
-          <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-900 border border-emerald-300 flex items-center gap-1 shrink-0">
+      {/* 1. Line 1: In Progress & Days Left badges + Close Date (Responsive wrapping) */}
+      <div className="flex flex-wrap items-center justify-between gap-1.5 mb-2">
+        <div className="flex flex-wrap items-center gap-1.5">
+          <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-900 border border-emerald-300 flex items-center gap-1">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse" />
             IN PROGRESS (UNFILLED)
           </span>
           {getUrgencyBadge(tender.days_left)}
         </div>
-        <span className="text-[11px] text-slate-400 font-mono flex items-center gap-1 shrink-0">
-          <Calendar className="w-3 h-3" />
+        <span className="text-[11px] text-slate-500 font-mono flex items-center gap-1">
+          <Calendar className="w-3 h-3 text-slate-400" />
           <span>Closes: {tender.closing_date}</span>
         </span>
       </div>
 
       {/* 2. Line 2: Source portal badge */}
-      <div className="flex items-center gap-1.5 mb-2 text-xs">
+      <div className="flex flex-wrap items-center gap-1.5 mb-2 text-xs">
         <span
           title={tender.source_portal}
-          className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-700 border border-slate-200 truncate max-w-[240px]"
+          className="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-700 border border-slate-200 break-words"
         >
           {sourceLabel}
         </span>
         {(tender.is_ogd_open_data || tender.source_portal.includes('data.gov.in')) && (
-          <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-cyan-100 text-cyan-900 border border-cyan-300 flex items-center gap-1 shadow-2xs shrink-0">
+          <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-cyan-100 text-cyan-900 border border-cyan-300 flex items-center gap-1 shadow-2xs">
             🏛️ data.gov.in (OGD)
           </span>
         )}
       </div>
 
-      <h3 className="font-bold text-slate-900 text-xs leading-snug line-clamp-2 mb-1.5">
+      {/* 3. Full Tender Title (Whole text displayed, zero cutoff) */}
+      <h3 className="font-bold text-slate-900 text-xs leading-snug break-words mb-2">
         {tender.title}
       </h3>
 
-      <div className="text-[11px] text-slate-500 mb-1 flex items-center gap-1">
-        <Building2 className="w-3 h-3 text-slate-400 shrink-0" />
-        <span className="truncate">{tender.organization}</span>
+      {/* 4. Procuring Authority (Whole text displayed) */}
+      <div className="text-[11px] text-slate-600 mb-2 flex items-start gap-1.5">
+        <Building2 className="w-3.5 h-3.5 text-slate-400 shrink-0 mt-0.5" />
+        <span className="break-words font-medium">{tender.organization}</span>
       </div>
 
       {/* Location badge & Scraping Origin */}
-      <div className="text-[10px] text-slate-600 mb-2 flex items-center gap-1.5 flex-wrap">
+      <div className="text-[10px] text-slate-600 mb-2.5 flex items-center gap-1.5 flex-wrap">
         <span className="inline-flex items-center gap-1 bg-rose-50/70 border border-rose-200/70 px-2 py-0.5 rounded-md text-[10px]">
           <MapPin className="w-3 h-3 text-rose-500 shrink-0" />
           <span className="font-semibold text-slate-800">{tender.state}</span>
           <span className="text-slate-300">•</span>
           <span className="text-rose-700 font-medium">{tender.city}</span>
         </span>
-        <span className="inline-flex items-center gap-1 bg-blue-50/70 border border-blue-200/70 px-2 py-0.5 rounded-md text-[10px] text-blue-800 font-medium truncate max-w-[170px]">
+        <span className="inline-flex items-center gap-1 bg-blue-50/70 border border-blue-200/70 px-2 py-0.5 rounded-md text-[10px] text-blue-800 font-medium break-words">
           {tender.category}
         </span>
         <span className="inline-flex items-center gap-1 bg-indigo-50 border border-indigo-200 px-1.5 py-0.5 rounded text-[9px] text-indigo-700 font-semibold">

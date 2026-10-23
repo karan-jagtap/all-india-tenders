@@ -63,7 +63,7 @@ export const TopFilterActionBar: React.FC<TopFilterActionBarProps> = ({
   };
 
   return (
-    <div className={`flex items-center gap-2 shrink-0 justify-end ${className}`}>
+    <div className={`flex flex-wrap sm:flex-nowrap items-center gap-1.5 sm:gap-2 shrink-0 justify-end ${className}`}>
       {/* PRIMARY FILTER BUTTON: Opens Right Overlapping Sidebar Drawer */}
       <button
         onClick={onOpenFilters}

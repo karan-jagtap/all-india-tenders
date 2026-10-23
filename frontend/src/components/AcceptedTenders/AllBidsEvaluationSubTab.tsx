@@ -427,6 +427,10 @@ export const AllBidsEvaluationSubTab: React.FC<AllBidsEvaluationSubTabProps> = (
           </span>
         </div>
 
+        <div className="sm:hidden text-[11px] text-slate-500 font-medium px-1 flex items-center justify-between">
+          <span>← Swipe table horizontally to see all columns →</span>
+        </div>
+
         <div className="overflow-x-auto rounded-xl border border-slate-200 shadow-2xs">
           <table className="w-full text-left text-xs">
             <thead className="bg-slate-900 text-white uppercase text-[10px] tracking-wider font-bold">
@@ -474,7 +478,7 @@ export const AllBidsEvaluationSubTab: React.FC<AllBidsEvaluationSubTabProps> = (
                       <td className="py-3 px-3">
                         <div className="flex items-center gap-1.5 font-bold text-slate-900">
                           {isWinner && <Award className="w-3.5 h-3.5 text-emerald-600 shrink-0" />}
-                          <span className="truncate max-w-[240px] sm:max-w-[320px]">
+                          <span className="break-words">
                             {bid.name}
                           </span>
                         </div>

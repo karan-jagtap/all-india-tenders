@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Tag, MapPin, TrendingUp, RotateCcw } from 'lucide-react';
 import { QUICK_SECTOR_CHIPS } from '../../constants';
-import { FilterSearchBar } from '../common';
+import { FilterSearchBar, SearchableDropdown, DropdownOption } from '../common';
 
 export type BidderSortOption = 'NAME_ASC' | 'NAME_DESC' | 'CONTRACTS_DESC' | 'VALUE_DESC' | 'TURNOVER_DESC';
 
@@ -34,6 +34,20 @@ export const BidderFilterBar: React.FC<BidderFilterBarProps> = ({
   hasActiveFilters,
   resetFilters
 }) => {
+  const categoryOptions: DropdownOption[] = useMemo(() => {
+    return allCategories.map((c) => ({
+      value: c,
+      label: c
+    }));
+  }, [allCategories]);
+
+  const stateOptions: DropdownOption[] = useMemo(() => {
+    return allStates.map((s) => ({
+      value: s,
+      label: s
+    }));
+  }, [allStates]);
+
   return (
     <div className="bg-slate-900 border border-slate-800 rounded-xl p-4 space-y-3 shadow-xs">
       {/* Primary Bar: Search on LEFT, Filters & Sort on RIGHT */}
@@ -51,49 +65,41 @@ export const BidderFilterBar: React.FC<BidderFilterBarProps> = ({
         {/* RIGHT SECTION: Dropdowns & Reset */}
         <div className="flex flex-wrap items-center gap-2 shrink-0">
           {/* Category Filter */}
-          <div className="flex items-center gap-1.5 bg-slate-800/90 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs">
-            <Tag className="w-3.5 h-3.5 text-blue-400 shrink-0" />
-            <span className="text-slate-300 font-semibold">Specialization:</span>
-            <select
+          <div className="w-full sm:w-52">
+            <SearchableDropdown
               value={selectedCategory}
-              onChange={(e) => setSelectedCategory(e.target.value)}
-              className="bg-transparent text-white font-medium focus:outline-none cursor-pointer max-w-[170px] truncate"
-            >
-              <option value="ALL" className="bg-slate-900 text-white">All Specializations ({allCategories.length})</option>
-              {allCategories.map((c) => (
-                <option key={c} value={c} className="bg-slate-900 text-white">
-                  {c}
-                </option>
-              ))}
-            </select>
+              onChange={setSelectedCategory}
+              options={categoryOptions}
+              allOptionLabel="All Specializations"
+              allOptionCount={allCategories.length}
+              placeholder="Search specialization..."
+              icon={<Tag className="w-3.5 h-3.5 text-blue-400" />}
+              accentColor="blue"
+            />
           </div>
 
           {/* State Filter */}
-          <div className="flex items-center gap-1.5 bg-slate-800/90 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs">
-            <MapPin className="w-3.5 h-3.5 text-rose-400 shrink-0" />
-            <span className="text-slate-300 font-semibold">State:</span>
-            <select
+          <div className="w-full sm:w-48">
+            <SearchableDropdown
               value={selectedState}
-              onChange={(e) => setSelectedState(e.target.value)}
-              className="bg-transparent text-white font-medium focus:outline-none cursor-pointer max-w-[150px] truncate"
-            >
-              <option value="ALL" className="bg-slate-900 text-white">All States ({allStates.length})</option>
-              {allStates.map((s) => (
-                <option key={s} value={s} className="bg-slate-900 text-white">
-                  {s}
-                </option>
-              ))}
-            </select>
+              onChange={setSelectedState}
+              options={stateOptions}
+              allOptionLabel="All States"
+              allOptionCount={allStates.length}
+              placeholder="Search state..."
+              icon={<MapPin className="w-3.5 h-3.5 text-rose-400" />}
+              accentColor="rose"
+            />
           </div>
 
           {/* Sort Dropdown */}
-          <div className="flex items-center gap-1.5 bg-slate-800/90 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs">
+          <div className="flex items-center gap-1.5 bg-slate-800/90 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs w-full sm:w-auto">
             <TrendingUp className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
             <span className="text-slate-300 font-semibold">Sort By:</span>
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value as BidderSortOption)}
-              className="bg-transparent text-white font-medium focus:outline-none cursor-pointer"
+              className="bg-transparent text-white font-medium focus:outline-none cursor-pointer flex-1"
             >
               <option value="NAME_ASC" className="bg-slate-900 text-white">Alphabetical (A → Z)</option>
               <option value="NAME_DESC" className="bg-slate-900 text-white">Alphabetical (Z → A)</option>

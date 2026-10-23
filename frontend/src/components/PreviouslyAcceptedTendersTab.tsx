@@ -277,6 +277,7 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
   const [selectedYear, setSelectedYear] = useState<string>('ALL');
   const [isVoiceSearching, setIsVoiceSearching] = useState<boolean>(false);
   const voiceSearchRef = useRef<any>(null);
+  const dossierRef = useRef<HTMLDivElement>(null);
 
   // Overlapping Filter Sidebar Drawer State
   const [isFilterSidebarOpen, setIsFilterSidebarOpen] = useState<boolean>(false);
@@ -997,6 +998,9 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
                   onClick={() => {
                     setSelectedTenderId(tender.id);
                     setActiveSubTab('comparison');
+                    if (window.innerWidth < 1024) {
+                      dossierRef.current?.scrollIntoView({ behavior: 'smooth' });
+                    }
                   }}
                   className={`cursor-pointer rounded-xl p-4 border transition-all text-xs relative ${
                     isSelected
@@ -1004,7 +1008,7 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
                       : 'bg-white border-slate-200 hover:border-slate-300 hover:bg-slate-50/70 shadow-2xs'
                   }`}
                 >
-                  <div className="flex items-center justify-between mb-1.5">
+                  <div className="flex flex-wrap items-center justify-between gap-1.5 mb-1.5">
                     <div className="flex items-center gap-1.5 flex-wrap">
                       <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200 flex items-center gap-1">
                         <Award className="w-3 h-3 text-emerald-600" />
@@ -1016,25 +1020,25 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
                         </span>
                       )}
                       <span
-                        className="px-1.5 py-0.5 rounded text-[10px] font-medium bg-slate-100 text-slate-700 border border-slate-200 truncate max-w-[130px]"
+                        className="px-1.5 py-0.5 rounded text-[10px] font-medium bg-slate-100 text-slate-700 border border-slate-200 break-words"
                         title={tender._source}
                       >
                         {sourceLabel}
                       </span>
                     </div>
-                    <span className="text-[11px] text-slate-400 font-mono flex items-center gap-1 shrink-0">
+                    <span className="text-[11px] text-slate-400 font-mono flex items-center gap-1">
                       <Calendar className="w-3 h-3" />
                       {tender.award_date}
                     </span>
                   </div>
 
-                  <h3 className="font-bold text-slate-900 text-xs leading-snug line-clamp-2 mb-1.5">
+                  <h3 className="font-bold text-slate-900 text-xs leading-snug break-words mb-1.5">
                     {tender.title}
                   </h3>
 
                   <div className="text-[11px] text-slate-500 mb-1 flex items-center gap-1">
                     <Building2 className="w-3 h-3 text-slate-400 shrink-0" />
-                    <span className="truncate">{tender.og_tender?.authority}</span>
+                    <span className="break-words">{tender.og_tender?.authority}</span>
                   </div>
 
                   {/* Location badge (State & City) */}
@@ -1050,7 +1054,7 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
                   {/* Winning Bidder Pill */}
                   <div className="bg-slate-50 rounded-lg p-2 border border-slate-100 mb-2.5">
                     <div className="text-[10px] uppercase font-semibold text-slate-400">Winning Contractor</div>
-                    <div className="font-bold text-slate-800 truncate text-[11px]">
+                    <div className="font-bold text-slate-800 break-words text-[11px]">
                       {tender.winning_company?.name}
                     </div>
                   </div>
@@ -1118,7 +1122,7 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
         </div>
 
         {/* Right Column: Deep-Dive Dossier for Selected Tender (65%) */}
-        <div className="space-y-4">
+        <div ref={dossierRef} className="space-y-4">
           {!selectedTender || filteredTenders.length === 0 ? (
             <div className="bg-white rounded-xl border border-slate-200 p-12 text-center text-slate-500 shadow-xs">
               <Award className="w-10 h-10 text-slate-300 mx-auto mb-3" />
@@ -1170,7 +1174,7 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 mt-3 pt-1 text-xs">
                   <div className="bg-slate-50 p-2.5 rounded-lg border border-slate-100">
                     <span className="text-[10px] text-slate-400 uppercase font-semibold block">Awarded To</span>
-                    <span className="font-bold text-slate-800 truncate block" title={selectedTender.winning_company?.name}>
+                    <span className="font-bold text-slate-800 break-words block" title={selectedTender.winning_company?.name}>
                       {selectedTender.winning_company?.name}
                     </span>
                   </div>
@@ -1192,17 +1196,17 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
 
                   <div className="bg-slate-50 p-2.5 rounded-lg border border-slate-100">
                     <span className="text-[10px] text-slate-400 uppercase font-semibold block">EMD Instrument</span>
-                    <span className="font-bold text-purple-700 block truncate" title={selectedTender.bid_submission?.emd_mode}>
+                    <span className="font-bold text-purple-700 block break-words" title={selectedTender.bid_submission?.emd_mode}>
                       {selectedTender.bid_submission?.emd_mode}
                     </span>
                   </div>
                 </div>
 
                 {/* Dossier Sub-Tab Navigation */}
-                <div className="flex flex-wrap items-center gap-1.5 mt-4 pt-3 border-t border-slate-100">
+                <div className="flex overflow-x-auto pb-1 no-scrollbar sm:flex-wrap items-center gap-1.5 mt-4 pt-3 border-t border-slate-100">
                   <button
                     onClick={() => setActiveSubTab('comparison')}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
+                    className={`shrink-0 whitespace-nowrap px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
                       activeSubTab === 'comparison'
                         ? 'bg-slate-900 text-white shadow-xs'
                         : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
@@ -1214,7 +1218,7 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
 
                   <button
                     onClick={() => setActiveSubTab('company')}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
+                    className={`shrink-0 whitespace-nowrap px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
                       activeSubTab === 'company'
                         ? 'bg-slate-900 text-white shadow-xs'
                         : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
@@ -1226,7 +1230,7 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
 
                   <button
                     onClick={() => setActiveSubTab('covers')}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
+                    className={`shrink-0 whitespace-nowrap px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
                       activeSubTab === 'covers'
                         ? 'bg-slate-900 text-white shadow-xs'
                         : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
@@ -1238,7 +1242,7 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
 
                   <button
                     onClick={() => setActiveSubTab('pqc')}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
+                    className={`shrink-0 whitespace-nowrap px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
                       activeSubTab === 'pqc'
                         ? 'bg-slate-900 text-white shadow-xs'
                         : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
@@ -1250,7 +1254,7 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
 
                   <button
                     onClick={() => setActiveSubTab('boq')}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
+                    className={`shrink-0 whitespace-nowrap px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
                       activeSubTab === 'boq'
                         ? 'bg-slate-900 text-white shadow-xs'
                         : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
@@ -1262,7 +1266,7 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
 
                   <button
                     onClick={() => setActiveSubTab('compliance')}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
+                    className={`shrink-0 whitespace-nowrap px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
                       activeSubTab === 'compliance'
                         ? 'bg-slate-900 text-white shadow-xs'
                         : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
@@ -1274,7 +1278,7 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
 
                   <button
                     onClick={() => setActiveSubTab('milestones')}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
+                    className={`shrink-0 whitespace-nowrap px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
                       activeSubTab === 'milestones'
                         ? 'bg-slate-900 text-white shadow-xs'
                         : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
@@ -1286,7 +1290,7 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
 
                   <button
                     onClick={() => setActiveSubTab('loa')}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
+                    className={`shrink-0 whitespace-nowrap px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
                       activeSubTab === 'loa'
                         ? 'bg-slate-900 text-white shadow-xs'
                         : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
@@ -1298,7 +1302,7 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
 
                   <button
                     onClick={() => setActiveSubTab('pdf')}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
+                    className={`shrink-0 whitespace-nowrap px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
                       activeSubTab === 'pdf'
                         ? 'bg-slate-900 text-white shadow-xs'
                         : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
@@ -1310,7 +1314,7 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
 
                   <button
                     onClick={() => setActiveSubTab('all_bids')}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
+                    className={`shrink-0 whitespace-nowrap px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
                       activeSubTab === 'all_bids'
                         ? 'bg-slate-900 text-white shadow-xs'
                         : 'bg-slate-100 text-slate-600 hover:bg-slate-200'

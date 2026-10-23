@@ -23,7 +23,7 @@ export const BidderCard: React.FC<BidderCardProps> = ({
           : 'bg-white border-slate-200 hover:border-slate-300 hover:bg-slate-50/70 shadow-2xs'
       }`}
     >
-      <div className="flex items-center justify-between mb-1">
+      <div className="flex flex-wrap items-center justify-between gap-1.5 mb-1.5">
         <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-100 text-blue-900 border border-blue-200">
           {bidder.pqc_clearance_rating || 'Super Class-I National'}
         </span>
@@ -32,13 +32,13 @@ export const BidderCard: React.FC<BidderCardProps> = ({
         </span>
       </div>
 
-      <h3 className="font-bold text-slate-900 text-xs leading-snug line-clamp-2 mt-1">
+      <h3 className="font-bold text-slate-900 text-xs leading-snug break-words mt-1">
         {bidder.name}
       </h3>
 
       <div className="text-[11px] text-slate-500 mt-1 flex items-center gap-1">
         <MapPin className="w-3 h-3 text-slate-400 shrink-0" />
-        <span className="truncate">{bidder.registered_office || (bidder.states && bidder.states[0]) || 'India'}</span>
+        <span className="break-words">{bidder.registered_office || (bidder.states && bidder.states[0]) || 'India'}</span>
       </div>
 
       {/* Financials Strip */}
