@@ -1,0 +1,1109 @@
+[
+  {
+    "authority": "AP Transmission Corporation (AP Transco)",
+    "portal": "Andhra Pradesh e-Procure (tender.apeprocurement.gov.in)",
+    "category": "Transmission Grids",
+    "accepted_count": 20,
+    "current_count": 3,
+    "sector": "State Governments & Local Bodies",
+    "state": "Andhra Pradesh"
+  },
+  {
+    "authority": "Ahmedabad Municipal Corporation (AMC)",
+    "portal": "Gujarat (n)Procure (tender.nprocure.com)",
+    "category": "Riverfront Corridors",
+    "accepted_count": 18,
+    "current_count": 3,
+    "sector": "State Governments & Local Bodies",
+    "state": "Gujarat"
+  },
+  {
+    "authority": "Andhra Pradesh Capital Region Dev Authority (AP CRDA)",
+    "portal": "Andhra Pradesh e-Procure (tender.apeprocurement.gov.in)",
+    "category": "Greenfield Capital City Infra",
+    "accepted_count": 20,
+    "current_count": 4,
+    "sector": "State Governments & Local Bodies",
+    "state": "Andhra Pradesh"
+  },
+  {
+    "authority": "Archaeological Survey of India (ASI)",
+    "portal": "Central CPPP (eprocure.gov.in)",
+    "category": "Refinery & Petrochemical EPC",
+    "accepted_count": 27,
+    "current_count": 6,
+    "sector": "Central Infra & Works",
+    "state": "National (Pan-India)"
+  },
+  {
+    "authority": "Assam Urban Water Supply & Sewerage Board",
+    "portal": "Assam Tenders (assamtenders.gov.in)",
+    "category": "Hill Highway Corridors",
+    "accepted_count": 17,
+    "current_count": 3,
+    "sector": "State Governments & Local Bodies",
+    "state": "Assam & North East"
+  },
+  {
+    "authority": "Ayodhya Development Authority (ADA)",
+    "portal": "UP e-Procure (etender.up.nic.in)",
+    "category": "State Expressways",
+    "accepted_count": 24,
+    "current_count": 5,
+    "sector": "State Governments & Local Bodies",
+    "state": "Uttar Pradesh"
+  },
+  {
+    "authority": "Bangalore Metro Rail Corporation Ltd (BMRCL Namma Metro)",
+    "portal": "Karnataka KPPP (kppp.karnataka.gov.in)",
+    "category": "Cauvery Water Supply Grids",
+    "accepted_count": 20,
+    "current_count": 4,
+    "sector": "Railways & Metros",
+    "state": "Karnataka"
+  },
+  {
+    "authority": "Bangalore Water Supply & Sewerage Board (BWSSB)",
+    "portal": "Karnataka KPPP (kppp.karnataka.gov.in)",
+    "category": "Institutional Tech Parks",
+    "accepted_count": 20,
+    "current_count": 4,
+    "sector": "State Governments & Local Bodies",
+    "state": "Karnataka"
+  },
+  {
+    "authority": "Bharat Heavy Electricals Limited (BHEL)",
+    "portal": "GeM (gem.gov.in)",
+    "category": "Oil & Gas Pipeline",
+    "accepted_count": 23,
+    "current_count": 5,
+    "sector": "PSUs & Energy",
+    "state": "National (Pan-India)"
+  },
+  {
+    "authority": "Bharat Petroleum Corporation Limited (BPCL Kochi/Mumbai)",
+    "portal": "Oil & Gas e-Procurement (iocletenders.nic.in)",
+    "category": "LNG Cryogenic Storage Tanks",
+    "accepted_count": 13,
+    "current_count": 2,
+    "sector": "PSUs & Energy",
+    "state": "Maharashtra"
+  },
+  {
+    "authority": "Bihar Rajya Pul Nirman Nigam Ltd (BRPNNL)",
+    "portal": "Bihar e-Procure (eproc2.bihar.gov.in)",
+    "category": "Flood Embankments & Barrages",
+    "accepted_count": 19,
+    "current_count": 3,
+    "sector": "State Governments & Local Bodies",
+    "state": "Bihar"
+  },
+  {
+    "authority": "Bihar Urban Infrastructure Dev Corp (BUIDCO)",
+    "portal": "Bihar e-Procure (eproc2.bihar.gov.in)",
+    "category": "Elevated Highway Corridors",
+    "accepted_count": 19,
+    "current_count": 4,
+    "sector": "State Governments & Local Bodies",
+    "state": "Odisha"
+  },
+  {
+    "authority": "Border Roads Organisation (BRO / Project Beacon, Dantak)",
+    "portal": "Defense Procurement Portal (defproc.gov.in)",
+    "category": "Strategic Airfield Runways",
+    "accepted_count": 17,
+    "current_count": 3,
+    "sector": "Defense & Paramilitary",
+    "state": "National (Pan-India)"
+  },
+  {
+    "authority": "Border Security Force (BSF, Ministry of Home Affairs)",
+    "portal": "Central CPPP (eprocure.gov.in)",
+    "category": "National Highways & EPC",
+    "accepted_count": 27,
+    "current_count": 7,
+    "sector": "Defense & Paramilitary",
+    "state": "National (Pan-India)"
+  },
+  {
+    "authority": "Bruhat Bengaluru Mahanagara Palike (BBMP Infrastructure)",
+    "portal": "Karnataka KPPP (kppp.karnataka.gov.in)",
+    "category": "Smart City Roads",
+    "accepted_count": 20,
+    "current_count": 4,
+    "sector": "State Governments & Local Bodies",
+    "state": "Karnataka"
+  },
+  {
+    "authority": "Central Public Works Department (CPWD Eastern Zone)",
+    "portal": "CPWD TenderWizard / CPPP",
+    "category": "Residential GPRA Housing",
+    "accepted_count": 28,
+    "current_count": 5,
+    "sector": "Central Infra & Works",
+    "state": "National (Pan-India)"
+  },
+  {
+    "authority": "Central Public Works Department (CPWD Northern Zone)",
+    "portal": "CPWD TenderWizard / CPPP",
+    "category": "Institutional Buildings",
+    "accepted_count": 28,
+    "current_count": 5,
+    "sector": "Central Infra & Works",
+    "state": "National (Pan-India)"
+  },
+  {
+    "authority": "Central Public Works Department (CPWD Southern Zone)",
+    "portal": "CPWD TenderWizard / CPPP",
+    "category": "Research & Nanotech Labs",
+    "accepted_count": 28,
+    "current_count": 5,
+    "sector": "Central Infra & Works",
+    "state": "National (Pan-India)"
+  },
+  {
+    "authority": "Central Public Works Department (CPWD Western Zone)",
+    "portal": "CPWD TenderWizard / CPPP",
+    "category": "Healthcare & AIIMS Hospitals",
+    "accepted_count": 28,
+    "current_count": 5,
+    "sector": "Central Infra & Works",
+    "state": "National (Pan-India)"
+  },
+  {
+    "authority": "Central Railway (Civil Infrastructure)",
+    "portal": "IREPS (ireps.gov.in)",
+    "category": "Signaling & Telecom (KAVACH)",
+    "accepted_count": 26,
+    "current_count": 5,
+    "sector": "Railways & Metros",
+    "state": "National (Pan-India)"
+  },
+  {
+    "authority": "Chennai Metro Rail Limited (CMRL Phase-2)",
+    "portal": "Tamil Nadu Tenders (tntenders.gov.in)",
+    "category": "Desalination & Water Grids",
+    "accepted_count": 20,
+    "current_count": 4,
+    "sector": "Railways & Metros",
+    "state": "Tamil Nadu"
+  },
+  {
+    "authority": "City and Industrial Development Corporation (CIDCO)",
+    "portal": "MahaTenders (mahatenders.gov.in)",
+    "category": "Bridges & Flyovers",
+    "accepted_count": 22,
+    "current_count": 4,
+    "sector": "State Governments & Local Bodies",
+    "state": "Maharashtra"
+  },
+  {
+    "authority": "Coal India Limited (CIL / CMPDI)",
+    "portal": "GeM (gem.gov.in)",
+    "category": "Oil & Gas Pipeline",
+    "accepted_count": 22,
+    "current_count": 4,
+    "sector": "PSUs & Energy",
+    "state": "National (Pan-India)"
+  },
+  {
+    "authority": "Dedicated Freight Corridor Corp of India (DFCCIL)",
+    "portal": "IREPS (ireps.gov.in)",
+    "category": "Station Redevelopment",
+    "accepted_count": 26,
+    "current_count": 5,
+    "sector": "Railways & Metros",
+    "state": "National (Pan-India)"
+  },
+  {
+    "authority": "Delhi Development Authority (DDA)",
+    "portal": "Central CPPP (eprocure.gov.in)",
+    "category": "Civil Defence Infrastructure",
+    "accepted_count": 28,
+    "current_count": 7,
+    "sector": "Central Infra & Works",
+    "state": "Delhi NCR"
+  },
+  {
+    "authority": "Delhi Jal Board (Govt of NCT of Delhi)",
+    "portal": "Delhi e-Procure (DMRC)",
+    "category": "Water Treatment & Sewers",
+    "accepted_count": 28,
+    "current_count": 5,
+    "sector": "State Governments & Local Bodies",
+    "state": "Delhi NCR"
+  },
+  {
+    "authority": "Delhi Metro Rail Corporation Ltd (DMRC)",
+    "portal": "Delhi e-Procure (DMRC)",
+    "category": "Metro Tunnels & Viaducts",
+    "accepted_count": 28,
+    "current_count": 5,
+    "sector": "Railways & Metros",
+    "state": "Delhi NCR"
+  },
+  {
+    "authority": "Delhi Transport Corporation (DTC)",
+    "portal": "Delhi e-Procure (DMRC)",
+    "category": "Electric Bus Infrastructure",
+    "accepted_count": 27,
+    "current_count": 5,
+    "sector": "State Governments & Local Bodies",
+    "state": "Delhi NCR"
+  },
+  {
+    "authority": "Directorate General of Married Accommodation Project (DG MAP)",
+    "portal": "Defense Procurement Portal (defproc.gov.in)",
+    "category": "Forward Operational Base Roads",
+    "accepted_count": 16,
+    "current_count": 3,
+    "sector": "Defense & Paramilitary",
+    "state": "National (Pan-India)"
+  },
+  {
+    "authority": "Engineers India Limited (EIL)",
+    "portal": "Central CPPP (eprocure.gov.in)",
+    "category": "Heritage Conservation",
+    "accepted_count": 27,
+    "current_count": 7,
+    "sector": "Central Infra & Works",
+    "state": "National (Pan-India)"
+  },
+  {
+    "authority": "GAIL (India) Limited",
+    "portal": "GeM (gem.gov.in)",
+    "category": "Substations & Electrical",
+    "accepted_count": 22,
+    "current_count": 4,
+    "sector": "PSUs & Energy",
+    "state": "National (Pan-India)"
+  },
+  {
+    "authority": "GAIL (India) Limited (National Gas Grid)",
+    "portal": "Oil & Gas e-Procurement (iocletenders.nic.in)",
+    "category": "Cross-Country Hydrocarbon Pipelines",
+    "accepted_count": 13,
+    "current_count": 2,
+    "sector": "PSUs & Energy",
+    "state": "National (Pan-India)"
+  },
+  {
+    "authority": "GIFT City Company Limited (Fintech Infrastructure)",
+    "portal": "Gujarat (n)Procure (tender.nprocure.com)",
+    "category": "Ports & Maritime Facilities",
+    "accepted_count": 18,
+    "current_count": 3,
+    "sector": "State Governments & Local Bodies",
+    "state": "Gujarat"
+  },
+  {
+    "authority": "Greater Chennai Corporation (GCC Infrastructure)",
+    "portal": "Tamil Nadu Tenders (tntenders.gov.in)",
+    "category": "Substations & T&D",
+    "accepted_count": 20,
+    "current_count": 4,
+    "sector": "State Governments & Local Bodies",
+    "state": "Tamil Nadu"
+  },
+  {
+    "authority": "Greater Hyderabad Municipal Corporation (GHMC)",
+    "portal": "Telangana e-Procurement (tender.telangana.gov.in)",
+    "category": "Elevated Skyways & Flyovers",
+    "accepted_count": 22,
+    "current_count": 4,
+    "sector": "State Governments & Local Bodies",
+    "state": "Telangana"
+  },
+  {
+    "authority": "Greater Mohali Area Development Authority (GMADA)",
+    "portal": "Punjab e-Procurement (eproc.punjab.gov.in)",
+    "category": "Canal Surface Water Grids",
+    "accepted_count": 18,
+    "current_count": 3,
+    "sector": "State Governments & Local Bodies",
+    "state": "Punjab"
+  },
+  {
+    "authority": "Gujarat Industrial Development Corporation (GIDC)",
+    "portal": "Gujarat (n)Procure (tender.nprocure.com)",
+    "category": "Industrial Smart Parks",
+    "accepted_count": 18,
+    "current_count": 4,
+    "sector": "State Governments & Local Bodies",
+    "state": "Gujarat"
+  },
+  {
+    "authority": "Gujarat Maritime Board (GMB Coastal Infra)",
+    "portal": "Gujarat (n)Procure (tender.nprocure.com)",
+    "category": "Fintech City Towers",
+    "accepted_count": 18,
+    "current_count": 4,
+    "sector": "State Governments & Local Bodies",
+    "state": "Gujarat"
+  },
+  {
+    "authority": "Gurugram Metropolitan Development Authority (GMDA)",
+    "portal": "Haryana e-Procurement (etenders.hry.nic.in)",
+    "category": "Industrial Mega Parks",
+    "accepted_count": 19,
+    "current_count": 3,
+    "sector": "Railways & Metros",
+    "state": "Haryana"
+  },
+  {
+    "authority": "Guwahati Metropolitan Development Authority (GMDA)",
+    "portal": "Assam Tenders (assamtenders.gov.in)",
+    "category": "Flood Control & River Training",
+    "accepted_count": 18,
+    "current_count": 3,
+    "sector": "Railways & Metros",
+    "state": "Haryana"
+  },
+  {
+    "authority": "H.P. Power Corporation Limited (HPPCL Hydro)",
+    "portal": "Uttarakhand e-Tenders (uktenders.gov.in)",
+    "category": "Mountain Ropeways",
+    "accepted_count": 16,
+    "current_count": 3,
+    "sector": "PSUs & Energy",
+    "state": "Uttarakhand"
+  },
+  {
+    "authority": "Haryana Shahari Vikas Pradhikaran (HSVP Urban)",
+    "portal": "Haryana e-Procurement (etenders.hry.nic.in)",
+    "category": "Metropolitan Drainage & STP",
+    "accepted_count": 19,
+    "current_count": 4,
+    "sector": "State Governments & Local Bodies",
+    "state": "Haryana"
+  },
+  {
+    "authority": "Haryana State Industrial & Infra Dev Corp (HSIIDC)",
+    "portal": "Haryana e-Procurement (etenders.hry.nic.in)",
+    "category": "Institutional Complexes",
+    "accepted_count": 18,
+    "current_count": 3,
+    "sector": "State Governments & Local Bodies",
+    "state": "Haryana"
+  },
+  {
+    "authority": "Himachal Pradesh Public Works Department (HP PWD)",
+    "portal": "Uttarakhand e-Tenders (uktenders.gov.in)",
+    "category": "Hydro Power Dams",
+    "accepted_count": 16,
+    "current_count": 3,
+    "sector": "State Governments & Local Bodies",
+    "state": "Uttarakhand"
+  },
+  {
+    "authority": "Hindustan Petroleum Corporation Limited (HPCL Visakh/Mumbai)",
+    "portal": "Oil & Gas e-Procurement (iocletenders.nic.in)",
+    "category": "Offshore Platform Platforms",
+    "accepted_count": 13,
+    "current_count": 2,
+    "sector": "PSUs & Energy",
+    "state": "Maharashtra"
+  },
+  {
+    "authority": "Hyderabad Metropolitan Development Authority (HMDA)",
+    "portal": "Telangana e-Procurement (tender.telangana.gov.in)",
+    "category": "Strategic Road Development",
+    "accepted_count": 21,
+    "current_count": 4,
+    "sector": "Railways & Metros",
+    "state": "Telangana"
+  },
+  {
+    "authority": "IRCON International Limited",
+    "portal": "IREPS (ireps.gov.in)",
+    "category": "Signaling & Telecom (KAVACH)",
+    "accepted_count": 25,
+    "current_count": 5,
+    "sector": "Railways & Metros",
+    "state": "National (Pan-India)"
+  },
+  {
+    "authority": "Indian Navy Naval Dockyard Engineering",
+    "portal": "Defense Procurement Portal (defproc.gov.in)",
+    "category": "Naval Dry Docks",
+    "accepted_count": 16,
+    "current_count": 3,
+    "sector": "Defense & Paramilitary",
+    "state": "National (Pan-India)"
+  },
+  {
+    "authority": "Indian Oil Corporation Limited (IOCL)",
+    "portal": "GeM (gem.gov.in)",
+    "category": "Electro-Mechanical",
+    "accepted_count": 22,
+    "current_count": 4,
+    "sector": "PSUs & Energy",
+    "state": "National (Pan-India)"
+  },
+  {
+    "authority": "Indian Oil Corporation Limited (Pipelines & Refineries)",
+    "portal": "Oil & Gas e-Procurement (iocletenders.nic.in)",
+    "category": "Cross-Country Hydrocarbon Pipelines",
+    "accepted_count": 13,
+    "current_count": 3,
+    "sector": "State Governments & Local Bodies",
+    "state": "National (Pan-India)"
+  },
+  {
+    "authority": "Indo-Tibetan Border Police (ITBP, MHA)",
+    "portal": "Central CPPP (eprocure.gov.in)",
+    "category": "Strategic Tunnels & Border Roads",
+    "accepted_count": 27,
+    "current_count": 7,
+    "sector": "Defense & Paramilitary",
+    "state": "National (Pan-India)"
+  },
+  {
+    "authority": "Industrial Infrastructure Dev Corp (IDCO Odisha)",
+    "portal": "Odisha Tenders (tendersodisha.gov.in)",
+    "category": "Mahanadi River Bridges",
+    "accepted_count": 19,
+    "current_count": 4,
+    "sector": "State Governments & Local Bodies",
+    "state": "Odisha"
+  },
+  {
+    "authority": "Irrigation & CAD Department, Govt of Telangana",
+    "portal": "Telangana e-Procurement (tender.telangana.gov.in)",
+    "category": "Lift Irrigation Grids",
+    "accepted_count": 21,
+    "current_count": 4,
+    "sector": "State Governments & Local Bodies",
+    "state": "Telangana"
+  },
+  {
+    "authority": "J&K Economic Reconstruction Agency (ERA J&K)",
+    "portal": "J&K e-Procurement (jktenders.gov.in)",
+    "category": "Avalanche Protection Shelters",
+    "accepted_count": 16,
+    "current_count": 3,
+    "sector": "State Governments & Local Bodies",
+    "state": "Jammu & Kashmir / Ladakh"
+  },
+  {
+    "authority": "J&K Projects Construction Corporation (JKPCC)",
+    "portal": "J&K e-Procurement (jktenders.gov.in)",
+    "category": "River Jhelum Flood Spillways",
+    "accepted_count": 16,
+    "current_count": 3,
+    "sector": "State Governments & Local Bodies",
+    "state": "Jammu & Kashmir / Ladakh"
+  },
+  {
+    "authority": "Jaipur Development Authority (JDA)",
+    "portal": "Rajasthan e-Procure (eproc.rajasthan.gov.in)",
+    "category": "Industrial Parks",
+    "accepted_count": 21,
+    "current_count": 4,
+    "sector": "State Governments & Local Bodies",
+    "state": "Rajasthan"
+  },
+  {
+    "authority": "Karnataka Urban Infrastructure Dev Corp (KUIDFC)",
+    "portal": "Karnataka KPPP (kppp.karnataka.gov.in)",
+    "category": "Urban Metro Rail",
+    "accepted_count": 20,
+    "current_count": 4,
+    "sector": "State Governments & Local Bodies",
+    "state": "Karnataka"
+  },
+  {
+    "authority": "Kerala State Electricity Board (KSEB Power)",
+    "portal": "Kerala e-Tenders (etenders.kerala.gov.in)",
+    "category": "Hydro & Solar Power",
+    "accepted_count": 20,
+    "current_count": 3,
+    "sector": "State Governments & Local Bodies",
+    "state": "Kerala"
+  },
+  {
+    "authority": "Kerala Water Authority (KWA Drinking Water)",
+    "portal": "Kerala e-Tenders (etenders.kerala.gov.in)",
+    "category": "Hilly Terrain Roads",
+    "accepted_count": 20,
+    "current_count": 4,
+    "sector": "State Governments & Local Bodies",
+    "state": "Kerala"
+  },
+  {
+    "authority": "Kochi Metro Rail Limited (KMRL Water Metro & Rail)",
+    "portal": "Kerala e-Tenders (etenders.kerala.gov.in)",
+    "category": "Water Supply & Treatment",
+    "accepted_count": 20,
+    "current_count": 4,
+    "sector": "Railways & Metros",
+    "state": "Kerala"
+  },
+  {
+    "authority": "Kolkata Metropolitan Development Authority (KMDA)",
+    "portal": "West Bengal Tenders (wbtenders.gov.in)",
+    "category": "Elevated Expressways",
+    "accepted_count": 18,
+    "current_count": 4,
+    "sector": "Railways & Metros",
+    "state": "West Bengal"
+  },
+  {
+    "authority": "Kolkata Municipal Corporation (KMC Projects)",
+    "portal": "West Bengal Tenders (wbtenders.gov.in)",
+    "category": "Urban Smart Cities",
+    "accepted_count": 18,
+    "current_count": 3,
+    "sector": "State Governments & Local Bodies",
+    "state": "West Bengal"
+  },
+  {
+    "authority": "Ladakh Autonomous Hill Development Council (LAHDC)",
+    "portal": "J&K e-Procurement (jktenders.gov.in)",
+    "category": "Cold-Weather Concrete Roads",
+    "accepted_count": 16,
+    "current_count": 3,
+    "sector": "State Governments & Local Bodies",
+    "state": "Jammu & Kashmir / Ladakh"
+  },
+  {
+    "authority": "M.P. Road Development Corporation (MPRDC)",
+    "portal": "MP Tenders (mptenders.gov.in)",
+    "category": "State Highway Corridors",
+    "accepted_count": 20,
+    "current_count": 4,
+    "sector": "State Governments & Local Bodies",
+    "state": "Madhya Pradesh"
+  },
+  {
+    "authority": "M.P. Urban Development Company (MPUDC)",
+    "portal": "MP Tenders (mptenders.gov.in)",
+    "category": "Narmada Water Pipelines",
+    "accepted_count": 20,
+    "current_count": 4,
+    "sector": "State Governments & Local Bodies",
+    "state": "Madhya Pradesh"
+  },
+  {
+    "authority": "Madhya Pradesh Metro Rail Corporation Ltd (MPMRCL)",
+    "portal": "MP Tenders (mptenders.gov.in)",
+    "category": "Smart City Infra",
+    "accepted_count": 20,
+    "current_count": 3,
+    "sector": "Railways & Metros",
+    "state": "Madhya Pradesh"
+  },
+  {
+    "authority": "MahaMetro Rail Corporation (Pune & Nagpur Metro)",
+    "portal": "MahaTenders (mahatenders.gov.in)",
+    "category": "Civil Infrastructure",
+    "accepted_count": 22,
+    "current_count": 4,
+    "sector": "Railways & Metros",
+    "state": "Maharashtra"
+  },
+  {
+    "authority": "Maharashtra Jeevan Pradhikaran (MJP)",
+    "portal": "MahaTenders (mahatenders.gov.in)",
+    "category": "Water Supply & Sanitation",
+    "accepted_count": 22,
+    "current_count": 4,
+    "sector": "State Governments & Local Bodies",
+    "state": "Maharashtra"
+  },
+  {
+    "authority": "Maharashtra State Road Development Corporation (MSRDC)",
+    "portal": "MahaTenders (mahatenders.gov.in)",
+    "category": "Urban Metro Rail",
+    "accepted_count": 22,
+    "current_count": 4,
+    "sector": "State Governments & Local Bodies",
+    "state": "Maharashtra"
+  },
+  {
+    "authority": "Military Engineer Services (MES Air Force & Army Bases)",
+    "portal": "Defense Procurement Portal (defproc.gov.in)",
+    "category": "Hardened Underground Shelters",
+    "accepted_count": 16,
+    "current_count": 3,
+    "sector": "Defense & Paramilitary",
+    "state": "National (Pan-India)"
+  },
+  {
+    "authority": "Ministry of Road Transport and Highways (MoRTH)",
+    "portal": "Central CPPP (eprocure.gov.in)",
+    "category": "Strategic Tunnels & Border Roads",
+    "accepted_count": 28,
+    "current_count": 7,
+    "sector": "Central Infra & Works",
+    "state": "National (Pan-India)"
+  },
+  {
+    "authority": "Mumbai Metropolitan Region Development Authority (MMRDA)",
+    "portal": "MahaTenders (mahatenders.gov.in)",
+    "category": "Roads & Highways",
+    "accepted_count": 22,
+    "current_count": 4,
+    "sector": "Railways & Metros",
+    "state": "Maharashtra"
+  },
+  {
+    "authority": "NTPC Limited (Renewable Energy & Thermal)",
+    "portal": "GeM (gem.gov.in)",
+    "category": "Renewable Energy & Solar",
+    "accepted_count": 23,
+    "current_count": 5,
+    "sector": "PSUs & Energy",
+    "state": "National (Pan-India)"
+  },
+  {
+    "authority": "National Buildings Construction Corp (NBCC India Ltd)",
+    "portal": "CPWD TenderWizard / CPPP",
+    "category": "Institutional Buildings",
+    "accepted_count": 28,
+    "current_count": 5,
+    "sector": "Central Infra & Works",
+    "state": "National (Pan-India)"
+  },
+  {
+    "authority": "National Highways & Infra Development Corp (NHIDCL)",
+    "portal": "Central CPPP (eprocure.gov.in)",
+    "category": "Refinery & Petrochemical EPC",
+    "accepted_count": 28,
+    "current_count": 7,
+    "sector": "Central Infra & Works",
+    "state": "National (Pan-India)"
+  },
+  {
+    "authority": "National Highways Authority of India (NHAI)",
+    "portal": "Central CPPP (eprocure.gov.in)",
+    "category": "National Highways & EPC",
+    "accepted_count": 28,
+    "current_count": 7,
+    "sector": "Central Infra & Works",
+    "state": "National (Pan-India)"
+  },
+  {
+    "authority": "New Okhla Industrial Development Authority (Noida Authority)",
+    "portal": "UP e-Procure (etender.up.nic.in)",
+    "category": "Smart City Flyovers",
+    "accepted_count": 24,
+    "current_count": 5,
+    "sector": "State Governments & Local Bodies",
+    "state": "Uttar Pradesh"
+  },
+  {
+    "authority": "North Eastern Electric Power Corporation (NEEPCO)",
+    "portal": "Assam Tenders (assamtenders.gov.in)",
+    "category": "Hydroelectric Plants",
+    "accepted_count": 17,
+    "current_count": 3,
+    "sector": "PSUs & Energy",
+    "state": "Assam & North East"
+  },
+  {
+    "authority": "Northern Railway (Engineering & S&T Dept)",
+    "portal": "IREPS (ireps.gov.in)",
+    "category": "Railway Track & Doubling",
+    "accepted_count": 26,
+    "current_count": 5,
+    "sector": "Railways & Metros",
+    "state": "National (Pan-India)"
+  },
+  {
+    "authority": "Odisha Mining Corporation Ltd (OMC Civil Infra)",
+    "portal": "Odisha Tenders (tendersodisha.gov.in)",
+    "category": "Heritage Smart Cities",
+    "accepted_count": 18,
+    "current_count": 3,
+    "sector": "State Governments & Local Bodies",
+    "state": "Odisha"
+  },
+  {
+    "authority": "Oil and Natural Gas Corporation (ONGC)",
+    "portal": "GeM (gem.gov.in)",
+    "category": "Heavy Civil & Industrial",
+    "accepted_count": 23,
+    "current_count": 4,
+    "sector": "PSUs & Energy",
+    "state": "National (Pan-India)"
+  },
+  {
+    "authority": "Oil and Natural Gas Corporation (Offshore Civil Assets)",
+    "portal": "Oil & Gas e-Procurement (iocletenders.nic.in)",
+    "category": "Refinery Civil Expansion",
+    "accepted_count": 13,
+    "current_count": 3,
+    "sector": "State Governments & Local Bodies",
+    "state": "National (Pan-India)"
+  },
+  {
+    "authority": "Pimpri-Chinchwad Municipal Corporation (PCMC)",
+    "portal": "MahaTenders (mahatenders.gov.in)",
+    "category": "Water Supply & Sanitation",
+    "accepted_count": 22,
+    "current_count": 5,
+    "sector": "State Governments & Local Bodies",
+    "state": "Maharashtra"
+  },
+  {
+    "authority": "Power Grid Corporation of India (PowerGrid)",
+    "portal": "GeM (gem.gov.in)",
+    "category": "Substations & Electrical",
+    "accepted_count": 23,
+    "current_count": 5,
+    "sector": "PSUs & Energy",
+    "state": "National (Pan-India)"
+  },
+  {
+    "authority": "Public Health Engineering Department (PHED Bihar)",
+    "portal": "Bihar e-Procure (eproc2.bihar.gov.in)",
+    "category": "Har Ghar Nal Ka Jal",
+    "accepted_count": 18,
+    "current_count": 3,
+    "sector": "State Governments & Local Bodies",
+    "state": "Bihar"
+  },
+  {
+    "authority": "Public Health Engineering Department (PHED Rajasthan)",
+    "portal": "Rajasthan e-Procure (eproc.rajasthan.gov.in)",
+    "category": "Heritage Roadways",
+    "accepted_count": 21,
+    "current_count": 4,
+    "sector": "State Governments & Local Bodies",
+    "state": "Rajasthan"
+  },
+  {
+    "authority": "Public Works (R&B) Department, Govt of J&K",
+    "portal": "J&K e-Procurement (jktenders.gov.in)",
+    "category": "Strategic Alpine Tunnels",
+    "accepted_count": 17,
+    "current_count": 3,
+    "sector": "State Governments & Local Bodies",
+    "state": "Jammu & Kashmir / Ladakh"
+  },
+  {
+    "authority": "Public Works Department, Govt of Haryana (Haryana B&R)",
+    "portal": "Haryana e-Procurement (etenders.hry.nic.in)",
+    "category": "NCR Expressways & Underpasses",
+    "accepted_count": 19,
+    "current_count": 4,
+    "sector": "State Governments & Local Bodies",
+    "state": "Haryana"
+  },
+  {
+    "authority": "Public Works Department, Govt of Karnataka (KPWD)",
+    "portal": "Karnataka KPPP (kppp.karnataka.gov.in)",
+    "category": "Urban Metro Rail",
+    "accepted_count": 20,
+    "current_count": 4,
+    "sector": "State Governments & Local Bodies",
+    "state": "Karnataka"
+  },
+  {
+    "authority": "Public Works Department, Govt of Kerala (Kerala PWD)",
+    "portal": "Kerala e-Tenders (etenders.kerala.gov.in)",
+    "category": "Coastal Waterways & Metro",
+    "accepted_count": 20,
+    "current_count": 4,
+    "sector": "State Governments & Local Bodies",
+    "state": "Kerala"
+  },
+  {
+    "authority": "Public Works Department, Govt of Madhya Pradesh (MP PWD)",
+    "portal": "MP Tenders (mptenders.gov.in)",
+    "category": "Metro Rail Viaducts",
+    "accepted_count": 20,
+    "current_count": 4,
+    "sector": "State Governments & Local Bodies",
+    "state": "Madhya Pradesh"
+  },
+  {
+    "authority": "Public Works Department, Govt of Maharashtra (MahaPWD)",
+    "portal": "MahaTenders (mahatenders.gov.in)",
+    "category": "Roads & Highways",
+    "accepted_count": 23,
+    "current_count": 5,
+    "sector": "State Governments & Local Bodies",
+    "state": "Maharashtra"
+  },
+  {
+    "authority": "Public Works Department, Govt of NCT of Delhi (PWD Delhi)",
+    "portal": "Delhi e-Procure (DMRC)",
+    "category": "Elevated Highway Corridors",
+    "accepted_count": 27,
+    "current_count": 5,
+    "sector": "State Governments & Local Bodies",
+    "state": "Delhi NCR"
+  },
+  {
+    "authority": "Public Works Department, Govt of Punjab (Punjab PWD B&R)",
+    "portal": "Punjab e-Procurement (eproc.punjab.gov.in)",
+    "category": "Border Highway Corridors",
+    "accepted_count": 18,
+    "current_count": 3,
+    "sector": "State Governments & Local Bodies",
+    "state": "Punjab"
+  },
+  {
+    "authority": "Public Works Department, Govt of Rajasthan (Rajasthan PWD)",
+    "portal": "Rajasthan e-Procure (eproc.rajasthan.gov.in)",
+    "category": "Desert Solar Corridors",
+    "accepted_count": 22,
+    "current_count": 4,
+    "sector": "State Governments & Local Bodies",
+    "state": "Rajasthan"
+  },
+  {
+    "authority": "Public Works Department, Govt of Uttarakhand (UK PWD)",
+    "portal": "Uttarakhand e-Tenders (uktenders.gov.in)",
+    "category": "Char Dham All-Weather Roadway",
+    "accepted_count": 17,
+    "current_count": 3,
+    "sector": "State Governments & Local Bodies",
+    "state": "Uttarakhand"
+  },
+  {
+    "authority": "Public Works Department, Govt of West Bengal (WB PWD)",
+    "portal": "West Bengal Tenders (wbtenders.gov.in)",
+    "category": "Riverfront Infrastructure",
+    "accepted_count": 18,
+    "current_count": 4,
+    "sector": "State Governments & Local Bodies",
+    "state": "West Bengal"
+  },
+  {
+    "authority": "Public Works Roads Department, Govt of Assam (PWRD Assam)",
+    "portal": "Assam Tenders (assamtenders.gov.in)",
+    "category": "Brahmaputra Bridge Projects",
+    "accepted_count": 18,
+    "current_count": 3,
+    "sector": "State Governments & Local Bodies",
+    "state": "Assam & North East"
+  },
+  {
+    "authority": "Pune Metropolitan Region Development Authority (PMRDA)",
+    "portal": "MahaTenders (mahatenders.gov.in)",
+    "category": "Civil Infrastructure",
+    "accepted_count": 22,
+    "current_count": 5,
+    "sector": "Railways & Metros",
+    "state": "Maharashtra"
+  },
+  {
+    "authority": "Pune Municipal Corporation (PMC Projects)",
+    "portal": "MahaTenders (mahatenders.gov.in)",
+    "category": "Bridges & Flyovers",
+    "accepted_count": 23,
+    "current_count": 5,
+    "sector": "State Governments & Local Bodies",
+    "state": "Maharashtra"
+  },
+  {
+    "authority": "Punjab Infrastructure Development Board (PIDB)",
+    "portal": "Punjab e-Procurement (eproc.punjab.gov.in)",
+    "category": "Aerocity Expressways",
+    "accepted_count": 17,
+    "current_count": 3,
+    "sector": "State Governments & Local Bodies",
+    "state": "Punjab"
+  },
+  {
+    "authority": "Punjab Water Supply & Sewerage Board (PWSSB)",
+    "portal": "Punjab e-Procurement (eproc.punjab.gov.in)",
+    "category": "Educational Institutes",
+    "accepted_count": 17,
+    "current_count": 3,
+    "sector": "State Governments & Local Bodies",
+    "state": "Punjab"
+  },
+  {
+    "authority": "Rail Vikas Nigam Limited (RVNL)",
+    "portal": "IREPS (ireps.gov.in)",
+    "category": "Overhead Electrification",
+    "accepted_count": 26,
+    "current_count": 5,
+    "sector": "Railways & Metros",
+    "state": "National (Pan-India)"
+  },
+  {
+    "authority": "RailTel Corporation of India",
+    "portal": "IREPS (ireps.gov.in)",
+    "category": "Railway Track & Doubling",
+    "accepted_count": 25,
+    "current_count": 5,
+    "sector": "Railways & Metros",
+    "state": "National (Pan-India)"
+  },
+  {
+    "authority": "Rajasthan State Industrial Dev Corp (RIICO)",
+    "portal": "Rajasthan e-Procure (eproc.rajasthan.gov.in)",
+    "category": "Chambal River Water Grids",
+    "accepted_count": 21,
+    "current_count": 4,
+    "sector": "State Governments & Local Bodies",
+    "state": "Rajasthan"
+  },
+  {
+    "authority": "Road Construction Department, Govt of Bihar (RCD Bihar)",
+    "portal": "Bihar e-Procure (eproc2.bihar.gov.in)",
+    "category": "Ganga River Mega Bridges",
+    "accepted_count": 19,
+    "current_count": 4,
+    "sector": "State Governments & Local Bodies",
+    "state": "Bihar"
+  },
+  {
+    "authority": "Roads & Buildings Department, Govt of AP (AP R&B)",
+    "portal": "Andhra Pradesh e-Procure (tender.apeprocurement.gov.in)",
+    "category": "Coastal Highways",
+    "accepted_count": 20,
+    "current_count": 4,
+    "sector": "State Governments & Local Bodies",
+    "state": "Andhra Pradesh"
+  },
+  {
+    "authority": "Roads & Buildings Department, Govt of Gujarat (Gujarat R&B)",
+    "portal": "Gujarat (n)Procure (tender.nprocure.com)",
+    "category": "Ports & Maritime Facilities",
+    "accepted_count": 18,
+    "current_count": 4,
+    "sector": "State Governments & Local Bodies",
+    "state": "Gujarat"
+  },
+  {
+    "authority": "Steel Authority of India Limited (SAIL)",
+    "portal": "GeM (gem.gov.in)",
+    "category": "Renewable Energy & Solar",
+    "accepted_count": 22,
+    "current_count": 4,
+    "sector": "PSUs & Energy",
+    "state": "National (Pan-India)"
+  },
+  {
+    "authority": "TANGEDCO (Tamil Nadu Power Generation & Distribution)",
+    "portal": "Tamil Nadu Tenders (tntenders.gov.in)",
+    "category": "State Highways & Flyovers",
+    "accepted_count": 20,
+    "current_count": 4,
+    "sector": "State Governments & Local Bodies",
+    "state": "Tamil Nadu"
+  },
+  {
+    "authority": "Tamil Nadu Highways Department (TN Highways)",
+    "portal": "Tamil Nadu Tenders (tntenders.gov.in)",
+    "category": "State Highways & Flyovers",
+    "accepted_count": 20,
+    "current_count": 4,
+    "sector": "State Governments & Local Bodies",
+    "state": "Tamil Nadu"
+  },
+  {
+    "authority": "Tamil Nadu Water Supply & Drainage Board (TWAD)",
+    "portal": "Tamil Nadu Tenders (tntenders.gov.in)",
+    "category": "Metro Rail & Viaducts",
+    "accepted_count": 20,
+    "current_count": 4,
+    "sector": "State Governments & Local Bodies",
+    "state": "Tamil Nadu"
+  },
+  {
+    "authority": "Telangana State Road Development Corp (TSRDC)",
+    "portal": "Telangana e-Procurement (tender.telangana.gov.in)",
+    "category": "Smart Urban Drainage",
+    "accepted_count": 21,
+    "current_count": 4,
+    "sector": "State Governments & Local Bodies",
+    "state": "Telangana"
+  },
+  {
+    "authority": "UP Expressways Industrial Development Authority (UPEIDA)",
+    "portal": "UP e-Procure (etender.up.nic.in)",
+    "category": "Ring Roads & Bypasses",
+    "accepted_count": 24,
+    "current_count": 5,
+    "sector": "State Governments & Local Bodies",
+    "state": "Uttar Pradesh"
+  },
+  {
+    "authority": "Uttar Pradesh Jal Nigam (Rural & Urban)",
+    "portal": "UP e-Procure (etender.up.nic.in)",
+    "category": "Rural Water Supply (JJM)",
+    "accepted_count": 24,
+    "current_count": 5,
+    "sector": "State Governments & Local Bodies",
+    "state": "Uttar Pradesh"
+  },
+  {
+    "authority": "Uttar Pradesh Public Works Department (UP PWD)",
+    "portal": "UP e-Procure (etender.up.nic.in)",
+    "category": "State Expressways",
+    "accepted_count": 24,
+    "current_count": 5,
+    "sector": "State Governments & Local Bodies",
+    "state": "Uttar Pradesh"
+  },
+  {
+    "authority": "Uttarakhand Jal Sansthan (Drinking Water)",
+    "portal": "Uttarakhand e-Tenders (uktenders.gov.in)",
+    "category": "Slope Stabilization & Rockfall Fencing",
+    "accepted_count": 16,
+    "current_count": 3,
+    "sector": "State Governments & Local Bodies",
+    "state": "Uttarakhand"
+  },
+  {
+    "authority": "Visakhapatnam Metropolitan Region Dev Authority (VMRDA)",
+    "portal": "Andhra Pradesh e-Procure (tender.apeprocurement.gov.in)",
+    "category": "Port Arterial Corridors",
+    "accepted_count": 20,
+    "current_count": 4,
+    "sector": "Railways & Metros",
+    "state": "Andhra Pradesh"
+  },
+  {
+    "authority": "Water Corporation of Odisha (WATCO)",
+    "portal": "Odisha Tenders (tendersodisha.gov.in)",
+    "category": "Mining Evacuation Corridors",
+    "accepted_count": 19,
+    "current_count": 3,
+    "sector": "State Governments & Local Bodies",
+    "state": "Odisha"
+  },
+  {
+    "authority": "West Bengal Housing Infrastructure Dev Corp (WBHIDCO)",
+    "portal": "West Bengal Tenders (wbtenders.gov.in)",
+    "category": "Power Distribution Grids",
+    "accepted_count": 18,
+    "current_count": 4,
+    "sector": "State Governments & Local Bodies",
+    "state": "West Bengal"
+  },
+  {
+    "authority": "West Bengal State Electricity Distribution Co (WBSEDCL)",
+    "portal": "West Bengal Tenders (wbtenders.gov.in)",
+    "category": "Riverfront Infrastructure",
+    "accepted_count": 18,
+    "current_count": 3,
+    "sector": "State Governments & Local Bodies",
+    "state": "West Bengal"
+  },
+  {
+    "authority": "Western Railway (Civil & Electrical Works)",
+    "portal": "IREPS (ireps.gov.in)",
+    "category": "Bridges & Tunnels",
+    "accepted_count": 26,
+    "current_count": 5,
+    "sector": "Railways & Metros",
+    "state": "National (Pan-India)"
+  },
+  {
+    "authority": "Works Department, Govt of Odisha (Odisha Works)",
+    "portal": "Odisha Tenders (tendersodisha.gov.in)",
+    "category": "Coastal Disaster Shelters",
+    "accepted_count": 19,
+    "current_count": 4,
+    "sector": "State Governments & Local Bodies",
+    "state": "Odisha"
+  }
+]

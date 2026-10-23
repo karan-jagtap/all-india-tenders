@@ -1,0 +1,13 @@
+{
+  "name": "all-india-tenders",
+  "version": "1.0.0",
+  "private": true,
+  "description": "All India Tenders - National Procurement Intelligence Platform",
+  "scripts": {
+    "dev": "./start.sh",
+    "start": "./start.sh",
+    "fe": "cd frontend && npm run dev",
+    "be": "cd backend && /Users/karan/workspace/tender-rag/backend/.venv/bin/uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload",
+    "build": "cd frontend && npm run build"
+  }
+}
