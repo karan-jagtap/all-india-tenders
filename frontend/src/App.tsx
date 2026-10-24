@@ -8,8 +8,11 @@ import {
   Users,
   Menu,
   X,
-  ChevronRight
+  ChevronRight,
+  Sun,
+  Moon
 } from 'lucide-react';
+import { useTheme } from './context/ThemeContext';
 import { HomeScreen } from './components/HomeScreen';
 import { PreviouslyAcceptedTendersTab } from './components/PreviouslyAcceptedTendersTab';
 import { CurrentTendersTab } from './components/CurrentTendersTab';
@@ -17,6 +20,7 @@ import { RegisteredBiddersTab } from './components/RegisteredBiddersTab';
 import { getPlatformStats, triggerLiveScrape, PlatformStats, ScrapeReport } from './services/api';
 
 export const App: React.FC = () => {
+  const { toggleTheme, isDark } = useTheme();
   const [activeTab, setActiveTab] = useState<'home' | 'current' | 'accepted' | 'bidders'>('home');
   const [stats, setStats] = useState<PlatformStats | null>(null);
   const [isSyncing, setIsSyncing] = useState<boolean>(false);
@@ -129,7 +133,7 @@ export const App: React.FC = () => {
   const currentTabObj = tabs.find((t) => t.id === activeTab) || tabs[0];
 
   return (
-    <div className="min-h-screen bg-slate-100 flex flex-col font-sans">
+    <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#070A10] text-slate-900 dark:text-slate-100 flex flex-col font-sans transition-colors duration-200">
       {/* Top National Tricolor Accent Strip */}
       <div className="h-1.5 w-full flex shrink-0">
         <div className="h-full w-1/3 bg-[#FF9933]" />
@@ -137,8 +141,8 @@ export const App: React.FC = () => {
         <div className="h-full w-1/3 bg-[#138808]" />
       </div>
 
-      {/* 1. Clean Top Navbar (Logo, Title, Sync Live Button, and Mobile Hamburger Menu) */}
-      <header className="bg-slate-900 border-b border-slate-800 text-white sticky top-0 z-50 shadow-sm">
+      {/* 1. Clean Top Navbar (Logo, Title, Language Selector, Theme Toggle, Sync Live Button, and Mobile Hamburger Menu) */}
+      <header className="bg-[#0A0E17] border-b border-slate-800 text-white sticky top-0 z-50 shadow-sm backdrop-blur-md">
         <div className="w-full px-3.5 sm:px-6 py-2.5 max-w-[1920px] mx-auto flex items-center justify-between gap-3">
           {/* Logo & Platform Name */}
           <div
@@ -149,7 +153,7 @@ export const App: React.FC = () => {
             className="flex items-center gap-2.5 sm:gap-3 min-w-0 cursor-pointer group"
             title="Click to go to Home Landing Page"
           >
-            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-orange-500 to-emerald-600 flex items-center justify-center shadow-md border border-white/20 shrink-0 group-hover:scale-105 transition-transform">
+            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-orange-500 via-amber-600 to-emerald-600 flex items-center justify-center shadow-md border border-white/20 shrink-0 group-hover:scale-105 transition-transform ring-1 ring-amber-500/20">
               <span className="text-lg sm:text-xl">🇮🇳</span>
             </div>
             <div className="min-w-0">
@@ -165,8 +169,25 @@ export const App: React.FC = () => {
             </div>
           </div>
 
-          {/* Top Actions: Sync Live + Hamburger Menu for smaller screens */}
-          <div className="flex items-center gap-2 shrink-0">
+          {/* Top Actions: Theme Toggle + Sync Live + Hamburger Menu for smaller screens */}
+          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+            {/* Theme Toggle Button (Light / Dark) */}
+            <button
+              onClick={toggleTheme}
+              className="px-2.5 py-2 rounded-lg bg-slate-800/90 hover:bg-slate-700 active:bg-slate-600 text-slate-200 hover:text-white border border-slate-700/80 flex items-center gap-1.5 transition-all cursor-pointer shadow-xs group"
+              title={isDark ? 'Switch to Light theme' : 'Switch to Dark theme'}
+              aria-label={isDark ? 'Switch to Light theme' : 'Switch to Dark theme'}
+            >
+              {isDark ? (
+                <Sun className="w-4 h-4 text-amber-400 group-hover:rotate-45 transition-transform duration-300" />
+              ) : (
+                <Moon className="w-4 h-4 text-amber-300 group-hover:-rotate-12 transition-transform duration-300" />
+              )}
+              <span className="text-[11px] font-semibold hidden sm:inline">
+                {isDark ? 'Light' : 'Dark'}
+              </span>
+            </button>
+
             {/* Sync Live Button */}
             <button
               onClick={handleSyncLive}
@@ -197,10 +218,10 @@ export const App: React.FC = () => {
       </header>
 
       {/* 2. Desktop Tab Bar Navigation (Visible on md:block, hidden on smaller screens where hamburger menu is used) */}
-      <nav className="hidden md:block bg-white border-b border-slate-200 px-6 py-2.5 shadow-2xs sticky top-[57px] z-40">
+      <nav className="hidden md:block bg-white/95 dark:bg-[#0B0F19]/95 backdrop-blur-md border-b border-slate-200/90 dark:border-slate-800/90 px-6 py-2.5 shadow-2xs sticky top-[57px] z-40 transition-colors">
         <div className="max-w-[1920px] mx-auto flex items-center justify-between gap-2.5">
           {/* Main Tenders Tabs */}
-          <div className="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200 shadow-inner gap-1 shrink-0">
+          <div className="flex items-center bg-slate-100/90 dark:bg-[#131A2B] p-1 rounded-xl border border-slate-200/90 dark:border-slate-800/80 shadow-inner gap-1 shrink-0">
             {tabs.map((t) => {
               const Icon = t.icon;
               const isSelected = activeTab === t.id;
@@ -211,7 +232,7 @@ export const App: React.FC = () => {
                   className={`px-4 sm:px-5 py-2 rounded-lg text-xs font-bold flex items-center justify-center gap-2 transition-all cursor-pointer shrink-0 whitespace-nowrap ${
                     isSelected
                       ? t.activeClasses
-                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/70'
+                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white dark:hover:bg-slate-800/70 hover:shadow-2xs'
                   }`}
                 >
                   <Icon
@@ -225,7 +246,7 @@ export const App: React.FC = () => {
                   {t.badge !== undefined && (
                     <span
                       className={`px-1.5 py-0.5 rounded-full text-[10px] font-mono font-semibold ${
-                        isSelected ? t.badgeColor : 'bg-slate-200 text-slate-700'
+                        isSelected ? t.badgeColor : 'bg-slate-200/90 dark:bg-slate-800 text-slate-700 dark:text-slate-300'
                       }`}
                     >
                       {t.badge}
@@ -238,8 +259,8 @@ export const App: React.FC = () => {
 
           {/* Sync Live Notice Toast Banner on Desktop */}
           {syncNotice && (
-            <div className="text-xs font-medium text-emerald-800 bg-emerald-50 border border-emerald-300 px-3 py-1.5 rounded-lg flex items-center gap-1.5 animate-pulse shadow-2xs">
-              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+            <div className="text-xs font-medium text-emerald-800 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-300 dark:border-emerald-800 px-3 py-1.5 rounded-lg flex items-center gap-1.5 animate-pulse shadow-2xs">
+              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
               <span>{syncNotice}</span>
             </div>
           )}
@@ -338,8 +359,28 @@ export const App: React.FC = () => {
               })}
             </div>
 
-            {/* Drawer Footer with Quick Sync Live button */}
-            <div className="p-4 border-t border-slate-800 bg-slate-950/60 space-y-3">
+            {/* Drawer Footer with Quick Theme Toggle & Sync Live button */}
+            <div className="p-4 border-t border-slate-800 bg-slate-950/60 space-y-2.5">
+              <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-800/60 border border-slate-700/70 text-xs">
+                <span className="font-semibold text-slate-300 text-[11px]">Appearance Theme</span>
+                <button
+                  onClick={toggleTheme}
+                  className="px-2.5 py-1.5 rounded-lg bg-slate-700 hover:bg-slate-600 text-white font-bold flex items-center gap-1.5 transition-all cursor-pointer text-xs"
+                >
+                  {isDark ? (
+                    <>
+                      <Sun className="w-3.5 h-3.5 text-amber-400" />
+                      <span>Light Theme</span>
+                    </>
+                  ) : (
+                    <>
+                      <Moon className="w-3.5 h-3.5 text-amber-300" />
+                      <span>Dark Theme</span>
+                    </>
+                  )}
+                </button>
+              </div>
+
               <button
                 onClick={() => {
                   handleSyncLive();
@@ -362,8 +403,8 @@ export const App: React.FC = () => {
 
       {/* Sync Live Notice Toast Banner for Mobile */}
       {syncNotice && (
-        <div className="md:hidden mx-3 mt-2 text-xs font-medium text-emerald-800 bg-emerald-50 border border-emerald-300 px-3 py-2 rounded-lg flex items-center gap-2 animate-pulse shadow-2xs">
-          <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+        <div className="md:hidden mx-3 mt-2 text-xs font-medium text-emerald-800 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-300 dark:border-emerald-800 px-3 py-2 rounded-lg flex items-center gap-2 animate-pulse shadow-2xs">
+          <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
           <span className="flex-1 break-words">{syncNotice}</span>
         </div>
       )}
@@ -387,10 +428,10 @@ export const App: React.FC = () => {
       </main>
 
       {/* Footer */}
-      <footer className="bg-slate-900 border-t border-slate-800 text-slate-400 text-xs py-3.5 px-4 sm:px-6 text-center">
+      <footer className="bg-white dark:bg-[#0A0E17] border-t border-slate-200/90 dark:border-slate-800 text-slate-600 dark:text-slate-400 text-xs py-4 px-4 sm:px-6 text-center transition-colors">
         <div className="flex flex-col sm:flex-row items-center justify-between gap-2 max-w-[1920px] mx-auto">
           <span>All India Tenders • Sourcing across 28+ Real Government Portals (51 Monitored Endpoints)</span>
-          <span className="text-orange-400 font-mono text-[11px]">
+          <span className="text-orange-600 dark:text-orange-400 font-mono text-[11px] font-medium">
             Purely Scraping-Based Architecture • Zero Database Required
           </span>
         </div>

@@ -46,7 +46,11 @@ Engineered with a **purely scraping-based, 100% in-memory RAM streaming architec
 - **Audited Financial Metrics:** 3-year turnover, net worth, active work-in-hand, and max single-bid capacity.
 - Track past awards, sector specializations (Highways, Bridges, Rail/Metro, Water & Sanitation, Buildings), and Joint Venture (JV) compatibility.
 
-### 5. 🤖 AI Competitor Simulation & Deep RAG Analytics
+### 5. 🌓 Theme Customization & Mobile-First UX
+- **Theme Modes:** Instant toggle between Slate Dark (`#0A0E17`) and clean Professional Light themes.
+- **Responsive Navigation:** Hamburger drawer menu on mobile viewports (<768px) with full navigation tabs and theme switch.
+
+### 6. 🤖 AI Competitor Simulation & Deep RAG Analytics
 - **AI L1 Bidder Prediction:** Real-time probability prediction of top competing bidders based on historical pricing patterns and regional presence.
 - **RAG Clause Analytics:** Natural language clause-by-clause query engine for dense Standard Bidding Documents (liquidated damages, price escalation, defect liability period).
 
@@ -140,9 +144,11 @@ all-india-tenders/
 │   │   │   ├── HomeScreen/            # Landing page & statutory source directory
 │   │   │   ├── CurrentTenders/        # In-progress tender cards, drawer, & SBD modal
 │   │   │   ├── RegisteredBidders/     # Contractor profiles & financial intelligence
+│   │   │   ├── common/                # Reusable UI (Drawer, Dropdowns, Search)
 │   │   │   ├── CurrentTendersTab.tsx  # In-progress tab container
 │   │   │   ├── PreviouslyAcceptedTendersTab.tsx  # Awarded bids archive
 │   │   │   └── RegisteredBiddersTab.tsx          # Contractors directory
+│   │   ├── context/                   # ThemeContext (Dark/Light appearance)
 │   │   ├── constants/                 # Real portal sources, contractors, & filter configs
 │   │   ├── types/                     # TypeScript domain models
 │   │   ├── utils/                     # Formatting, calculations, & helpers

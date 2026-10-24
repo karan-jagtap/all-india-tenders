@@ -29,28 +29,28 @@ export const ActiveFilterChipsBar: React.FC<ActiveFilterChipsBarProps> = ({
   const getColorClasses = (color?: string) => {
     switch (color) {
       case 'emerald':
-        return 'bg-emerald-50 text-emerald-800 border-emerald-200 hover:border-emerald-300';
+        return 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800 hover:border-emerald-300';
       case 'blue':
-        return 'bg-blue-50 text-blue-800 border-blue-200 hover:border-blue-300';
+        return 'bg-blue-50 dark:bg-blue-950/60 text-blue-800 dark:text-blue-300 border-blue-200 dark:border-blue-800 hover:border-blue-300';
       case 'rose':
-        return 'bg-rose-50 text-rose-800 border-rose-200 hover:border-rose-300';
+        return 'bg-rose-50 dark:bg-rose-950/60 text-rose-800 dark:text-rose-300 border-rose-200 dark:border-rose-900/60 hover:border-rose-300';
       case 'amber':
-        return 'bg-amber-50 text-amber-800 border-amber-200 hover:border-amber-300';
+        return 'bg-amber-50 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 border-amber-200 dark:border-amber-800 hover:border-amber-300';
       case 'violet':
-        return 'bg-violet-50 text-violet-800 border-violet-200 hover:border-violet-300';
+        return 'bg-violet-50 dark:bg-violet-950/60 text-violet-800 dark:text-violet-300 border-violet-200 dark:border-violet-800 hover:border-violet-300';
       case 'slate':
-        return 'bg-slate-100 text-slate-800 border-slate-300 hover:border-slate-400';
+        return 'bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 border-slate-300 dark:border-slate-700 hover:border-slate-400';
       case 'orange':
       default:
-        return 'bg-orange-50 text-orange-800 border-orange-200 hover:border-orange-300';
+        return 'bg-orange-50 dark:bg-orange-950/60 text-orange-800 dark:text-orange-300 border-orange-200 dark:border-orange-800 hover:border-orange-300';
     }
   };
 
   return (
     <div
-      className={`pt-2 border-t border-slate-100 flex flex-wrap items-center gap-1.5 text-xs animate-fadeIn ${className}`}
+      className={`pt-2 border-t border-slate-100 dark:border-slate-800 flex flex-wrap items-center gap-1.5 text-xs animate-fadeIn ${className}`}
     >
-      <span className="text-[11px] text-slate-500 font-semibold mr-1">Applied:</span>
+      <span className="text-[11px] text-slate-500 dark:text-slate-400 font-semibold mr-1">Applied:</span>
 
       {chips.map((chip) => (
         <span

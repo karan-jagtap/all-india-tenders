@@ -319,31 +319,31 @@ export const AllBidsEvaluationSubTab: React.FC<AllBidsEvaluationSubTabProps> = (
   };
 
   return (
-    <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-xs space-y-6">
+    <div className="bg-white dark:bg-[#0E1422] rounded-xl border border-slate-200/90 dark:border-slate-800 p-5 shadow-xs space-y-6 transition-colors">
       {/* 1. Header Bar: Official Tender Evaluation Statement */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-200">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-200 dark:border-slate-800">
         <div>
           <div className="flex items-center gap-2 mb-1">
             <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-wider uppercase bg-amber-500 text-slate-950 flex items-center gap-1 shadow-2xs">
               <Users className="w-3.5 h-3.5" />
               Comparative Bid Evaluation Matrix (All Competitors)
             </span>
-            <span className="text-[11px] font-mono text-slate-500">
+            <span className="text-[11px] font-mono text-slate-500 dark:text-slate-400">
               Form 49 • NIC-GEP / CPPP Standards
             </span>
           </div>
-          <h3 className="text-base font-bold text-slate-900 tracking-tight">
+          <h3 className="text-base font-bold text-slate-900 dark:text-white tracking-tight">
             Financial & Technical Bids Comparison: L1 Winner vs L2, L3, L4, L5 Competitors
           </h3>
-          <p className="text-xs text-slate-500 mt-0.5">
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
             Comprehensive comparative statement of all participating contractors, evaluated quotes, price spreads, and committee resolution.
           </p>
         </div>
 
         <div className="flex items-center gap-2 shrink-0">
-          <div className="px-3 py-1.5 bg-emerald-50 border border-emerald-200 rounded-lg text-right">
-            <span className="text-[10px] uppercase font-bold text-emerald-700 block">L1 Winning Bid</span>
-            <span className="text-xs font-mono font-bold text-emerald-900">
+          <div className="px-3 py-1.5 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/80 rounded-lg text-right">
+            <span className="text-[10px] uppercase font-bold text-emerald-700 dark:text-emerald-400 block">L1 Winning Bid</span>
+            <span className="text-xs font-mono font-bold text-emerald-900 dark:text-emerald-200">
               {formatCr(l1Bid.quotedAmountInr)}
             </span>
           </div>
@@ -353,16 +353,16 @@ export const AllBidsEvaluationSubTab: React.FC<AllBidsEvaluationSubTabProps> = (
       {/* 2. Key Executive Summary Metric Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {/* Card 1: Winning L1 Bid */}
-        <div className="bg-emerald-50/70 border border-emerald-200 rounded-xl p-3.5 shadow-2xs">
-          <div className="flex items-center justify-between text-emerald-800 mb-1">
+        <div className="bg-emerald-50/70 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-900/50 rounded-xl p-3.5 shadow-2xs">
+          <div className="flex items-center justify-between text-emerald-800 dark:text-emerald-300 mb-1">
             <span className="text-[11px] font-bold uppercase tracking-wider">L1 Awarded Bid</span>
-            <Award className="w-4 h-4 text-emerald-600" />
+            <Award className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
           </div>
-          <div className="text-lg font-black text-emerald-950 font-mono">
+          <div className="text-lg font-black text-emerald-950 dark:text-emerald-200 font-mono">
             {formatCr(l1Bid.quotedAmountInr)}
           </div>
-          <div className="text-[11px] text-emerald-700 mt-1 flex items-center gap-1">
-            <TrendingDown className="w-3 h-3 text-emerald-600" />
+          <div className="text-[11px] text-emerald-700 dark:text-emerald-400 mt-1 flex items-center gap-1 font-mono">
+            <TrendingDown className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
             <span>
               {l1Bid.quotedDiscountPct > 0
                 ? `${l1Bid.quotedDiscountPct}% below estimate`
@@ -372,43 +372,43 @@ export const AllBidsEvaluationSubTab: React.FC<AllBidsEvaluationSubTabProps> = (
         </div>
 
         {/* Card 2: L1 vs L2 Margin */}
-        <div className="bg-blue-50/70 border border-blue-200 rounded-xl p-3.5 shadow-2xs">
-          <div className="flex items-center justify-between text-blue-800 mb-1">
+        <div className="bg-blue-50/70 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-900/50 rounded-xl p-3.5 shadow-2xs">
+          <div className="flex items-center justify-between text-blue-800 dark:text-blue-300 mb-1">
             <span className="text-[11px] font-bold uppercase tracking-wider">L1 to L2 Spread</span>
-            <Scale className="w-4 h-4 text-blue-600" />
+            <Scale className="w-4 h-4 text-blue-600 dark:text-blue-400" />
           </div>
-          <div className="text-lg font-black text-blue-950 font-mono">
+          <div className="text-lg font-black text-blue-950 dark:text-blue-200 font-mono">
             +{l1MarginOverL2Pct}%
           </div>
-          <div className="text-[11px] text-blue-700 mt-1">
+          <div className="text-[11px] text-blue-700 dark:text-blue-400 mt-1 font-mono">
             L1 won by <strong>{formatCr(l1MarginOverL2Inr)}</strong> margin
           </div>
         </div>
 
         {/* Card 3: Public Exchequer Savings */}
-        <div className="bg-amber-50/70 border border-amber-200 rounded-xl p-3.5 shadow-2xs">
-          <div className="flex items-center justify-between text-amber-800 mb-1">
+        <div className="bg-amber-50/70 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900/50 rounded-xl p-3.5 shadow-2xs">
+          <div className="flex items-center justify-between text-amber-800 dark:text-amber-300 mb-1">
             <span className="text-[11px] font-bold uppercase tracking-wider">Public Savings</span>
-            <TrendingDown className="w-4 h-4 text-amber-600" />
+            <TrendingDown className="w-4 h-4 text-amber-600 dark:text-amber-400" />
           </div>
-          <div className="text-lg font-black text-amber-950 font-mono">
+          <div className="text-lg font-black text-amber-950 dark:text-amber-200 font-mono">
             {exchequerSavingsInr > 0 ? formatCr(exchequerSavingsInr) : '₹ 0.00 Cr'}
           </div>
-          <div className="text-[11px] text-amber-700 mt-1">
+          <div className="text-[11px] text-amber-700 dark:text-amber-400 mt-1 font-mono">
             Saved below ₹ {formatCr(estimatedCost)} budget
           </div>
         </div>
 
         {/* Card 4: Total Bidders Evaluated */}
-        <div className="bg-slate-50 border border-slate-200 rounded-xl p-3.5 shadow-2xs">
-          <div className="flex items-center justify-between text-slate-700 mb-1">
+        <div className="bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/60 rounded-xl p-3.5 shadow-2xs">
+          <div className="flex items-center justify-between text-slate-700 dark:text-slate-300 mb-1">
             <span className="text-[11px] font-bold uppercase tracking-wider">Evaluated Bids</span>
-            <Users className="w-4 h-4 text-slate-500" />
+            <Users className="w-4 h-4 text-slate-500 dark:text-slate-400" />
           </div>
-          <div className="text-lg font-black text-slate-900 font-mono">
+          <div className="text-lg font-black text-slate-900 dark:text-white font-mono">
             5 Bidders
           </div>
-          <div className="text-[11px] text-slate-500 mt-1">
+          <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">
             {evaluatedBids.filter((b) => !b.isDisqualified).length} Responsive •{' '}
             {evaluatedBids.filter((b) => b.isDisqualified).length} Rejected
           </div>
@@ -418,22 +418,22 @@ export const AllBidsEvaluationSubTab: React.FC<AllBidsEvaluationSubTabProps> = (
       {/* 3. Comprehensive All Bids Evaluation Matrix Table */}
       <div className="space-y-2">
         <div className="flex items-center justify-between">
-          <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
-            <FileSpreadsheet className="w-4 h-4 text-emerald-600" />
+          <h4 className="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider flex items-center gap-1.5">
+            <FileSpreadsheet className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
             <span>Master Comparative Bids Table (Rankings L1 – L5)</span>
           </h4>
-          <span className="text-[11px] text-slate-400">
+          <span className="text-[11px] text-slate-400 dark:text-slate-500">
             Click on any row to expand technical dossier and equipment breakdown
           </span>
         </div>
 
-        <div className="sm:hidden text-[11px] text-slate-500 font-medium px-1 flex items-center justify-between">
+        <div className="sm:hidden text-[11px] text-slate-500 dark:text-slate-400 font-medium px-1 flex items-center justify-between">
           <span>← Swipe table horizontally to see all columns →</span>
         </div>
 
-        <div className="overflow-x-auto rounded-xl border border-slate-200 shadow-2xs">
+        <div className="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-800 shadow-2xs">
           <table className="w-full text-left text-xs">
-            <thead className="bg-slate-900 text-white uppercase text-[10px] tracking-wider font-bold">
+            <thead className="bg-slate-900 dark:bg-slate-950 text-white uppercase text-[10px] tracking-wider font-bold">
               <tr>
                 <th className="py-3 px-3">Rank</th>
                 <th className="py-3 px-3">Contractor / Firm Name</th>
@@ -445,7 +445,7 @@ export const AllBidsEvaluationSubTab: React.FC<AllBidsEvaluationSubTabProps> = (
                 <th className="py-3 px-3">Tender Verdict</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100 bg-white">
+            <tbody className="divide-y divide-slate-100 dark:divide-slate-800 bg-white dark:bg-[#0E1422]">
               {evaluatedBids.map((bid) => {
                 const isSelected = expandedBidderRank === bid.rank;
                 const isWinner = bid.isWinner;
@@ -457,10 +457,10 @@ export const AllBidsEvaluationSubTab: React.FC<AllBidsEvaluationSubTabProps> = (
                       onClick={() => setExpandedBidderRank(isSelected ? null : bid.rank)}
                       className={`transition-colors cursor-pointer ${
                         isWinner
-                          ? 'bg-emerald-50/50 hover:bg-emerald-50'
+                          ? 'bg-emerald-50/50 dark:bg-emerald-950/20 hover:bg-emerald-50 dark:hover:bg-emerald-950/40'
                           : isDisq
-                          ? 'bg-rose-50/30 hover:bg-rose-50/60'
-                          : 'hover:bg-slate-50'
+                          ? 'bg-rose-50/30 dark:bg-rose-950/20 hover:bg-rose-50/60 dark:hover:bg-rose-950/40'
+                          : 'hover:bg-slate-50 dark:hover:bg-slate-800/40'
                       }`}
                     >
                       {/* Rank */}
@@ -476,13 +476,13 @@ export const AllBidsEvaluationSubTab: React.FC<AllBidsEvaluationSubTabProps> = (
 
                       {/* Contractor Name & HQ */}
                       <td className="py-3 px-3">
-                        <div className="flex items-center gap-1.5 font-bold text-slate-900">
-                          {isWinner && <Award className="w-3.5 h-3.5 text-emerald-600 shrink-0" />}
+                        <div className="flex items-center gap-1.5 font-bold text-slate-900 dark:text-white">
+                          {isWinner && <Award className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />}
                           <span className="break-words">
                             {bid.name}
                           </span>
                         </div>
-                        <div className="text-[11px] text-slate-400 flex items-center gap-1 mt-0.5">
+                        <div className="text-[11px] text-slate-400 dark:text-slate-500 flex items-center gap-1 mt-0.5">
                           <MapPin className="w-2.5 h-2.5" />
                           <span>{bid.hq}</span>
                           <span>•</span>
@@ -493,13 +493,13 @@ export const AllBidsEvaluationSubTab: React.FC<AllBidsEvaluationSubTabProps> = (
                       {/* Financial Bid */}
                       <td className="py-3 px-3 font-mono whitespace-nowrap">
                         {isDisq ? (
-                          <span className="text-slate-400 italic">Unopened (Deficient)</span>
+                          <span className="text-slate-400 dark:text-slate-500 italic">Unopened (Deficient)</span>
                         ) : (
                           <div>
-                            <span className="font-bold text-slate-900">
+                            <span className="font-bold text-slate-900 dark:text-white">
                               {formatCr(bid.quotedAmountInr)}
                             </span>
-                            <div className="text-[10px] text-slate-400">
+                            <div className="text-[10px] text-slate-400 dark:text-slate-500">
                               {formatINR(bid.quotedAmountInr)}
                             </div>
                           </div>
@@ -509,13 +509,13 @@ export const AllBidsEvaluationSubTab: React.FC<AllBidsEvaluationSubTabProps> = (
                       {/* Variance vs Estimate */}
                       <td className="py-3 px-3 font-mono whitespace-nowrap">
                         {isDisq ? (
-                          <span className="text-slate-400">—</span>
+                          <span className="text-slate-400 dark:text-slate-500">—</span>
                         ) : bid.varianceVsEstimatePct <= 0 ? (
-                          <span className="font-bold text-emerald-700 bg-emerald-100/80 px-1.5 py-0.5 rounded text-[11px]">
+                          <span className="font-bold text-emerald-700 dark:text-emerald-400 bg-emerald-100/80 dark:bg-emerald-950/60 px-1.5 py-0.5 rounded text-[11px]">
                             {bid.varianceVsEstimatePct}%
                           </span>
                         ) : (
-                          <span className="font-bold text-rose-700 bg-rose-100/80 px-1.5 py-0.5 rounded text-[11px]">
+                          <span className="font-bold text-rose-700 dark:text-rose-400 bg-rose-100/80 dark:bg-rose-950/60 px-1.5 py-0.5 rounded text-[11px]">
                             +{bid.varianceVsEstimatePct}%
                           </span>
                         )}
@@ -524,15 +524,15 @@ export const AllBidsEvaluationSubTab: React.FC<AllBidsEvaluationSubTabProps> = (
                       {/* Margin vs L1 */}
                       <td className="py-3 px-3 font-mono whitespace-nowrap">
                         {isWinner ? (
-                          <span className="text-emerald-700 font-bold text-[11px]">
+                          <span className="text-emerald-700 dark:text-emerald-400 font-bold text-[11px]">
                             0.00% (Base Price)
                           </span>
                         ) : isDisq ? (
-                          <span className="text-slate-400">—</span>
+                          <span className="text-slate-400 dark:text-slate-500">—</span>
                         ) : (
-                          <div className="text-slate-700">
+                          <div className="text-slate-700 dark:text-slate-300">
                             <span className="font-bold">+{bid.marginOverL1Pct}%</span>
-                            <div className="text-[10px] text-slate-400">
+                            <div className="text-[10px] text-slate-400 dark:text-slate-500">
                               (+{formatCr(bid.marginOverL1Inr)})
                             </div>
                           </div>
@@ -544,10 +544,10 @@ export const AllBidsEvaluationSubTab: React.FC<AllBidsEvaluationSubTabProps> = (
                         <span
                           className={`font-bold px-1.5 py-0.5 rounded text-[11px] ${
                             bid.techScore >= 90
-                              ? 'bg-emerald-100 text-emerald-800'
+                              ? 'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300'
                               : bid.techScore >= 80
-                              ? 'bg-blue-100 text-blue-800'
-                              : 'bg-rose-100 text-rose-800'
+                              ? 'bg-blue-100 dark:bg-blue-950/60 text-blue-800 dark:text-blue-300'
+                              : 'bg-rose-100 dark:bg-rose-950/60 text-rose-800 dark:text-rose-300'
                           }`}
                         >
                           {bid.techScore}/100
@@ -557,13 +557,13 @@ export const AllBidsEvaluationSubTab: React.FC<AllBidsEvaluationSubTabProps> = (
                       {/* PQC / Cover-2 */}
                       <td className="py-3 px-3 whitespace-nowrap">
                         {isDisq ? (
-                          <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-rose-700 bg-rose-50 border border-rose-200 px-2 py-0.5 rounded">
-                            <XCircle className="w-3 h-3 text-rose-600" />
+                          <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-rose-700 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/50 px-2 py-0.5 rounded">
+                            <XCircle className="w-3 h-3 text-rose-600 dark:text-rose-400" />
                             Disqualified
                           </span>
                         ) : (
-                          <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded">
-                            <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                          <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-900/50 px-2 py-0.5 rounded">
+                            <CheckCircle2 className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
                             PQC Passed
                           </span>
                         )}
@@ -580,9 +580,9 @@ export const AllBidsEvaluationSubTab: React.FC<AllBidsEvaluationSubTabProps> = (
                             {bid.statusBadge}
                           </span>
                           {isSelected ? (
-                            <ChevronUp className="w-3.5 h-3.5 text-slate-400" />
+                            <ChevronUp className="w-3.5 h-3.5 text-slate-400 dark:text-slate-300" />
                           ) : (
-                            <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
+                            <ChevronDown className="w-3.5 h-3.5 text-slate-400 dark:text-slate-300" />
                           )}
                         </div>
                       </td>
@@ -590,53 +590,53 @@ export const AllBidsEvaluationSubTab: React.FC<AllBidsEvaluationSubTabProps> = (
 
                     {/* Expandable Breakdown Drawer Row */}
                     {isSelected && (
-                      <tr className="bg-slate-50/80 border-b border-slate-200">
+                      <tr className="bg-slate-50/80 dark:bg-slate-900/60 border-b border-slate-200 dark:border-slate-800">
                         <td colSpan={8} className="p-4">
                           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
                             {/* Col 1: Evaluation Verdict */}
-                            <div className="space-y-1.5 bg-white p-3 rounded-lg border border-slate-200">
-                              <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">
+                            <div className="space-y-1.5 bg-white dark:bg-[#0E1422] p-3 rounded-lg border border-slate-200 dark:border-slate-800">
+                              <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">
                                 Committee Evaluation Findings
                               </span>
-                              <p className="text-slate-800 leading-relaxed text-[11px]">
+                              <p className="text-slate-800 dark:text-slate-200 leading-relaxed text-[11px]">
                                 {bid.evaluationSummary}
                               </p>
-                              <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[11px]">
-                                <span className="text-slate-500">Security Mode:</span>
-                                <span className="font-semibold text-slate-800">{bid.emdStatus}</span>
+                              <div className="pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-[11px]">
+                                <span className="text-slate-500 dark:text-slate-400">Security Mode:</span>
+                                <span className="font-semibold text-slate-800 dark:text-slate-200">{bid.emdStatus}</span>
                               </div>
                             </div>
 
                             {/* Col 2: Equipment & Machinery Fleet */}
-                            <div className="space-y-1.5 bg-white p-3 rounded-lg border border-slate-200">
-                              <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">
+                            <div className="space-y-1.5 bg-white dark:bg-[#0E1422] p-3 rounded-lg border border-slate-200 dark:border-slate-800">
+                              <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">
                                 Committed Plant & Machinery
                               </span>
-                              <p className="text-slate-700 leading-relaxed text-[11px]">
+                              <p className="text-slate-700 dark:text-slate-300 leading-relaxed text-[11px]">
                                 {bid.equipmentDeclared}
                               </p>
-                              <div className="pt-2 border-t border-slate-100 flex items-center justify-between text-[11px]">
-                                <span className="text-slate-500">Technical Score:</span>
-                                <span className="font-bold text-slate-900 font-mono">{bid.techScore} / 100</span>
+                              <div className="pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-[11px]">
+                                <span className="text-slate-500 dark:text-slate-400">Technical Score:</span>
+                                <span className="font-bold text-slate-900 dark:text-white font-mono">{bid.techScore} / 100</span>
                               </div>
                             </div>
 
                             {/* Col 3: Financial Capacity & Turnover */}
-                            <div className="space-y-1.5 bg-white p-3 rounded-lg border border-slate-200">
-                              <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">
+                            <div className="space-y-1.5 bg-white dark:bg-[#0E1422] p-3 rounded-lg border border-slate-200 dark:border-slate-800">
+                              <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">
                                 Verified Financial Standing
                               </span>
                               <div className="flex items-center justify-between text-[11px]">
-                                <span className="text-slate-500">Audited Turnover:</span>
-                                <span className="font-semibold text-slate-900 font-mono">{bid.turnoverCited}</span>
+                                <span className="text-slate-500 dark:text-slate-400">Audited Turnover:</span>
+                                <span className="font-semibold text-slate-900 dark:text-white font-mono">{bid.turnoverCited}</span>
                               </div>
                               <div className="flex items-center justify-between text-[11px]">
-                                <span className="text-slate-500">Cover-1 Compliance:</span>
-                                <span className="text-emerald-600 font-semibold">{bid.cover1Status}</span>
+                                <span className="text-slate-500 dark:text-slate-400">Cover-1 Compliance:</span>
+                                <span className="text-emerald-600 dark:text-emerald-400 font-semibold">{bid.cover1Status}</span>
                               </div>
                               <div className="flex items-center justify-between text-[11px]">
-                                <span className="text-slate-500">Cover-2 Technical:</span>
-                                <span className={bid.isDisqualified ? 'text-rose-600 font-semibold' : 'text-emerald-600 font-semibold'}>
+                                <span className="text-slate-500 dark:text-slate-400">Cover-2 Technical:</span>
+                                <span className={bid.isDisqualified ? 'text-rose-600 dark:text-rose-400 font-semibold' : 'text-emerald-600 dark:text-emerald-400 font-semibold'}>
                                   {bid.cover2Status}
                                 </span>
                               </div>
@@ -654,13 +654,13 @@ export const AllBidsEvaluationSubTab: React.FC<AllBidsEvaluationSubTabProps> = (
       </div>
 
       {/* 4. Visual Price Spread Spectrum */}
-      <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3">
+      <div className="bg-slate-50 dark:bg-slate-900/40 p-4 rounded-xl border border-slate-200 dark:border-slate-800 space-y-3">
         <div className="flex items-center justify-between">
-          <span className="text-[11px] font-bold text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
-            <TrendingUp className="w-3.5 h-3.5 text-blue-600" />
+          <span className="text-[11px] font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider flex items-center gap-1.5">
+            <TrendingUp className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
             Competitive Price Clustering (Visual Dispersion vs Department Estimate)
           </span>
-          <span className="text-[11px] font-mono text-slate-500">
+          <span className="text-[11px] font-mono text-slate-500 dark:text-slate-400">
             Estimate: {formatCr(estimatedCost)}
           </span>
         </div>
@@ -679,17 +679,17 @@ export const AllBidsEvaluationSubTab: React.FC<AllBidsEvaluationSubTabProps> = (
                       <span className={`px-1.5 py-0.2 rounded text-[10px] ${getRankBadgeClasses(b.rank)}`}>
                         {b.rank}
                       </span>
-                      <span className="font-semibold text-slate-800">{b.name}</span>
+                      <span className="font-semibold text-slate-800 dark:text-slate-200">{b.name}</span>
                     </div>
                     <div className="font-mono text-xs">
-                      <strong className="text-slate-900">{formatCr(b.quotedAmountInr)}</strong>
-                      <span className="text-[11px] text-slate-500 ml-1.5">
+                      <strong className="text-slate-900 dark:text-white">{formatCr(b.quotedAmountInr)}</strong>
+                      <span className="text-[11px] text-slate-500 dark:text-slate-400 ml-1.5">
                         ({b.varianceVsEstimatePct <= 0 ? `${b.varianceVsEstimatePct}%` : `+${b.varianceVsEstimatePct}%`})
                       </span>
                     </div>
                   </div>
 
-                  <div className="w-full h-2.5 bg-slate-200 rounded-full overflow-hidden flex">
+                  <div className="w-full h-2.5 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden flex">
                     <div
                       style={{ width: `${barWidth}%` }}
                       className={`h-full rounded-full transition-all duration-500 ${

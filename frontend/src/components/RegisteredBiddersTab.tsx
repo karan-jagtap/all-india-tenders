@@ -191,21 +191,21 @@ export const RegisteredBiddersTab: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
         {/* Left Column: Bidders Directory Cards (35% -> col-span-4) */}
         <div className="lg:col-span-4 xl:col-span-4 space-y-2.5 max-h-[calc(100vh-250px)] overflow-y-auto pr-1">
-          <div className="text-xs text-slate-500 font-semibold px-1 flex items-center justify-between">
+          <div className="text-xs text-slate-500 dark:text-slate-400 font-semibold px-1 flex items-center justify-between">
             <span>Registered Contractors ({filteredBidders.length})</span>
-            <span className="text-[11px] text-slate-400">Sorted by {sortBy.replace('_DESC', '').toLowerCase()}</span>
+            <span className="text-[11px] text-slate-400 dark:text-slate-500">Sorted by {sortBy.replace('_DESC', '').toLowerCase()}</span>
           </div>
 
           {loading ? (
-            <div className="p-8 text-center bg-white rounded-xl border border-slate-200">
+            <div className="p-8 text-center bg-white dark:bg-[#0E1422] rounded-xl border border-slate-200/90 dark:border-slate-800">
               <div className="inline-block animate-spin w-6 h-6 border-2 border-blue-600 border-t-transparent rounded-full mb-2" />
-              <p className="text-xs text-slate-500">Loading contractor directory in RAM...</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400">Loading contractor directory in RAM...</p>
             </div>
           ) : filteredBidders.length === 0 ? (
-            <div className="p-8 text-center bg-white rounded-xl border border-slate-200">
-              <Building2 className="w-8 h-8 text-slate-300 mx-auto mb-2" />
-              <h3 className="text-sm font-bold text-slate-700">No Contractors Found</h3>
-              <p className="text-xs text-slate-400 mt-1">Try broadening your search or resetting filters.</p>
+            <div className="p-8 text-center bg-white dark:bg-[#0E1422] rounded-xl border border-slate-200/90 dark:border-slate-800">
+              <Building2 className="w-8 h-8 text-slate-300 dark:text-slate-600 mx-auto mb-2" />
+              <h3 className="text-sm font-bold text-slate-700 dark:text-slate-200">No Contractors Found</h3>
+              <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">Try broadening your search or resetting filters.</p>
               <button
                 onClick={resetFilters}
                 className="mt-3 px-3 py-1.5 bg-blue-600 text-white text-xs rounded-lg hover:bg-blue-700 font-semibold cursor-pointer"
@@ -254,7 +254,7 @@ export const RegisteredBiddersTab: React.FC = () => {
               />
             </div>
           ) : (
-            <div className="bg-white rounded-xl border border-slate-200 p-8 text-center text-slate-400">
+            <div className="bg-white dark:bg-[#0E1422] rounded-xl border border-slate-200/90 dark:border-slate-800 p-8 text-center text-slate-400 dark:text-slate-500">
               Select a contractor to view complete profile dossier.
             </div>
           )}

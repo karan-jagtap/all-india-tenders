@@ -19,7 +19,7 @@ export const CompetitorPredictionSubTab: React.FC<CompetitorPredictionSubTabProp
   preBidPrediction
 }) => {
   return (
-    <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-xs space-y-5 animate-in fade-in duration-150">
+    <div className="bg-white dark:bg-[#0E1422] rounded-xl border border-slate-200/90 dark:border-slate-800 p-5 shadow-xs space-y-5 animate-in fade-in duration-150 transition-colors">
       {/* Banner */}
       <div className="bg-gradient-to-r from-slate-950 via-slate-900 to-amber-950 rounded-xl p-5 border border-amber-500/30 text-white shadow-sm">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
@@ -53,54 +53,54 @@ export const CompetitorPredictionSubTab: React.FC<CompetitorPredictionSubTabProp
 
       {/* 4 Core Intelligence Metric Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
-        <div className="bg-slate-50 p-3.5 rounded-xl border border-slate-200">
+        <div className="bg-slate-50 dark:bg-slate-800/60 p-3.5 rounded-xl border border-slate-200 dark:border-slate-700/60">
           <span className="text-[10px] text-slate-400 uppercase font-semibold block">Official NIT Estimate</span>
-          <strong className="text-sm font-bold text-slate-900 block mt-0.5">
+          <strong className="text-sm font-bold text-slate-900 dark:text-white block mt-0.5 font-mono">
             {formatINR(preBidPrediction.estimatedCostInr)}
           </strong>
-          <span className="text-[11px] text-slate-500 mt-1 block">Baseline 100% Rate Book</span>
+          <span className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 block">Baseline 100% Rate Book</span>
         </div>
 
-        <div className="bg-emerald-50/70 p-3.5 rounded-xl border border-emerald-200">
-          <span className="text-[10px] text-emerald-700 uppercase font-semibold block">Predicted L1 Winner Cutoff</span>
-          <strong className="text-sm font-bold text-emerald-900 block mt-0.5">
+        <div className="bg-emerald-50/70 dark:bg-emerald-950/30 p-3.5 rounded-xl border border-emerald-200 dark:border-emerald-900/50">
+          <span className="text-[10px] text-emerald-700 dark:text-emerald-400 uppercase font-semibold block">Predicted L1 Winner Cutoff</span>
+          <strong className="text-sm font-bold text-emerald-900 dark:text-emerald-200 block mt-0.5 font-mono">
             {formatINR(preBidPrediction.predictedL1QuoteInr)}
           </strong>
-          <span className="text-[11px] text-emerald-700 font-semibold mt-1 block">
+          <span className="text-[11px] text-emerald-700 dark:text-emerald-400 font-semibold mt-1 block">
             {preBidPrediction.predictedL1VariancePct}% below estimate
           </span>
         </div>
 
-        <div className="bg-amber-50/70 p-3.5 rounded-xl border border-amber-200">
-          <span className="text-[10px] text-amber-800 uppercase font-semibold block">Target Winning Sweet Spot</span>
-          <strong className="text-xs font-bold text-amber-950 block mt-0.5 font-mono">
+        <div className="bg-amber-50/70 dark:bg-amber-950/30 p-3.5 rounded-xl border border-amber-200 dark:border-amber-900/50">
+          <span className="text-[10px] text-amber-800 dark:text-amber-400 uppercase font-semibold block">Target Winning Sweet Spot</span>
+          <strong className="text-xs font-bold text-amber-950 dark:text-amber-200 block mt-0.5 font-mono">
             {formatINR(preBidPrediction.winningSweetSpotMinInr)} – {formatINR(preBidPrediction.winningSweetSpotMaxInr)}
           </strong>
-          <span className="text-[11px] text-amber-800 font-semibold mt-1 block">
+          <span className="text-[11px] text-amber-800 dark:text-amber-400 font-semibold mt-1 block">
             {preBidPrediction.winningSweetSpotMinPct}% to {preBidPrediction.winningSweetSpotMaxPct}% (88% Win Rate)
           </span>
         </div>
 
-        <div className="bg-rose-50/70 p-3.5 rounded-xl border border-rose-200">
-          <span className="text-[10px] text-rose-700 uppercase font-semibold block">"Winner's Curse" Risk Zone</span>
-          <strong className="text-sm font-bold text-rose-900 block mt-0.5 font-mono">
+        <div className="bg-rose-50/70 dark:bg-rose-950/30 p-3.5 rounded-xl border border-rose-200 dark:border-rose-900/50">
+          <span className="text-[10px] text-rose-700 dark:text-rose-400 uppercase font-semibold block">"Winner's Curse" Risk Zone</span>
+          <strong className="text-sm font-bold text-rose-900 dark:text-rose-200 block mt-0.5 font-mono">
             Below {formatINR(preBidPrediction.winnersCurseThresholdInr)}
           </strong>
-          <span className="text-[11px] text-rose-700 font-semibold mt-1 block">
+          <span className="text-[11px] text-rose-700 dark:text-rose-400 font-semibold mt-1 block">
             Beyond {preBidPrediction.winnersCurseThresholdPct}% (Negative Margin)
           </span>
         </div>
       </div>
 
       {/* Authority Clearance Insight Callout */}
-      <div className="p-3 bg-amber-50/50 rounded-lg border border-amber-200/80 text-xs text-amber-950 flex items-center justify-between gap-3">
+      <div className="p-3 bg-amber-50/50 dark:bg-amber-950/20 rounded-lg border border-amber-200/80 dark:border-amber-900/40 text-xs text-amber-950 dark:text-amber-200 flex items-center justify-between gap-3">
         <div className="flex items-center gap-2">
-          <Radio className="w-4 h-4 text-amber-600 shrink-0" />
+          <Radio className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
           <span>
             <strong>RAG Historical Authority Pattern:</strong> {preBidPrediction.authorityHistoricalClearancePattern}
           </span>
         </div>
-        <span className="text-[10px] font-mono font-semibold text-amber-800 shrink-0">
+        <span className="text-[10px] font-mono font-semibold text-amber-800 dark:text-amber-400 shrink-0">
           Sample Size: 2,600+ Awards
         </span>
       </div>
@@ -175,22 +175,22 @@ export const CompetitorPredictionSubTab: React.FC<CompetitorPredictionSubTabProp
       <div>
         <div className="flex items-center justify-between mb-2.5">
           <div>
-            <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
-              <CheckCircle className="w-4 h-4 text-emerald-600" />
+            <h4 className="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider flex items-center gap-1.5">
+              <CheckCircle className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
               Simulated Financial Comparative Statement (Predicted CS Sheet)
             </h4>
-            <p className="text-[11px] text-slate-500 mt-0.5">
+            <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
               Projected financial opening based on PQC contractor balance sheets, regional equipment depots, and GFR 173 compliance.
             </p>
           </div>
-          <span className="text-[11px] text-slate-600 bg-slate-100 px-2.5 py-1 rounded-lg border border-slate-200 font-mono">
+          <span className="text-[11px] text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 px-2.5 py-1 rounded-lg border border-slate-200 dark:border-slate-700 font-mono">
             RAG Matched: 5 Contenders
           </span>
         </div>
 
-        <div className="overflow-x-auto rounded-xl border border-slate-200 shadow-2xs">
+        <div className="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-800 shadow-2xs">
           <table className="w-full text-left text-xs">
-            <thead className="bg-slate-900 text-slate-200 text-[10px] uppercase font-bold tracking-wider">
+            <thead className="bg-slate-900 dark:bg-slate-950 text-slate-200 text-[10px] uppercase font-bold tracking-wider">
               <tr>
                 <th className="py-2.5 px-3">Predicted Rank</th>
                 <th className="py-2.5 px-3">Qualified Competitor</th>
@@ -203,13 +203,13 @@ export const CompetitorPredictionSubTab: React.FC<CompetitorPredictionSubTabProp
                 <th className="py-2.5 px-3">Bidding Behavior & Logistics Rationale</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-200 bg-white">
+            <tbody className="divide-y divide-slate-200 dark:divide-slate-800 bg-white dark:bg-[#0E1422]">
               {preBidPrediction.bids.map((b) => {
                 const isL1 = b.rank.startsWith('L1');
                 return (
                   <tr
                     key={b.bidderName}
-                    className={isL1 ? 'bg-emerald-50/50 hover:bg-emerald-50 transition-colors' : 'hover:bg-slate-50/80 transition-colors'}
+                    className={isL1 ? 'bg-emerald-50/50 dark:bg-emerald-950/20 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 transition-colors' : 'hover:bg-slate-50/80 dark:hover:bg-slate-800/50 transition-colors'}
                   >
                     <td className="py-3 px-3 whitespace-nowrap">
                       {isL1 ? (
@@ -218,30 +218,30 @@ export const CompetitorPredictionSubTab: React.FC<CompetitorPredictionSubTabProp
                           {b.rank}
                         </span>
                       ) : (
-                        <span className="inline-block px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-700 border border-slate-200">
+                        <span className="inline-block px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
                           {b.rank}
                         </span>
                       )}
                     </td>
 
                     <td className="py-3 px-3">
-                      <div className="font-bold text-slate-900 leading-snug">{b.bidderName}</div>
-                      <div className="text-[10px] text-slate-500 flex items-center gap-1 mt-0.5 flex-wrap">
+                      <div className="font-bold text-slate-900 dark:text-white leading-snug">{b.bidderName}</div>
+                      <div className="text-[10px] text-slate-500 dark:text-slate-400 flex items-center gap-1 mt-0.5 flex-wrap">
                         <MapPin className="w-2.5 h-2.5 text-slate-400" />
                         <span>{b.headquarters}</span>
                         <span>•</span>
-                        <span className="font-semibold text-slate-700">{b.contractorClass}</span>
+                        <span className="font-semibold text-slate-700 dark:text-slate-300">{b.contractorClass}</span>
                         <span>•</span>
-                        <span className="text-emerald-700 font-semibold">Turnover ₹ {b.annualTurnoverCr} Cr</span>
+                        <span className="text-emerald-700 dark:text-emerald-400 font-semibold">Turnover ₹ {b.annualTurnoverCr} Cr</span>
                       </div>
                     </td>
 
                     <td className="py-3 px-3 whitespace-nowrap">
-                      <div className="font-bold text-slate-900 font-mono text-[11px] flex items-center gap-1">
-                        <span className="text-emerald-700">{b.sectorWinRatePct}%</span>
+                      <div className="font-bold text-slate-900 dark:text-white font-mono text-[11px] flex items-center gap-1">
+                        <span className="text-emerald-700 dark:text-emerald-400">{b.sectorWinRatePct}%</span>
                         <span className="text-slate-400 font-normal">Win Rate</span>
                       </div>
-                      <div className="text-[10px] text-slate-500 mt-0.5 truncate max-w-[160px]" title={b.headToHeadRecord}>
+                      <div className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5 truncate max-w-[160px]" title={b.headToHeadRecord}>
                         {b.headToHeadRecord}
                       </div>
                     </td>
@@ -249,45 +249,45 @@ export const CompetitorPredictionSubTab: React.FC<CompetitorPredictionSubTabProp
                     <td className="py-3 px-3 whitespace-nowrap">
                       <span className={`inline-block px-2 py-0.5 rounded text-[9px] font-bold ${
                         b.pricingPosture.includes('Aggressive')
-                          ? 'bg-rose-100 text-rose-800 border border-rose-200'
+                          ? 'bg-rose-100 dark:bg-rose-950/60 text-rose-800 dark:text-rose-300 border border-rose-200 dark:border-rose-900/60'
                           : b.pricingPosture.includes('Balanced')
-                          ? 'bg-blue-100 text-blue-800 border border-blue-200'
-                          : 'bg-amber-100 text-amber-800 border border-amber-200'
+                          ? 'bg-blue-100 dark:bg-blue-950/60 text-blue-800 dark:text-blue-300 border border-blue-200 dark:border-blue-900/60'
+                          : 'bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-900/60'
                       }`}>
                         {b.pricingPosture}
                       </span>
-                      <div className="text-[10px] text-slate-500 font-mono mt-0.5">
+                      <div className="text-[10px] text-slate-500 dark:text-slate-400 font-mono mt-0.5">
                         Book: ₹ {b.orderBookCr} Cr • Solv: {b.solvencyRatio}x
                       </div>
                     </td>
 
-                    <td className="py-3 px-3 whitespace-nowrap font-mono font-bold text-slate-900">
+                    <td className="py-3 px-3 whitespace-nowrap font-mono font-bold text-slate-900 dark:text-white">
                       {formatINR(b.quotedAmountInr)}
                     </td>
 
                     <td className="py-3 px-3 whitespace-nowrap font-mono font-bold">
-                      <span className={b.variancePct < 0 ? 'text-emerald-700' : 'text-slate-700'}>
+                      <span className={b.variancePct < 0 ? 'text-emerald-700 dark:text-emerald-400' : 'text-slate-700 dark:text-slate-300'}>
                         {b.variancePct > 0 ? `+${b.variancePct}%` : `${b.variancePct}%`}
                       </span>
                     </td>
 
                     <td className="py-3 px-3 whitespace-nowrap font-mono text-[11px]">
                       {isL1 ? (
-                        <span className="text-emerald-700 font-bold">0.0 (Baseline)</span>
+                        <span className="text-emerald-700 dark:text-emerald-400 font-bold">0.0 (Baseline)</span>
                       ) : (
-                        <span className="text-slate-600">
+                        <span className="text-slate-600 dark:text-slate-400">
                           +{formatINR(b.deltaL1Inr)} (+{b.deltaL1Pct}%)
                         </span>
                       )}
                     </td>
 
-                    <td className="py-3 px-3 whitespace-nowrap font-mono font-semibold text-slate-700">
+                    <td className="py-3 px-3 whitespace-nowrap font-mono font-semibold text-slate-700 dark:text-slate-300">
                       {b.technicalScore} / 100
                     </td>
 
-                    <td className="py-3 px-3 text-[11px] text-slate-600 max-w-sm">
+                    <td className="py-3 px-3 text-[11px] text-slate-600 dark:text-slate-400 max-w-sm">
                       <p className="leading-relaxed">{b.biddingStrategy}</p>
-                      <span className="inline-block text-[10px] text-blue-700 font-medium mt-0.5">
+                      <span className="inline-block text-[10px] text-blue-700 dark:text-blue-400 font-medium mt-0.5">
                         {b.fleetMobilityIndex}
                       </span>
                     </td>
@@ -301,41 +301,41 @@ export const CompetitorPredictionSubTab: React.FC<CompetitorPredictionSubTabProp
 
       {/* Strategic Action Advisory Playbook */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs pt-1">
-        <div className="p-4 bg-emerald-50/80 rounded-xl border border-emerald-200 space-y-1.5">
-          <div className="font-bold text-emerald-950 flex items-center gap-1.5">
-            <CheckCircle className="w-4 h-4 text-emerald-600" />
+        <div className="p-4 bg-emerald-50/80 dark:bg-emerald-950/30 rounded-xl border border-emerald-200 dark:border-emerald-900/50 space-y-1.5">
+          <div className="font-bold text-emerald-950 dark:text-emerald-200 flex items-center gap-1.5">
+            <CheckCircle className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
             Winning Sweet-Spot Strategy
           </div>
-          <p className="text-[11px] text-emerald-900 leading-relaxed font-semibold">
+          <p className="text-[11px] text-emerald-900 dark:text-emerald-300 leading-relaxed font-semibold">
             {preBidPrediction.strategicAdvice.recommendedPriceWindow}
           </p>
-          <p className="text-[11px] text-emerald-800 leading-relaxed">
+          <p className="text-[11px] text-emerald-800 dark:text-emerald-400 leading-relaxed">
             {preBidPrediction.strategicAdvice.targetAction}
           </p>
         </div>
 
-        <div className="p-4 bg-rose-50/80 rounded-xl border border-rose-200 space-y-1.5">
-          <div className="font-bold text-rose-950 flex items-center gap-1.5">
-            <AlertCircle className="w-4 h-4 text-rose-600" />
+        <div className="p-4 bg-rose-50/80 dark:bg-rose-950/30 rounded-xl border border-rose-200 dark:border-rose-900/50 space-y-1.5">
+          <div className="font-bold text-rose-950 dark:text-rose-200 flex items-center gap-1.5">
+            <AlertCircle className="w-4 h-4 text-rose-600 dark:text-rose-400" />
             "Winner's Curse" Risk Warning
           </div>
-          <p className="text-[11px] text-rose-900 leading-relaxed font-semibold">
+          <p className="text-[11px] text-rose-900 dark:text-rose-300 leading-relaxed font-semibold">
             Avoid Quoting Below {formatINR(preBidPrediction.winnersCurseThresholdInr)} ({preBidPrediction.winnersCurseThresholdPct}%)
           </p>
-          <p className="text-[11px] text-rose-800 leading-relaxed">
+          <p className="text-[11px] text-rose-800 dark:text-rose-400 leading-relaxed">
             {preBidPrediction.strategicAdvice.riskAlert}
           </p>
         </div>
 
-        <div className="p-4 bg-blue-50/80 rounded-xl border border-blue-200 space-y-1.5">
-          <div className="font-bold text-blue-950 flex items-center gap-1.5">
-            <ShieldAlert className="w-4 h-4 text-blue-600" />
+        <div className="p-4 bg-blue-50/80 dark:bg-blue-950/30 rounded-xl border border-blue-200 dark:border-blue-900/50 space-y-1.5">
+          <div className="font-bold text-blue-950 dark:text-blue-200 flex items-center gap-1.5">
+            <ShieldAlert className="w-4 h-4 text-blue-600 dark:text-blue-400" />
             Cover-1 Technical Compliance Safeguard
           </div>
-          <p className="text-[11px] text-blue-900 leading-relaxed font-semibold">
+          <p className="text-[11px] text-blue-900 dark:text-blue-300 leading-relaxed font-semibold">
             Strict Pre-Qualification Criteria (PQC) Adherence
           </p>
-          <p className="text-[11px] text-blue-800 leading-relaxed">
+          <p className="text-[11px] text-blue-800 dark:text-blue-400 leading-relaxed">
             {preBidPrediction.strategicAdvice.complianceKey}
           </p>
         </div>

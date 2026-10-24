@@ -589,9 +589,9 @@ export const CurrentTendersTab: React.FC = () => {
             {visibleCount < filteredTenders.length && (
               <div
                 ref={sentinelRef}
-                className="py-4 text-center text-xs text-slate-500 flex items-center justify-center gap-2 bg-slate-50/80 rounded-xl border border-dashed border-slate-200"
+                className="py-4 text-center text-xs text-slate-500 dark:text-slate-400 flex items-center justify-center gap-2 bg-slate-50/80 dark:bg-slate-900/60 rounded-xl border border-dashed border-slate-200 dark:border-slate-800"
               >
-                <RefreshCw className="w-3.5 h-3.5 animate-spin text-orange-600" />
+                <RefreshCw className="w-3.5 h-3.5 animate-spin text-orange-600 dark:text-orange-400" />
                 <span>
                   Loading {Math.min(PAGE_SIZE, filteredTenders.length - visibleCount)} more notices...
                 </span>
@@ -599,15 +599,15 @@ export const CurrentTendersTab: React.FC = () => {
             )}
 
             {visibleCount >= filteredTenders.length && filteredTenders.length > 0 && (
-              <div className="py-2.5 text-center text-[11px] text-slate-400 font-medium">
+              <div className="py-2.5 text-center text-[11px] text-slate-400 dark:text-slate-500 font-medium">
                 ✓ Showing all {filteredTenders.length} in-progress notices (Purely Scraped)
               </div>
             )}
 
             {filteredTenders.length === 0 && (
-              <div className="text-center py-12 px-4 bg-white rounded-xl border border-slate-200 text-xs text-slate-500 space-y-2">
-                <Radio className="w-8 h-8 text-slate-300 mx-auto" />
-                <p className="font-semibold text-slate-800">No in-progress tenders matched the active filters.</p>
+              <div className="text-center py-12 px-4 bg-white dark:bg-[#0E1422] rounded-xl border border-slate-200/90 dark:border-slate-800 text-xs text-slate-500 dark:text-slate-400 space-y-2">
+                <Radio className="w-8 h-8 text-slate-300 dark:text-slate-600 mx-auto" />
+                <p className="font-semibold text-slate-800 dark:text-slate-200">No in-progress tenders matched the active filters.</p>
                 <button
                   onClick={resetAllFilters}
                   className="px-3 py-1.5 bg-orange-600 hover:bg-orange-700 text-white rounded text-xs font-semibold cursor-pointer"
@@ -622,10 +622,10 @@ export const CurrentTendersTab: React.FC = () => {
         {/* Right Column: Deep-Dive Dossier (65%) */}
         <div ref={dossierRef} className="space-y-4">
           {!selectedTender || filteredTenders.length === 0 ? (
-            <div className="bg-white rounded-xl border border-slate-200 p-12 text-center shadow-xs">
-              <Radio className="w-10 h-10 text-slate-300 mx-auto mb-3" />
-              <h3 className="text-sm font-bold text-slate-800">No matching in-progress tenders found</h3>
-              <p className="text-xs text-slate-400 mt-1 mb-4">
+            <div className="bg-white dark:bg-[#0E1422] rounded-xl border border-slate-200/90 dark:border-slate-800 p-12 text-center shadow-xs">
+              <Radio className="w-10 h-10 text-slate-300 dark:text-slate-600 mx-auto mb-3" />
+              <h3 className="text-sm font-bold text-slate-800 dark:text-slate-100">No matching in-progress tenders found</h3>
+              <p className="text-xs text-slate-400 dark:text-slate-500 mt-1 mb-4">
                 No active tenders match your selected filter combination. Try resetting your filters.
               </p>
               <button

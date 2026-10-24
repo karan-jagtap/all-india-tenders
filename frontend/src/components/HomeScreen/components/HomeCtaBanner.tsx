@@ -7,12 +7,12 @@ export interface HomeCtaBannerProps {
 
 export const HomeCtaBanner: React.FC<HomeCtaBannerProps> = ({ onNavigate }) => {
   return (
-    <section className="bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-6">
+    <section className="bg-white dark:bg-[#0E1422] border border-slate-200/90 dark:border-slate-800 rounded-2xl p-6 sm:p-8 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-6 transition-colors">
       <div className="space-y-1.5 text-center sm:text-left">
-        <h3 className="text-lg font-bold text-slate-900">
+        <h3 className="text-lg font-bold text-slate-900 dark:text-white">
           Ready to explore India's public procurement tenders?
         </h3>
-        <p className="text-xs text-slate-500 max-w-xl">
+        <p className="text-xs text-slate-500 dark:text-slate-400 max-w-xl">
           Choose a section to inspect live statutory notices, search 10-year awarded bid archives, or evaluate registered infrastructure contractors.
         </p>
       </div>

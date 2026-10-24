@@ -32,17 +32,17 @@ export const TenderDocsSubTab: React.FC<TenderDocsSubTabProps> = ({
       : `${selectedTender.id}_Bill_of_Quantities_BOQ.csv`;
 
   return (
-    <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-xs space-y-4">
+    <div className="bg-white dark:bg-[#0E1422] rounded-xl border border-slate-200/90 dark:border-slate-800 p-5 shadow-xs space-y-4 transition-colors">
       {/* Top Sourcing & Package Overview */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 pb-3 border-b border-slate-100">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 pb-3 border-b border-slate-100 dark:border-slate-800">
         <div>
-          <h4 className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
-            <Layers className="w-4 h-4 text-indigo-600" />
+          <h4 className="text-xs font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
+            <Layers className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
             Official Sourced Tender Documents Package
           </h4>
-          <p className="text-[11px] text-slate-500 mt-0.5">
+          <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
             Complete statutory documents published on {selectedTender.source_portal} for NIT Reference{' '}
-            <code className="text-blue-700 font-bold font-mono">{selectedTender.nit_number}</code>.
+            <code className="text-blue-700 dark:text-blue-400 font-bold font-mono">{selectedTender.nit_number}</code>.
           </p>
         </div>
 
@@ -50,7 +50,7 @@ export const TenderDocsSubTab: React.FC<TenderDocsSubTabProps> = ({
           {onOpenWholeDoc && (
             <button
               onClick={onOpenWholeDoc}
-              className="px-3 py-1.5 rounded-lg text-xs font-bold bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 flex items-center gap-1.5 shadow-2xs transition-all cursor-pointer"
+              className="px-3 py-1.5 rounded-lg text-xs font-bold bg-indigo-50 dark:bg-indigo-950/40 hover:bg-indigo-100 dark:hover:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-900/50 flex items-center gap-1.5 shadow-2xs transition-all cursor-pointer"
               title="Expand whole tender document in dedicated reader modal"
             >
               <Eye className="w-3.5 h-3.5" />
@@ -69,7 +69,7 @@ export const TenderDocsSubTab: React.FC<TenderDocsSubTabProps> = ({
             href={activeDocUrl}
             target="_blank"
             rel="noreferrer"
-            className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-900 text-white hover:bg-slate-800 flex items-center gap-1 transition-all"
+            className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-900 dark:bg-slate-800 text-white hover:bg-slate-800 dark:hover:bg-slate-700 flex items-center gap-1 transition-all"
           >
             <ExternalLink className="w-3.5 h-3.5" />
             <span>New Tab</span>
@@ -84,31 +84,31 @@ export const TenderDocsSubTab: React.FC<TenderDocsSubTabProps> = ({
           onClick={() => setSelectedDocType('sbd')}
           className={`p-3.5 rounded-xl border text-xs cursor-pointer transition-all ${
             selectedDocType === 'sbd'
-              ? 'bg-indigo-50/70 border-indigo-600 shadow-sm ring-1 ring-indigo-600'
-              : 'bg-slate-50/60 border-slate-200 hover:border-slate-300 hover:bg-slate-100/70'
+              ? 'bg-indigo-50/70 dark:bg-indigo-950/40 border-indigo-600 shadow-sm ring-1 ring-indigo-600'
+              : 'bg-slate-50/60 dark:bg-slate-800/40 border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 hover:bg-slate-100/70 dark:hover:bg-slate-800/70'
           }`}
         >
           <div className="flex items-center justify-between gap-2 mb-1.5">
-            <span className="px-2 py-0.5 rounded text-[9px] font-bold bg-indigo-100 text-indigo-800 border border-indigo-300">
+            <span className="px-2 py-0.5 rounded text-[9px] font-bold bg-indigo-100 dark:bg-indigo-900/60 text-indigo-800 dark:text-indigo-300 border border-indigo-300 dark:border-indigo-800">
               Comprehensive SBD
             </span>
-            <span className="text-[10px] font-mono text-slate-500">48 Pages • 3.8 MB</span>
+            <span className="text-[10px] font-mono text-slate-500 dark:text-slate-400">48 Pages • 3.8 MB</span>
           </div>
-          <h5 className="font-bold text-slate-900 text-xs mb-1">
+          <h5 className="font-bold text-slate-900 dark:text-white text-xs mb-1">
             Detailed Tender Document (SBD / RFP)
           </h5>
-          <p className="text-[11px] text-slate-500 line-clamp-2">
+          <p className="text-[11px] text-slate-500 dark:text-slate-400 line-clamp-2">
             Includes Instructions to Bidders (ITB), General & Special Conditions of Contract (GCC/SCC), PQC Qualification, Technical Specs & Codes (IRC/MoRTH/CPWD/BIS), and Statutory Annexures.
           </p>
-          <div className="mt-2.5 pt-2 border-t border-slate-200/60 flex items-center justify-between text-[10px]">
-            <span className="text-indigo-700 font-semibold">
+          <div className="mt-2.5 pt-2 border-t border-slate-200/60 dark:border-slate-700/60 flex items-center justify-between text-[10px]">
+            <span className="text-indigo-700 dark:text-indigo-400 font-semibold">
               {selectedDocType === 'sbd' ? '● Active in Viewer' : 'Click to View'}
             </span>
             <a
               href={sbdUrl}
               download={`${selectedTender.id}_Detailed_Tender_Document_SBD.pdf`}
               onClick={(e) => e.stopPropagation()}
-              className="text-slate-600 hover:text-indigo-600 font-medium flex items-center gap-0.5"
+              className="text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 font-medium flex items-center gap-0.5"
             >
               <Download className="w-3 h-3" /> Download
             </a>
@@ -120,31 +120,31 @@ export const TenderDocsSubTab: React.FC<TenderDocsSubTabProps> = ({
           onClick={() => setSelectedDocType('nit')}
           className={`p-3.5 rounded-xl border text-xs cursor-pointer transition-all ${
             selectedDocType === 'nit'
-              ? 'bg-orange-50/70 border-orange-600 shadow-sm ring-1 ring-orange-600'
-              : 'bg-slate-50/60 border-slate-200 hover:border-slate-300 hover:bg-slate-100/70'
+              ? 'bg-orange-50/70 dark:bg-orange-950/40 border-orange-600 shadow-sm ring-1 ring-orange-600'
+              : 'bg-slate-50/60 dark:bg-slate-800/40 border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 hover:bg-slate-100/70 dark:hover:bg-slate-800/70'
           }`}
         >
           <div className="flex items-center justify-between gap-2 mb-1.5">
-            <span className="px-2 py-0.5 rounded text-[9px] font-bold bg-orange-100 text-orange-800 border border-orange-300">
+            <span className="px-2 py-0.5 rounded text-[9px] font-bold bg-orange-100 dark:bg-orange-900/60 text-orange-800 dark:text-orange-300 border border-orange-300 dark:border-orange-800">
               NIT Notice
             </span>
-            <span className="text-[10px] font-mono text-slate-500">2 Pages • 480 KB</span>
+            <span className="text-[10px] font-mono text-slate-500 dark:text-slate-400">2 Pages • 480 KB</span>
           </div>
-          <h5 className="font-bold text-slate-900 text-xs mb-1">
+          <h5 className="font-bold text-slate-900 dark:text-white text-xs mb-1">
             Notice Inviting Tender (NIT Summary)
           </h5>
-          <p className="text-[11px] text-slate-500 line-clamp-2">
+          <p className="text-[11px] text-slate-500 dark:text-slate-400 line-clamp-2">
             Official advertisement summary notice published on portal specifying key dates, EMD amount, tender fee, and basic eligibility criteria.
           </p>
-          <div className="mt-2.5 pt-2 border-t border-slate-200/60 flex items-center justify-between text-[10px]">
-            <span className="text-orange-700 font-semibold">
+          <div className="mt-2.5 pt-2 border-t border-slate-200/60 dark:border-slate-700/60 flex items-center justify-between text-[10px]">
+            <span className="text-orange-700 dark:text-orange-400 font-semibold">
               {selectedDocType === 'nit' ? '● Active in Viewer' : 'Click to View'}
             </span>
             <a
               href={pdfUrl}
               download={`${selectedTender.id}_NIT_notice.pdf`}
               onClick={(e) => e.stopPropagation()}
-              className="text-slate-600 hover:text-orange-600 font-medium flex items-center gap-0.5"
+              className="text-slate-600 dark:text-slate-300 hover:text-orange-600 dark:hover:text-orange-400 font-medium flex items-center gap-0.5"
             >
               <Download className="w-3 h-3" /> Download
             </a>
@@ -156,31 +156,31 @@ export const TenderDocsSubTab: React.FC<TenderDocsSubTabProps> = ({
           onClick={() => setSelectedDocType('boq')}
           className={`p-3.5 rounded-xl border text-xs cursor-pointer transition-all ${
             selectedDocType === 'boq'
-              ? 'bg-emerald-50/70 border-emerald-600 shadow-sm ring-1 ring-emerald-600'
-              : 'bg-slate-50/60 border-slate-200 hover:border-slate-300 hover:bg-slate-100/70'
+              ? 'bg-emerald-50/70 dark:bg-emerald-950/40 border-emerald-600 shadow-sm ring-1 ring-emerald-600'
+              : 'bg-slate-50/60 dark:bg-slate-800/40 border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 hover:bg-slate-100/70 dark:hover:bg-slate-800/70'
           }`}
         >
           <div className="flex items-center justify-between gap-2 mb-1.5">
-            <span className="px-2 py-0.5 rounded text-[9px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
+            <span className="px-2 py-0.5 rounded text-[9px] font-bold bg-emerald-100 dark:bg-emerald-900/60 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800">
               Price BOQ
             </span>
-            <span className="text-[10px] font-mono text-slate-500">6 Pages • 320 KB</span>
+            <span className="text-[10px] font-mono text-slate-500 dark:text-slate-400">6 Pages • 320 KB</span>
           </div>
-          <h5 className="font-bold text-slate-900 text-xs mb-1">
+          <h5 className="font-bold text-slate-900 dark:text-white text-xs mb-1">
             Bill of Quantities (BOQ / Rate Schedule)
           </h5>
-          <p className="text-[11px] text-slate-500 line-clamp-2">
+          <p className="text-[11px] text-slate-500 dark:text-slate-400 line-clamp-2">
             Itemized financial schedule detailing item descriptions, quantities, and departmental estimate totaling {formatINR(selectedTender.estimated_cost_inr || 0)} for Cover-2 bidding.
           </p>
-          <div className="mt-2.5 pt-2 border-t border-slate-200/60 flex items-center justify-between text-[10px]">
-            <span className="text-emerald-700 font-semibold">
+          <div className="mt-2.5 pt-2 border-t border-slate-200/60 dark:border-slate-700/60 flex items-center justify-between text-[10px]">
+            <span className="text-emerald-700 dark:text-emerald-400 font-semibold">
               {selectedDocType === 'boq' ? '● Active in Viewer' : 'Click to View'}
             </span>
             <a
               href={boqUrl}
               download={`${selectedTender.id}_BOQ_Schedule.pdf`}
               onClick={(e) => e.stopPropagation()}
-              className="text-slate-600 hover:text-emerald-600 font-medium flex items-center gap-0.5"
+              className="text-slate-600 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 font-medium flex items-center gap-0.5"
             >
               <Download className="w-3 h-3" /> Download
             </a>
@@ -189,7 +189,7 @@ export const TenderDocsSubTab: React.FC<TenderDocsSubTabProps> = ({
       </div>
 
       {/* Document Sourcing Notice Bar */}
-      <div className="p-3 bg-slate-900 text-white rounded-lg text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+      <div className="p-3 bg-slate-900 dark:bg-slate-950 text-white rounded-lg text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-2 border border-slate-800">
         <div className="flex items-center gap-2">
           <span className="px-2 py-0.5 bg-indigo-500/30 text-indigo-300 font-mono text-[10px] rounded font-bold uppercase">
             Official Portal Sourcing

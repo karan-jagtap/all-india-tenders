@@ -19,71 +19,71 @@ export const BidderCard: React.FC<BidderCardProps> = ({
       onClick={onSelect}
       className={`cursor-pointer rounded-xl p-4 border transition-all text-xs relative ${
         isSelected
-          ? 'bg-white border-blue-600 shadow-md ring-1 ring-blue-600'
-          : 'bg-white border-slate-200 hover:border-slate-300 hover:bg-slate-50/70 shadow-2xs'
+          ? 'bg-white dark:bg-[#131A2B] border-blue-600 dark:border-blue-500 shadow-md ring-1 ring-blue-600'
+          : 'bg-white dark:bg-[#0E1422] border-slate-200/90 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 hover:bg-slate-50/70 dark:hover:bg-[#131A2B]/60 shadow-[0_1px_3px_rgba(15,23,42,0.03)]'
       }`}
     >
       <div className="flex flex-wrap items-center justify-between gap-1.5 mb-1.5">
-        <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-100 text-blue-900 border border-blue-200">
+        <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-100 dark:bg-blue-950/60 text-blue-900 dark:text-blue-300 border border-blue-200 dark:border-blue-800">
           {bidder.pqc_clearance_rating || 'Super Class-I National'}
         </span>
-        <span className="text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+        <span className="text-[11px] font-semibold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/50 px-2 py-0.5 rounded border border-emerald-200 dark:border-emerald-800">
           {bidder.total_contracts_won} Won Contracts
         </span>
       </div>
 
-      <h3 className="font-bold text-slate-900 text-xs leading-snug break-words mt-1">
+      <h3 className="font-bold text-slate-900 dark:text-white text-xs leading-snug break-words mt-1">
         {bidder.name}
       </h3>
 
-      <div className="text-[11px] text-slate-500 mt-1 flex items-center gap-1">
-        <MapPin className="w-3 h-3 text-slate-400 shrink-0" />
+      <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 flex items-center gap-1">
+        <MapPin className="w-3 h-3 text-slate-400 dark:text-slate-500 shrink-0" />
         <span className="break-words">{bidder.registered_office || (bidder.states && bidder.states[0]) || 'India'}</span>
       </div>
 
       {/* Financials Strip */}
-      <div className="grid grid-cols-2 gap-2 pt-2.5 mt-2 border-t border-slate-100 text-xs">
+      <div className="grid grid-cols-2 gap-2 pt-2.5 mt-2 border-t border-slate-100 dark:border-slate-800 text-xs">
         <div>
-          <span className="text-slate-400 block text-[10px]">Total Awarded</span>
-          <strong className="text-slate-900 font-bold font-mono">
+          <span className="text-slate-400 dark:text-slate-500 block text-[10px]">Total Awarded</span>
+          <strong className="text-slate-900 dark:text-white font-bold font-mono">
             {formatCr(bidder.total_awarded_value_inr)}
           </strong>
         </div>
         <div>
-          <span className="text-slate-400 block text-[10px]">Audited Turnover</span>
-          <strong className="text-purple-700 font-bold font-mono">
+          <span className="text-slate-400 dark:text-slate-500 block text-[10px]">Audited Turnover</span>
+          <strong className="text-purple-700 dark:text-purple-400 font-bold font-mono">
             {formatCr(bidder.audited_turnover_inr)}
           </strong>
         </div>
       </div>
 
       {/* Financial Standing & Win Rate */}
-      <div className="grid grid-cols-2 gap-2 pt-2 mt-1 border-t border-slate-100 text-[10px]">
+      <div className="grid grid-cols-2 gap-2 pt-2 mt-1 border-t border-slate-100 dark:border-slate-800 text-[10px]">
         <div>
-          <span className="text-slate-400 block">Credit Rating</span>
-          <span className="font-bold text-blue-700 truncate block" title={bidder.credit_rating}>
+          <span className="text-slate-400 dark:text-slate-500 block">Credit Rating</span>
+          <span className="font-bold text-blue-700 dark:text-blue-400 truncate block" title={bidder.credit_rating}>
             {bidder.credit_rating?.split('(')[0]?.trim() || 'CRISIL AAA'}
           </span>
         </div>
         <div>
-          <span className="text-slate-400 block">Win Rate / Book</span>
-          <span className="font-bold text-emerald-700 block">
+          <span className="text-slate-400 dark:text-slate-500 block">Win Rate / Book</span>
+          <span className="font-bold text-emerald-700 dark:text-emerald-400 block font-mono">
             {bidder.win_rate_pct || 68}% • {formatCr(bidder.unexecuted_order_book_inr)}
           </span>
         </div>
       </div>
 
       {/* Badges strip */}
-      <div className="mt-2.5 pt-2 border-t border-slate-100 flex items-center gap-1.5 flex-wrap">
-        <span className="text-[9px] bg-slate-100 text-slate-700 font-medium px-2 py-0.5 rounded">
+      <div className="mt-2.5 pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center gap-1.5 flex-wrap">
+        <span className="text-[9px] bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-medium px-2 py-0.5 rounded">
           {bidder.categories[0] || 'Civil'}
         </span>
         {bidder.categories[1] && (
-          <span className="text-[9px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded">
+          <span className="text-[9px] bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 px-2 py-0.5 rounded">
             +{bidder.categories.length - 1} more
           </span>
         )}
-        <span className="text-[9px] bg-emerald-50 text-emerald-800 px-2 py-0.5 rounded border border-emerald-200 font-medium ml-auto">
+        <span className="text-[9px] bg-emerald-50 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 px-2 py-0.5 rounded border border-emerald-200 dark:border-emerald-800 font-medium ml-auto">
           Make in India {bidder.local_content_pct}%
         </span>
       </div>

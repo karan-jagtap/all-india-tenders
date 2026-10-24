@@ -770,7 +770,7 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
 
   if (loading && tenders.length === 0) {
     return (
-      <div className="bg-white rounded-xl border border-slate-200 p-12 text-center text-slate-500 shadow-xs flex flex-col items-center justify-center">
+      <div className="bg-white dark:bg-[#0E1422] rounded-xl border border-slate-200/90 dark:border-slate-800 p-12 text-center text-slate-500 dark:text-slate-400 shadow-xs flex flex-col items-center justify-center">
         <div className="w-8 h-8 border-3 border-emerald-500 border-t-transparent rounded-full animate-spin mb-3" />
         <span className="text-sm font-semibold text-slate-800">Loading Historical Accepted Bids Archive...</span>
         <span className="text-xs text-slate-400 mt-1">Retrieving 843 awarded Indian public procurement tenders, submissions & LOA orders</span>
@@ -841,7 +841,7 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
       </div>
 
       {/* Top Filter and Search Bar: Search on LEFT, Filters on RIGHT */}
-      <div className="bg-white border border-slate-200 rounded-xl p-3 shadow-xs space-y-2.5">
+      <div className="bg-white dark:bg-[#0E1422] border border-slate-200/90 dark:border-slate-800 rounded-xl p-3 shadow-xs space-y-2.5 transition-colors">
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
           <FilterSearchBar
             searchQuery={searchQuery}
@@ -1004,76 +1004,76 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
                   }}
                   className={`cursor-pointer rounded-xl p-4 border transition-all text-xs relative ${
                     isSelected
-                      ? 'bg-white border-emerald-500 shadow-md ring-1 ring-emerald-500'
-                      : 'bg-white border-slate-200 hover:border-slate-300 hover:bg-slate-50/70 shadow-2xs'
+                      ? 'bg-white dark:bg-[#131A2B] border-emerald-500 shadow-md ring-1 ring-emerald-500'
+                      : 'bg-white dark:bg-[#0E1422] border-slate-200/90 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 hover:bg-slate-50/70 dark:hover:bg-slate-800/40 shadow-2xs'
                   }`}
                 >
                   <div className="flex flex-wrap items-center justify-between gap-1.5 mb-1.5">
                     <div className="flex items-center gap-1.5 flex-wrap">
-                      <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200 flex items-center gap-1">
-                        <Award className="w-3 h-3 text-emerald-600" />
+                      <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 flex items-center gap-1">
+                        <Award className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
                         AWARDED (L1)
                       </span>
                       {tender.year && (
-                        <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-orange-100 text-orange-900 border border-orange-200">
+                        <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-orange-100 dark:bg-orange-950/60 text-orange-900 dark:text-orange-300 border border-orange-200 dark:border-orange-800">
                           {tender.year}
                         </span>
                       )}
                       <span
-                        className="px-1.5 py-0.5 rounded text-[10px] font-medium bg-slate-100 text-slate-700 border border-slate-200 break-words"
+                        className="px-1.5 py-0.5 rounded text-[10px] font-medium bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 break-words"
                         title={tender._source}
                       >
                         {sourceLabel}
                       </span>
                     </div>
-                    <span className="text-[11px] text-slate-400 font-mono flex items-center gap-1">
+                    <span className="text-[11px] text-slate-400 dark:text-slate-500 font-mono flex items-center gap-1">
                       <Calendar className="w-3 h-3" />
                       {tender.award_date}
                     </span>
                   </div>
 
-                  <h3 className="font-bold text-slate-900 text-xs leading-snug break-words mb-1.5">
+                  <h3 className="font-bold text-slate-900 dark:text-white text-xs leading-snug break-words mb-1.5">
                     {tender.title}
                   </h3>
 
-                  <div className="text-[11px] text-slate-500 mb-1 flex items-center gap-1">
+                  <div className="text-[11px] text-slate-500 dark:text-slate-400 mb-1 flex items-center gap-1">
                     <Building2 className="w-3 h-3 text-slate-400 shrink-0" />
                     <span className="break-words">{tender.og_tender?.authority}</span>
                   </div>
 
                   {/* Location badge (State & City) */}
-                  <div className="text-[10px] text-slate-600 mb-2 flex items-center gap-1.5 flex-wrap">
-                    <span className="inline-flex items-center gap-1 bg-rose-50/70 border border-rose-200/70 px-2 py-0.5 rounded-md text-[10px]">
+                  <div className="text-[10px] text-slate-600 dark:text-slate-400 mb-2 flex items-center gap-1.5 flex-wrap">
+                    <span className="inline-flex items-center gap-1 bg-rose-50/70 dark:bg-rose-950/40 border border-rose-200/70 dark:border-rose-900/40 px-2 py-0.5 rounded-md text-[10px]">
                       <MapPin className="w-3 h-3 text-rose-500 shrink-0" />
-                      <span className="font-semibold text-slate-800">{tender._state}</span>
-                      <span className="text-slate-300">•</span>
-                      <span className="text-rose-700 font-medium">{tender._city}</span>
+                      <span className="font-semibold text-slate-800 dark:text-slate-200">{tender._state}</span>
+                      <span className="text-slate-300 dark:text-slate-600">•</span>
+                      <span className="text-rose-700 dark:text-rose-400 font-medium">{tender._city}</span>
                     </span>
                   </div>
 
                   {/* Winning Bidder Pill */}
-                  <div className="bg-slate-50 rounded-lg p-2 border border-slate-100 mb-2.5">
+                  <div className="bg-slate-50 dark:bg-slate-800/60 rounded-lg p-2 border border-slate-100 dark:border-slate-700/60 mb-2.5">
                     <div className="text-[10px] uppercase font-semibold text-slate-400">Winning Contractor</div>
-                    <div className="font-bold text-slate-800 break-words text-[11px]">
+                    <div className="font-bold text-slate-800 dark:text-slate-100 break-words text-[11px]">
                       {tender.winning_company?.name}
                     </div>
                   </div>
 
                   {/* Financial Metrics Row */}
-                  <div className="flex items-center justify-between pt-2 border-t border-slate-100 text-[11px]">
+                  <div className="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-slate-800 text-[11px]">
                     <div>
                       <span className="text-slate-400 block text-[10px]">Award Value</span>
-                      <strong className="text-emerald-700 font-bold">
+                      <strong className="text-emerald-700 dark:text-emerald-400 font-bold font-mono">
                         {formatINR(tender.bid_submission?.quoted_amount_inr)}
                       </strong>
                     </div>
 
                     <div className="text-right">
                       <span className="text-slate-400 block text-[10px]">Estimated</span>
-                      <span className="text-slate-600 line-through">
+                      <span className="text-slate-600 dark:text-slate-400 line-through font-mono">
                         {formatINR(tender.og_tender?.estimated_cost_inr)}
                       </span>
-                      <span className="ml-1 text-[10px] font-semibold text-emerald-600">
+                      <span className="ml-1 text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 font-mono">
                         (-{tender.bid_submission?.quoted_discount_pct}%)
                       </span>
                     </div>
@@ -1092,27 +1092,27 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
             {visibleCount < filteredTenders.length && (
               <div
                 ref={sentinelRef}
-                className="py-3 flex items-center justify-center gap-2 text-slate-500 text-xs bg-slate-50/70 rounded-xl border border-dashed border-slate-200 my-1"
+                className="py-3 flex items-center justify-center gap-2 text-slate-500 dark:text-slate-400 text-xs bg-slate-50/70 dark:bg-slate-900/60 rounded-xl border border-dashed border-slate-200 dark:border-slate-800 my-1"
               >
                 <div className="w-4 h-4 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
-                <span className="text-[11px] font-medium text-slate-500">
+                <span className="text-[11px] font-medium text-slate-500 dark:text-slate-400">
                   {isLoadingMore ? 'Loading more awarded contracts...' : 'Scroll down for more contracts...'}
                 </span>
               </div>
             )}
 
             {visibleCount >= filteredTenders.length && filteredTenders.length > 0 && (
-              <div className="py-2.5 text-center text-[11px] text-slate-400 font-medium border-t border-slate-100">
+              <div className="py-2.5 text-center text-[11px] text-slate-400 dark:text-slate-500 font-medium border-t border-slate-100 dark:border-slate-800">
                 ✓ Showing all {filteredTenders.length} contracts
               </div>
             )}
 
             {filteredTenders.length === 0 && (
-              <div className="bg-white rounded-xl border border-slate-200 p-8 text-center text-slate-500 text-xs space-y-2">
+              <div className="bg-white dark:bg-[#0E1422] rounded-xl border border-slate-200/90 dark:border-slate-800 p-8 text-center text-slate-500 dark:text-slate-400 text-xs space-y-2">
                 <p>No accepted tenders matching your selected criteria.</p>
                 <button
                   onClick={resetAllFilters}
-                  className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100 transition-colors cursor-pointer"
+                  className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 hover:bg-emerald-100 dark:hover:bg-emerald-900/40 transition-colors cursor-pointer"
                 >
                   Reset All Filters
                 </button>
@@ -1124,10 +1124,10 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
         {/* Right Column: Deep-Dive Dossier for Selected Tender (65%) */}
         <div ref={dossierRef} className="space-y-4">
           {!selectedTender || filteredTenders.length === 0 ? (
-            <div className="bg-white rounded-xl border border-slate-200 p-12 text-center text-slate-500 shadow-xs">
-              <Award className="w-10 h-10 text-slate-300 mx-auto mb-3" />
-              <h3 className="text-sm font-bold text-slate-800">No matching accepted tenders found</h3>
-              <p className="text-xs text-slate-400 mt-1 mb-4">
+            <div className="bg-white dark:bg-[#0E1422] rounded-xl border border-slate-200/90 dark:border-slate-800 p-12 text-center text-slate-500 dark:text-slate-400 shadow-xs">
+              <Award className="w-10 h-10 text-slate-300 dark:text-slate-600 mx-auto mb-3" />
+              <h3 className="text-sm font-bold text-slate-800 dark:text-slate-100">No matching accepted tenders found</h3>
+              <p className="text-xs text-slate-400 dark:text-slate-500 mt-1 mb-4">
                 No tenders match your current filter combination. Try adjusting the Source, Organisation, State, City, or Year filters.
               </p>
               <button
@@ -1140,18 +1140,18 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
           ) : (
             <>
               {/* Active Dossier Header */}
-              <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-xs">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100">
+              <div className="bg-white dark:bg-[#0E1422] rounded-xl border border-slate-200/90 dark:border-slate-800 p-5 shadow-xs transition-colors">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-100 dark:border-slate-800">
                   <div>
                     <div className="flex items-center gap-2 mb-1">
-                      <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
+                      <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
                         🏆 L1 WINNING PROPOSAL
                       </span>
-                      <span className="text-xs text-slate-400 font-mono">
+                      <span className="text-xs text-slate-400 dark:text-slate-500 font-mono">
                         LOA: {selectedTender.acceptance_and_loa?.loa_number}
                       </span>
                     </div>
-                    <h3 className="text-sm font-bold text-slate-900 leading-snug">
+                    <h3 className="text-sm font-bold text-slate-900 dark:text-white leading-snug">
                       {selectedTender.title}
                     </h3>
                   </div>
@@ -1161,10 +1161,10 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
                     <a
                       href={pdfUrl}
                       download={`${selectedTender.id}_awarded_dossier.pdf`}
-                      className="px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 border border-emerald-300 text-emerald-800 rounded-lg text-xs font-semibold flex items-center gap-1 shadow-2xs transition-all"
+                      className="px-3 py-1.5 bg-emerald-50 dark:bg-emerald-950/40 hover:bg-emerald-100 dark:hover:bg-emerald-900/40 border border-emerald-300 dark:border-emerald-800/80 text-emerald-800 dark:text-emerald-300 rounded-lg text-xs font-semibold flex items-center gap-1 shadow-2xs transition-all"
                       title="Download Official In-Memory Generated PDF Dossier"
                     >
-                      <Download className="w-3.5 h-3.5 text-emerald-600" />
+                      <Download className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
                       <span>Download Dossier PDF</span>
                     </a>
                   </div>
@@ -1172,44 +1172,44 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
 
                 {/* Quick Summary Strip */}
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 mt-3 pt-1 text-xs">
-                  <div className="bg-slate-50 p-2.5 rounded-lg border border-slate-100">
+                  <div className="bg-slate-50 dark:bg-slate-800/60 p-2.5 rounded-lg border border-slate-100 dark:border-slate-700/60">
                     <span className="text-[10px] text-slate-400 uppercase font-semibold block">Awarded To</span>
-                    <span className="font-bold text-slate-800 break-words block" title={selectedTender.winning_company?.name}>
+                    <span className="font-bold text-slate-800 dark:text-slate-100 break-words block" title={selectedTender.winning_company?.name}>
                       {selectedTender.winning_company?.name}
                     </span>
                   </div>
 
-                  <div className="bg-slate-50 p-2.5 rounded-lg border border-slate-100">
+                  <div className="bg-slate-50 dark:bg-slate-800/60 p-2.5 rounded-lg border border-slate-100 dark:border-slate-700/60">
                     <span className="text-[10px] text-slate-400 uppercase font-semibold block">Quoted L1 Bid</span>
-                    <span className="font-bold text-emerald-700 block">
+                    <span className="font-bold text-emerald-700 dark:text-emerald-400 block font-mono">
                       {formatINR(selectedTender.bid_submission?.quoted_amount_inr)}
                     </span>
                   </div>
 
-                  <div className="bg-slate-50 p-2.5 rounded-lg border border-slate-100">
+                  <div className="bg-slate-50 dark:bg-slate-800/60 p-2.5 rounded-lg border border-slate-100 dark:border-slate-700/60">
                     <span className="text-[10px] text-slate-400 uppercase font-semibold block">L1 Discount</span>
-                    <span className="font-bold text-emerald-600 block flex items-center gap-1">
+                    <span className="font-bold text-emerald-600 dark:text-emerald-400 block flex items-center gap-1 font-mono">
                       <TrendingDown className="w-3.5 h-3.5" />
                       {selectedTender.bid_submission?.quoted_discount_pct}% below estimate
                     </span>
                   </div>
 
-                  <div className="bg-slate-50 p-2.5 rounded-lg border border-slate-100">
+                  <div className="bg-slate-50 dark:bg-slate-800/60 p-2.5 rounded-lg border border-slate-100 dark:border-slate-700/60">
                     <span className="text-[10px] text-slate-400 uppercase font-semibold block">EMD Instrument</span>
-                    <span className="font-bold text-purple-700 block break-words" title={selectedTender.bid_submission?.emd_mode}>
+                    <span className="font-bold text-purple-700 dark:text-purple-400 block break-words" title={selectedTender.bid_submission?.emd_mode}>
                       {selectedTender.bid_submission?.emd_mode}
                     </span>
                   </div>
                 </div>
 
                 {/* Dossier Sub-Tab Navigation */}
-                <div className="flex overflow-x-auto pb-1 no-scrollbar sm:flex-wrap items-center gap-1.5 mt-4 pt-3 border-t border-slate-100">
+                <div className="flex overflow-x-auto pb-1 no-scrollbar sm:flex-wrap items-center gap-1.5 mt-4 pt-3 border-t border-slate-100 dark:border-slate-800">
                   <button
                     onClick={() => setActiveSubTab('comparison')}
                     className={`shrink-0 whitespace-nowrap px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
                       activeSubTab === 'comparison'
-                        ? 'bg-slate-900 text-white shadow-xs'
-                        : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                        ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-950 shadow-xs'
+                        : 'bg-slate-100 dark:bg-slate-800/80 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
                     }`}
                   >
                     <Layers className="w-3.5 h-3.5" />
@@ -1220,8 +1220,8 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
                     onClick={() => setActiveSubTab('company')}
                     className={`shrink-0 whitespace-nowrap px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
                       activeSubTab === 'company'
-                        ? 'bg-slate-900 text-white shadow-xs'
-                        : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                        ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-950 shadow-xs'
+                        : 'bg-slate-100 dark:bg-slate-800/80 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
                     }`}
                   >
                     <Building2 className="w-3.5 h-3.5" />
@@ -1232,8 +1232,8 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
                     onClick={() => setActiveSubTab('covers')}
                     className={`shrink-0 whitespace-nowrap px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
                       activeSubTab === 'covers'
-                        ? 'bg-slate-900 text-white shadow-xs'
-                        : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                        ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-950 shadow-xs'
+                        : 'bg-slate-100 dark:bg-slate-800/80 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
                     }`}
                   >
                     <FolderLock className="w-3.5 h-3.5" />
@@ -1244,8 +1244,8 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
                     onClick={() => setActiveSubTab('pqc')}
                     className={`shrink-0 whitespace-nowrap px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
                       activeSubTab === 'pqc'
-                        ? 'bg-slate-900 text-white shadow-xs'
-                        : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                        ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-950 shadow-xs'
+                        : 'bg-slate-100 dark:bg-slate-800/80 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
                     }`}
                   >
                     <Wrench className="w-3.5 h-3.5 text-amber-500" />
@@ -1256,8 +1256,8 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
                     onClick={() => setActiveSubTab('boq')}
                     className={`shrink-0 whitespace-nowrap px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
                       activeSubTab === 'boq'
-                        ? 'bg-slate-900 text-white shadow-xs'
-                        : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                        ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-950 shadow-xs'
+                        : 'bg-slate-100 dark:bg-slate-800/80 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
                     }`}
                   >
                     <FileSpreadsheet className="w-3.5 h-3.5 text-emerald-500" />
@@ -1268,8 +1268,8 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
                     onClick={() => setActiveSubTab('compliance')}
                     className={`shrink-0 whitespace-nowrap px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
                       activeSubTab === 'compliance'
-                        ? 'bg-slate-900 text-white shadow-xs'
-                        : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                        ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-950 shadow-xs'
+                        : 'bg-slate-100 dark:bg-slate-800/80 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
                     }`}
                   >
                     <Scale className="w-3.5 h-3.5 text-blue-500" />
@@ -1280,8 +1280,8 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
                     onClick={() => setActiveSubTab('milestones')}
                     className={`shrink-0 whitespace-nowrap px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
                       activeSubTab === 'milestones'
-                        ? 'bg-slate-900 text-white shadow-xs'
-                        : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                        ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-950 shadow-xs'
+                        : 'bg-slate-100 dark:bg-slate-800/80 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
                     }`}
                   >
                     <Clock className="w-3.5 h-3.5 text-purple-500" />
@@ -1292,8 +1292,8 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
                     onClick={() => setActiveSubTab('loa')}
                     className={`shrink-0 whitespace-nowrap px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
                       activeSubTab === 'loa'
-                        ? 'bg-slate-900 text-white shadow-xs'
-                        : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                        ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-950 shadow-xs'
+                        : 'bg-slate-100 dark:bg-slate-800/80 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
                     }`}
                   >
                     <Stamp className="w-3.5 h-3.5 text-rose-500" />
@@ -1304,8 +1304,8 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
                     onClick={() => setActiveSubTab('pdf')}
                     className={`shrink-0 whitespace-nowrap px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
                       activeSubTab === 'pdf'
-                        ? 'bg-slate-900 text-white shadow-xs'
-                        : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                        ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-950 shadow-xs'
+                        : 'bg-slate-100 dark:bg-slate-800/80 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
                     }`}
                   >
                     <FileText className="w-3.5 h-3.5 text-cyan-500" />
@@ -1316,8 +1316,8 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
                     onClick={() => setActiveSubTab('all_bids')}
                     className={`shrink-0 whitespace-nowrap px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
                       activeSubTab === 'all_bids'
-                        ? 'bg-slate-900 text-white shadow-xs'
-                        : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                        ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-950 shadow-xs'
+                        : 'bg-slate-100 dark:bg-slate-800/80 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
                     }`}
                   >
                     <Users className="w-3.5 h-3.5 text-amber-500" />
@@ -1328,20 +1328,20 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
 
               {/* Sub-tab 1: OG Tender vs Winning Bid Comparison */}
               {activeSubTab === 'comparison' && (
-                <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-xs space-y-4">
+                <div className="bg-white dark:bg-[#0E1422] rounded-xl border border-slate-200/90 dark:border-slate-800 p-5 shadow-xs space-y-4 transition-colors">
                   <div>
-                    <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
-                      <ShieldCheck className="w-4 h-4 text-emerald-600" />
+                    <h4 className="text-xs font-bold text-slate-900 dark:text-slate-100 uppercase tracking-wider flex items-center gap-1.5">
+                      <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                       Comparative Audit: Tender Requirement vs Contractor Submission
                     </h4>
-                    <p className="text-xs text-slate-500 mt-0.5">
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                       Side-by-side compliance mapping showing how this bidder satisfied every qualification threshold.
                     </p>
                   </div>
 
-                  <div className="overflow-x-auto border border-slate-200 rounded-lg">
+                  <div className="overflow-x-auto border border-slate-200 dark:border-slate-800 rounded-lg">
                     <table className="w-full text-left text-xs">
-                      <thead className="bg-slate-50 text-slate-600 font-semibold border-b border-slate-200">
+                      <thead className="bg-slate-50 dark:bg-[#131A2B] text-slate-600 dark:text-slate-300 font-semibold border-b border-slate-200 dark:border-slate-800">
                         <tr>
                           <th className="py-2.5 px-3">Evaluation Parameter</th>
                           <th className="py-2.5 px-3 w-1/3">Original Tender (NIT) Condition</th>
@@ -1349,104 +1349,104 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
                           <th className="py-2.5 px-3 text-center">Verdict</th>
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-slate-100 text-slate-700">
+                      <tbody className="divide-y divide-slate-100 dark:divide-slate-800 text-slate-700 dark:text-slate-300">
                         <tr>
-                          <td className="py-2.5 px-3 font-semibold text-slate-900">Total Price / Financial Bid</td>
-                          <td className="py-2.5 px-3 font-mono">
+                          <td className="py-2.5 px-3 font-semibold text-slate-900 dark:text-slate-100">Total Price / Financial Bid</td>
+                          <td className="py-2.5 px-3 font-mono text-slate-700 dark:text-slate-300">
                             Estimated: {formatINR(selectedTender.og_tender?.estimated_cost_inr)}
                           </td>
-                          <td className="py-2.5 px-3 font-mono font-bold text-emerald-700">
+                          <td className="py-2.5 px-3 font-mono font-bold text-emerald-700 dark:text-emerald-400">
                             {formatINR(selectedTender.bid_submission?.quoted_amount_inr)} (-{selectedTender.bid_submission?.quoted_discount_pct}%)
                           </td>
                           <td className="py-2.5 px-3 text-center">
-                            <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800">
+                            <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-transparent dark:border-emerald-800/60">
                               L1 LOWEST
                             </span>
                           </td>
                         </tr>
 
                         <tr>
-                          <td className="py-2.5 px-3 font-semibold text-slate-900">Earnest Money Deposit (EMD)</td>
-                          <td className="py-2.5 px-3 font-mono">
+                          <td className="py-2.5 px-3 font-semibold text-slate-900 dark:text-slate-100">Earnest Money Deposit (EMD)</td>
+                          <td className="py-2.5 px-3 font-mono text-slate-700 dark:text-slate-300">
                             ₹ {(selectedTender.og_tender?.emd_amount_inr || 0).toLocaleString('en-IN')}
                           </td>
                           <td className="py-2.5 px-3">
-                            <span className="font-semibold text-slate-900">{selectedTender.bid_submission?.emd_mode}:</span>
-                            <div className="text-[11px] text-slate-500 mt-0.5">{selectedTender.bid_submission?.emd_reference}</div>
+                            <span className="font-semibold text-slate-900 dark:text-slate-100">{selectedTender.bid_submission?.emd_mode}:</span>
+                            <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">{selectedTender.bid_submission?.emd_reference}</div>
                           </td>
                           <td className="py-2.5 px-3 text-center">
-                            <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800">
+                            <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-transparent dark:border-emerald-800/60">
                               ACCEPTED
                             </span>
                           </td>
                         </tr>
 
                         <tr>
-                          <td className="py-2.5 px-3 font-semibold text-slate-900">Annual Financial Turnover</td>
-                          <td className="py-2.5 px-3 font-mono">
+                          <td className="py-2.5 px-3 font-semibold text-slate-900 dark:text-slate-100">Annual Financial Turnover</td>
+                          <td className="py-2.5 px-3 font-mono text-slate-700 dark:text-slate-300">
                             Min 40%: {formatINR(selectedTender.og_tender?.min_turnover_inr)}
                           </td>
                           <td className="py-2.5 px-3">
-                            <div className="font-mono font-bold text-slate-900">
+                            <div className="font-mono font-bold text-slate-900 dark:text-slate-100">
                               {formatINR(selectedTender.winning_company?.audited_turnover_inr)}
                             </div>
-                            <div className="text-[10px] text-slate-500 font-mono">
+                            <div className="text-[10px] text-slate-500 dark:text-slate-400 font-mono">
                               CA UDIN: {selectedTender.winning_company?.ca_udin}
                             </div>
                           </td>
                           <td className="py-2.5 px-3 text-center">
-                            <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800">
+                            <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-transparent dark:border-emerald-800/60">
                               SURPASSES
                             </span>
                           </td>
                         </tr>
 
                         <tr>
-                          <td className="py-2.5 px-3 font-semibold text-slate-900">Bank Solvency Certificate</td>
-                          <td className="py-2.5 px-3 font-mono">
+                          <td className="py-2.5 px-3 font-semibold text-slate-900 dark:text-slate-100">Bank Solvency Certificate</td>
+                          <td className="py-2.5 px-3 font-mono text-slate-700 dark:text-slate-300">
                             Min 40%: {formatINR(selectedTender.og_tender?.min_solvency_inr)}
                           </td>
                           <td className="py-2.5 px-3">
-                            <div className="font-mono font-bold text-slate-900">
+                            <div className="font-mono font-bold text-slate-900 dark:text-slate-100">
                               {formatINR(selectedTender.winning_company?.solvency_certificate_inr)}
                             </div>
-                            <div className="text-[10px] text-slate-500">
+                            <div className="text-[10px] text-slate-500 dark:text-slate-400">
                               {selectedTender.winning_company?.solvency_bank}
                             </div>
                           </td>
                           <td className="py-2.5 px-3 text-center">
-                            <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800">
+                            <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-transparent dark:border-emerald-800/60">
                               QUALIFIED
                             </span>
                           </td>
                         </tr>
 
                         <tr>
-                          <td className="py-2.5 px-3 font-semibold text-slate-900">Similar Work 3-2-1 Experience</td>
-                          <td className="py-2.5 px-3 text-[11px]">
+                          <td className="py-2.5 px-3 font-semibold text-slate-900 dark:text-slate-100">Similar Work 3-2-1 Experience</td>
+                          <td className="py-2.5 px-3 text-[11px] text-slate-700 dark:text-slate-300">
                             {selectedTender.og_tender?.similar_work_criteria}
                           </td>
-                          <td className="py-2.5 px-3 text-[11px]">
+                          <td className="py-2.5 px-3 text-[11px] text-slate-700 dark:text-slate-300">
                             Satisfied via completed central/state PSU projects with verified completion certificates.
                           </td>
                           <td className="py-2.5 px-3 text-center">
-                            <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800">
+                            <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-transparent dark:border-emerald-800/60">
                               VERIFIED
                             </span>
                           </td>
                         </tr>
 
                         <tr>
-                          <td className="py-2.5 px-3 font-semibold text-slate-900">Make in India Local Content</td>
-                          <td className="py-2.5 px-3 text-[11px]">
+                          <td className="py-2.5 px-3 font-semibold text-slate-900 dark:text-slate-100">Make in India Local Content</td>
+                          <td className="py-2.5 px-3 text-[11px] text-slate-700 dark:text-slate-300">
                             Class-I Local Supplier (Minimum 50% Domestic Value Addition)
                           </td>
-                          <td className="py-2.5 px-3 text-[11px]">
-                            <span className="font-bold text-slate-900">{selectedTender.winning_company?.local_content_class}</span>
+                          <td className="py-2.5 px-3 text-[11px] text-slate-700 dark:text-slate-300">
+                            <span className="font-bold text-slate-900 dark:text-slate-100">{selectedTender.winning_company?.local_content_class}</span>
                             <div>Declared: <strong>{selectedTender.winning_company?.local_content_pct}%</strong> Local Content</div>
                           </td>
                           <td className="py-2.5 px-3 text-center">
-                            <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800">
+                            <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-transparent dark:border-emerald-800/60">
                               COMPLIANT
                             </span>
                           </td>
@@ -1459,65 +1459,65 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
 
               {/* Sub-tab 2: Winning Company Profile */}
               {activeSubTab === 'company' && (
-                <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-xs space-y-4">
+                <div className="bg-white dark:bg-[#0E1422] rounded-xl border border-slate-200/90 dark:border-slate-800 p-5 shadow-xs space-y-4 transition-colors">
                   <div>
-                    <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
-                      <Building2 className="w-4 h-4 text-emerald-600" />
+                    <h4 className="text-xs font-bold text-slate-900 dark:text-slate-100 uppercase tracking-wider flex items-center gap-1.5">
+                      <Building2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                       Corporate Credentials of the Awarded Contractor
                     </h4>
-                    <p className="text-xs text-slate-500 mt-0.5">
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                       Official incorporation, tax filings, statutory licenses, and key management personnel.
                     </p>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
-                    <div className="bg-slate-50 p-3 rounded-lg border border-slate-200">
+                    <div className="bg-slate-50 dark:bg-slate-800/60 p-3 rounded-lg border border-slate-200 dark:border-slate-700/60">
                       <span className="text-[10px] text-slate-400 font-semibold uppercase block">Company Legal Name</span>
-                      <strong className="text-slate-900 text-xs">{selectedTender.winning_company?.name}</strong>
-                      <span className="block text-[11px] text-slate-500 mt-1">{selectedTender.winning_company?.business_type}</span>
+                      <strong className="text-slate-900 dark:text-slate-100 text-xs">{selectedTender.winning_company?.name}</strong>
+                      <span className="block text-[11px] text-slate-500 dark:text-slate-400 mt-1">{selectedTender.winning_company?.business_type}</span>
                     </div>
 
-                    <div className="bg-slate-50 p-3 rounded-lg border border-slate-200">
+                    <div className="bg-slate-50 dark:bg-slate-800/60 p-3 rounded-lg border border-slate-200 dark:border-slate-700/60">
                       <span className="text-[10px] text-slate-400 font-semibold uppercase block">Corporate Identification (CIN)</span>
-                      <span className="font-mono text-slate-800 font-bold">{selectedTender.winning_company?.cin}</span>
+                      <span className="font-mono text-slate-800 dark:text-slate-200 font-bold">{selectedTender.winning_company?.cin}</span>
                     </div>
 
-                    <div className="bg-slate-50 p-3 rounded-lg border border-slate-200 md:col-span-2">
+                    <div className="bg-slate-50 dark:bg-slate-800/60 p-3 rounded-lg border border-slate-200 dark:border-slate-700/60 md:col-span-2">
                       <span className="text-[10px] text-slate-400 font-semibold uppercase block">Registered Corporate Office</span>
-                      <span className="text-slate-700">{selectedTender.winning_company?.registered_office}</span>
+                      <span className="text-slate-700 dark:text-slate-300">{selectedTender.winning_company?.registered_office}</span>
                     </div>
 
-                    <div className="bg-slate-50 p-3 rounded-lg border border-slate-200">
+                    <div className="bg-slate-50 dark:bg-slate-800/60 p-3 rounded-lg border border-slate-200 dark:border-slate-700/60">
                       <span className="text-[10px] text-slate-400 font-semibold uppercase block">Tax Identifiers</span>
-                      <div className="font-mono text-slate-800">GSTIN: {selectedTender.winning_company?.gstin}</div>
-                      <div className="font-mono text-slate-800">PAN: {selectedTender.winning_company?.pan}</div>
+                      <div className="font-mono text-slate-800 dark:text-slate-200">GSTIN: {selectedTender.winning_company?.gstin}</div>
+                      <div className="font-mono text-slate-800 dark:text-slate-200">PAN: {selectedTender.winning_company?.pan}</div>
                     </div>
 
-                    <div className="bg-slate-50 p-3 rounded-lg border border-slate-200">
+                    <div className="bg-slate-50 dark:bg-slate-800/60 p-3 rounded-lg border border-slate-200 dark:border-slate-700/60">
                       <span className="text-[10px] text-slate-400 font-semibold uppercase block">MSME & Enterprise Category</span>
-                      <span className="font-semibold text-slate-800">{selectedTender.winning_company?.msme_status}</span>
+                      <span className="font-semibold text-slate-800 dark:text-slate-200">{selectedTender.winning_company?.msme_status}</span>
                     </div>
 
-                    <div className="bg-slate-50 p-3 rounded-lg border border-slate-200">
+                    <div className="bg-slate-50 dark:bg-slate-800/60 p-3 rounded-lg border border-slate-200 dark:border-slate-700/60">
                       <span className="text-[10px] text-slate-400 font-semibold uppercase block">Audited 3-Year Turnover</span>
-                      <div className="font-mono font-bold text-emerald-700 text-xs">
+                      <div className="font-mono font-bold text-emerald-700 dark:text-emerald-400 text-xs">
                         {formatINR(selectedTender.winning_company?.audited_turnover_inr)}
                       </div>
-                      <div className="text-[10px] text-slate-500 mt-0.5">CA UDIN: {selectedTender.winning_company?.ca_udin}</div>
+                      <div className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">CA UDIN: {selectedTender.winning_company?.ca_udin}</div>
                     </div>
 
-                    <div className="bg-slate-50 p-3 rounded-lg border border-slate-200">
+                    <div className="bg-slate-50 dark:bg-slate-800/60 p-3 rounded-lg border border-slate-200 dark:border-slate-700/60">
                       <span className="text-[10px] text-slate-400 font-semibold uppercase block">Bank Solvency Backing</span>
-                      <div className="font-mono font-bold text-slate-800 text-xs">
+                      <div className="font-mono font-bold text-slate-800 dark:text-slate-200 text-xs">
                         {formatINR(selectedTender.winning_company?.solvency_certificate_inr)}
                       </div>
-                      <div className="text-[10px] text-slate-500 mt-0.5">{selectedTender.winning_company?.solvency_bank}</div>
+                      <div className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">{selectedTender.winning_company?.solvency_bank}</div>
                     </div>
 
-                    <div className="bg-slate-50 p-3 rounded-lg border border-slate-200 md:col-span-2">
+                    <div className="bg-slate-50 dark:bg-slate-800/60 p-3 rounded-lg border border-slate-200 dark:border-slate-700/60 md:col-span-2">
                       <span className="text-[10px] text-slate-400 font-semibold uppercase block">Key Project In-Charge</span>
-                      <div className="text-slate-800 font-medium flex items-center gap-1.5 mt-0.5">
-                        <Users className="w-3.5 h-3.5 text-slate-500" />
+                      <div className="text-slate-800 dark:text-slate-200 font-medium flex items-center gap-1.5 mt-0.5">
+                        <Users className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" />
                         <span>{selectedTender.winning_company?.project_lead}</span>
                       </div>
                     </div>
@@ -1528,27 +1528,27 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
               {/* Sub-tab 3: Filled 3-Cover Bid Dossier */}
               {activeSubTab === 'covers' && (
                 <div className="space-y-4">
-                  <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-xs">
-                    <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5 mb-1">
-                      <FolderLock className="w-4 h-4 text-emerald-600" />
+                  <div className="bg-white dark:bg-[#0E1422] rounded-xl border border-slate-200/90 dark:border-slate-800 p-5 shadow-xs transition-colors">
+                    <h4 className="text-xs font-bold text-slate-900 dark:text-slate-100 uppercase tracking-wider flex items-center gap-1.5 mb-1">
+                      <FolderLock className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                       What the Winning Bidder Submitted in the 3 Packets
                     </h4>
-                    <p className="text-xs text-slate-500 mb-4">
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mb-4">
                       Inspection of actual exhibits, certificates, affidavits, and price BOQ schedule filed on the portal.
                     </p>
 
                     <div className="space-y-3.5">
                       {/* Cover 1 */}
-                      <div className="bg-amber-50/50 rounded-xl border border-amber-200 overflow-hidden">
-                        <div className="bg-amber-100/80 px-4 py-2 text-xs font-bold text-amber-900 flex items-center justify-between">
+                      <div className="bg-amber-50/50 dark:bg-amber-950/20 rounded-xl border border-amber-200 dark:border-amber-900/40 overflow-hidden">
+                        <div className="bg-amber-100/80 dark:bg-amber-950/50 px-4 py-2 text-xs font-bold text-amber-900 dark:text-amber-200 flex items-center justify-between">
                           <span>{selectedTender.bid_submission?.cover_1?.name}</span>
-                          <span className="text-[10px] uppercase font-mono px-2 py-0.5 rounded bg-white/80">Fee & EMD</span>
+                          <span className="text-[10px] uppercase font-mono px-2 py-0.5 rounded bg-white/80 dark:bg-slate-800 text-slate-800 dark:text-slate-200">Fee & EMD</span>
                         </div>
                         <div className="p-3.5">
-                          <ul className="space-y-1.5 text-xs text-slate-700">
+                          <ul className="space-y-1.5 text-xs text-slate-700 dark:text-slate-300">
                             {selectedTender.bid_submission?.cover_1?.items.map((item, idx) => (
                               <li key={idx} className="flex items-start gap-2">
-                                <CheckCircle2 className="w-3.5 h-3.5 text-amber-600 shrink-0 mt-0.5" />
+                                <CheckCircle2 className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
                                 <span className="leading-snug">{item}</span>
                               </li>
                             ))}
@@ -1557,16 +1557,16 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
                       </div>
 
                       {/* Cover 2 */}
-                      <div className="bg-blue-50/50 rounded-xl border border-blue-200 overflow-hidden">
-                        <div className="bg-blue-100/80 px-4 py-2 text-xs font-bold text-blue-900 flex items-center justify-between">
+                      <div className="bg-blue-50/50 dark:bg-blue-950/20 rounded-xl border border-blue-200 dark:border-blue-900/40 overflow-hidden">
+                        <div className="bg-blue-100/80 dark:bg-blue-950/50 px-4 py-2 text-xs font-bold text-blue-900 dark:text-blue-200 flex items-center justify-between">
                           <span>{selectedTender.bid_submission?.cover_2?.name}</span>
-                          <span className="text-[10px] uppercase font-mono px-2 py-0.5 rounded bg-white/80">Technical & PQ</span>
+                          <span className="text-[10px] uppercase font-mono px-2 py-0.5 rounded bg-white/80 dark:bg-slate-800 text-slate-800 dark:text-slate-200">Technical & PQ</span>
                         </div>
                         <div className="p-3.5">
-                          <ul className="space-y-1.5 text-xs text-slate-700">
+                          <ul className="space-y-1.5 text-xs text-slate-700 dark:text-slate-300">
                             {selectedTender.bid_submission?.cover_2?.items.map((item, idx) => (
                               <li key={idx} className="flex items-start gap-2">
-                                <CheckCircle2 className="w-3.5 h-3.5 text-blue-600 shrink-0 mt-0.5" />
+                                <CheckCircle2 className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400 shrink-0 mt-0.5" />
                                 <span className="leading-snug">{item}</span>
                               </li>
                             ))}
@@ -1575,16 +1575,16 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
                       </div>
 
                       {/* Cover 3 */}
-                      <div className="bg-emerald-50/50 rounded-xl border border-emerald-200 overflow-hidden">
-                        <div className="bg-emerald-100/80 px-4 py-2 text-xs font-bold text-emerald-900 flex items-center justify-between">
+                      <div className="bg-emerald-50/50 dark:bg-emerald-950/20 rounded-xl border border-emerald-200 dark:border-emerald-900/40 overflow-hidden">
+                        <div className="bg-emerald-100/80 dark:bg-emerald-950/50 px-4 py-2 text-xs font-bold text-emerald-900 dark:text-emerald-200 flex items-center justify-between">
                           <span>{selectedTender.bid_submission?.cover_3?.name}</span>
-                          <span className="text-[10px] uppercase font-mono px-2 py-0.5 rounded bg-white/80">Financial BOQ</span>
+                          <span className="text-[10px] uppercase font-mono px-2 py-0.5 rounded bg-white/80 dark:bg-slate-800 text-slate-800 dark:text-slate-200">Financial BOQ</span>
                         </div>
                         <div className="p-3.5">
-                          <ul className="space-y-1.5 text-xs text-slate-700">
+                          <ul className="space-y-1.5 text-xs text-slate-700 dark:text-slate-300">
                             {selectedTender.bid_submission?.cover_3?.items.map((item, idx) => (
                               <li key={idx} className="flex items-start gap-2">
-                                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" />
+                                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
                                 <span className="leading-snug">{item}</span>
                               </li>
                             ))}
@@ -1598,52 +1598,52 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
 
               {/* Sub-tab 4: Technical PQC & Machinery */}
               {activeSubTab === 'pqc' && (
-                <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-xs space-y-4">
+                <div className="bg-white dark:bg-[#0E1422] rounded-xl border border-slate-200/90 dark:border-slate-800 p-5 shadow-xs space-y-4 transition-colors">
                   <div>
-                    <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
-                      <Wrench className="w-4 h-4 text-amber-600" />
+                    <h4 className="text-xs font-bold text-slate-900 dark:text-slate-100 uppercase tracking-wider flex items-center gap-1.5">
+                      <Wrench className="w-4 h-4 text-amber-600 dark:text-amber-400" />
                       Technical Pre-Qualification Criteria (PQC) & Machinery Deployment
                     </h4>
-                    <p className="text-xs text-slate-500 mt-0.5">
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                       Verification of GFR Rule 173 technical experience thresholds, specialized plant deployment, and certified engineering manpower.
                     </p>
                   </div>
 
                   {/* 3-2-1 Experience Formula Grid */}
-                  <div className="bg-amber-50/60 rounded-xl border border-amber-200 p-4">
-                    <span className="text-[11px] font-bold text-amber-900 uppercase tracking-wider block mb-2">
+                  <div className="bg-amber-50/60 dark:bg-amber-950/20 rounded-xl border border-amber-200 dark:border-amber-900/40 p-4">
+                    <span className="text-[11px] font-bold text-amber-900 dark:text-amber-200 uppercase tracking-wider block mb-2">
                       GFR Rule 173 Similar Work Formula Verification
                     </span>
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
-                      <div className="bg-white p-3 rounded-lg border border-amber-200/80 shadow-2xs">
-                        <span className="text-[10px] text-amber-700 font-bold uppercase block">Condition A (3 Works)</span>
-                        <div className="font-mono font-bold text-slate-900 text-xs mt-0.5">
+                      <div className="bg-white dark:bg-[#141C2E] p-3 rounded-lg border border-amber-200/80 dark:border-amber-900/40 shadow-2xs">
+                        <span className="text-[10px] text-amber-700 dark:text-amber-400 font-bold uppercase block">Condition A (3 Works)</span>
+                        <div className="font-mono font-bold text-slate-900 dark:text-slate-100 text-xs mt-0.5">
                           ≥ {formatINR((selectedTender.og_tender?.estimated_cost_inr || 0) * 0.4)}
                         </div>
-                        <span className="text-[10px] text-slate-500 block mt-1">3 completed similar works of 40% cost in last 7 years</span>
-                        <span className="inline-block mt-2 px-2 py-0.5 bg-emerald-100 text-emerald-800 text-[9px] font-bold rounded">
+                        <span className="text-[10px] text-slate-500 dark:text-slate-400 block mt-1">3 completed similar works of 40% cost in last 7 years</span>
+                        <span className="inline-block mt-2 px-2 py-0.5 bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 text-[9px] font-bold rounded">
                           ✓ VERIFIED & APPROVED
                         </span>
                       </div>
 
-                      <div className="bg-white p-3 rounded-lg border border-amber-200/80 shadow-2xs">
-                        <span className="text-[10px] text-amber-700 font-bold uppercase block">Condition B (2 Works)</span>
-                        <div className="font-mono font-bold text-slate-900 text-xs mt-0.5">
+                      <div className="bg-white dark:bg-[#141C2E] p-3 rounded-lg border border-amber-200/80 dark:border-amber-900/40 shadow-2xs">
+                        <span className="text-[10px] text-amber-700 dark:text-amber-400 font-bold uppercase block">Condition B (2 Works)</span>
+                        <div className="font-mono font-bold text-slate-900 dark:text-slate-100 text-xs mt-0.5">
                           ≥ {formatINR((selectedTender.og_tender?.estimated_cost_inr || 0) * 0.5)}
                         </div>
-                        <span className="text-[10px] text-slate-500 block mt-1">2 completed similar works of 50% cost in last 7 years</span>
-                        <span className="inline-block mt-2 px-2 py-0.5 bg-emerald-100 text-emerald-800 text-[9px] font-bold rounded">
+                        <span className="text-[10px] text-slate-500 dark:text-slate-400 block mt-1">2 completed similar works of 50% cost in last 7 years</span>
+                        <span className="inline-block mt-2 px-2 py-0.5 bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 text-[9px] font-bold rounded">
                           ✓ VERIFIED & APPROVED
                         </span>
                       </div>
 
-                      <div className="bg-white p-3 rounded-lg border border-amber-200/80 shadow-2xs">
-                        <span className="text-[10px] text-amber-700 font-bold uppercase block">Condition C (1 Work)</span>
-                        <div className="font-mono font-bold text-slate-900 text-xs mt-0.5">
+                      <div className="bg-white dark:bg-[#141C2E] p-3 rounded-lg border border-amber-200/80 dark:border-amber-900/40 shadow-2xs">
+                        <span className="text-[10px] text-amber-700 dark:text-amber-400 font-bold uppercase block">Condition C (1 Work)</span>
+                        <div className="font-mono font-bold text-slate-900 dark:text-slate-100 text-xs mt-0.5">
                           ≥ {formatINR((selectedTender.og_tender?.estimated_cost_inr || 0) * 0.8)}
                         </div>
-                        <span className="text-[10px] text-slate-500 block mt-1">1 single completed mega work of 80% contract value</span>
-                        <span className="inline-block mt-2 px-2 py-0.5 bg-emerald-100 text-emerald-800 text-[9px] font-bold rounded">
+                        <span className="text-[10px] text-slate-500 dark:text-slate-400 block mt-1">1 single completed mega work of 80% contract value</span>
+                        <span className="inline-block mt-2 px-2 py-0.5 bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 text-[9px] font-bold rounded">
                           ✓ EXCEEDS CRITERIA
                         </span>
                       </div>
@@ -1652,8 +1652,8 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
 
                   {/* Plant & Machinery Deployment Undertaking */}
                   <div>
-                    <h5 className="text-xs font-bold text-slate-800 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-                      <Truck className="w-3.5 h-3.5 text-slate-600" />
+                    <h5 className="text-xs font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                      <Truck className="w-3.5 h-3.5 text-slate-600 dark:text-slate-400" />
                       Mandatory Heavy Plant & Equipment Mobilized on Site
                     </h5>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
@@ -1665,12 +1665,12 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
                         { name: "Heavy Hydraulic Excavators & Front-End Loaders", qty: "6 Units", status: "Owned Fleet", cap: "1.2 m³ Bucket" },
                         { name: "NABL-Accredited Field Material Testing Laboratory", qty: "1 Site Lab", status: "Established at KM 0", cap: "IS / MORTH Standard" }
                       ].map((mach, idx) => (
-                        <div key={idx} className="bg-slate-50 p-2.5 rounded-lg border border-slate-200 flex items-center justify-between">
+                        <div key={idx} className="bg-slate-50 dark:bg-slate-800/60 p-2.5 rounded-lg border border-slate-200 dark:border-slate-700/60 flex items-center justify-between">
                           <div>
-                            <span className="font-semibold text-slate-900 block leading-tight">{mach.name}</span>
-                            <span className="text-[10px] text-slate-500 font-mono">Specs: {mach.cap} • Min Req: {mach.qty}</span>
+                            <span className="font-semibold text-slate-900 dark:text-slate-100 block leading-tight">{mach.name}</span>
+                            <span className="text-[10px] text-slate-500 dark:text-slate-400 font-mono">Specs: {mach.cap} • Min Req: {mach.qty}</span>
                           </div>
-                          <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 shrink-0">
+                          <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60 shrink-0">
                             {mach.status}
                           </span>
                         </div>
@@ -1679,31 +1679,31 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
                   </div>
 
                   {/* Key Personnel & Technical Staff */}
-                  <div className="bg-slate-50 rounded-xl p-4 border border-slate-200">
-                    <h5 className="text-xs font-bold text-slate-800 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-                      <Users className="w-3.5 h-3.5 text-slate-600" />
+                  <div className="bg-slate-50 dark:bg-slate-800/60 rounded-xl p-4 border border-slate-200 dark:border-slate-700/60">
+                    <h5 className="text-xs font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                      <Users className="w-3.5 h-3.5 text-slate-600 dark:text-slate-400" />
                       Statutory Key Engineering Manpower Committed by Bidder
                     </h5>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-                      <div className="bg-white p-2.5 rounded-lg border border-slate-200">
+                      <div className="bg-white dark:bg-[#141C2E] p-2.5 rounded-lg border border-slate-200 dark:border-slate-700/60">
                         <span className="text-[10px] uppercase font-semibold text-slate-400 block">Project Director / Head</span>
-                        <strong className="text-slate-900">{selectedTender.winning_company?.project_lead}</strong>
-                        <span className="text-[11px] text-slate-500 block mt-0.5">25+ Years Experience • B.Tech Civil (NICMAR)</span>
+                        <strong className="text-slate-900 dark:text-slate-100">{selectedTender.winning_company?.project_lead}</strong>
+                        <span className="text-[11px] text-slate-500 dark:text-slate-400 block mt-0.5">25+ Years Experience • B.Tech Civil (NICMAR)</span>
                       </div>
-                      <div className="bg-white p-2.5 rounded-lg border border-slate-200">
+                      <div className="bg-white dark:bg-[#141C2E] p-2.5 rounded-lg border border-slate-200 dark:border-slate-700/60">
                         <span className="text-[10px] uppercase font-semibold text-slate-400 block">Chief Quality & Materials Lead</span>
-                        <strong className="text-slate-900">Er. Rameshwar Patil (Senior Materials Engr)</strong>
-                        <span className="text-[11px] text-slate-500 block mt-0.5">18 Years Highway Quality Audit • Certified NABL Auditor</span>
+                        <strong className="text-slate-900 dark:text-slate-100">Er. Rameshwar Patil (Senior Materials Engr)</strong>
+                        <span className="text-[11px] text-slate-500 dark:text-slate-400 block mt-0.5">18 Years Highway Quality Audit • Certified NABL Auditor</span>
                       </div>
-                      <div className="bg-white p-2.5 rounded-lg border border-slate-200">
+                      <div className="bg-white dark:bg-[#141C2E] p-2.5 rounded-lg border border-slate-200 dark:border-slate-700/60">
                         <span className="text-[10px] uppercase font-semibold text-slate-400 block">Structural Bridge / RCC Specialist</span>
-                        <strong className="text-slate-900">Er. S. N. Bannerjee (Chief Structural Lead)</strong>
-                        <span className="text-[11px] text-slate-500 block mt-0.5">20 Years Major Flyovers & Box Culvert Construction</span>
+                        <strong className="text-slate-900 dark:text-slate-100">Er. S. N. Bannerjee (Chief Structural Lead)</strong>
+                        <span className="text-[11px] text-slate-500 dark:text-slate-400 block mt-0.5">20 Years Major Flyovers & Box Culvert Construction</span>
                       </div>
-                      <div className="bg-white p-2.5 rounded-lg border border-slate-200">
+                      <div className="bg-white dark:bg-[#141C2E] p-2.5 rounded-lg border border-slate-200 dark:border-slate-700/60">
                         <span className="text-[10px] uppercase font-semibold text-slate-400 block">HSE & Environmental Officer</span>
-                        <strong className="text-slate-900">Er. Ajay Deshmukh (Safety Lead)</strong>
-                        <span className="text-[11px] text-slate-500 block mt-0.5">Certified NEBOSH & ISO 45001 Compliance Officer</span>
+                        <strong className="text-slate-900 dark:text-slate-100">Er. Ajay Deshmukh (Safety Lead)</strong>
+                        <span className="text-[11px] text-slate-500 dark:text-slate-400 block mt-0.5">Certified NEBOSH & ISO 45001 Compliance Officer</span>
                       </div>
                     </div>
                   </div>
@@ -1712,50 +1712,50 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
 
               {/* Sub-tab 5: Financial BOQ Analysis */}
               {activeSubTab === 'boq' && (
-                <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-xs space-y-4">
+                <div className="bg-white dark:bg-[#0E1422] rounded-xl border border-slate-200/90 dark:border-slate-800 p-5 shadow-xs space-y-4 transition-colors">
                   <div>
-                    <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
-                      <FileSpreadsheet className="w-4 h-4 text-emerald-600" />
+                    <h4 className="text-xs font-bold text-slate-900 dark:text-slate-100 uppercase tracking-wider flex items-center gap-1.5">
+                      <FileSpreadsheet className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                       Itemized Bill of Quantities (BOQ) & Quoted Financial Schedule
                     </h4>
-                    <p className="text-xs text-slate-500 mt-0.5">
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                       Financial rate schedule showing bill line items, component percentages, and competitive tender evaluation against L2 and L3 bids.
                     </p>
                   </div>
 
                   {/* Summary Comparison vs Estimate */}
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
-                    <div className="bg-slate-50 p-3 rounded-lg border border-slate-200">
+                    <div className="bg-slate-50 dark:bg-slate-800/60 p-3 rounded-lg border border-slate-200 dark:border-slate-700/60">
                       <span className="text-[10px] uppercase font-semibold text-slate-400">Department Estimate</span>
-                      <div className="font-mono font-bold text-slate-900 text-sm mt-0.5">
+                      <div className="font-mono font-bold text-slate-900 dark:text-slate-100 text-sm mt-0.5">
                         {formatINR(selectedTender.og_tender?.estimated_cost_inr)}
                       </div>
-                      <span className="text-[10px] text-slate-500">Based on Official DSR Rates</span>
+                      <span className="text-[10px] text-slate-500 dark:text-slate-400">Based on Official DSR Rates</span>
                     </div>
 
-                    <div className="bg-emerald-50 p-3 rounded-lg border border-emerald-200">
-                      <span className="text-[10px] uppercase font-semibold text-emerald-700">Contractor Quoted L1 Bid</span>
-                      <div className="font-mono font-bold text-emerald-800 text-sm mt-0.5">
+                    <div className="bg-emerald-50 dark:bg-emerald-950/30 p-3 rounded-lg border border-emerald-200 dark:border-emerald-800/50">
+                      <span className="text-[10px] uppercase font-semibold text-emerald-700 dark:text-emerald-300">Contractor Quoted L1 Bid</span>
+                      <div className="font-mono font-bold text-emerald-800 dark:text-emerald-200 text-sm mt-0.5">
                         {formatINR(selectedTender.bid_submission?.quoted_amount_inr)}
                       </div>
-                      <span className="text-[10px] text-emerald-700 font-bold">
+                      <span className="text-[10px] text-emerald-700 dark:text-emerald-400 font-bold">
                         -{selectedTender.bid_submission?.quoted_discount_pct}% Below Department Estimate
                       </span>
                     </div>
 
-                    <div className="bg-blue-50 p-3 rounded-lg border border-blue-200">
-                      <span className="text-[10px] uppercase font-semibold text-blue-700">Net Exchequer Savings</span>
-                      <div className="font-mono font-bold text-blue-900 text-sm mt-0.5">
+                    <div className="bg-blue-50 dark:bg-blue-950/30 p-3 rounded-lg border border-blue-200 dark:border-blue-800/50">
+                      <span className="text-[10px] uppercase font-semibold text-blue-700 dark:text-blue-300">Net Exchequer Savings</span>
+                      <div className="font-mono font-bold text-blue-900 dark:text-blue-200 text-sm mt-0.5">
                         {formatINR((selectedTender.og_tender?.estimated_cost_inr || 0) - (selectedTender.bid_submission?.quoted_amount_inr || 0))}
                       </div>
-                      <span className="text-[10px] text-blue-600">Saved to Government Treasury</span>
+                      <span className="text-[10px] text-blue-600 dark:text-blue-400">Saved to Government Treasury</span>
                     </div>
                   </div>
 
                   {/* Itemized BOQ Schedule Table */}
-                  <div className="overflow-x-auto border border-slate-200 rounded-lg">
+                  <div className="overflow-x-auto border border-slate-200 dark:border-slate-800 rounded-lg">
                     <table className="w-full text-left text-xs">
-                      <thead className="bg-slate-50 text-slate-600 font-semibold border-b border-slate-200">
+                      <thead className="bg-slate-50 dark:bg-[#131A2B] text-slate-600 dark:text-slate-300 font-semibold border-b border-slate-200 dark:border-slate-800">
                         <tr>
                           <th className="py-2.5 px-3">Item #</th>
                           <th className="py-2.5 px-3">BOQ Component Description</th>
@@ -1764,7 +1764,7 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
                           <th className="py-2.5 px-3 text-center">Pricing Strategy</th>
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-slate-100 text-slate-700">
+                      <tbody className="divide-y divide-slate-100 dark:divide-slate-800 text-slate-700 dark:text-slate-300">
                         {[
                           { no: "1.0", desc: "Site Clearance, Earthwork in Excavation, Embankment & Subgrade", est: "9.5%", quot: "9.1%", note: "Competitive local borrowing" },
                           { no: "2.0", desc: "Granular Sub-Base (GSB) & Wet Mix Macadam (WMM) Base Course", est: "21.0%", quot: "20.2%", note: "Dedicated captive quarry tie-up" },
@@ -1773,13 +1773,13 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
                           { no: "5.0", desc: "Traffic Safety, Signboards, Thermoplastic Markings & Crash Barriers", est: "6.5%", quot: "6.2%", note: "Compliant IRC standards" },
                           { no: "6.0", desc: "Quality Control, Lab Testing, Environmental Mitigation & Demobilization", est: "5.5%", quot: "5.4%", note: "Full safety & environmental compliance" }
                         ].map((row, idx) => (
-                          <tr key={idx} className="hover:bg-slate-50/60">
-                            <td className="py-2.5 px-3 font-mono text-slate-500">{row.no}</td>
-                            <td className="py-2.5 px-3 font-medium text-slate-800">{row.desc}</td>
-                            <td className="py-2.5 px-3 text-right font-mono">{row.est}</td>
-                            <td className="py-2.5 px-3 text-right font-mono font-bold text-emerald-700">{row.quot}</td>
+                          <tr key={idx} className="hover:bg-slate-50/60 dark:hover:bg-slate-800/40">
+                            <td className="py-2.5 px-3 font-mono text-slate-500 dark:text-slate-400">{row.no}</td>
+                            <td className="py-2.5 px-3 font-medium text-slate-800 dark:text-slate-200">{row.desc}</td>
+                            <td className="py-2.5 px-3 text-right font-mono text-slate-600 dark:text-slate-300">{row.est}</td>
+                            <td className="py-2.5 px-3 text-right font-mono font-bold text-emerald-700 dark:text-emerald-400">{row.quot}</td>
                             <td className="py-2.5 px-3 text-center">
-                              <span className="px-2 py-0.5 rounded text-[10px] bg-slate-100 text-slate-700 font-medium">
+                              <span className="px-2 py-0.5 rounded text-[10px] bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-medium">
                                 {row.note}
                               </span>
                             </td>
@@ -1790,45 +1790,45 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
                   </div>
 
                   {/* Competitive Bid Matrix (L1 vs L2 vs L3) */}
-                  <div className="bg-slate-50 p-4 rounded-xl border border-slate-200">
-                    <span className="text-[11px] font-bold text-slate-800 uppercase tracking-wider block mb-2">
+                  <div className="bg-slate-50 dark:bg-slate-800/60 p-4 rounded-xl border border-slate-200 dark:border-slate-700/60">
+                    <span className="text-[11px] font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider block mb-2">
                       Competitive Price Comparison Matrix (Tender Evaluation Committee)
                     </span>
                     <div className="space-y-2 text-xs">
-                      <div className="bg-emerald-50/80 p-2.5 rounded-lg border border-emerald-300 flex items-center justify-between">
+                      <div className="bg-emerald-50/80 dark:bg-emerald-950/40 p-2.5 rounded-lg border border-emerald-300 dark:border-emerald-800/60 flex items-center justify-between">
                         <div className="flex items-center gap-2">
                           <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-600 text-white">L1 WINNER</span>
-                          <span className="font-bold text-slate-900">{selectedTender.winning_company?.name}</span>
+                          <span className="font-bold text-slate-900 dark:text-slate-100">{selectedTender.winning_company?.name}</span>
                         </div>
                         <div className="text-right">
-                          <span className="font-mono font-bold text-emerald-800">
+                          <span className="font-mono font-bold text-emerald-800 dark:text-emerald-300">
                             {formatINR(selectedTender.bid_submission?.quoted_amount_inr)}
                           </span>
-                          <span className="text-[10px] text-emerald-700 font-bold ml-1.5">
+                          <span className="text-[10px] text-emerald-700 dark:text-emerald-400 font-bold ml-1.5">
                             (-{selectedTender.bid_submission?.quoted_discount_pct}%)
                           </span>
                         </div>
                       </div>
 
-                      <div className="bg-white p-2.5 rounded-lg border border-slate-200 flex items-center justify-between text-slate-600">
+                      <div className="bg-white dark:bg-[#141C2E] p-2.5 rounded-lg border border-slate-200 dark:border-slate-700/60 flex items-center justify-between text-slate-600 dark:text-slate-300">
                         <div className="flex items-center gap-2">
-                          <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-200 text-slate-700">L2 BIDDER</span>
+                          <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200">L2 BIDDER</span>
                           <span>Afcons Infrastructure / Larsen & Toubro Consortium</span>
                         </div>
                         <div className="text-right font-mono">
                           <span>{formatINR((selectedTender.bid_submission?.quoted_amount_inr || 0) * 1.026)}</span>
-                          <span className="text-[10px] text-slate-500 ml-1.5">(+2.6% over L1)</span>
+                          <span className="text-[10px] text-slate-500 dark:text-slate-400 ml-1.5">(+2.6% over L1)</span>
                         </div>
                       </div>
 
-                      <div className="bg-white p-2.5 rounded-lg border border-slate-200 flex items-center justify-between text-slate-600">
+                      <div className="bg-white dark:bg-[#141C2E] p-2.5 rounded-lg border border-slate-200 dark:border-slate-700/60 flex items-center justify-between text-slate-600 dark:text-slate-300">
                         <div className="flex items-center gap-2">
-                          <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-200 text-slate-700">L3 BIDDER</span>
+                          <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200">L3 BIDDER</span>
                           <span>NCC Limited / Dilip Buildcon JV</span>
                         </div>
                         <div className="text-right font-mono">
                           <span>{formatINR((selectedTender.bid_submission?.quoted_amount_inr || 0) * 1.054)}</span>
-                          <span className="text-[10px] text-slate-500 ml-1.5">(+5.4% over L1)</span>
+                          <span className="text-[10px] text-slate-500 dark:text-slate-400 ml-1.5">(+5.4% over L1)</span>
                         </div>
                       </div>
                     </div>
@@ -1838,76 +1838,76 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
 
               {/* Sub-tab 6: Make in India & Legal Affidavits */}
               {activeSubTab === 'compliance' && (
-                <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-xs space-y-4">
+                <div className="bg-white dark:bg-[#0E1422] rounded-xl border border-slate-200/90 dark:border-slate-800 p-5 shadow-xs space-y-4 transition-colors">
                   <div>
-                    <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
-                      <Scale className="w-4 h-4 text-blue-600" />
+                    <h4 className="text-xs font-bold text-slate-900 dark:text-slate-100 uppercase tracking-wider flex items-center gap-1.5">
+                      <Scale className="w-4 h-4 text-blue-600 dark:text-blue-400" />
                       Statutory, Tax & Make in India Order (DPIIT) Legal Exhibits
                     </h4>
-                    <p className="text-xs text-slate-500 mt-0.5">
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                       Mandatory government public procurement regulatory filings, anti-corruption integrity accords, and tax standing certificates.
                     </p>
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
                     {/* Make in India PPO Card */}
-                    <div className="bg-emerald-50/70 p-4 rounded-xl border border-emerald-200 space-y-2">
+                    <div className="bg-emerald-50/70 dark:bg-emerald-950/30 p-4 rounded-xl border border-emerald-200 dark:border-emerald-800/50 space-y-2">
                       <div className="flex items-center justify-between">
-                        <span className="text-[10px] font-bold text-emerald-800 uppercase">Make in India Order 2017</span>
+                        <span className="text-[10px] font-bold text-emerald-800 dark:text-emerald-300 uppercase">Make in India Order 2017</span>
                         <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-600 text-white">CLASS-I SUPPLIER</span>
                       </div>
-                      <p className="text-slate-800 font-medium">
+                      <p className="text-slate-800 dark:text-slate-200 font-medium">
                         Declared Local Domestic Content: <strong>{selectedTender.winning_company?.local_content_pct}%</strong>
                       </p>
-                      <p className="text-[11px] text-slate-600 leading-relaxed">
+                      <p className="text-[11px] text-slate-600 dark:text-slate-300 leading-relaxed">
                         Conforms to Ministry of Commerce & Industry (DPIIT) Public Procurement Order. All cement, steel, bituminous mixes, and structural assemblies sourced from domestic producers.
                       </p>
-                      <div className="text-[10px] text-slate-500 font-mono pt-1 border-t border-emerald-200">
+                      <div className="text-[10px] text-slate-500 dark:text-slate-400 font-mono pt-1 border-t border-emerald-200 dark:border-emerald-800/50">
                         Statutory Auditor Certification: Verified & Signed
                       </div>
                     </div>
 
                     {/* CVC Integrity Pact Card */}
-                    <div className="bg-blue-50/70 p-4 rounded-xl border border-blue-200 space-y-2">
+                    <div className="bg-blue-50/70 dark:bg-blue-950/30 p-4 rounded-xl border border-blue-200 dark:border-blue-800/50 space-y-2">
                       <div className="flex items-center justify-between">
-                        <span className="text-[10px] font-bold text-blue-800 uppercase">CVC Integrity Pact</span>
+                        <span className="text-[10px] font-bold text-blue-800 dark:text-blue-300 uppercase">CVC Integrity Pact</span>
                         <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-600 text-white">SIGNED & RATIFIED</span>
                       </div>
-                      <p className="text-slate-800 font-medium">
+                      <p className="text-slate-800 dark:text-slate-200 font-medium">
                         Central Vigilance Commission Anti-Corruption Accord
                       </p>
-                      <p className="text-[11px] text-slate-600 leading-relaxed">
+                      <p className="text-[11px] text-slate-600 dark:text-slate-300 leading-relaxed">
                         Pre-contract Integrity Pact signed between {selectedTender.winning_company?.name} and {selectedTender.og_tender?.authority}. Monitored by Independent External Monitor (IEM).
                       </p>
-                      <div className="text-[10px] text-slate-500 font-mono pt-1 border-t border-blue-200">
+                      <div className="text-[10px] text-slate-500 dark:text-slate-400 font-mono pt-1 border-t border-blue-200 dark:border-blue-800/50">
                         IEM Sign-off: Zero complaints or bid irregularities noted.
                       </div>
                     </div>
 
                     {/* Tax & GST Standing Card */}
-                    <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-2">
-                      <span className="text-[10px] font-bold text-slate-500 uppercase block">Tax Authorities & Filings</span>
-                      <div className="font-mono text-slate-900 font-bold">
+                    <div className="bg-slate-50 dark:bg-slate-800/60 p-4 rounded-xl border border-slate-200 dark:border-slate-700/60 space-y-2">
+                      <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase block">Tax Authorities & Filings</span>
+                      <div className="font-mono text-slate-900 dark:text-slate-100 font-bold">
                         GSTIN: {selectedTender.winning_company?.gstin}
                       </div>
-                      <p className="text-[11px] text-slate-600">
+                      <p className="text-[11px] text-slate-600 dark:text-slate-300">
                         Up-to-date monthly GSTR-1 and GSTR-3B filings verified on GST Portal. No pending tax recoveries or attachment notices from Central Board of Indirect Taxes (CBIC).
                       </p>
-                      <div className="text-[10px] text-slate-500 font-mono pt-1 border-t border-slate-200">
+                      <div className="text-[10px] text-slate-500 dark:text-slate-400 font-mono pt-1 border-t border-slate-200 dark:border-slate-700/60">
                         PAN: {selectedTender.winning_company?.pan} (Income Tax Dept Cleared)
                       </div>
                     </div>
 
                     {/* Sworn Non-Blacklisting Affidavit Card */}
-                    <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-2">
-                      <span className="text-[10px] font-bold text-slate-500 uppercase block">Judicial Non-Blacklisting Affidavit</span>
-                      <p className="text-slate-800 font-medium">
+                    <div className="bg-slate-50 dark:bg-slate-800/60 p-4 rounded-xl border border-slate-200 dark:border-slate-700/60 space-y-2">
+                      <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase block">Judicial Non-Blacklisting Affidavit</span>
+                      <p className="text-slate-800 dark:text-slate-200 font-medium">
                         Non-Debarment Oath on ₹ 100 Stamp Paper
                       </p>
-                      <p className="text-[11px] text-slate-600 leading-relaxed">
+                      <p className="text-[11px] text-slate-600 dark:text-slate-300 leading-relaxed">
                         Sworn affidavit affirming that {selectedTender.winning_company?.name} has never been blacklisted, debarred or disqualified by CPWD, NHAI, Railways, State PWDs or any multilateral donor agency (World Bank/ADB).
                       </p>
-                      <div className="text-[10px] text-slate-500 font-mono pt-1 border-t border-slate-200">
+                      <div className="text-[10px] text-slate-500 dark:text-slate-400 font-mono pt-1 border-t border-slate-200 dark:border-slate-700/60">
                         Attested by: Notary Public & Commissioner of Oaths
                       </div>
                     </div>
@@ -1917,13 +1917,13 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
 
               {/* Sub-tab 7: Milestones & Payment Terms */}
               {activeSubTab === 'milestones' && (
-                <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-xs space-y-4">
+                <div className="bg-white dark:bg-[#0E1422] rounded-xl border border-slate-200/90 dark:border-slate-800 p-5 shadow-xs space-y-4 transition-colors">
                   <div>
-                    <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
-                      <Clock className="w-4 h-4 text-purple-600" />
+                    <h4 className="text-xs font-bold text-slate-900 dark:text-slate-100 uppercase tracking-wider flex items-center gap-1.5">
+                      <Clock className="w-4 h-4 text-purple-600 dark:text-purple-400" />
                       Contract Execution Milestones & Running Account (RA) Billing Schedule
                     </h4>
-                    <p className="text-xs text-slate-500 mt-0.5">
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                       Detailed stage-by-stage construction timeline, milestone financial triggers, defect liability period, and liquidated damages provisions.
                     </p>
                   </div>
@@ -1964,24 +1964,24 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
                         financial_release: "Final Bill preparation & 50% retention money refund"
                       }
                     ].map((m, idx) => (
-                      <div key={idx} className="bg-slate-50 p-3.5 rounded-xl border border-slate-200 relative overflow-hidden">
+                      <div key={idx} className="bg-slate-50 dark:bg-slate-800/60 p-3.5 rounded-xl border border-slate-200 dark:border-slate-700/60 relative overflow-hidden">
                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-1.5">
                           <div className="flex items-center gap-2">
-                            <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-purple-100 text-purple-900 border border-purple-200">
+                            <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-purple-100 dark:bg-purple-950/60 text-purple-900 dark:text-purple-300 border border-purple-200 dark:border-purple-800/60">
                               {m.stage}
                             </span>
-                            <strong className="text-slate-900 text-xs">{m.title}</strong>
+                            <strong className="text-slate-900 dark:text-slate-100 text-xs">{m.title}</strong>
                           </div>
                           <div className="flex items-center gap-2 text-xs">
-                            <span className="text-slate-500 font-mono">{m.time}</span>
-                            <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-200">
+                            <span className="text-slate-500 dark:text-slate-400 font-mono">{m.time}</span>
+                            <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60">
                               {m.progress}
                             </span>
                           </div>
                         </div>
-                        <p className="text-xs text-slate-600 leading-relaxed mb-2">{m.desc}</p>
-                        <div className="text-[10px] text-purple-800 font-medium bg-purple-50 px-2 py-1 rounded border border-purple-100 flex items-center gap-1">
-                          <DollarSign className="w-3 h-3 text-purple-600 shrink-0" />
+                        <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed mb-2">{m.desc}</p>
+                        <div className="text-[10px] text-purple-800 dark:text-purple-300 font-medium bg-purple-50 dark:bg-purple-950/40 px-2 py-1 rounded border border-purple-100 dark:border-purple-800/40 flex items-center gap-1">
+                          <DollarSign className="w-3 h-3 text-purple-600 dark:text-purple-400 shrink-0" />
                           <span>Financial Milestone Trigger: {m.financial_release}</span>
                         </div>
                       </div>
@@ -1990,22 +1990,22 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
 
                   {/* Contract Protection & Security Clauses */}
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
-                    <div className="bg-slate-50 p-3 rounded-lg border border-slate-200">
+                    <div className="bg-slate-50 dark:bg-slate-800/60 p-3 rounded-lg border border-slate-200 dark:border-slate-700/60">
                       <span className="text-[10px] uppercase font-semibold text-slate-400">Performance Bank Guarantee</span>
-                      <strong className="text-slate-900 block mt-0.5">5% of Contract Value</strong>
-                      <span className="text-[10px] text-slate-500 block mt-1">Submitted within 14 days of LOA, valid up to DLP completion + 60 days.</span>
+                      <strong className="text-slate-900 dark:text-slate-100 block mt-0.5">5% of Contract Value</strong>
+                      <span className="text-[10px] text-slate-500 dark:text-slate-400 block mt-1">Submitted within 14 days of LOA, valid up to DLP completion + 60 days.</span>
                     </div>
 
-                    <div className="bg-slate-50 p-3 rounded-lg border border-slate-200">
+                    <div className="bg-slate-50 dark:bg-slate-800/60 p-3 rounded-lg border border-slate-200 dark:border-slate-700/60">
                       <span className="text-[10px] uppercase font-semibold text-slate-400">Defect Liability Period (DLP)</span>
-                      <strong className="text-slate-900 block mt-0.5">36 to 60 Months Guarantee</strong>
-                      <span className="text-[10px] text-slate-500 block mt-1">Free maintenance of riding quality, culvert settlement, and road safety furniture.</span>
+                      <strong className="text-slate-900 dark:text-slate-100 block mt-0.5">36 to 60 Months Guarantee</strong>
+                      <span className="text-[10px] text-slate-500 dark:text-slate-400 block mt-1">Free maintenance of riding quality, culvert settlement, and road safety furniture.</span>
                     </div>
 
-                    <div className="bg-slate-50 p-3 rounded-lg border border-slate-200">
+                    <div className="bg-slate-50 dark:bg-slate-800/60 p-3 rounded-lg border border-slate-200 dark:border-slate-700/60">
                       <span className="text-[10px] uppercase font-semibold text-slate-400">Liquidated Damages (LD)</span>
-                      <strong className="text-slate-900 block mt-0.5">0.5% per Week (Max 10%)</strong>
-                      <span className="text-[10px] text-slate-500 block mt-1">Statutory delay compensation levied for unauthorized extension of time.</span>
+                      <strong className="text-slate-900 dark:text-slate-100 block mt-0.5">0.5% per Week (Max 10%)</strong>
+                      <span className="text-[10px] text-slate-500 dark:text-slate-400 block mt-1">Statutory delay compensation levied for unauthorized extension of time.</span>
                     </div>
                   </div>
                 </div>
@@ -2013,53 +2013,53 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
 
               {/* Sub-tab 8: LOA & Committee Verdict */}
               {activeSubTab === 'loa' && (
-                <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-xs space-y-4">
+                <div className="bg-white dark:bg-[#0E1422] rounded-xl border border-slate-200/90 dark:border-slate-800 p-5 shadow-xs space-y-4 transition-colors">
                   <div>
-                    <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
-                      <Stamp className="w-4 h-4 text-emerald-600" />
+                    <h4 className="text-xs font-bold text-slate-900 dark:text-slate-100 uppercase tracking-wider flex items-center gap-1.5">
+                      <Stamp className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                       Official Letter of Acceptance (LOA) & Tender Committee Minutes
                     </h4>
-                    <p className="text-xs text-slate-500 mt-0.5">
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                       Official endorsement and justification for selecting this contractor as the lowest responsive L1 bidder.
                     </p>
                   </div>
 
                   {/* LOA Certificate Frame */}
-                  <div className="bg-slate-50 border-2 border-slate-300 rounded-xl p-5 relative">
+                  <div className="bg-slate-50 dark:bg-[#080C14] border-2 border-slate-300 dark:border-slate-700 rounded-xl p-5 relative">
                     {/* Official Stamp Watermark */}
-                    <div className="absolute right-6 top-6 border-2 border-emerald-600 text-emerald-700 font-bold px-3 py-1 rounded text-xs uppercase tracking-widest rotate-6 bg-white/90 shadow-2xs">
+                    <div className="absolute right-6 top-6 border-2 border-emerald-600 text-emerald-700 dark:text-emerald-400 font-bold px-3 py-1 rounded text-xs uppercase tracking-widest rotate-6 bg-white/90 dark:bg-slate-900/90 shadow-2xs">
                       AWARDED & ACCEPTED
                     </div>
 
                     <div className="space-y-3 text-xs">
-                      <div className="flex items-center justify-between border-b border-slate-200 pb-2.5">
+                      <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-2.5">
                         <div>
                           <span className="text-[10px] text-slate-400 uppercase font-semibold">Letter of Acceptance (LOA) Number</span>
-                          <div className="font-mono font-bold text-slate-900 text-xs">
+                          <div className="font-mono font-bold text-slate-900 dark:text-slate-100 text-xs">
                             {selectedTender.acceptance_and_loa?.loa_number}
                           </div>
                         </div>
                         <div className="text-right">
                           <span className="text-[10px] text-slate-400 uppercase font-semibold">Date of Issuance</span>
-                          <div className="font-semibold text-slate-800">{selectedTender.acceptance_and_loa?.loa_date}</div>
+                          <div className="font-semibold text-slate-800 dark:text-slate-200">{selectedTender.acceptance_and_loa?.loa_date}</div>
                         </div>
                       </div>
 
                       <div>
                         <span className="text-[10px] text-slate-400 uppercase font-semibold">Awarding Authority</span>
-                        <div className="font-medium text-slate-800">{selectedTender.acceptance_and_loa?.awarding_authority}</div>
+                        <div className="font-medium text-slate-800 dark:text-slate-200">{selectedTender.acceptance_and_loa?.awarding_authority}</div>
                       </div>
 
                       <div>
                         <span className="text-[10px] text-slate-400 uppercase font-semibold">Contract Agreement Execution</span>
-                        <div className="font-medium text-slate-800">{selectedTender.acceptance_and_loa?.contract_agreement_date}</div>
+                        <div className="font-medium text-slate-800 dark:text-slate-200">{selectedTender.acceptance_and_loa?.contract_agreement_date}</div>
                       </div>
 
-                      <div className="bg-white p-3.5 rounded-lg border border-slate-200 mt-2">
+                      <div className="bg-white dark:bg-[#141C2E] p-3.5 rounded-lg border border-slate-200 dark:border-slate-700/60 mt-2">
                         <span className="text-[10px] text-slate-400 uppercase font-semibold block mb-1">
                           Tender Evaluation Committee Findings & Recommendation
                         </span>
-                        <p className="text-slate-700 leading-relaxed text-xs">
+                        <p className="text-slate-700 dark:text-slate-300 leading-relaxed text-xs">
                           "{selectedTender.acceptance_and_loa?.committee_verdict}"
                         </p>
                       </div>
@@ -2070,14 +2070,14 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
 
               {/* Sub-tab 5: Live PDF Document Preview */}
               {activeSubTab === 'pdf' && (
-                <div className="bg-white rounded-xl border border-slate-200 p-4 shadow-xs space-y-3">
+                <div className="bg-white dark:bg-[#0E1422] rounded-xl border border-slate-200/90 dark:border-slate-800 p-4 shadow-xs space-y-3 transition-colors">
                   <div className="flex items-center justify-between">
                     <div>
-                      <h4 className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
-                        <FileText className="w-4 h-4 text-emerald-600" />
+                      <h4 className="text-xs font-bold text-slate-900 dark:text-slate-100 flex items-center gap-1.5">
+                        <FileText className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                         Official Generated Bid Dossier (PDF Document)
                       </h4>
-                      <p className="text-[11px] text-slate-500">
+                      <p className="text-[11px] text-slate-500 dark:text-slate-400">
                         Compiled dynamically via ReportLab in memory with zero local disk footprint.
                       </p>
                     </div>
@@ -2086,7 +2086,7 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
                       <a
                         href={pdfUrl}
                         download={`${selectedTender.id}_awarded_dossier.pdf`}
-                        className="px-3 py-1.5 rounded-md text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 flex items-center gap-1"
+                        className="px-3 py-1.5 rounded-md text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 flex items-center gap-1"
                       >
                         <Download className="w-3.5 h-3.5" />
                         <span>Download PDF</span>
@@ -2095,7 +2095,7 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
                         href={pdfUrl}
                         target="_blank"
                         rel="noreferrer"
-                        className="px-3 py-1.5 rounded-md text-xs font-semibold bg-slate-900 text-white hover:bg-slate-800 flex items-center gap-1"
+                        className="px-3 py-1.5 rounded-md text-xs font-semibold bg-slate-900 dark:bg-slate-700 text-white hover:bg-slate-800 dark:hover:bg-slate-600 flex items-center gap-1"
                       >
                         <ExternalLink className="w-3.5 h-3.5" />
                         <span>Open in New Window</span>
@@ -2104,7 +2104,7 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
                   </div>
 
                   {/* PDF Preview Frame */}
-                  <div className="w-full h-[620px] rounded-lg border border-slate-300 overflow-hidden bg-slate-100 shadow-inner">
+                  <div className="w-full h-[620px] rounded-lg border border-slate-300 dark:border-slate-700 overflow-hidden bg-slate-100 dark:bg-slate-900 shadow-inner">
                     <iframe
                       src={pdfUrl}
                       title="Accepted Tender Dossier PDF Preview"

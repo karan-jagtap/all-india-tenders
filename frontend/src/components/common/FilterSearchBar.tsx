@@ -55,7 +55,7 @@ export const FilterSearchBar: React.FC<FilterSearchBarProps> = ({
         } py-2.5 transition-all focus:outline-none focus:ring-2 ${
           isDark
             ? 'bg-slate-800/90 hover:bg-slate-800 text-white placeholder-slate-400 border border-slate-700'
-            : 'bg-slate-50 hover:bg-slate-100/70 focus:bg-white text-slate-800 placeholder-slate-400 border border-slate-200'
+            : 'bg-slate-50 dark:bg-[#141C2E] hover:bg-slate-100/70 dark:hover:bg-[#18233A] focus:bg-white dark:focus:bg-[#141C2E] text-slate-800 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 border border-slate-200/90 dark:border-slate-700'
         } ${
           isVoiceSearching
             ? 'border-red-400 ring-2 ring-red-400 bg-red-50 text-red-900'

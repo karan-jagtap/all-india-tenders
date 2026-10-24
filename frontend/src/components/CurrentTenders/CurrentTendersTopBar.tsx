@@ -174,7 +174,7 @@ export const CurrentTendersTopBar: React.FC<CurrentTendersTopBarProps> = ({
   ]);
 
   return (
-    <div className="bg-white border border-slate-200 rounded-xl p-3 shadow-xs space-y-2.5">
+    <div className="bg-white dark:bg-[#0E1422] border border-slate-200/90 dark:border-slate-800 rounded-xl p-3 shadow-xs space-y-2.5">
       {/* Clean Single Row Toolbar: Search on LEFT, Filter button & Reload on RIGHT */}
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
         {/* Reusable Search Bar Component */}

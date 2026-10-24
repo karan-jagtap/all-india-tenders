@@ -3,9 +3,27 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    --canvas-bg: #f8fafc;
+    --surface-bg: #ffffff;
+    --border-subtle: #e2e8f0;
+    --text-primary: #0f172a;
+    --text-muted: #64748b;
+  }
+
+  .dark {
+    --canvas-bg: #080c14;
+    --surface-bg: #0e1422;
+    --border-subtle: #1e293b;
+    --text-primary: #f8fafc;
+    --text-muted: #94a3b8;
+  }
+
   body {
-    @apply bg-slate-50 text-slate-900;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background-color: var(--canvas-bg);
+    color: var(--text-primary);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    transition: background-color 0.2s ease, color 0.2s ease;
   }
 }
 
@@ -23,6 +41,16 @@
 }
 ::-webkit-scrollbar-thumb:hover {
   background: #94a3b8;
+}
+
+.dark ::-webkit-scrollbar-track {
+  background: #0b0f19;
+}
+.dark ::-webkit-scrollbar-thumb {
+  background: #1e293b;
+}
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #334155;
 }
 
 @keyframes slideInRight {
@@ -49,4 +77,17 @@
 
 .animate-fadeIn {
   animation: fadeIn 0.2s ease-out forwards;
+}
+
+/* Architectural civic card depth */
+.civic-card {
+  background-color: #ffffff;
+  border: 1px solid rgba(226, 232, 240, 0.85);
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.03), 0 1px 2px rgba(15, 23, 42, 0.02);
+}
+
+.dark .civic-card {
+  background-color: #0e1422;
+  border: 1px solid rgba(30, 41, 59, 0.85);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
 }
