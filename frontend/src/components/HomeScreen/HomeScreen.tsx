@@ -1,4 +1,5 @@
 import React from 'react';
+import { Stack } from '@mantine/core';
 import { PlatformStats } from '../../types';
 import {
   HomeHeroSection,
@@ -37,7 +38,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
   };
 
   return (
-    <div className="space-y-10 pb-12 animate-fadeIn">
+    <Stack gap="xl" pb="xl">
       {/* 1. Hero Section */}
       <HomeHeroSection
         activeTenders={activeTenders}
@@ -72,6 +73,6 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
 
       {/* 6. Feedback & Contact Us Section (Stores in DB & emails kmessilj@gmail.com) */}
       <HomeFeedbackContactSection />
-    </div>
+    </Stack>
   );
 };

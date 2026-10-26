@@ -1,4 +1,5 @@
 import React from 'react';
+import { Card, Badge, Title, Text, Group, SimpleGrid, Box } from '@mantine/core';
 import { MapPin, ChevronRight } from 'lucide-react';
 import { RegisteredBidder } from '../../types';
 import { formatCr } from '../../utils';
@@ -15,84 +16,95 @@ export const BidderCard: React.FC<BidderCardProps> = ({
   onSelect
 }) => {
   return (
-    <div
+    <Card
+      p="md"
+      radius="lg"
+      withBorder
       onClick={onSelect}
-      className={`cursor-pointer rounded-xl p-4 border transition-all text-xs relative ${
-        isSelected
-          ? 'bg-white dark:bg-[#131A2B] border-blue-600 dark:border-blue-500 shadow-md ring-1 ring-blue-600'
-          : 'bg-white dark:bg-[#0E1422] border-slate-200/90 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 hover:bg-slate-50/70 dark:hover:bg-[#131A2B]/60 shadow-[0_1px_3px_rgba(15,23,42,0.03)]'
-      }`}
+      style={{
+        backgroundColor: isSelected ? 'var(--color-surface-hover)' : 'var(--color-surface)',
+        borderColor: isSelected ? 'var(--color-blue)' : 'var(--color-border)',
+        boxShadow: isSelected ? '0 0 0 2px var(--color-blue)' : '0 1px 3px rgba(0, 0, 0, 0.04)',
+        cursor: 'pointer',
+        transition: 'all 0.15s ease',
+        position: 'relative',
+      }}
     >
-      <div className="flex flex-wrap items-center justify-between gap-1.5 mb-1.5">
-        <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-100 dark:bg-blue-950/60 text-blue-900 dark:text-blue-300 border border-blue-200 dark:border-blue-800">
+      <Group justify="space-between" mb={6}>
+        <Badge size="xs" variant="light" color="blue">
           {bidder.pqc_clearance_rating || 'Super Class-I National'}
-        </span>
-        <span className="text-[11px] font-semibold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/50 px-2 py-0.5 rounded border border-emerald-200 dark:border-emerald-800">
+        </Badge>
+        <Badge size="xs" variant="light" color="teal">
           {bidder.total_contracts_won} Won Contracts
-        </span>
-      </div>
+        </Badge>
+      </Group>
 
-      <h3 className="font-bold text-slate-900 dark:text-white text-xs leading-snug break-words mt-1">
+      <Title order={4} size="xs" mb={4} style={{ color: 'var(--color-text-main)', fontWeight: 700, lineHeight: 1.3 }}>
         {bidder.name}
-      </h3>
+      </Title>
 
-      <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 flex items-center gap-1">
-        <MapPin className="w-3 h-3 text-slate-400 dark:text-slate-500 shrink-0" />
-        <span className="break-words">{bidder.registered_office || (bidder.states && bidder.states[0]) || 'India'}</span>
-      </div>
+      <Group gap={4} mb="xs">
+        <MapPin className="w-3 h-3 text-slate-400 shrink-0" />
+        <Text size="11px" c="dimmed">
+          {bidder.registered_office || (bidder.states && bidder.states[0]) || 'India'}
+        </Text>
+      </Group>
 
       {/* Financials Strip */}
-      <div className="grid grid-cols-2 gap-2 pt-2.5 mt-2 border-t border-slate-100 dark:border-slate-800 text-xs">
-        <div>
-          <span className="text-slate-400 dark:text-slate-500 block text-[10px]">Total Awarded</span>
-          <strong className="text-slate-900 dark:text-white font-bold font-mono">
+      <SimpleGrid cols={2} spacing="xs" pt="xs" style={{ borderTop: '1px solid var(--color-border-subtle)' }}>
+        <Box>
+          <Text size="10px" c="dimmed">Total Awarded</Text>
+          <Text size="xs" fw={700} ff="monospace" style={{ color: 'var(--color-text-main)' }}>
             {formatCr(bidder.total_awarded_value_inr)}
-          </strong>
-        </div>
-        <div>
-          <span className="text-slate-400 dark:text-slate-500 block text-[10px]">Audited Turnover</span>
-          <strong className="text-purple-700 dark:text-purple-400 font-bold font-mono">
+          </Text>
+        </Box>
+        <Box>
+          <Text size="10px" c="dimmed">Audited Turnover</Text>
+          <Text size="xs" fw={700} ff="monospace" c="grape">
             {formatCr(bidder.audited_turnover_inr)}
-          </strong>
-        </div>
-      </div>
+          </Text>
+        </Box>
+      </SimpleGrid>
 
       {/* Financial Standing & Win Rate */}
-      <div className="grid grid-cols-2 gap-2 pt-2 mt-1 border-t border-slate-100 dark:border-slate-800 text-[10px]">
-        <div>
-          <span className="text-slate-400 dark:text-slate-500 block">Credit Rating</span>
-          <span className="font-bold text-blue-700 dark:text-blue-400 truncate block" title={bidder.credit_rating}>
+      <SimpleGrid cols={2} spacing="xs" pt="xs" mt={4} style={{ borderTop: '1px solid var(--color-border-subtle)' }}>
+        <Box>
+          <Text size="10px" c="dimmed">Credit Rating</Text>
+          <Text size="11px" fw={700} c="blue" lineClamp={1} title={bidder.credit_rating}>
             {bidder.credit_rating?.split('(')[0]?.trim() || 'CRISIL AAA'}
-          </span>
-        </div>
-        <div>
-          <span className="text-slate-400 dark:text-slate-500 block">Win Rate / Book</span>
-          <span className="font-bold text-emerald-700 dark:text-emerald-400 block font-mono">
+          </Text>
+        </Box>
+        <Box>
+          <Text size="10px" c="dimmed">Win Rate / Book</Text>
+          <Text size="11px" fw={700} c="teal" ff="monospace">
             {bidder.win_rate_pct || 68}% • {formatCr(bidder.unexecuted_order_book_inr)}
-          </span>
-        </div>
-      </div>
+          </Text>
+        </Box>
+      </SimpleGrid>
 
       {/* Badges strip */}
-      <div className="mt-2.5 pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center gap-1.5 flex-wrap">
-        <span className="text-[9px] bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-medium px-2 py-0.5 rounded">
-          {bidder.categories[0] || 'Civil'}
-        </span>
-        {bidder.categories[1] && (
-          <span className="text-[9px] bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 px-2 py-0.5 rounded">
-            +{bidder.categories.length - 1} more
-          </span>
-        )}
-        <span className="text-[9px] bg-emerald-50 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 px-2 py-0.5 rounded border border-emerald-200 dark:border-emerald-800 font-medium ml-auto">
+      <Group justify="space-between" pt="xs" mt={6} style={{ borderTop: '1px solid var(--color-border-subtle)' }}>
+        <Group gap={4}>
+          <Badge size="xs" variant="outline" color="gray" radius="sm">
+            {bidder.categories[0] || 'Civil'}
+          </Badge>
+          {bidder.categories[1] && (
+            <Badge size="xs" variant="outline" color="gray" radius="sm">
+              +{bidder.categories.length - 1} more
+            </Badge>
+          )}
+        </Group>
+
+        <Badge size="xs" variant="light" color="teal" radius="sm">
           Make in India {bidder.local_content_pct}%
-        </span>
-      </div>
+        </Badge>
+      </Group>
 
       {isSelected && (
-        <div className="absolute right-2 top-1/2 -translate-y-1/2 text-blue-600">
+        <Box style={{ position: 'absolute', right: 8, top: '50%', transform: 'translateY(-50%)', color: 'var(--color-blue)' }}>
           <ChevronRight className="w-5 h-5" />
-        </div>
+        </Box>
       )}
-    </div>
+    </Card>
   );
 };

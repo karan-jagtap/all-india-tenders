@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { useMantineColorScheme } from '@mantine/core';
 
 export type Theme = 'light' | 'dark';
 
@@ -10,21 +11,20 @@ export interface ThemeContextType {
 }
 
 const ThemeContext = createContext<ThemeContextType>({
-  theme: 'light',
+  theme: 'dark',
   toggleTheme: () => {},
   setTheme: () => {},
-  isDark: false
+  isDark: true,
 });
 
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { setColorScheme } = useMantineColorScheme();
+
   const [theme, setThemeState] = useState<Theme>(() => {
-    if (typeof window === 'undefined') return 'light';
+    if (typeof window === 'undefined') return 'dark';
     const saved = localStorage.getItem('ait_theme');
     if (saved === 'dark' || saved === 'light') return saved;
-    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-      return 'dark';
-    }
-    return 'light';
+    return 'dark';
   });
 
   useEffect(() => {
@@ -32,14 +32,18 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     if (theme === 'dark') {
       root.classList.add('dark');
       root.setAttribute('data-theme', 'dark');
+      root.setAttribute('data-mantine-color-scheme', 'dark');
       document.body.classList.add('dark');
+      setColorScheme('dark');
     } else {
       root.classList.remove('dark');
       root.setAttribute('data-theme', 'light');
+      root.setAttribute('data-mantine-color-scheme', 'light');
       document.body.classList.remove('dark');
+      setColorScheme('light');
     }
     localStorage.setItem('ait_theme', theme);
-  }, [theme]);
+  }, [theme, setColorScheme]);
 
   const toggleTheme = () => {
     setThemeState((prev) => (prev === 'dark' ? 'light' : 'dark'));
@@ -50,7 +54,14 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   };
 
   return (
-    <ThemeContext.Provider value={{ theme, toggleTheme, setTheme, isDark: theme === 'dark' }}>
+    <ThemeContext.Provider
+      value={{
+        theme,
+        toggleTheme,
+        setTheme,
+        isDark: theme === 'dark',
+      }}
+    >
       {children}
     </ThemeContext.Provider>
   );

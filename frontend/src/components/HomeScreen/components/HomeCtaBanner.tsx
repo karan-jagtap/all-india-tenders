@@ -1,4 +1,5 @@
 import React from 'react';
+import { Paper, Title, Text, Button, Group, Stack } from '@mantine/core';
 import { Radio, Award, Users } from 'lucide-react';
 
 export interface HomeCtaBannerProps {
@@ -7,39 +8,67 @@ export interface HomeCtaBannerProps {
 
 export const HomeCtaBanner: React.FC<HomeCtaBannerProps> = ({ onNavigate }) => {
   return (
-    <section className="bg-white dark:bg-[#0E1422] border border-slate-200/90 dark:border-slate-800 rounded-2xl p-6 sm:p-8 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-6 transition-colors">
-      <div className="space-y-1.5 text-center sm:text-left">
-        <h3 className="text-lg font-bold text-slate-900 dark:text-white">
-          Ready to explore India's public procurement tenders?
-        </h3>
-        <p className="text-xs text-slate-500 dark:text-slate-400 max-w-xl">
-          Choose a section to inspect live statutory notices, search 17-year awarded bid archives (2010 – 2026), or evaluate registered infrastructure contractors.
-        </p>
-      </div>
+    <Paper
+      p={{ base: 'md', sm: 'xl' }}
+      radius="xl"
+      withBorder
+      style={{
+        backgroundColor: 'var(--color-surface)',
+        borderColor: 'var(--color-border)',
+        boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)',
+      }}
+    >
+      <Group justify="space-between" align="center" gap="lg" wrap="wrap">
+        <Stack gap={4} style={{ maxWidth: 620 }}>
+          <Title order={3} size="h4" style={{ color: 'var(--color-text-main)', fontWeight: 800 }}>
+            Ready to explore India's public procurement tenders?
+          </Title>
+          <Text size="xs" style={{ color: 'var(--color-text-muted)' }}>
+            Choose a section to inspect live statutory notices, search 17-year awarded bid archives (2010 – 2026), or evaluate registered infrastructure contractors.
+          </Text>
+        </Stack>
 
-      <div className="flex items-center gap-3 shrink-0 flex-wrap justify-center">
-        <button
-          onClick={() => onNavigate('current')}
-          className="px-4 py-2.5 rounded-xl bg-orange-600 hover:bg-orange-500 text-white font-bold text-xs flex items-center gap-1.5 shadow-sm transition-all cursor-pointer"
-        >
-          <Radio className="w-3.5 h-3.5 animate-pulse" />
-          <span>InProgress Tenders</span>
-        </button>
-        <button
-          onClick={() => onNavigate('accepted')}
-          className="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs flex items-center gap-1.5 shadow-sm transition-all cursor-pointer"
-        >
-          <Award className="w-3.5 h-3.5" />
-          <span>Awarded Archive</span>
-        </button>
-        <button
-          onClick={() => onNavigate('bidders')}
-          className="px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs flex items-center gap-1.5 shadow-sm transition-all cursor-pointer"
-        >
-          <Users className="w-3.5 h-3.5" />
-          <span>Registered Contractors</span>
-        </button>
-      </div>
-    </section>
+        <Group gap="sm" wrap="wrap">
+          <Button
+            color="orange"
+            radius="md"
+            size="sm"
+            leftSection={<Radio className="w-3.5 h-3.5 animate-pulse" />}
+            onClick={() => onNavigate('current')}
+            styles={{
+              root: { fontWeight: 700 }
+            }}
+          >
+            InProgress Tenders
+          </Button>
+
+          <Button
+            color="teal"
+            radius="md"
+            size="sm"
+            leftSection={<Award className="w-3.5 h-3.5" />}
+            onClick={() => onNavigate('accepted')}
+            styles={{
+              root: { fontWeight: 700 }
+            }}
+          >
+            Awarded Archive
+          </Button>
+
+          <Button
+            color="blue"
+            radius="md"
+            size="sm"
+            leftSection={<Users className="w-3.5 h-3.5" />}
+            onClick={() => onNavigate('bidders')}
+            styles={{
+              root: { fontWeight: 700 }
+            }}
+          >
+            Registered Contractors
+          </Button>
+        </Group>
+      </Group>
+    </Paper>
   );
 };

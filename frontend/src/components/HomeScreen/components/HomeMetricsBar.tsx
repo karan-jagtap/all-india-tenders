@@ -1,5 +1,6 @@
 import React from 'react';
-import { Radio, TrendingDown, Award, Users, Globe, Cpu, ChevronRight } from 'lucide-react';
+import { SimpleGrid, Paper, Text, Group, Box } from '@mantine/core';
+import { Radio, TrendingDown, Award, Users, Globe, Database, ChevronRight } from 'lucide-react';
 
 export interface HomeMetricsBarProps {
   activeTenders: number;
@@ -19,118 +20,170 @@ export const HomeMetricsBar: React.FC<HomeMetricsBarProps> = ({
   onScrollToSources
 }) => {
   return (
-    <section className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
+    <SimpleGrid cols={{ base: 2, sm: 3, lg: 6 }} spacing="sm">
       {/* Metric 1: Live Notices */}
-      <div
+      <Paper
+        p="md"
+        radius="lg"
+        withBorder
         onClick={() => onNavigate('current')}
-        className="bg-white dark:bg-[#0E1422] border border-slate-200/90 dark:border-slate-800 hover:border-orange-500 dark:hover:border-orange-500 rounded-xl p-4 shadow-[0_1px_3px_rgba(15,23,42,0.04)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.3)] hover:shadow-md transition-all cursor-pointer group"
+        style={{
+          backgroundColor: 'var(--color-surface)',
+          borderColor: 'var(--color-border)',
+          cursor: 'pointer',
+          transition: 'all 0.15s ease',
+        }}
+        className="hover-card-orange"
       >
-        <div className="flex items-center justify-between text-slate-400 mb-1">
-          <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+        <Group justify="space-between" mb={4}>
+          <Text size="xs" fw={700} tt="uppercase" style={{ letterSpacing: '0.05em', color: 'var(--color-text-dimmed)' }}>
             Live Notices
-          </span>
-          <Radio className="w-4 h-4 text-orange-500 group-hover:scale-110 transition-transform" />
-        </div>
-        <div className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white font-mono tracking-tight">
+          </Text>
+          <Radio className="w-4 h-4 text-orange-500 animate-pulse" />
+        </Group>
+        <Text fz={{ base: 'xl', sm: '1.6rem' }} fw={900} ff="monospace" style={{ color: 'var(--color-text-main)' }}>
           {activeTenders.toLocaleString()}
-        </div>
-        <span className="text-[11px] text-orange-600 dark:text-orange-400 font-medium flex items-center gap-1 mt-0.5">
-          <span>In-Progress Unfilled</span>
-          <ChevronRight className="w-3 h-3" />
-        </span>
-      </div>
+        </Text>
+        <Group gap={4} mt={4}>
+          <Text size="xs" fw={600} c="orange">In-Progress Unfilled</Text>
+          <ChevronRight className="w-3 h-3 text-orange-500" />
+        </Group>
+      </Paper>
 
       {/* Metric 2: Pipeline Value */}
-      <div className="bg-white dark:bg-[#0E1422] border border-slate-200/90 dark:border-slate-800 rounded-xl p-4 shadow-[0_1px_3px_rgba(15,23,42,0.04)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.3)]">
-        <div className="flex items-center justify-between text-slate-400 mb-1">
-          <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+      <Paper
+        p="md"
+        radius="lg"
+        withBorder
+        style={{
+          backgroundColor: 'var(--color-surface)',
+          borderColor: 'var(--color-border)',
+        }}
+      >
+        <Group justify="space-between" mb={4}>
+          <Text size="xs" fw={700} tt="uppercase" style={{ letterSpacing: '0.05em', color: 'var(--color-text-dimmed)' }}>
             Pipeline Value
-          </span>
+          </Text>
           <TrendingDown className="w-4 h-4 text-emerald-500" />
-        </div>
-        <div className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white font-mono tracking-tight">
-          ₹ {totalValueCr} <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">Cr</span>
-        </div>
-        <span className="text-[11px] text-emerald-600 dark:text-emerald-400 font-medium">
-          Estimated Cost Total
-        </span>
-      </div>
+        </Group>
+        <Text fz={{ base: 'xl', sm: '1.6rem' }} fw={900} ff="monospace" style={{ color: 'var(--color-text-main)' }}>
+          ₹ {totalValueCr} <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--color-text-muted)' }}>Cr</span>
+        </Text>
+        <Box mt={4}>
+          <Text size="xs" fw={600} c="teal">Estimated Cost Total</Text>
+        </Box>
+      </Paper>
 
       {/* Metric 3: Awarded Bids */}
-      <div
+      <Paper
+        p="md"
+        radius="lg"
+        withBorder
         onClick={() => onNavigate('accepted')}
-        className="bg-white dark:bg-[#0E1422] border border-slate-200/90 dark:border-slate-800 hover:border-emerald-500 dark:hover:border-emerald-500 rounded-xl p-4 shadow-[0_1px_3px_rgba(15,23,42,0.04)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.3)] hover:shadow-md transition-all cursor-pointer group"
+        style={{
+          backgroundColor: 'var(--color-surface)',
+          borderColor: 'var(--color-border)',
+          cursor: 'pointer',
+          transition: 'all 0.15s ease',
+        }}
+        className="hover-card-teal"
       >
-        <div className="flex items-center justify-between text-slate-400 mb-1">
-          <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+        <Group justify="space-between" mb={4}>
+          <Text size="xs" fw={700} tt="uppercase" style={{ letterSpacing: '0.05em', color: 'var(--color-text-dimmed)' }}>
             Awarded Bids
-          </span>
-          <Award className="w-4 h-4 text-emerald-600 dark:text-emerald-400 group-hover:scale-110 transition-transform" />
-        </div>
-        <div className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white font-mono tracking-tight">
+          </Text>
+          <Award className="w-4 h-4 text-emerald-500" />
+        </Group>
+        <Text fz={{ base: 'xl', sm: '1.6rem' }} fw={900} ff="monospace" style={{ color: 'var(--color-text-main)' }}>
           {acceptedTenders.toLocaleString()}
-        </div>
-        <span className="text-[11px] text-emerald-700 dark:text-emerald-400 font-medium flex items-center gap-1 mt-0.5">
-          <span>10-Yr Historical Archive</span>
-          <ChevronRight className="w-3 h-3" />
-        </span>
-      </div>
+        </Text>
+        <Group gap={4} mt={4}>
+          <Text size="xs" fw={600} c="teal">17-Yr Historical Archive</Text>
+          <ChevronRight className="w-3 h-3 text-emerald-500" />
+        </Group>
+      </Paper>
 
       {/* Metric 4: Registered Contractors */}
-      <div
+      <Paper
+        p="md"
+        radius="lg"
+        withBorder
         onClick={() => onNavigate('bidders')}
-        className="bg-white dark:bg-[#0E1422] border border-slate-200/90 dark:border-slate-800 hover:border-blue-500 dark:hover:border-blue-500 rounded-xl p-4 shadow-[0_1px_3px_rgba(15,23,42,0.04)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.3)] hover:shadow-md transition-all cursor-pointer group"
+        style={{
+          backgroundColor: 'var(--color-surface)',
+          borderColor: 'var(--color-border)',
+          cursor: 'pointer',
+          transition: 'all 0.15s ease',
+        }}
+        className="hover-card-blue"
       >
-        <div className="flex items-center justify-between text-slate-400 mb-1">
-          <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+        <Group justify="space-between" mb={4}>
+          <Text size="xs" fw={700} tt="uppercase" style={{ letterSpacing: '0.05em', color: 'var(--color-text-dimmed)' }}>
             Contractors
-          </span>
-          <Users className="w-4 h-4 text-blue-600 dark:text-blue-400 group-hover:scale-110 transition-transform" />
-        </div>
-        <div className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white font-mono tracking-tight">
+          </Text>
+          <Users className="w-4 h-4 text-blue-500" />
+        </Group>
+        <Text fz={{ base: 'xl', sm: '1.6rem' }} fw={900} ff="monospace" style={{ color: 'var(--color-text-main)' }}>
           {biddersCount}
-        </div>
-        <span className="text-[11px] text-blue-600 dark:text-blue-400 font-medium flex items-center gap-1 mt-0.5">
-          <span>EPC & Infra Profiles</span>
-          <ChevronRight className="w-3 h-3" />
-        </span>
-      </div>
+        </Text>
+        <Group gap={4} mt={4}>
+          <Text size="xs" fw={600} c="blue">EPC & Infra Profiles</Text>
+          <ChevronRight className="w-3 h-3 text-blue-500" />
+        </Group>
+      </Paper>
 
       {/* Metric 5: Real Portals */}
-      <div
+      <Paper
+        p="md"
+        radius="lg"
+        withBorder
         onClick={onScrollToSources}
-        className="bg-white dark:bg-[#0E1422] border border-slate-200/90 dark:border-slate-800 hover:border-cyan-500 dark:hover:border-cyan-500 rounded-xl p-4 shadow-[0_1px_3px_rgba(15,23,42,0.04)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.3)] hover:shadow-md transition-all cursor-pointer group"
+        style={{
+          backgroundColor: 'var(--color-surface)',
+          borderColor: 'var(--color-border)',
+          cursor: 'pointer',
+          transition: 'all 0.15s ease',
+        }}
+        className="hover-card-cyan"
       >
-        <div className="flex items-center justify-between text-slate-400 mb-1">
-          <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+        <Group justify="space-between" mb={4}>
+          <Text size="xs" fw={700} tt="uppercase" style={{ letterSpacing: '0.05em', color: 'var(--color-text-dimmed)' }}>
             Real Portals
-          </span>
-          <Globe className="w-4 h-4 text-cyan-600 dark:text-cyan-400 group-hover:scale-110 transition-transform" />
-        </div>
-        <div className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white font-mono tracking-tight">
-          28+ <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">Sources</span>
-        </div>
-        <span className="text-[11px] text-cyan-700 dark:text-cyan-400 font-medium flex items-center gap-1 mt-0.5">
-          <span>51 Endpoints Monitored</span>
-          <ChevronRight className="w-3 h-3" />
-        </span>
-      </div>
+          </Text>
+          <Globe className="w-4 h-4 text-cyan-500" />
+        </Group>
+        <Text fz={{ base: 'xl', sm: '1.6rem' }} fw={900} ff="monospace" style={{ color: 'var(--color-text-main)' }}>
+          28+ <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--color-text-muted)' }}>Sources</span>
+        </Text>
+        <Group gap={4} mt={4}>
+          <Text size="xs" fw={600} c="cyan">51 Endpoints Monitored</Text>
+          <ChevronRight className="w-3 h-3 text-cyan-500" />
+        </Group>
+      </Paper>
 
       {/* Metric 6: Architecture */}
-      <div className="bg-white dark:bg-[#0E1422] border border-slate-200/90 dark:border-slate-800 rounded-xl p-4 shadow-[0_1px_3px_rgba(15,23,42,0.04)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.3)]">
-        <div className="flex items-center justify-between text-slate-400 mb-1">
-          <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+      <Paper
+        p="md"
+        radius="lg"
+        withBorder
+        style={{
+          backgroundColor: 'var(--color-surface)',
+          borderColor: 'var(--color-border)',
+        }}
+      >
+        <Group justify="space-between" mb={4}>
+          <Text size="xs" fw={700} tt="uppercase" style={{ letterSpacing: '0.05em', color: 'var(--color-text-dimmed)' }}>
             Architecture
-          </span>
-          <Cpu className="w-4 h-4 text-purple-600 dark:text-purple-400" />
-        </div>
-        <div className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white font-mono tracking-tight">
-          0 DB
-        </div>
-        <span className="text-[11px] text-purple-700 dark:text-purple-400 font-mono font-medium">
-          100% In-Memory RAM
-        </span>
-      </div>
-    </section>
+          </Text>
+          <Database className="w-4 h-4 text-purple-500" />
+        </Group>
+        <Text fz={{ base: 'xl', sm: '1.6rem' }} fw={900} ff="monospace" style={{ color: 'var(--color-text-main)' }}>
+          SQLite + Vector
+        </Text>
+        <Box mt={4}>
+          <Text size="xs" fw={600} c="grape" ff="monospace">Persistent + In-Memory</Text>
+        </Box>
+      </Paper>
+    </SimpleGrid>
   );
 };

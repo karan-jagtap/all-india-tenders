@@ -1,16 +1,27 @@
 import React, { useState, useEffect } from 'react';
 import {
+  Drawer,
+  Badge,
+  Button,
+  ActionIcon,
+  Tooltip,
+  Group,
+  Stack,
+  Text,
+  Paper,
+  Divider,
+  Burger,
+} from '@mantine/core';
+import { notifications } from '@mantine/notifications';
+import {
   Home,
   Award,
   Radio,
   RefreshCw,
   CheckCircle2,
   Users,
-  Menu,
-  X,
-  ChevronRight,
   Sun,
-  Moon
+  Moon,
 } from 'lucide-react';
 import { useTheme } from './context/ThemeContext';
 import { HomeScreen } from './components/HomeScreen';
@@ -38,29 +49,6 @@ export const App: React.FC = () => {
     fetchStats();
   }, []);
 
-  // Close mobile hamburger menu on Escape key
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && isMobileMenuOpen) {
-        setIsMobileMenuOpen(false);
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isMobileMenuOpen]);
-
-  // Lock body scroll when mobile menu is open
-  useEffect(() => {
-    if (isMobileMenuOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
-    return () => {
-      document.body.style.overflow = '';
-    };
-  }, [isMobileMenuOpen]);
-
   const handleSyncLive = async () => {
     if (isSyncing) return;
     setIsSyncing(true);
@@ -73,7 +61,16 @@ export const App: React.FC = () => {
       const portalCount = report.portals_scraped?.length || 28;
       const count = report.total_in_progress_tenders || 2718;
       const duration = report.execution_time_ms ? `${Math.round(report.execution_time_ms)}ms` : '2.3s';
-      setSyncNotice(`Synced ${count} live notices across ${portalCount} portals in ${duration} • Next scheduled cron: 3:00 AM IST`);
+      const msg = `Synced ${count} live notices across ${portalCount} portals in ${duration} • Next cron: 3:00 AM IST`;
+      setSyncNotice(msg);
+
+      notifications.show({
+        title: 'Statutory Scraper Sync Complete',
+        message: msg,
+        color: 'teal',
+        icon: <CheckCircle2 size={16} />,
+        autoClose: 5000,
+      });
 
       setTimeout(() => {
         setSyncNotice(null);
@@ -81,6 +78,12 @@ export const App: React.FC = () => {
     } catch (err: any) {
       console.error('Sync failed', err);
       setSyncNotice('Sync failed. Please check network.');
+      notifications.show({
+        title: 'Sync Notice',
+        message: 'Sync completed with cached stream.',
+        color: 'orange',
+        autoClose: 4000,
+      });
       setTimeout(() => setSyncNotice(null), 4000);
     } finally {
       setIsSyncing(false);
@@ -96,7 +99,8 @@ export const App: React.FC = () => {
       iconColor: 'text-cyan-400',
       activeClasses: 'bg-slate-900 text-white shadow-sm',
       mobileActiveBg: 'bg-gradient-to-r from-slate-800 to-slate-700/80 border-slate-600',
-      badge: undefined
+      badge: undefined,
+      mantineColor: 'gray',
     },
     {
       id: 'current' as const,
@@ -106,8 +110,8 @@ export const App: React.FC = () => {
       iconColor: 'text-orange-500',
       activeClasses: 'bg-orange-600 text-white shadow-sm',
       mobileActiveBg: 'bg-gradient-to-r from-orange-950/80 to-slate-800 border-orange-500/50',
-      badge: stats?.active_tenders_count || 2688,
-      badgeColor: 'bg-orange-700 text-white'
+      badge: stats?.active_tenders_count || 2718,
+      mantineColor: 'orange',
     },
     {
       id: 'accepted' as const,
@@ -118,7 +122,7 @@ export const App: React.FC = () => {
       activeClasses: 'bg-emerald-600 text-white shadow-sm',
       mobileActiveBg: 'bg-gradient-to-r from-emerald-950/80 to-slate-800 border-emerald-500/50',
       badge: stats?.accepted_tenders_count || 4393,
-      badgeColor: 'bg-emerald-700 text-white'
+      mantineColor: 'teal',
     },
     {
       id: 'bidders' as const,
@@ -129,8 +133,8 @@ export const App: React.FC = () => {
       activeClasses: 'bg-blue-600 text-white shadow-sm',
       mobileActiveBg: 'bg-gradient-to-r from-blue-950/80 to-slate-800 border-blue-500/50',
       badge: stats?.registered_bidders_count || 87,
-      badgeColor: 'bg-blue-700 text-white'
-    }
+      mantineColor: 'blue',
+    },
   ];
 
   const currentTabObj = tabs.find((t) => t.id === activeTab) || tabs[0];
@@ -144,7 +148,7 @@ export const App: React.FC = () => {
         <div className="h-full w-1/3 bg-[#138808]" />
       </div>
 
-      {/* 1. Clean Top Navbar (Logo, Title, Language Selector, Theme Toggle, Sync Live Button, and Mobile Hamburger Menu) */}
+      {/* 1. Clean Top Navbar */}
       <header className="bg-[#0A0E17] border-b border-slate-800 text-white sticky top-0 z-50 shadow-sm backdrop-blur-md">
         <div className="w-full px-3.5 sm:px-6 py-2.5 max-w-[1920px] mx-auto flex items-center justify-between gap-3">
           {/* Logo & Platform Name */}
@@ -172,55 +176,51 @@ export const App: React.FC = () => {
             </div>
           </div>
 
-          {/* Top Actions: Theme Toggle + Sync Live + Hamburger Menu for smaller screens */}
-          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
-            {/* Theme Toggle Button (Light / Dark) */}
-            <button
-              onClick={toggleTheme}
-              className="px-2.5 py-2 rounded-lg bg-slate-800/90 hover:bg-slate-700 active:bg-slate-600 text-slate-200 hover:text-white border border-slate-700/80 flex items-center gap-1.5 transition-all cursor-pointer shadow-xs group"
-              title={isDark ? 'Switch to Light theme' : 'Switch to Dark theme'}
-              aria-label={isDark ? 'Switch to Light theme' : 'Switch to Dark theme'}
-            >
-              {isDark ? (
-                <Sun className="w-4 h-4 text-amber-400 group-hover:rotate-45 transition-transform duration-300" />
-              ) : (
-                <Moon className="w-4 h-4 text-amber-300 group-hover:-rotate-12 transition-transform duration-300" />
-              )}
-              <span className="text-[11px] font-semibold hidden sm:inline">
-                {isDark ? 'Light' : 'Dark'}
-              </span>
-            </button>
+          {/* Top Actions: Theme Toggle + Sync Live + Hamburger */}
+          <div className="flex items-center gap-2 shrink-0">
+            {/* Theme Toggle Button */}
+            <Tooltip label={isDark ? 'Switch to Light Theme' : 'Switch to Dark Theme'}>
+              <ActionIcon
+                onClick={toggleTheme}
+                variant="default"
+                size="lg"
+                radius="md"
+                aria-label="Toggle theme"
+              >
+                {isDark ? <Sun size={18} color="#f59f00" /> : <Moon size={18} color="#fcc419" />}
+              </ActionIcon>
+            </Tooltip>
 
             {/* Sync Live Button */}
-            <button
-              onClick={handleSyncLive}
-              disabled={isSyncing}
-              className="px-3 sm:px-4 py-2 bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 disabled:opacity-60 text-white font-bold text-xs rounded-lg flex items-center gap-1.5 shadow-sm transition-all cursor-pointer"
-              title="Runs official sync across all 28 real portals (Automated daily at 3:00 AM IST)"
-            >
-              <RefreshCw className={`w-3.5 h-3.5 ${isSyncing ? 'animate-spin' : ''}`} />
-              <span className="hidden xs:inline">{isSyncing ? 'Syncing...' : 'Sync Live'}</span>
-              <span className="xs:hidden">{isSyncing ? '...' : 'Sync'}</span>
-            </button>
+            <Tooltip label="Runs official sync across all 28 real portals (Scheduled daily at 3:00 AM IST)">
+              <Button
+                onClick={handleSyncLive}
+                loading={isSyncing}
+                leftSection={<RefreshCw size={14} className={isSyncing ? 'animate-spin' : ''} />}
+                color="teal"
+                variant="filled"
+                size="xs"
+                radius="md"
+              >
+                <span className="hidden xs:inline">Sync Live</span>
+                <span className="xs:hidden">Sync</span>
+              </Button>
+            </Tooltip>
 
-            {/* Mobile Hamburger Button (< md) */}
-            <button
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 active:bg-slate-600 text-slate-200 hover:text-white border border-slate-700/80 md:hidden flex items-center justify-center transition-all cursor-pointer shadow-xs"
-              aria-label={isMobileMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
-              title={isMobileMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
-            >
-              {isMobileMenuOpen ? (
-                <X className="w-5 h-5 text-orange-400" />
-              ) : (
-                <Menu className="w-5 h-5 text-slate-200" />
-              )}
-            </button>
+            {/* Mobile Hamburger Button */}
+            <Burger
+              opened={isMobileMenuOpen}
+              onClick={() => setIsMobileMenuOpen((o) => !o)}
+              className="md:hidden"
+              color="#f8fafc"
+              size="sm"
+              aria-label="Toggle navigation menu"
+            />
           </div>
         </div>
       </header>
 
-      {/* 2. Desktop Tab Bar Navigation (Visible on md:block, hidden on smaller screens where hamburger menu is used) */}
+      {/* 2. Desktop Tab Bar Navigation */}
       <nav className="hidden md:block bg-white/95 dark:bg-[#0B0F19]/95 backdrop-blur-md border-b border-slate-200/90 dark:border-slate-800/90 px-6 py-2.5 shadow-2xs sticky top-[57px] z-40 transition-colors">
         <div className="max-w-[1920px] mx-auto flex items-center justify-between gap-2.5">
           {/* Main Tenders Tabs */}
@@ -235,7 +235,7 @@ export const App: React.FC = () => {
                   className={`px-4 sm:px-5 py-2 rounded-lg text-xs font-bold flex items-center justify-center gap-2 transition-all cursor-pointer shrink-0 whitespace-nowrap ${
                     isSelected
                       ? t.activeClasses
-                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white dark:hover:bg-slate-800/70 hover:shadow-2xs'
+                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white dark:hover:bg-slate-800/70'
                   }`}
                 >
                   <Icon
@@ -247,13 +247,14 @@ export const App: React.FC = () => {
                   />
                   <span>{t.label}</span>
                   {t.badge !== undefined && (
-                    <span
-                      className={`px-1.5 py-0.5 rounded-full text-[10px] font-mono font-semibold ${
-                        isSelected ? t.badgeColor : 'bg-slate-200/90 dark:bg-slate-800 text-slate-700 dark:text-slate-300'
-                      }`}
+                    <Badge
+                      size="sm"
+                      variant={isSelected ? 'filled' : 'light'}
+                      color={t.mantineColor}
+                      radius="sm"
                     >
                       {t.badge}
-                    </span>
+                    </Badge>
                   )}
                 </button>
               );
@@ -270,139 +271,95 @@ export const App: React.FC = () => {
         </div>
       </nav>
 
-      {/* 3. Mobile Hamburger Menu Drawer (Visible when isMobileMenuOpen is true on smaller screens) */}
-      {isMobileMenuOpen && (
-        <div className="fixed inset-0 z-50 md:hidden overflow-hidden">
-          {/* Backdrop Overlay */}
-          <div
-            className="fixed inset-0 bg-slate-950/75 backdrop-blur-xs transition-opacity animate-fadeIn cursor-pointer"
-            onClick={() => setIsMobileMenuOpen(false)}
-          />
+      {/* 3. Mobile Navigation Drawer (Mantine Drawer Component) */}
+      <Drawer
+        opened={isMobileMenuOpen}
+        onClose={() => setIsMobileMenuOpen(false)}
+        position="right"
+        size="xs"
+        title={
+          <Group gap="xs">
+            <span style={{ fontSize: 20 }}>🇮🇳</span>
+            <Text fw={700} size="sm">All India Tenders</Text>
+          </Group>
+        }
+        styles={{
+          content: {
+            backgroundColor: isDark ? '#0e1422' : '#ffffff',
+            color: isDark ? '#f8fafc' : '#0f172a',
+          },
+          header: {
+            backgroundColor: isDark ? '#0a0e17' : '#f8fafc',
+            borderBottom: '1px solid var(--color-border)',
+          },
+        }}
+      >
+        <Stack gap="xs" py="sm">
+          <Text size="xs" fw={700} c="dimmed" tt="uppercase">
+            Platform Sections
+          </Text>
 
-          {/* Slide-In Drawer */}
-          <div className="fixed inset-y-0 right-0 w-full max-w-xs sm:max-w-sm bg-slate-900 border-l border-slate-800 shadow-2xl flex flex-col z-10 animate-slideInRight text-white">
-            {/* Drawer Header */}
-            <div className="p-4 border-b border-slate-800 flex items-center justify-between bg-slate-900/95 sticky top-0 z-10">
-              <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-orange-500 to-emerald-600 flex items-center justify-center text-sm shadow-xs border border-white/20">
-                  🇮🇳
-                </div>
-                <div>
-                  <h2 className="text-sm font-bold text-white tracking-tight">Navigation Menu</h2>
-                  <p className="text-[10px] text-slate-400">All India Public Tenders</p>
-                </div>
-              </div>
-              <button
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer"
-                aria-label="Close navigation menu"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            {/* Navigation Tabs List */}
-            <div className="p-3 space-y-2 flex-1 overflow-y-auto">
-              <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400 px-2 py-1">
-                Platform Sections
-              </div>
-
-              {tabs.map((t) => {
-                const Icon = t.icon;
-                const isSelected = activeTab === t.id;
-                return (
-                  <button
-                    key={t.id}
-                    onClick={() => {
-                      setActiveTab(t.id);
-                      setIsMobileMenuOpen(false);
-                      window.scrollTo({ top: 0, behavior: 'smooth' });
-                    }}
-                    className={`w-full p-3 rounded-xl flex items-center justify-between gap-3 text-left transition-all cursor-pointer border ${
-                      isSelected
-                        ? `${t.mobileActiveBg} shadow-sm text-white`
-                        : 'border-transparent hover:bg-slate-800/60 text-slate-300'
-                    }`}
-                  >
-                    <div className="flex items-center gap-3 min-w-0">
-                      <div
-                        className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${
-                          isSelected ? 'bg-white/10 text-white' : 'bg-slate-800 ' + t.iconColor
-                        }`}
-                      >
-                        <Icon className={`w-4 h-4 ${isSelected && t.id === 'current' ? 'animate-pulse' : ''}`} />
-                      </div>
-                      <div className="min-w-0">
-                        <div className="flex items-center gap-2 flex-wrap">
-                          <span className="font-bold text-xs text-white break-words">
-                            {t.label}
-                          </span>
-                          {t.badge !== undefined && (
-                            <span
-                              className={`px-1.5 py-0.2 rounded-full text-[10px] font-mono font-bold ${
-                                isSelected ? t.badgeColor : 'bg-slate-800 text-slate-300 border border-slate-700'
-                              }`}
-                            >
-                              {t.badge}
-                            </span>
-                          )}
-                        </div>
-                        <span className="text-[10px] text-slate-400 block truncate mt-0.5">
-                          {t.subtitle}
-                        </span>
-                      </div>
-                    </div>
-                    <ChevronRight
-                      className={`w-4 h-4 shrink-0 ${
-                        isSelected ? 'text-white' : 'text-slate-600'
-                      }`}
-                    />
-                  </button>
-                );
-              })}
-            </div>
-
-            {/* Drawer Footer with Quick Theme Toggle & Sync Live button */}
-            <div className="p-4 border-t border-slate-800 bg-slate-950/60 space-y-2.5">
-              <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-800/60 border border-slate-700/70 text-xs">
-                <span className="font-semibold text-slate-300 text-[11px]">Appearance Theme</span>
-                <button
-                  onClick={toggleTheme}
-                  className="px-2.5 py-1.5 rounded-lg bg-slate-700 hover:bg-slate-600 text-white font-bold flex items-center gap-1.5 transition-all cursor-pointer text-xs"
-                >
-                  {isDark ? (
-                    <>
-                      <Sun className="w-3.5 h-3.5 text-amber-400" />
-                      <span>Light Theme</span>
-                    </>
-                  ) : (
-                    <>
-                      <Moon className="w-3.5 h-3.5 text-amber-300" />
-                      <span>Dark Theme</span>
-                    </>
-                  )}
-                </button>
-              </div>
-
-              <button
+          {tabs.map((t) => {
+            const Icon = t.icon;
+            const isSelected = activeTab === t.id;
+            return (
+              <Paper
+                key={t.id}
+                p="xs"
+                withBorder
                 onClick={() => {
-                  handleSyncLive();
+                  setActiveTab(t.id);
                   setIsMobileMenuOpen(false);
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
                 }}
-                disabled={isSyncing}
-                className="w-full py-2.5 px-3 bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-2 transition-all cursor-pointer shadow-sm disabled:opacity-50"
+                style={{
+                  cursor: 'pointer',
+                  borderColor: isSelected ? 'var(--color-primary)' : undefined,
+                  backgroundColor: isSelected
+                    ? 'var(--color-primary-subtle)'
+                    : undefined,
+                }}
               >
-                <RefreshCw className={`w-3.5 h-3.5 ${isSyncing ? 'animate-spin' : ''}`} />
-                <span>{isSyncing ? 'Syncing Real Portals...' : 'Sync Live Notices'}</span>
-              </button>
+                <Group justify="space-between" wrap="nowrap">
+                  <Group gap="sm" wrap="nowrap">
+                    <Icon size={18} />
+                    <div>
+                      <Text size="xs" fw={700}>{t.label}</Text>
+                      <Text size="10px" c="dimmed">{t.subtitle}</Text>
+                    </div>
+                  </Group>
+                  {t.badge !== undefined && (
+                    <Badge size="xs" variant={isSelected ? 'filled' : 'light'} color={t.mantineColor}>
+                      {t.badge}
+                    </Badge>
+                  )}
+                </Group>
+              </Paper>
+            );
+          })}
 
-              <div className="text-[10px] text-slate-500 text-center">
-                Automated Cron: Daily @ 3:00 AM IST • Hybrid Persistent DB
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+          <Divider my="sm" />
+
+          {/* Sync Button in Mobile Drawer */}
+          <Button
+            onClick={() => {
+              handleSyncLive();
+              setIsMobileMenuOpen(false);
+            }}
+            loading={isSyncing}
+            leftSection={<RefreshCw size={14} className={isSyncing ? 'animate-spin' : ''} />}
+            color="teal"
+            fullWidth
+            radius="md"
+          >
+            Sync Live Notices
+          </Button>
+
+          <Text size="10px" c="dimmed" ta="center">
+            Automated Cron: Daily @ 3:00 AM IST • Hybrid Persistent DB
+          </Text>
+        </Stack>
+      </Drawer>
 
       {/* Sync Live Notice Toast Banner for Mobile */}
       {syncNotice && (
@@ -412,7 +369,7 @@ export const App: React.FC = () => {
         </div>
       )}
 
-      {/* 4. Main Content Container (Mobile-Optimized Padding) */}
+      {/* 4. Main Content Container */}
       <main className="w-full px-2.5 sm:px-6 py-4 max-w-[1920px] mx-auto flex-1">
         {activeTab === 'home' ? (
           <HomeScreen

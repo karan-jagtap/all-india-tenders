@@ -1,4 +1,18 @@
 import React, { useState } from 'react';
+import {
+  Card,
+  Badge,
+  Text,
+  Title,
+  Group,
+  Stack,
+  SimpleGrid,
+  ThemeIcon,
+  Collapse,
+  Button,
+  Paper,
+  Divider,
+} from '@mantine/core';
 import { 
   CheckCircle2, 
   TrendingUp, 
@@ -65,132 +79,156 @@ export const PQCSubTab: React.FC<PQCSubTabProps> = ({ selectedTender }) => {
   const expAmounts = extractExpAmounts(selectedTender.experience_criteria);
 
   return (
-    <div className="bg-white dark:bg-[#0E1422] rounded-xl border border-slate-200/90 dark:border-slate-800 p-5 shadow-xs space-y-5 transition-colors">
+    <Card p="lg" radius="lg" withBorder shadow="xs">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 dark:border-slate-800/80 pb-3.5">
+      <Group justify="space-between" mb="md" wrap="wrap">
         <div>
-          <h4 className="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider flex items-center gap-1.5">
-            <ShieldCheck className="w-4 h-4 text-orange-600 dark:text-orange-400" />
-            Pre-Qualification & Eligibility Criteria (PQC)
-          </h4>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+          <Group gap="xs">
+            <ShieldCheck size={18} color="#ea580c" />
+            <Title order={5} tt="uppercase" lts={1} fz="xs" fw={700}>
+              Pre-Qualification & Eligibility Criteria (PQC)
+            </Title>
+          </Group>
+          <Text size="xs" c="dimmed" mt={4}>
             Mandatory Cover-2 qualification thresholds required before price bid opening.
-          </p>
+          </Text>
         </div>
-        <div className="flex items-center gap-2">
-          <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800 flex items-center gap-1">
-            <CheckCircle2 className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
+        <Group gap="xs">
+          <Badge color="teal" variant="light" size="sm" leftSection={<CheckCircle2 size={12} />}>
             Cover-2 Mandatory
-          </span>
-          <span className="px-2.5 py-1 rounded-full text-[10px] font-mono text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
+          </Badge>
+          <Badge color="gray" variant="outline" size="sm">
             GFR 2017
-          </span>
-        </div>
-      </div>
+          </Badge>
+        </Group>
+      </Group>
 
-      {/* 3 Simpler Metric Cards Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <Divider mb="md" />
+
+      {/* 3 Simpler Metric Cards Grid (Mantine SimpleGrid & Card) */}
+      <SimpleGrid cols={{ base: 1, sm: 3 }} spacing="md">
         {/* Card 1: Annual Turnover */}
-        <div className="rounded-xl border border-blue-200 dark:border-blue-900/60 bg-blue-50/40 dark:bg-blue-950/20 p-4 flex flex-col justify-between hover:border-blue-300 dark:hover:border-blue-800 transition-all shadow-xs">
-          <div>
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-[11px] font-bold uppercase tracking-wider text-blue-900 dark:text-blue-300">
-                Annual Turnover
-              </span>
-              <div className="p-1.5 rounded-lg bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400">
-                <TrendingUp className="w-4 h-4" />
-              </div>
+        <Card p="md" radius="md" withBorder style={{ backgroundColor: 'var(--color-blue-subtle)' }}>
+          <Stack justify="space-between" h="100%">
+            <div>
+              <Group justify="space-between" mb="xs">
+                <Text size="11px" fw={700} tt="uppercase" c="blue">
+                  Annual Turnover
+                </Text>
+                <ThemeIcon color="blue" variant="light" size="sm" radius="md">
+                  <TrendingUp size={14} />
+                </ThemeIcon>
+              </Group>
+              <Text fz={{ base: 'xl', sm: '26px' }} fw={900} ff="monospace">
+                {turnoverAmount}
+              </Text>
+              <Text size="xs" c="dimmed" mt={4}>
+                Min. average annual turnover (40%)
+              </Text>
             </div>
-            <div className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
-              {turnoverAmount}
+            <div>
+              <Divider my="xs" opacity={0.5} />
+              <Group justify="space-between">
+                <Text size="10px" c="dimmed">Period: Past 3 Audited FY</Text>
+                <Text size="10px" fw={700} c="blue">CA UDIN</Text>
+              </Group>
             </div>
-            <p className="text-xs text-slate-600 dark:text-slate-400 mt-1 font-medium">
-              Min. average annual turnover (40%)
-            </p>
-          </div>
-          <div className="mt-4 pt-3 border-t border-blue-200/60 dark:border-blue-900/40 flex items-center justify-between text-[11px] text-blue-800 dark:text-blue-300">
-            <span>Period: Past 3 Audited FY</span>
-            <span className="font-semibold text-blue-600 dark:text-blue-400">CA UDIN</span>
-          </div>
-        </div>
+          </Stack>
+        </Card>
 
         {/* Card 2: Bank Solvency */}
-        <div className="rounded-xl border border-purple-200 dark:border-purple-900/60 bg-purple-50/40 dark:bg-purple-950/20 p-4 flex flex-col justify-between hover:border-purple-300 dark:hover:border-purple-800 transition-all shadow-xs">
-          <div>
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-[11px] font-bold uppercase tracking-wider text-purple-900 dark:text-purple-300">
-                Bank Solvency
-              </span>
-              <div className="p-1.5 rounded-lg bg-purple-100 dark:bg-purple-900/50 text-purple-600 dark:text-purple-400">
-                <Landmark className="w-4 h-4" />
-              </div>
+        <Card p="md" radius="md" withBorder style={{ backgroundColor: 'var(--color-purple-subtle)' }}>
+          <Stack justify="space-between" h="100%">
+            <div>
+              <Group justify="space-between" mb="xs">
+                <Text size="11px" fw={700} tt="uppercase" c="grape">
+                  Bank Solvency
+                </Text>
+                <ThemeIcon color="grape" variant="light" size="sm" radius="md">
+                  <Landmark size={14} />
+                </ThemeIcon>
+              </Group>
+              <Text fz={{ base: 'xl', sm: '26px' }} fw={900} ff="monospace">
+                {solvencyAmount}
+              </Text>
+              <Text size="xs" c="dimmed" mt={4}>
+                Banker's Solvency Certificate (20%)
+              </Text>
             </div>
-            <div className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
-              {solvencyAmount}
+            <div>
+              <Divider my="xs" opacity={0.5} />
+              <Group justify="space-between">
+                <Text size="10px" c="dimmed">Issuer: Scheduled Bank</Text>
+                <Text size="10px" fw={700} c="grape">Form C</Text>
+              </Group>
             </div>
-            <p className="text-xs text-slate-600 dark:text-slate-400 mt-1 font-medium">
-              Banker's Solvency Certificate (20%)
-            </p>
-          </div>
-          <div className="mt-4 pt-3 border-t border-purple-200/60 dark:border-purple-900/40 flex items-center justify-between text-[11px] text-purple-800 dark:text-purple-300">
-            <span>Issuer: Scheduled Bank</span>
-            <span className="font-semibold text-purple-600 dark:text-purple-400">Form C</span>
-          </div>
-        </div>
+          </Stack>
+        </Card>
 
         {/* Card 3: Similar Work Experience */}
-        <div className="rounded-xl border border-emerald-200 dark:border-emerald-900/60 bg-emerald-50/40 dark:bg-emerald-950/20 p-4 flex flex-col justify-between hover:border-emerald-300 dark:hover:border-emerald-800 transition-all shadow-xs">
-          <div>
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-900 dark:text-emerald-300">
-                Similar Work (3-2-1)
-              </span>
-              <div className="p-1.5 rounded-lg bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 dark:text-emerald-400">
-                <Award className="w-4 h-4" />
-              </div>
+        <Card p="md" radius="md" withBorder style={{ backgroundColor: 'var(--color-emerald-subtle)' }}>
+          <Stack justify="space-between" h="100%">
+            <div>
+              <Group justify="space-between" mb="xs">
+                <Text size="11px" fw={700} tt="uppercase" c="teal">
+                  Similar Work (3-2-1)
+                </Text>
+                <ThemeIcon color="teal" variant="light" size="sm" radius="md">
+                  <Award size={14} />
+                </ThemeIcon>
+              </Group>
+              <Text fz={{ base: 'xl', sm: '26px' }} fw={900} ff="monospace">
+                {expAmounts.headline}
+              </Text>
+              <Text size="xs" c="dimmed" mt={4}>
+                1 work @ 80% or equivalent past 7 yrs
+              </Text>
             </div>
-            <div className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
-              {expAmounts.headline}
+            <div>
+              <Divider my="xs" opacity={0.5} />
+              <Group justify="space-between">
+                <Text size="10px" c="dimmed">2 works: {expAmounts.work2}</Text>
+                <Text size="10px" fw={700} c="teal">3 works: {expAmounts.work3}</Text>
+              </Group>
             </div>
-            <p className="text-xs text-slate-600 dark:text-slate-400 mt-1 font-medium">
-              1 work @ 80% or equivalent past 7 yrs
-            </p>
-          </div>
-          <div className="mt-4 pt-3 border-t border-emerald-200/60 dark:border-emerald-900/40 flex items-center justify-between text-[11px] text-emerald-800 dark:text-emerald-300">
-            <span>2 works: {expAmounts.work2}</span>
-            <span className="font-semibold text-emerald-600 dark:text-emerald-400">3 works: {expAmounts.work3}</span>
-          </div>
-        </div>
-      </div>
+          </Stack>
+        </Card>
+      </SimpleGrid>
 
       {/* Expandable Detailed Statutory NIT Clauses */}
-      <div className="pt-1">
-        <button
+      <Stack mt="md" gap="xs">
+        <Button
+          variant="subtle"
+          color="gray"
+          size="xs"
           onClick={() => setShowFullClauses(!showFullClauses)}
-          className="text-xs text-slate-500 dark:text-slate-400 hover:text-orange-600 dark:hover:text-orange-400 font-medium flex items-center gap-1.5 transition-colors cursor-pointer"
+          leftSection={<FileText size={14} />}
+          rightSection={showFullClauses ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+          justify="flex-start"
+          p={0}
         >
-          <FileText className="w-3.5 h-3.5" />
-          <span>{showFullClauses ? 'Hide Detailed Legal NIT Clauses' : 'View Detailed Legal NIT Clauses & Criteria Text'}</span>
-          {showFullClauses ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
-        </button>
+          {showFullClauses ? 'Hide Detailed Legal NIT Clauses' : 'View Detailed Legal NIT Clauses & Criteria Text'}
+        </Button>
 
-        {showFullClauses && (
-          <div className="mt-3 p-3.5 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200/90 dark:border-slate-800 space-y-2.5 text-xs animate-fadeIn">
-            <div>
-              <span className="font-bold text-slate-800 dark:text-slate-200 block mb-0.5">Turnover Clause:</span>
-              <p className="text-slate-600 dark:text-slate-400">{selectedTender.turnover_criteria || 'As per NIT'}</p>
-            </div>
-            <div>
-              <span className="font-bold text-slate-800 dark:text-slate-200 block mb-0.5">Bank Solvency Clause:</span>
-              <p className="text-slate-600 dark:text-slate-400">{selectedTender.solvency_criteria || 'As per NIT'}</p>
-            </div>
-            <div>
-              <span className="font-bold text-slate-800 dark:text-slate-200 block mb-0.5">Work Experience Clause:</span>
-              <p className="text-slate-600 dark:text-slate-400">{selectedTender.experience_criteria || 'As per NIT'}</p>
-            </div>
-          </div>
-        )}
-      </div>
-    </div>
+        <Collapse in={showFullClauses}>
+          <Paper p="sm" radius="md" withBorder mt="xs">
+            <Stack gap="xs">
+              <div>
+                <Text size="xs" fw={700} mb={2}>Turnover Clause:</Text>
+                <Text size="xs" c="dimmed">{selectedTender.turnover_criteria || 'As per NIT'}</Text>
+              </div>
+              <div>
+                <Text size="xs" fw={700} mb={2}>Bank Solvency Clause:</Text>
+                <Text size="xs" c="dimmed">{selectedTender.solvency_criteria || 'As per NIT'}</Text>
+              </div>
+              <div>
+                <Text size="xs" fw={700} mb={2}>Work Experience Clause:</Text>
+                <Text size="xs" c="dimmed">{selectedTender.experience_criteria || 'As per NIT'}</Text>
+              </div>
+            </Stack>
+          </Paper>
+        </Collapse>
+      </Stack>
+    </Card>
   );
 };

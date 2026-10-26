@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { Title, Text, Badge, SimpleGrid, Button, Paper, Select, Group, Stack, Box } from '@mantine/core';
 import { Globe, Filter, RefreshCw } from 'lucide-react';
 import { REAL_PORTAL_SOURCES } from '../../../constants/portalSources';
 import { PortalSourceCard } from './PortalSourceCard';
@@ -38,104 +39,116 @@ export const HomeSourcesDirectory: React.FC<HomeSourcesDirectoryProps> = ({
   }, [portalSearch, selectedCategory, selectedRegion]);
 
   return (
-    <section id="real-sources-directory" className="space-y-5 pt-4">
+    <Stack gap="md" id="real-sources-directory" pt="sm">
       {/* Section Header */}
-      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 border-b border-slate-200 dark:border-slate-800 pb-3">
-        <div>
-          <div className="flex items-center gap-2">
-            <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-cyan-100 dark:bg-cyan-950/60 text-cyan-900 dark:text-cyan-300 border border-cyan-200 dark:border-cyan-800 flex items-center gap-1">
-              <Globe className="w-3 h-3 text-cyan-700 dark:text-cyan-400" />
+      <Group justify="space-between" align="flex-end" pb="xs" style={{ borderBottom: '1px solid var(--color-border)' }}>
+        <Stack gap={4}>
+          <Group gap="xs">
+            <Badge color="cyan" variant="light" size="sm" radius="sm" leftSection={<Globe className="w-3 h-3" />}>
               Statutory Source Directory
-            </span>
-            <h2 className="text-lg sm:text-2xl font-black text-slate-900 dark:text-white">
+            </Badge>
+            <Title order={2} size="h3" style={{ color: 'var(--color-text-main)', fontWeight: 800 }}>
               What All Real Sources Are We Sourcing From?
-            </h2>
-          </div>
-          <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
+            </Title>
+          </Group>
+          <Text size="xs" style={{ color: 'var(--color-text-muted)' }}>
             Direct statutory ingestion from {REAL_PORTAL_SOURCES.length} official national procurement platforms, state government portals, and open data feeds.
-          </p>
-        </div>
+          </Text>
+        </Stack>
 
-        <div className="flex items-center gap-2 shrink-0">
-          <div className="text-xs text-slate-500 dark:text-slate-400 font-mono bg-slate-100 dark:bg-slate-800 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700">
-            Showing <strong className="text-slate-900 dark:text-white">{filteredPortals.length}</strong> of {REAL_PORTAL_SOURCES.length} Real Portals
-          </div>
-          <button
+        <Group gap="xs">
+          <Badge variant="outline" color="gray" size="lg" radius="md">
+            Showing <strong style={{ color: 'var(--color-text-main)', margin: '0 4px' }}>{filteredPortals.length}</strong> of {REAL_PORTAL_SOURCES.length} Real Portals
+          </Badge>
+          <Button
+            color="teal"
+            radius="md"
+            size="xs"
+            leftSection={<RefreshCw className={`w-3.5 h-3.5 ${isSyncing ? 'animate-spin' : ''}`} />}
+            loading={isSyncing}
             onClick={onTriggerSync}
-            disabled={isSyncing}
-            className="px-3 py-1.5 rounded-lg text-xs font-bold bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white flex items-center gap-1.5 shadow-2xs transition-all cursor-pointer disabled:opacity-60"
-            title="Trigger live statutory scraper across all 28 real government tender portals"
+            styles={{ root: { fontWeight: 700 } }}
           >
-            <RefreshCw className={`w-3.5 h-3.5 ${isSyncing ? 'animate-spin' : ''}`} />
-            <span className="hidden sm:inline">{isSyncing ? 'Scraping Live...' : 'Sync Live Scraper'}</span>
-            <span className="sm:hidden">{isSyncing ? '...' : 'Sync'}</span>
-          </button>
-        </div>
-      </div>
+            {isSyncing ? 'Scraping Live...' : 'Sync Live Scraper'}
+          </Button>
+        </Group>
+      </Group>
 
       {/* Search & Category Filter Toolbar */}
-      <div className="bg-white dark:bg-[#0E1422] border border-slate-200/90 dark:border-slate-800 rounded-xl p-3 sm:p-4 shadow-2xs space-y-3 transition-colors">
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
-          {/* Reusable Search Bar Component */}
-          <FilterSearchBar
-            searchQuery={portalSearch}
-            setSearchQuery={setPortalSearch}
-            placeholder="Search portal name, domain (e.g. eprocure.gov.in), state, or authority (NHAI, DMRC)..."
-            variant="light"
-            accentColor="blue"
-            className="flex-1 max-w-lg"
-          />
+      <Paper
+        p="md"
+        radius="lg"
+        withBorder
+        style={{
+          backgroundColor: 'var(--color-surface)',
+          borderColor: 'var(--color-border)',
+        }}
+      >
+        <Stack gap="sm">
+          <Group justify="space-between" align="center">
+            {/* Search Bar */}
+            <Box style={{ flex: 1, maxWidth: 520 }}>
+              <FilterSearchBar
+                searchQuery={portalSearch}
+                setSearchQuery={setPortalSearch}
+                placeholder="Search portal name, domain, state, or authority (NHAI, DMRC)..."
+                variant="light"
+                accentColor="blue"
+              />
+            </Box>
 
-          {/* Region Select */}
-          <div className="flex items-center gap-2 shrink-0">
-            <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">Region:</span>
-            <select
+            {/* Region Select */}
+            <Select
+              size="xs"
+              radius="md"
+              label="Region"
               value={selectedRegion}
-              onChange={(e) => setSelectedRegion(e.target.value)}
-              className="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-700 dark:text-slate-200 focus:outline-none cursor-pointer font-medium"
-            >
-              <option value="ALL">All Regions (India)</option>
-              <option value="National">National / Central</option>
-              <option value="North">North India</option>
-              <option value="South">South India</option>
-              <option value="West">West India</option>
-              <option value="East & Central">East & Central</option>
-              <option value="North East">North East</option>
-            </select>
-          </div>
-        </div>
+              onChange={(val) => setSelectedRegion(val || 'ALL')}
+              data={[
+                { value: 'ALL', label: 'All Regions (India)' },
+                { value: 'National', label: 'National / Central' },
+                { value: 'North', label: 'North India' },
+                { value: 'South', label: 'South India' },
+                { value: 'West', label: 'West India' },
+                { value: 'East & Central', label: 'East & Central' },
+                { value: 'North East', label: 'North East' }
+              ]}
+              style={{ width: 190 }}
+            />
+          </Group>
 
-        {/* Category Filter Pills */}
-        <div className="flex items-center gap-1.5 flex-wrap pt-1 border-t border-slate-100 dark:border-slate-800">
-          <span className="text-[11px] font-semibold text-slate-400 dark:text-slate-400 mr-1 flex items-center gap-1">
-            <Filter className="w-3 h-3" />
-            Jurisdiction:
-          </span>
-          {[
-            { id: 'ALL', label: `All Portals (${REAL_PORTAL_SOURCES.length})` },
-            { id: 'Central', label: 'Central Government' },
-            { id: 'State', label: 'State Governments' },
-            { id: 'Defense & PSU', label: 'Defense & Energy PSUs' },
-            { id: 'Railways', label: 'Railways (IREPS)' },
-            { id: 'Open Data', label: 'Open Data (data.gov.in)' }
-          ].map((cat) => (
-            <button
-              key={cat.id}
-              onClick={() => setSelectedCategory(cat.id)}
-              className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-colors cursor-pointer ${
-                selectedCategory === cat.id
-                  ? 'bg-cyan-600 text-white shadow-2xs'
-                  : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
-              }`}
-            >
-              {cat.label}
-            </button>
-          ))}
-        </div>
-      </div>
+          {/* Category Filter Pills */}
+          <Group gap={6} pt="xs" style={{ borderTop: '1px solid var(--color-border-subtle)' }} wrap="wrap">
+            <Group gap={4}>
+              <Filter className="w-3 h-3 text-slate-400" />
+              <Text size="11px" fw={600} c="dimmed">Jurisdiction:</Text>
+            </Group>
+            {[
+              { id: 'ALL', label: `All Portals (${REAL_PORTAL_SOURCES.length})` },
+              { id: 'Central', label: 'Central Government' },
+              { id: 'State', label: 'State Governments' },
+              { id: 'Defense & PSU', label: 'Defense & Energy PSUs' },
+              { id: 'Railways', label: 'Railways (IREPS)' },
+              { id: 'Open Data', label: 'Open Data (data.gov.in)' }
+            ].map((cat) => (
+              <Button
+                key={cat.id}
+                variant={selectedCategory === cat.id ? 'filled' : 'subtle'}
+                color={selectedCategory === cat.id ? 'cyan' : 'gray'}
+                size="compact-xs"
+                radius="md"
+                onClick={() => setSelectedCategory(cat.id)}
+                styles={{ root: { fontWeight: 600 } }}
+              >
+                {cat.label}
+              </Button>
+            ))}
+          </Group>
+        </Stack>
+      </Paper>
 
       {/* Portals Cards Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <SimpleGrid cols={{ base: 1, md: 2, lg: 3 }} spacing="sm">
         {filteredPortals.map((portal) => (
           <PortalSourceCard
             key={portal.id}
@@ -143,20 +156,33 @@ export const HomeSourcesDirectory: React.FC<HomeSourcesDirectoryProps> = ({
             onNavigate={onNavigate}
           />
         ))}
-      </div>
+      </SimpleGrid>
 
       {filteredPortals.length === 0 && (
-        <div className="text-center py-12 bg-white dark:bg-[#0E1422] rounded-xl border border-slate-200/90 dark:border-slate-800 text-slate-500 dark:text-slate-400 space-y-2">
-          <Globe className="w-8 h-8 mx-auto text-slate-300 dark:text-slate-600" />
-          <p className="font-semibold text-slate-800 dark:text-slate-200">No portal matched your search "{portalSearch}".</p>
-          <button
-            onClick={() => { setPortalSearch(''); setSelectedCategory('ALL'); setSelectedRegion('ALL'); }}
-            className="text-xs text-cyan-600 dark:text-cyan-400 underline font-semibold cursor-pointer"
-          >
-            Reset portal search & filters
-          </button>
-        </div>
+        <Paper
+          p="xl"
+          radius="lg"
+          withBorder
+          style={{
+            backgroundColor: 'var(--color-surface)',
+            borderColor: 'var(--color-border)',
+            textAlign: 'center',
+          }}
+        >
+          <Stack align="center" gap="xs">
+            <Globe className="w-8 h-8 text-slate-400" />
+            <Text fw={600} size="sm">No portal matched your search "{portalSearch}".</Text>
+            <Button
+              variant="subtle"
+              color="cyan"
+              size="xs"
+              onClick={() => { setPortalSearch(''); setSelectedCategory('ALL'); setSelectedRegion('ALL'); }}
+            >
+              Reset portal search & filters
+            </Button>
+          </Stack>
+        </Paper>
       )}
-    </section>
+    </Stack>
   );
 };

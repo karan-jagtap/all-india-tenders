@@ -1,5 +1,19 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import {
+  Modal,
+  Badge,
+  TextInput,
+  Button,
+  Group,
+  Stack,
+  Text,
+  Title,
+  Card,
+  SimpleGrid,
+  Box,
+  ActionIcon,
+} from '@mantine/core';
+import {
   X,
   Building2,
   Globe,
@@ -99,244 +113,270 @@ export const OrganizationsDirectoryModal: React.FC<Props> = ({
     });
   }, [statutoryPortals, searchQuery]);
 
-  if (!isOpen) return null;
-
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-950/70 backdrop-blur-xs flex items-center justify-center p-3 sm:p-6 animate-in fade-in duration-200">
-      <div className="bg-white dark:bg-[#0E1422] w-full max-w-6xl rounded-2xl shadow-2xl border border-slate-200/90 dark:border-slate-800 overflow-hidden flex flex-col max-h-[92vh] transition-colors">
+    <Modal
+      opened={isOpen}
+      onClose={onClose}
+      size="92%"
+      radius="xl"
+      withCloseButton={false}
+      padding={0}
+      styles={{
+        content: {
+          overflow: 'hidden',
+          backgroundColor: 'var(--color-surface)',
+          border: '1px solid var(--color-border)',
+        },
+        body: {
+          padding: 0,
+        }
+      }}
+    >
+      <div style={{ display: 'flex', flexDirection: 'column', maxHeight: '88vh' }}>
         {/* Header Bar */}
-        <div className="bg-slate-900 dark:bg-slate-950 text-white px-5 sm:px-7 py-4 flex items-center justify-between border-b border-slate-800 shrink-0">
+        <Group justify="space-between" align="center" px="xl" py="md" style={{ backgroundColor: '#070a10', color: '#ffffff', borderBottom: '1px solid #1e293b' }}>
           <div>
-            <div className="flex items-center gap-2 mb-1">
-              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-wider uppercase bg-orange-500 text-white flex items-center gap-1 shadow-xs">
-                <Globe className="w-3.5 h-3.5" />
+            <Group gap="xs" mb={4}>
+              <Badge color="orange" size="sm" radius="xl" leftSection={<Globe className="w-3.5 h-3.5" />}>
                 Pan-India Sourcing Directory
-              </span>
-              <span className="text-xs text-slate-400 font-mono">100% Statutory Public Feeds</span>
-            </div>
-            <h2 className="text-base sm:text-lg font-bold text-white tracking-tight flex items-center gap-2">
+              </Badge>
+              <Text size="xs" c="dimmed" ff="monospace">100% Statutory Public Feeds</Text>
+            </Group>
+            <Title order={3} size="h4" style={{ color: '#ffffff', fontWeight: 700 }}>
               All 123 Sourced Indian Authorities & 25 Statutory Portals
-            </h2>
+            </Title>
           </div>
 
-          <button
-            onClick={onClose}
-            className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer"
-            aria-label="Close modal"
-          >
-            <X className="w-5 h-5" />
-          </button>
-        </div>
+          <ActionIcon variant="subtle" color="gray" size="lg" radius="md" onClick={onClose} aria-label="Close directory">
+            <X className="w-5 h-5 text-white" />
+          </ActionIcon>
+        </Group>
 
         {/* Stats Strip */}
-        <div className="bg-slate-50 dark:bg-slate-900/60 border-b border-slate-200 dark:border-slate-800 px-5 sm:px-7 py-2.5 flex items-center justify-between gap-3 text-xs flex-wrap shrink-0">
-          <div className="flex items-center gap-4 flex-wrap">
-            <div className="flex items-center gap-1.5 font-medium text-slate-700 dark:text-slate-300">
-              <Building2 className="w-4 h-4 text-orange-600 dark:text-orange-400" />
-              <span><strong>123</strong> Government Organizations</span>
-            </div>
-            <span className="text-slate-300 dark:text-slate-700">•</span>
-            <div className="flex items-center gap-1.5 font-medium text-slate-700 dark:text-slate-300">
-              <Globe className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-              <span><strong>25</strong> National & State Portals</span>
-            </div>
-            <span className="text-slate-300 dark:text-slate-700">•</span>
-            <div className="flex items-center gap-1.5 font-medium text-slate-700 dark:text-slate-300">
-              <Award className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-              <span><strong>4,350+</strong> Awarded Contracts</span>
-            </div>
-            <span className="text-slate-300 dark:text-slate-700">•</span>
-            <div className="flex items-center gap-1.5 font-medium text-slate-700 dark:text-slate-300">
-              <Radio className="w-4 h-4 text-orange-500 dark:text-orange-400" />
-              <span><strong>2,718</strong> Live In-Progress Notices</span>
-            </div>
-          </div>
+        <Group justify="space-between" px="xl" py="xs" style={{ backgroundColor: 'var(--color-surface-subtle)', borderBottom: '1px solid var(--color-border)' }}>
+          <Group gap="md">
+            <Group gap={6}>
+              <Building2 className="w-4 h-4 text-orange-500" />
+              <Text size="xs" fw={600} style={{ color: 'var(--color-text-main)' }}><strong>123</strong> Government Organizations</Text>
+            </Group>
+            <Text c="dimmed">•</Text>
+            <Group gap={6}>
+              <Globe className="w-4 h-4 text-blue-500" />
+              <Text size="xs" fw={600} style={{ color: 'var(--color-text-main)' }}><strong>25</strong> National & State Portals</Text>
+            </Group>
+            <Text c="dimmed">•</Text>
+            <Group gap={6}>
+              <Award className="w-4 h-4 text-emerald-500" />
+              <Text size="xs" fw={600} style={{ color: 'var(--color-text-main)' }}><strong>4,350+</strong> Awarded Contracts</Text>
+            </Group>
+            <Text c="dimmed">•</Text>
+            <Group gap={6}>
+              <Radio className="w-4 h-4 text-orange-500" />
+              <Text size="xs" fw={600} style={{ color: 'var(--color-text-main)' }}><strong>2,718</strong> Live Notices</Text>
+            </Group>
+          </Group>
 
-          <span className="text-[11px] text-slate-500 dark:text-slate-400 font-mono">Enterprise Persistent DB • In-Memory Stream</span>
-        </div>
+          <Text size="11px" ff="monospace" c="dimmed">Enterprise Persistent DB • In-Memory Stream</Text>
+        </Group>
 
         {/* Search & Sector Filters */}
-        <div className="p-4 sm:px-7 sm:py-3.5 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0E1422] space-y-3 shrink-0">
-          <div className="relative">
-            <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search by organization name (NHAI, CPWD, BHEL, DMRC, MahaPWD...), state, or portal..."
-              className="w-full pl-10 pr-4 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs sm:text-sm text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-orange-500 focus:bg-white dark:focus:bg-slate-900 transition-all shadow-inner"
-            />
-            {searchQuery && (
-              <button
-                onClick={() => setSearchQuery('')}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 font-bold"
-              >
-                Clear
-              </button>
-            )}
-          </div>
+        <Box p="md" px="xl" style={{ borderBottom: '1px solid var(--color-border)', backgroundColor: 'var(--color-surface)' }}>
+          <TextInput
+            placeholder="Search by organization name (NHAI, CPWD, BHEL, DMRC, MahaPWD...), state, or portal..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            leftSection={<Search className="w-4 h-4 text-slate-400" />}
+            rightSection={
+              searchQuery ? (
+                <Button variant="subtle" size="compact-xs" color="gray" onClick={() => setSearchQuery('')}>
+                  Clear
+                </Button>
+              ) : null
+            }
+            radius="md"
+            size="sm"
+            mb="sm"
+          />
 
           {/* Sector Tabs */}
-          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs scrollbar-none">
+          <Group gap="xs" wrap="nowrap" style={{ overflowX: 'auto', paddingBottom: 4 }}>
             {sectors.map((sec) => {
               const Icon = sec.icon;
               const isActive = selectedSector === sec.id;
               return (
-                <button
+                <Button
                   key={sec.id}
+                  variant={isActive ? 'filled' : 'light'}
+                  color={isActive ? 'dark' : 'gray'}
+                  size="xs"
+                  radius="md"
+                  leftSection={<Icon className={`w-3.5 h-3.5 ${isActive ? 'text-orange-400' : ''}`} />}
+                  rightSection={
+                    <Badge size="xs" variant={isActive ? 'white' : 'light'} color={isActive ? 'dark' : 'gray'} radius="xl">
+                      {sec.count}
+                    </Badge>
+                  }
                   onClick={() => setSelectedSector(sec.id)}
-                  className={`px-3 py-1.5 rounded-lg font-semibold flex items-center gap-1.5 shrink-0 transition-all cursor-pointer ${
-                    isActive
-                      ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-950 shadow-xs'
-                      : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
-                  }`}
+                  styles={{ root: { flexShrink: 0, fontWeight: 600 } }}
                 >
-                  <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-orange-400' : 'text-slate-500 dark:text-slate-400'}`} />
-                  <span>{sec.label}</span>
-                  <span
-                    className={`px-1.5 py-0.2 rounded-full text-[10px] font-mono ${
-                      isActive ? 'bg-slate-800 dark:bg-slate-200 text-slate-200 dark:text-slate-800' : 'bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300'
-                    }`}
-                  >
-                    {sec.count}
-                  </span>
-                </button>
+                  {sec.label}
+                </Button>
               );
             })}
-          </div>
-        </div>
+          </Group>
+        </Box>
 
         {/* Directory Body */}
-        <div className="p-4 sm:p-7 overflow-y-auto flex-1 bg-slate-50/50 dark:bg-[#070A10]/50">
+        <Box p="lg" px="xl" style={{ overflowY: 'auto', flex: 1, backgroundColor: 'var(--color-canvas)' }}>
           {selectedSector === 'PORTALS' ? (
             /* 25 Portals Grid */
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5">
+            <SimpleGrid cols={{ base: 1, sm: 2, lg: 3 }} spacing="sm">
               {filteredPortals.map((p, idx) => {
                 const domain = p.portal.match(/\((.*?)\)/)?.[1] || p.portal;
                 const portalName = p.portal.split('(')[0].trim();
                 return (
-                  <div
+                  <Card
                     key={idx}
-                    className="bg-white dark:bg-[#0E1422] p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-2xs hover:border-slate-300 dark:hover:border-slate-700 transition-all flex flex-col justify-between"
+                    p="md"
+                    radius="lg"
+                    withBorder
+                    style={{
+                      backgroundColor: 'var(--color-surface)',
+                      borderColor: 'var(--color-border)',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      justifyContent: 'space-between',
+                    }}
                   >
                     <div>
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-50 dark:bg-blue-950/40 text-blue-800 dark:text-blue-300 border border-blue-200 dark:border-blue-900/50 flex items-center gap-1">
-                          <Globe className="w-3 h-3 text-blue-600 dark:text-blue-400" />
+                      <Group justify="space-between" mb="xs">
+                        <Badge size="xs" color="blue" variant="light" leftSection={<Globe className="w-3 h-3" />}>
                           200 OK Active Feed
-                        </span>
-                        <span className="text-[10px] text-slate-400 font-mono">#{idx + 1}</span>
-                      </div>
+                        </Badge>
+                        <Text size="10px" c="dimmed" ff="monospace">#{idx + 1}</Text>
+                      </Group>
 
-                      <h4 className="font-bold text-slate-900 dark:text-white text-xs sm:text-sm mb-1">{portalName}</h4>
-                      <p className="font-mono text-[11px] text-blue-600 dark:text-blue-400 break-all mb-3">{domain}</p>
+                      <Title order={4} size="xs" mb={2} style={{ color: 'var(--color-text-main)', fontWeight: 700 }}>
+                        {portalName}
+                      </Title>
+                      <Text size="11px" ff="monospace" c="blue" style={{ wordBreak: 'break-all', marginBottom: 12 }}>
+                        {domain}
+                      </Text>
                     </div>
 
-                    <div className="pt-2.5 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs text-slate-600 dark:text-slate-400">
+                    <Group justify="space-between" pt="xs" style={{ borderTop: '1px solid var(--color-border-subtle)' }}>
                       <div>
-                        <span className="text-[10px] text-slate-400 block font-medium">Executing Bodies</span>
-                        <strong className="text-slate-800 dark:text-slate-200">{p.orgsCount} Orgs</strong>
+                        <Text size="10px" c="dimmed">Executing Bodies</Text>
+                        <Text size="xs" fw={700} style={{ color: 'var(--color-text-main)' }}>{p.orgsCount} Orgs</Text>
                       </div>
-                      <div className="text-right">
-                        <span className="text-[10px] text-slate-400 block font-medium">Tenders Catalog</span>
-                        <span className="text-emerald-700 dark:text-emerald-400 font-bold">{p.awardedTenders} Awarded</span>
-                        <span className="text-slate-300 dark:text-slate-700 mx-1">•</span>
-                        <span className="text-orange-600 dark:text-orange-400 font-bold">{p.activeTenders} Live</span>
-                      </div>
-                    </div>
-                  </div>
+                      <Box style={{ textAlign: 'right' }}>
+                        <Text size="10px" c="dimmed">Tenders Catalog</Text>
+                        <Group gap={4}>
+                          <Text size="xs" fw={700} c="teal">{p.awardedTenders} Awarded</Text>
+                          <Text size="xs" c="dimmed">•</Text>
+                          <Text size="xs" fw={700} c="orange">{p.activeTenders} Live</Text>
+                        </Group>
+                      </Box>
+                    </Group>
+                  </Card>
                 );
               })}
-            </div>
+            </SimpleGrid>
           ) : (
             /* 123 Organizations Grid */
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5">
+            <SimpleGrid cols={{ base: 1, sm: 2, lg: 3 }} spacing="sm">
               {filteredOrgs.map((o, idx) => {
                 const portalShort = o.portal.split('(')[0].trim();
                 return (
-                  <div
+                  <Card
                     key={idx}
-                    className="bg-white dark:bg-[#0E1422] p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-2xs hover:border-slate-300 dark:hover:border-slate-700 hover:shadow-xs transition-all flex flex-col justify-between"
+                    p="md"
+                    radius="lg"
+                    withBorder
+                    style={{
+                      backgroundColor: 'var(--color-surface)',
+                      borderColor: 'var(--color-border)',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      justifyContent: 'space-between',
+                    }}
                   >
                     <div>
-                      <div className="flex items-center justify-between gap-1.5 mb-2 flex-wrap">
-                        <span className="inline-flex items-center gap-1 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 px-2 py-0.5 rounded text-[10px] font-semibold border border-slate-200 dark:border-slate-700">
-                          <MapPin className="w-3 h-3 text-rose-500" />
+                      <Group justify="space-between" mb="xs">
+                        <Badge size="xs" variant="light" color="red" leftSection={<MapPin className="w-3 h-3" />}>
                           {o.state}
-                        </span>
-
-                        <span className="px-2 py-0.5 rounded text-[10px] font-medium bg-purple-50 dark:bg-purple-950/40 text-purple-800 dark:text-purple-300 border border-purple-200 dark:border-purple-900/50 truncate max-w-[140px]">
+                        </Badge>
+                        <Badge size="xs" variant="light" color="grape" style={{ maxWidth: 140 }}>
                           {o.sector}
-                        </span>
-                      </div>
+                        </Badge>
+                      </Group>
 
-                      <h4 className="font-bold text-slate-900 dark:text-white text-xs sm:text-sm leading-snug mb-1.5">
+                      <Title order={4} size="xs" mb={4} style={{ color: 'var(--color-text-main)', fontWeight: 700, lineHeight: 1.3 }}>
                         {o.authority}
-                      </h4>
+                      </Title>
 
-                      <div className="text-[11px] text-slate-500 dark:text-slate-400 mb-2.5 flex items-center gap-1">
-                        <Layers className="w-3 h-3 text-slate-400 shrink-0" />
-                        <span className="truncate">{o.category}</span>
-                      </div>
+                      <Group gap={4} mb="xs">
+                        <Layers className="w-3 h-3 text-slate-400" />
+                        <Text size="11px" c="dimmed" lineClamp={1}>{o.category}</Text>
+                      </Group>
                     </div>
 
-                    <div className="pt-2.5 border-t border-slate-100 dark:border-slate-800">
-                      <div className="text-[10px] text-slate-500 dark:text-slate-400 mb-2 truncate" title={o.portal}>
-                        <span className="font-semibold text-slate-700 dark:text-slate-300">Source: </span>
-                        {portalShort}
-                      </div>
+                    <Box pt="xs" style={{ borderTop: '1px solid var(--color-border-subtle)' }}>
+                      <Text size="10px" c="dimmed" lineClamp={1} mb={6} title={o.portal}>
+                        <strong>Source: </strong>{portalShort}
+                      </Text>
 
-                      <div className="flex items-center justify-between text-xs pt-1">
-                        <div className="flex items-center gap-2">
-                          <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+                      <Group justify="space-between" align="center">
+                        <Group gap={6}>
+                          <Badge size="xs" variant="light" color="teal">
                             {o.accepted_count} Awarded
-                          </span>
-                          <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-orange-50 dark:bg-orange-950/40 text-orange-900 dark:text-orange-300 border border-orange-200 dark:border-orange-800">
+                          </Badge>
+                          <Badge size="xs" variant="light" color="orange">
                             {o.current_count} Live
-                          </span>
-                        </div>
+                          </Badge>
+                        </Group>
 
                         {onSelectOrg && (
-                          <button
+                          <Button
+                            variant="subtle"
+                            color="orange"
+                            size="compact-xs"
                             onClick={() => {
                               onSelectOrg(o.authority);
                               onClose();
                             }}
-                            className="text-[11px] font-semibold text-orange-600 dark:text-orange-400 hover:text-orange-700 dark:hover:text-orange-300 hover:underline cursor-pointer"
+                            styles={{ root: { fontWeight: 700 } }}
                           >
                             Filter Tenders →
-                          </button>
+                          </Button>
                         )}
-                      </div>
-                    </div>
-                  </div>
+                      </Group>
+                    </Box>
+                  </Card>
                 );
               })}
-            </div>
+            </SimpleGrid>
           )}
 
           {filteredOrgs.length === 0 && selectedSector !== 'PORTALS' && (
-            <div className="text-center py-12 text-slate-400 text-xs">
-              <Building2 className="w-8 h-8 mx-auto mb-2 text-slate-300 dark:text-slate-600" />
-              <span>No organizations found matching "{searchQuery}"</span>
-            </div>
+            <Stack align="center" justify="center" py="xl" gap="xs">
+              <Building2 className="w-8 h-8 text-slate-400" />
+              <Text size="xs" c="dimmed">No organizations found matching "{searchQuery}"</Text>
+            </Stack>
           )}
-        </div>
+        </Box>
 
         {/* Footer */}
-        <div className="bg-white dark:bg-[#0E1422] border-t border-slate-200 dark:border-slate-800 px-5 sm:px-7 py-3 flex items-center justify-between text-xs shrink-0">
-          <span className="text-slate-500 dark:text-slate-400 text-[11px]">
+        <Group justify="space-between" px="xl" py="sm" style={{ backgroundColor: 'var(--color-surface)', borderTop: '1px solid var(--color-border)' }}>
+          <Text size="11px" c="dimmed">
             National Public Procurement Catalog • Unified Portal Framework (CPPP, GeM, IREPS, MoD & 19 States)
-          </span>
+          </Text>
 
-          <button
-            onClick={onClose}
-            className="px-4 py-1.5 bg-slate-900 dark:bg-slate-800 hover:bg-slate-800 dark:hover:bg-slate-700 text-white rounded-lg font-semibold text-xs transition-colors cursor-pointer"
-          >
+          <Button variant="default" size="xs" radius="md" onClick={onClose}>
             Close Directory
-          </button>
-        </div>
+          </Button>
+        </Group>
       </div>
-    </div>
+    </Modal>
   );
 };

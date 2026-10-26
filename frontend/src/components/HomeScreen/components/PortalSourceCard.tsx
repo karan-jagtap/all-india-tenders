@@ -1,4 +1,5 @@
 import React from 'react';
+import { Card, Badge, Title, Text, Group, Stack, Anchor, Button, Box } from '@mantine/core';
 import { ExternalLink, ChevronRight } from 'lucide-react';
 import { PortalSourceInfo } from '../../../constants/portalSources';
 
@@ -9,89 +10,102 @@ export interface PortalSourceCardProps {
 
 export const PortalSourceCard: React.FC<PortalSourceCardProps> = ({ portal, onNavigate }) => {
   return (
-    <div className="bg-white dark:bg-[#0E1422] border border-slate-200/90 dark:border-slate-800 hover:border-cyan-300 dark:hover:border-cyan-700 rounded-xl p-4 shadow-2xs hover:shadow-md transition-all flex flex-col justify-between space-y-3 group">
-      <div className="space-y-2">
+    <Card
+      p="md"
+      radius="lg"
+      withBorder
+      style={{
+        backgroundColor: 'var(--color-surface)',
+        borderColor: 'var(--color-border)',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'space-between',
+        transition: 'all 0.15s ease',
+      }}
+      className="hover-card-cyan"
+    >
+      <Stack gap="xs">
         {/* Header: Portal Name & Domain */}
-        <div className="flex items-start justify-between gap-2">
-          <div className="min-w-0">
-            <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-cyan-700 dark:text-cyan-400 bg-cyan-50 dark:bg-cyan-950/40 px-2 py-0.5 rounded border border-cyan-200 dark:border-cyan-800">
+        <Group justify="space-between" align="flex-start" wrap="nowrap">
+          <Box style={{ minWidth: 0, flex: 1 }}>
+            <Badge size="xs" variant="light" color="cyan" radius="sm">
               {portal.domain}
-            </span>
-            <h4 className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white mt-1.5 leading-snug group-hover:text-cyan-700 dark:group-hover:text-cyan-400 transition-colors">
+            </Badge>
+            <Title order={4} size="sm" mt={6} style={{ color: 'var(--color-text-main)', fontWeight: 700, lineHeight: 1.3 }}>
               {portal.name}
-            </h4>
-          </div>
+            </Title>
+          </Box>
 
-          <span className="px-2 py-0.5 rounded text-[9px] font-bold tracking-wide uppercase bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/80 flex items-center gap-1 shrink-0">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse" />
+          <Badge size="xs" variant="light" color="teal" radius="sm" leftSection={<span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />}>
             LIVE
-          </span>
-        </div>
+          </Badge>
+        </Group>
 
         {/* State, Region & Category */}
-        <div className="flex items-center gap-1.5 text-[11px] text-slate-500 dark:text-slate-400">
-          <span className="font-semibold text-slate-700 dark:text-slate-300">{portal.state}</span>
+        <Group gap={6} style={{ fontSize: '11px', color: 'var(--color-text-dimmed)' }}>
+          <Text size="11px" fw={600} style={{ color: 'var(--color-text-sub)' }}>{portal.state}</Text>
           <span>•</span>
-          <span className="text-slate-400">{portal.region}</span>
+          <Text size="11px" style={{ color: 'var(--color-text-dimmed)' }}>{portal.region}</Text>
           <span>•</span>
-          <span className="text-cyan-600 dark:text-cyan-400 font-medium">{portal.category}</span>
-        </div>
+          <Text size="11px" fw={600} c="cyan">{portal.category}</Text>
+        </Group>
 
         {/* Description */}
-        <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed line-clamp-2">
+        <Text size="xs" lineClamp={2} style={{ color: 'var(--color-text-sub)', lineHeight: 1.5 }}>
           {portal.description}
-        </p>
+        </Text>
 
         {/* Key Authorities Covered */}
-        <div>
-          <span className="text-[10px] uppercase font-bold text-slate-400 block mb-1">
+        <Box>
+          <Text size="10px" fw={700} tt="uppercase" style={{ color: 'var(--color-text-dimmed)', marginBottom: 4 }}>
             Procuring Authorities:
-          </span>
-          <div className="flex flex-wrap gap-1">
+          </Text>
+          <Group gap={4} wrap="wrap">
             {portal.keyAuthorities.slice(0, 4).map((auth) => (
-              <span
-                key={auth}
-                className="px-1.5 py-0.5 rounded text-[10px] font-medium bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 truncate max-w-[170px]"
-              >
+              <Badge key={auth} size="xs" variant="outline" color="gray" radius="sm" styles={{ root: { textTransform: 'none' } }}>
                 {auth}
-              </span>
+              </Badge>
             ))}
             {portal.keyAuthorities.length > 4 && (
-              <span className="px-1.5 py-0.5 rounded text-[10px] font-medium bg-slate-50 dark:bg-slate-900 text-slate-400">
+              <Text size="10px" c="dimmed">
                 +{portal.keyAuthorities.length - 4} more
-              </span>
+              </Text>
             )}
-          </div>
-        </div>
+          </Group>
+        </Box>
 
         {/* Statutory Framework */}
-        <div className="text-[10px] text-slate-500 dark:text-slate-400 font-mono pt-1 border-t border-slate-100 dark:border-slate-800">
+        <Text size="10px" ff="monospace" pt={6} style={{ color: 'var(--color-text-dimmed)', borderTop: '1px solid var(--color-border-subtle)' }}>
           🛡️ {portal.statutoryFramework}
-        </div>
-      </div>
+        </Text>
+      </Stack>
 
       {/* Card Footer: Visit Portal & Filter by Source button */}
-      <div className="pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-2">
-        <a
+      <Group justify="space-between" align="center" pt="xs" mt="xs" style={{ borderTop: '1px solid var(--color-border)' }}>
+        <Anchor
           href={portal.url}
           target="_blank"
           rel="noopener noreferrer"
-          className="text-xs font-bold text-cyan-700 dark:text-cyan-400 hover:text-cyan-900 dark:hover:text-cyan-300 flex items-center gap-1 cursor-pointer"
-          title={`Open official portal ${portal.domain}`}
+          size="xs"
+          fw={700}
+          c="cyan"
+          style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}
         >
           <span>Visit Portal</span>
           <ExternalLink className="w-3 h-3" />
-        </a>
+        </Anchor>
 
-        <button
+        <Button
+          variant="subtle"
+          color="orange"
+          size="compact-xs"
+          rightSection={<ChevronRight className="w-3 h-3" />}
           onClick={() => onNavigate('current')}
-          className="text-[11px] font-semibold text-orange-600 dark:text-orange-400 hover:text-orange-700 dark:hover:text-orange-300 flex items-center gap-0.5 cursor-pointer"
-          title="View tenders scraped from this portal"
+          styles={{ root: { fontWeight: 700 } }}
         >
-          <span>View Tenders</span>
-          <ChevronRight className="w-3 h-3" />
-        </button>
-      </div>
-    </div>
+          View Tenders
+        </Button>
+      </Group>
+    </Card>
   );
 };

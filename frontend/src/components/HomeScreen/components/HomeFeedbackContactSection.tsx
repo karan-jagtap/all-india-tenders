@@ -1,11 +1,27 @@
 import React, { useState } from 'react';
+import {
+  Paper,
+  Title,
+  Text,
+  Badge,
+  TextInput,
+  Select,
+  Textarea,
+  Button,
+  Stack,
+  Group,
+  SimpleGrid,
+  Alert,
+  ThemeIcon,
+  Box,
+} from '@mantine/core';
 import { Mail, Send, MessageSquare, User, Phone, CheckCircle2, AlertCircle, Clock, Sparkles } from 'lucide-react';
 
 export const HomeFeedbackContactSection: React.FC = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
-  const [subject, setSubject] = useState<'Feedback' | 'Contact Us'>('Feedback');
+  const [subject, setSubject] = useState<string>('Feedback');
   const [message, setMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
@@ -64,216 +80,235 @@ export const HomeFeedbackContactSection: React.FC = () => {
   };
 
   return (
-    <section id="feedback-contact-section" className="bg-white dark:bg-[#0E1422] border border-slate-200/90 dark:border-slate-800 rounded-2xl p-6 sm:p-10 shadow-sm transition-colors">
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
+    <Paper
+      id="feedback-contact-section"
+      p={{ base: 'md', sm: 'xl' }}
+      radius="xl"
+      withBorder
+      style={{
+        backgroundColor: 'var(--color-surface)',
+        borderColor: 'var(--color-border)',
+      }}
+    >
+      <SimpleGrid cols={{ base: 1, lg: 12 }} spacing="xl">
         {/* Left Column: Direct Ingestion & Trust Assurances */}
-        <div className="lg:col-span-5 space-y-6">
-          <div className="space-y-2.5">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold bg-orange-100 dark:bg-orange-950/60 text-orange-900 dark:text-orange-300 border border-orange-300 dark:border-orange-800">
-              <Sparkles className="w-3.5 h-3.5 text-orange-600 dark:text-orange-400" />
-              <span>Feedback & Contact Us</span>
-            </span>
-            <h2 className="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+        <Stack gap="lg" style={{ gridColumn: 'span 5' }}>
+          <Stack gap="xs">
+            <Group gap="xs">
+              <Badge color="orange" variant="light" size="sm" radius="sm" leftSection={<Sparkles className="w-3.5 h-3.5" />}>
+                Feedback & Contact Us
+              </Badge>
+            </Group>
+            <Title order={2} size="h3" style={{ color: 'var(--color-text-main)', fontWeight: 800 }}>
               Get in Touch with Our Procurement Team
-            </h2>
-            <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+            </Title>
+            <Text size="xs" style={{ color: 'var(--color-text-sub)', lineHeight: 1.6 }}>
               Have questions about Indian public tenders, GeM portal sourcing, or want to suggest a new platform capability? We review every submission.
-            </p>
-          </div>
+            </Text>
+          </Stack>
 
-          <div className="space-y-3.5 pt-2">
+          <Stack gap="sm">
             {/* Direct Email Card */}
-            <div className="p-4 rounded-xl bg-slate-50 dark:bg-[#131A2B] border border-slate-200/80 dark:border-slate-800 flex items-start gap-3.5">
-              <div className="p-2.5 rounded-lg bg-orange-500/10 dark:bg-orange-500/20 text-orange-600 dark:text-orange-400 shrink-0">
-                <Mail className="w-4 h-4" />
-              </div>
-              <div className="space-y-0.5 min-w-0">
-                <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block">
-                  Direct Response
-                </span>
-                <span className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white block">
-                  Immediate Notification
-                </span>
-                <span className="text-[11px] text-slate-500 dark:text-slate-400 block">
-                  Automated notification sent to our team immediately upon submission.
-                </span>
-              </div>
-            </div>
+            <Paper
+              p="md"
+              radius="md"
+              withBorder
+              style={{
+                backgroundColor: 'var(--color-surface-subtle)',
+                borderColor: 'var(--color-border)',
+              }}
+            >
+              <Group align="flex-start" gap="md">
+                <ThemeIcon color="orange" variant="light" size="md" radius="md">
+                  <Mail className="w-4 h-4" />
+                </ThemeIcon>
+                <Box style={{ flex: 1 }}>
+                  <Text size="10px" fw={700} tt="uppercase" style={{ color: 'var(--color-text-dimmed)', letterSpacing: '0.05em' }}>
+                    Direct Response
+                  </Text>
+                  <Text size="xs" fw={700} style={{ color: 'var(--color-text-main)' }}>
+                    Immediate Notification
+                  </Text>
+                  <Text size="11px" style={{ color: 'var(--color-text-muted)' }}>
+                    Automated notification sent to our team immediately upon submission.
+                  </Text>
+                </Box>
+              </Group>
+            </Paper>
 
             {/* Quick Response */}
-            <div className="p-4 rounded-xl bg-slate-50 dark:bg-[#131A2B] border border-slate-200/80 dark:border-slate-800 flex items-start gap-3.5">
-              <div className="p-2.5 rounded-lg bg-blue-500/10 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 shrink-0">
-                <Clock className="w-4 h-4" />
-              </div>
-              <div className="space-y-0.5">
-                <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block">
-                  Response SLA
-                </span>
-                <span className="text-xs font-semibold text-slate-800 dark:text-slate-200 block">
-                  Usually replies within 24 hours
-                </span>
-                <span className="text-[11px] text-slate-500 dark:text-slate-400 block">
-                  Technical support for bidding documents and API integrations.
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
+            <Paper
+              p="md"
+              radius="md"
+              withBorder
+              style={{
+                backgroundColor: 'var(--color-surface-subtle)',
+                borderColor: 'var(--color-border)',
+              }}
+            >
+              <Group align="flex-start" gap="md">
+                <ThemeIcon color="blue" variant="light" size="md" radius="md">
+                  <Clock className="w-4 h-4" />
+                </ThemeIcon>
+                <Box style={{ flex: 1 }}>
+                  <Text size="10px" fw={700} tt="uppercase" style={{ color: 'var(--color-text-dimmed)', letterSpacing: '0.05em' }}>
+                    Response SLA
+                  </Text>
+                  <Text size="xs" fw={700} style={{ color: 'var(--color-text-main)' }}>
+                    Usually replies within 24 hours
+                  </Text>
+                  <Text size="11px" style={{ color: 'var(--color-text-muted)' }}>
+                    Technical support for bidding documents and API integrations.
+                  </Text>
+                </Box>
+              </Group>
+            </Paper>
+          </Stack>
+        </Stack>
 
         {/* Right Column: Contact & Feedback Interactive Form */}
-        <div className="lg:col-span-7 bg-slate-50/70 dark:bg-[#131A2B]/70 border border-slate-200/80 dark:border-slate-800/90 rounded-xl p-5 sm:p-7 shadow-xs">
+        <Paper
+          p={{ base: 'md', sm: 'lg' }}
+          radius="lg"
+          withBorder
+          style={{
+            gridColumn: 'span 7',
+            backgroundColor: 'var(--color-surface-subtle)',
+            borderColor: 'var(--color-border)',
+          }}
+        >
           {successMessage ? (
-            <div className="py-8 text-center space-y-4 animate-fadeIn">
-              <div className="w-14 h-14 bg-emerald-100 dark:bg-emerald-950/80 text-emerald-600 dark:text-emerald-400 rounded-full flex items-center justify-center mx-auto shadow-sm">
+            <Stack align="center" justify="center" py="xl" gap="md">
+              <ThemeIcon color="teal" size={56} radius="xl" variant="light">
                 <CheckCircle2 className="w-8 h-8" />
-              </div>
-              <div className="space-y-1.5 max-w-md mx-auto">
-                <h3 className="text-lg font-bold text-slate-900 dark:text-white">
+              </ThemeIcon>
+              <Stack gap={4} align="center" style={{ maxWidth: 420, textAlign: 'center' }}>
+                <Title order={3} size="h4" style={{ color: 'var(--color-text-main)', fontWeight: 700 }}>
                   Submission Successfully Received!
-                </h3>
-                <p className="text-xs text-slate-600 dark:text-slate-300">
+                </Title>
+                <Text size="xs" style={{ color: 'var(--color-text-sub)' }}>
                   {successMessage}
-                </p>
-                <p className="text-[11px] text-slate-500 dark:text-slate-400 pt-1">
+                </Text>
+                <Text size="11px" style={{ color: 'var(--color-text-dimmed)' }}>
                   Our team has been notified and will review your message shortly.
-                </p>
-              </div>
-              <button
-                type="button"
+                </Text>
+              </Stack>
+              <Button
+                variant="default"
+                size="xs"
+                radius="md"
                 onClick={() => setSuccessMessage(null)}
-                className="mt-4 px-4 py-2 rounded-lg bg-slate-200 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 text-xs font-semibold transition-all cursor-pointer"
               >
                 Send Another Message
-              </button>
-            </div>
+              </Button>
+            </Stack>
           ) : (
-            <form onSubmit={handleSubmit} className="space-y-4">
-              {errorMessage && (
-                <div className="p-3 rounded-lg bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-900 text-rose-800 dark:text-rose-300 text-xs flex items-center gap-2">
-                  <AlertCircle className="w-4 h-4 shrink-0" />
-                  <span>{errorMessage}</span>
-                </div>
-              )}
+            <form onSubmit={handleSubmit}>
+              <Stack gap="sm">
+                {errorMessage && (
+                  <Alert
+                    icon={<AlertCircle className="w-4 h-4" />}
+                    color="red"
+                    radius="md"
+                    title="Submission Error"
+                  >
+                    {errorMessage}
+                  </Alert>
+                )}
 
-              {/* Name & Email Row */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-1.5">
-                  <label htmlFor="feedback-name" className="text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1">
-                    <User className="w-3.5 h-3.5 text-slate-400" />
-                    <span>Your Full Name <span className="text-orange-500">*</span></span>
-                  </label>
-                  <input
-                    id="feedback-name"
-                    type="text"
+                <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="sm">
+                  <TextInput
+                    label="Your Full Name"
                     required
+                    size="xs"
+                    radius="md"
+                    placeholder="e.g. Ramesh Sharma"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    placeholder="e.g. Ramesh Sharma"
-                    className="w-full px-3.5 py-2 text-xs rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-[#0E1422] text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-orange-500"
+                    leftSection={<User className="w-3.5 h-3.5 text-slate-400" />}
                   />
-                </div>
 
-                <div className="space-y-1.5">
-                  <label htmlFor="feedback-email" className="text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1">
-                    <Mail className="w-3.5 h-3.5 text-slate-400" />
-                    <span>Email Address <span className="text-orange-500">*</span></span>
-                  </label>
-                  <input
-                    id="feedback-email"
-                    type="email"
+                  <TextInput
+                    label="Email Address"
                     required
+                    type="email"
+                    size="xs"
+                    radius="md"
+                    placeholder="you@company.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="you@company.com"
-                    className="w-full px-3.5 py-2 text-xs rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-[#0E1422] text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-orange-500"
+                    leftSection={<Mail className="w-3.5 h-3.5 text-slate-400" />}
                   />
-                </div>
-              </div>
+                </SimpleGrid>
 
-              {/* Phone & Subject Category Row */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-1.5">
-                  <label htmlFor="feedback-phone" className="text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1">
-                    <Phone className="w-3.5 h-3.5 text-slate-400" />
-                    <span>Mobile / WhatsApp Number</span>
-                  </label>
-                  <input
-                    id="feedback-phone"
-                    type="tel"
+                <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="sm">
+                  <TextInput
+                    label="Mobile / WhatsApp Number"
+                    size="xs"
+                    radius="md"
+                    placeholder="+91 98765 43210 (optional)"
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
-                    placeholder="+91 98765 43210 (optional)"
-                    className="w-full px-3.5 py-2 text-xs rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-[#0E1422] text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-orange-500"
+                    leftSection={<Phone className="w-3.5 h-3.5 text-slate-400" />}
                   />
-                </div>
 
-                <div className="space-y-1.5">
-                  <label htmlFor="feedback-subject" className="text-xs font-bold text-slate-700 dark:text-slate-300">
-                    Feedback / Contact Us
-                  </label>
-                  <select
-                    id="feedback-subject"
+                  <Select
+                    label="Subject Category"
+                    size="xs"
+                    radius="md"
+                    data={[
+                      { value: 'Feedback', label: 'Platform Feedback' },
+                      { value: 'Contact Us', label: 'Contact Us / Support' }
+                    ]}
                     value={subject}
-                    onChange={(e) => setSubject(e.target.value as 'Feedback' | 'Contact Us')}
-                    className="w-full px-3.5 py-2 text-xs rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-[#0E1422] text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-orange-500"
-                  >
-                    <option value="Feedback">Feedback</option>
-                    <option value="Contact Us">Contact Us</option>
-                  </select>
-                </div>
-              </div>
+                    onChange={(val) => setSubject(val || 'Feedback')}
+                  />
+                </SimpleGrid>
 
-              {/* Message Field */}
-              <div className="space-y-1.5">
-                <label htmlFor="feedback-message" className="text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center justify-between">
-                  <span className="flex items-center gap-1">
-                    <MessageSquare className="w-3.5 h-3.5 text-slate-400" />
-                    <span>Message / Details <span className="text-orange-500">*</span></span>
-                  </span>
-                  <span className="text-[10px] text-slate-400 font-normal">
-                    {message.length} / 5,000 characters
-                  </span>
-                </label>
-                <textarea
-                  id="feedback-message"
+                <Textarea
+                  label={
+                    <Group justify="space-between" w="100%">
+                      <Group gap={4}>
+                        <MessageSquare className="w-3.5 h-3.5 text-slate-400" />
+                        <span>Message / Details</span>
+                      </Group>
+                      <Text size="10px" c="dimmed">
+                        {message.length} / 5,000
+                      </Text>
+                    </Group>
+                  }
                   required
-                  rows={4}
+                  size="xs"
+                  radius="md"
+                  minRows={4}
                   maxLength={5000}
-                  value={message}
-                  onChange={(e) => setMessage(e.target.value)}
                   placeholder={
                     subject === 'Contact Us'
                       ? 'Please describe your query, procurement requirement, or question in detail...'
                       : 'Please share your suggestions, ideas, or feedback to help us improve...'
                   }
-                  className="w-full px-3.5 py-2.5 text-xs rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-[#0E1422] text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-orange-500 resize-y"
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
                 />
-              </div>
 
-              {/* Submit Button */}
-              <div className="flex items-center justify-end pt-2">
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="px-5 py-2.5 rounded-xl bg-orange-600 hover:bg-orange-500 active:bg-orange-700 disabled:opacity-50 text-white font-bold text-xs flex items-center gap-2 shadow-sm transition-all cursor-pointer"
-                >
-                  {isSubmitting ? (
-                    <>
-                      <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                      <span>Submitting...</span>
-                    </>
-                  ) : (
-                    <>
-                      <Send className="w-3.5 h-3.5" />
-                      <span>{subject === 'Contact Us' ? 'Submit Contact Request' : 'Submit Feedback'}</span>
-                    </>
-                  )}
-                </button>
-              </div>
+                <Group justify="flex-end" pt="xs">
+                  <Button
+                    type="submit"
+                    color="orange"
+                    radius="md"
+                    size="sm"
+                    loading={isSubmitting}
+                    leftSection={<Send className="w-3.5 h-3.5" />}
+                    styles={{ root: { fontWeight: 700 } }}
+                  >
+                    {subject === 'Contact Us' ? 'Submit Contact Request' : 'Submit Feedback'}
+                  </Button>
+                </Group>
+              </Stack>
             </form>
           )}
-        </div>
-      </div>
-    </section>
+        </Paper>
+      </SimpleGrid>
+    </Paper>
   );
 };

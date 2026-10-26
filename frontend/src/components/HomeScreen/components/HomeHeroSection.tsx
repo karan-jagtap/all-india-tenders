@@ -1,4 +1,5 @@
 import React from 'react';
+import { Paper, Title, Text, Button, Group, Stack, Badge } from '@mantine/core';
 import { Radio, Award, Users, Globe, ArrowRight } from 'lucide-react';
 
 export interface HomeHeroSectionProps {
@@ -17,69 +18,179 @@ export const HomeHeroSection: React.FC<HomeHeroSectionProps> = ({
   onScrollToSources
 }) => {
   return (
-    <section className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 border border-slate-800 text-white p-6 sm:p-10 shadow-xl">
+    <Paper
+      p={{ base: 'lg', sm: 'xl' }}
+      radius="xl"
+      withBorder
+      style={{
+        position: 'relative',
+        overflow: 'hidden',
+        background: 'linear-gradient(135deg, #070a10 0%, #0e1422 50%, #070a10 100%)',
+        borderColor: '#1e293b',
+        color: '#ffffff',
+        boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.4), 0 8px 10px -6px rgba(0, 0, 0, 0.4)',
+      }}
+    >
       {/* Decorative background glow accents */}
-      <div className="absolute top-0 right-0 -mr-20 -mt-20 w-80 h-80 rounded-full bg-orange-600/15 blur-3xl pointer-events-none" />
-      <div className="absolute bottom-0 left-0 -ml-20 -mb-20 w-80 h-80 rounded-full bg-emerald-600/15 blur-3xl pointer-events-none" />
+      <div
+        style={{
+          position: 'absolute',
+          top: 0,
+          right: 0,
+          marginRight: '-5rem',
+          marginTop: '-5rem',
+          width: '20rem',
+          height: '20rem',
+          borderRadius: '50%',
+          backgroundColor: 'rgba(234, 88, 12, 0.15)',
+          filter: 'blur(48px)',
+          pointerEvents: 'none',
+        }}
+      />
+      <div
+        style={{
+          position: 'absolute',
+          bottom: 0,
+          left: 0,
+          marginLeft: '-5rem',
+          marginBottom: '-5rem',
+          width: '20rem',
+          height: '20rem',
+          borderRadius: '50%',
+          backgroundColor: 'rgba(16, 185, 129, 0.15)',
+          filter: 'blur(48px)',
+          pointerEvents: 'none',
+        }}
+      />
 
-      <div className="relative z-10 max-w-4xl space-y-5">
+      <Stack gap="md" style={{ position: 'relative', zIndex: 10, maxWidth: 900 }}>
         {/* National Tricolor Badge */}
-        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold bg-slate-800/80 border border-slate-700/80 backdrop-blur-sm text-slate-200">
-          <span className="text-base leading-none">🇮🇳</span>
-          <span className="font-bold text-orange-400">National Public Procurement Platform</span>
-          <span className="text-slate-500">•</span>
-          <span className="text-emerald-400 font-mono">Hybrid Persistent DB + Vector Ready</span>
-        </div>
+        <Group gap="xs">
+          <Badge
+            size="lg"
+            radius="xl"
+            variant="outline"
+            styles={{
+              root: {
+                backgroundColor: 'rgba(30, 41, 59, 0.85)',
+                borderColor: '#334155',
+                color: '#e2e8f0',
+                textTransform: 'none',
+                fontWeight: 600,
+                padding: '6px 14px',
+                height: 'auto',
+              }
+            }}
+          >
+            <span style={{ fontSize: '1rem', marginRight: 6 }}>🇮🇳</span>
+            <span style={{ color: '#fb923c', fontWeight: 700 }}>National Public Procurement Platform</span>
+            <span style={{ margin: '0 6px', color: '#64748b' }}>•</span>
+            <span style={{ color: '#34d399', fontFamily: 'monospace' }}>Hybrid Persistent DB + Vector Ready</span>
+          </Badge>
+        </Group>
 
         {/* Headline */}
-        <h1 className="text-2xl sm:text-4xl lg:text-5xl font-black tracking-tight text-white leading-tight">
+        <Title
+          order={1}
+          style={{
+            fontSize: 'clamp(1.75rem, 4vw, 2.75rem)',
+            fontWeight: 900,
+            lineHeight: 1.15,
+            letterSpacing: '-0.02em',
+            color: '#ffffff',
+          }}
+        >
           Autonomous Tender Intelligence Across{' '}
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-amber-300 to-emerald-400">
+          <span
+            style={{
+              background: 'linear-gradient(to right, #fb923c, #fcd34d, #34d399)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+            }}
+          >
             India's Official Procurement Portals
           </span>
-        </h1>
+        </Title>
 
         {/* Subtitle */}
-        <p className="text-xs sm:text-base text-slate-300 leading-relaxed max-w-3xl">
+        <Text size="sm" style={{ color: '#cbd5e1', lineHeight: 1.6, maxWidth: 760 }}>
           Real-time statutory procurement intelligence platform aggregating unfilled in-progress tenders, complete 48-page Standard Bidding Documents (SBD / RFP), 17-year awarded bid records (2010 – 2026), and contractor intelligence from <strong>28+ official Central and State government portals</strong> — powered by an <strong>Enterprise Hybrid Persistent Database Architecture</strong>.
-        </p>
+        </Text>
 
         {/* CTA Action Buttons */}
-        <div className="flex flex-wrap items-center gap-3 pt-2">
-          <button
+        <Group gap="sm" pt="xs" wrap="wrap">
+          <Button
+            color="orange"
+            size="md"
+            radius="md"
+            leftSection={<Radio className="w-4 h-4 animate-pulse" />}
+            rightSection={<ArrowRight className="w-4 h-4" />}
             onClick={() => onNavigate('current')}
-            className="px-5 py-3 rounded-xl bg-orange-600 hover:bg-orange-500 active:bg-orange-700 text-white font-bold text-xs sm:text-sm flex items-center gap-2 shadow-lg shadow-orange-600/30 transition-all cursor-pointer"
+            styles={{
+              root: {
+                fontWeight: 800,
+                boxShadow: '0 10px 15px -3px rgba(234, 88, 12, 0.35)',
+              }
+            }}
           >
-            <Radio className="w-4 h-4 animate-pulse text-white" />
-            <span>Explore In-Progress Tenders ({activeTenders.toLocaleString()})</span>
-            <ArrowRight className="w-4 h-4" />
-          </button>
+            Explore In-Progress Tenders ({activeTenders.toLocaleString()})
+          </Button>
 
-          <button
+          <Button
+            color="teal"
+            size="md"
+            radius="md"
+            leftSection={<Award className="w-4 h-4 text-emerald-300" />}
             onClick={() => onNavigate('accepted')}
-            className="px-5 py-3 rounded-xl bg-emerald-700 hover:bg-emerald-600 active:bg-emerald-800 text-white font-bold text-xs sm:text-sm flex items-center gap-2 shadow-lg shadow-emerald-700/30 transition-all cursor-pointer"
+            styles={{
+              root: {
+                fontWeight: 800,
+                boxShadow: '0 10px 15px -3px rgba(16, 185, 129, 0.35)',
+              }
+            }}
           >
-            <Award className="w-4 h-4 text-emerald-300" />
-            <span>Awarded Bids Archive ({acceptedTenders.toLocaleString()})</span>
-          </button>
+            Awarded Bids Archive ({acceptedTenders.toLocaleString()})
+          </Button>
 
-          <button
+          <Button
+            variant="default"
+            size="md"
+            radius="md"
+            leftSection={<Users className="w-4 h-4 text-blue-400" />}
             onClick={() => onNavigate('bidders')}
-            className="px-4 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-bold text-xs sm:text-sm flex items-center gap-2 transition-all cursor-pointer"
+            styles={{
+              root: {
+                backgroundColor: '#1e293b',
+                borderColor: '#334155',
+                color: '#f1f5f9',
+                fontWeight: 700,
+              }
+            }}
           >
-            <Users className="w-4 h-4 text-blue-400" />
-            <span>Registered Contractors ({biddersCount})</span>
-          </button>
+            Registered Contractors ({biddersCount})
+          </Button>
 
-          <button
+          <Button
+            variant="subtle"
+            size="md"
+            radius="md"
+            leftSection={<Globe className="w-4 h-4 text-cyan-400" />}
             onClick={onScrollToSources}
-            className="px-4 py-3 rounded-xl bg-slate-800/60 hover:bg-slate-800 text-slate-300 border border-slate-700/60 font-semibold text-xs sm:text-sm flex items-center gap-2 transition-all cursor-pointer"
+            styles={{
+              root: {
+                backgroundColor: 'rgba(30, 41, 59, 0.5)',
+                color: '#cbd5e1',
+                fontWeight: 600,
+                '&:hover': {
+                  backgroundColor: '#1e293b',
+                }
+              }
+            }}
           >
-            <Globe className="w-4 h-4 text-cyan-400" />
-            <span>View 28+ Real Sourced Portals</span>
-          </button>
-        </div>
-      </div>
-    </section>
+            View 28+ Real Sourced Portals
+          </Button>
+        </Group>
+      </Stack>
+    </Paper>
   );
 };
