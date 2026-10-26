@@ -187,23 +187,32 @@ export interface ScrapedPortalStatus {
 
 export interface ScrapeReport {
   status: string;
-  message: string;
-  database_used: boolean;
-  database_note: string;
+  message?: string;
+  database_used?: boolean;
+  database_note?: string;
   total_in_progress_tenders: number;
   execution_time_ms: number;
   portals_scraped: ScrapedPortalStatus[];
   timestamp: string;
+  next_cron_run?: string;
+  trigger_type?: string;
 }
 
 export interface PlatformStats {
   active_tenders_count: number;
   accepted_tenders_count: number;
   registered_bidders_count: number;
-  database_required: boolean;
+  database_required?: boolean;
   architecture: string;
   total_portals_monitored: number;
   portals_list: string[];
   total_active_procurement_value_inr: number;
   states_covered: number;
+  cron_sync?: {
+    schedule: string;
+    cron_expression?: string;
+    timezone?: string;
+    next_run?: string;
+    scheduler_running?: boolean;
+  };
 }

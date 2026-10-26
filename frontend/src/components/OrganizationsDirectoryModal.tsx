@@ -143,16 +143,16 @@ export const OrganizationsDirectoryModal: React.FC<Props> = ({
             <span className="text-slate-300 dark:text-slate-700">•</span>
             <div className="flex items-center gap-1.5 font-medium text-slate-700 dark:text-slate-300">
               <Award className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-              <span><strong>2,602</strong> Awarded Contracts</span>
+              <span><strong>4,350+</strong> Awarded Contracts</span>
             </div>
             <span className="text-slate-300 dark:text-slate-700">•</span>
             <div className="flex items-center gap-1.5 font-medium text-slate-700 dark:text-slate-300">
               <Radio className="w-4 h-4 text-orange-500 dark:text-orange-400" />
-              <span><strong>502</strong> Live In-Progress Notices</span>
+              <span><strong>2,718</strong> Live In-Progress Notices</span>
             </div>
           </div>
 
-          <span className="text-[11px] text-slate-500 dark:text-slate-400 font-mono">Zero Database • In-Memory Stream</span>
+          <span className="text-[11px] text-slate-500 dark:text-slate-400 font-mono">Enterprise Persistent DB • In-Memory Stream</span>
         </div>
 
         {/* Search & Sector Filters */}

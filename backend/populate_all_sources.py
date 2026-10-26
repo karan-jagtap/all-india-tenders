@@ -28,7 +28,7 @@ Populates all 25 real public procurement portals across India:
 25. Oil, Gas & Petrochemicals (iocletenders.nic.in / ongc)
 
 Generates:
-1. all_sources_accepted_catalog.json (Multi-year Awarded Dossiers 2017-2026)
+1. all_sources_accepted_catalog.json (Multi-year Awarded Dossiers 2010-2026)
 2. all_sources_current_catalog.json (Live In-Progress Active Notices 2026)
 """
 
@@ -785,12 +785,14 @@ all_accepted = []
 all_current = []
 
 today = date(2026, 3, 25)
+NUM_HISTORICAL_YEARS = 17
+START_HISTORICAL_YEAR = 2010
 
 for src in SOURCES:
-    # 1. Generate Accepted Tenders across 2017 - 2026
-    count_acc = src['accepted_target_count']
+    # 1. Generate Accepted Tenders across 17-Year Historical Horizon (2010 - 2026)
+    count_acc = int(src['accepted_target_count'] * 1.7)
     for i in range(count_acc):
-        year = 2017 + (i % 10)  # Covers years 2017 through 2026
+        year = START_HISTORICAL_YEAR + (i % NUM_HISTORICAL_YEARS)  # Covers years 2010 through 2026
         org = src['orgs'][i % len(src['orgs'])]
         cat = src['categories'][i % len(src['categories'])]
         city = src['cities'][i % len(src['cities'])]

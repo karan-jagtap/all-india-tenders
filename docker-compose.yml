@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  # ==============================================================================
+  # PostgreSQL 16 with pgvector Extension
+  # Official image with vector similarity search (Vector(384) / Vector(768)) pre-installed.
+  # ==============================================================================
+  db:
+    image: pgvector/pgvector:pg16
+    container_name: all_india_tenders_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgrespassword
+      POSTGRES_DB: all_india_tenders
+    ports:
+      - "5432:5432"
+    volumes:
+      - ait_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d all_india_tenders"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  ait_pgdata:
+    name: ait_pgdata

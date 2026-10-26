@@ -149,11 +149,11 @@ export async function getPlatformStats(): Promise<PlatformStats> {
   }
 
   return {
-    active_tenders_count: 2688,
-    accepted_tenders_count: 2602,
+    active_tenders_count: 2718,
+    accepted_tenders_count: 4393,
     registered_bidders_count: 87,
-    database_required: false,
-    architecture: 'Purely Scraping-Based (In-Memory RAM Streaming, 0 DB Required)',
+    database_required: true,
+    architecture: 'Enterprise Hybrid (PostgreSQL 16 / SQLite Persistent DB + In-Memory RAM Stream)',
     total_portals_monitored: 28,
     portals_list: [
       'Central Public Procurement Portal (eprocure.gov.in)',

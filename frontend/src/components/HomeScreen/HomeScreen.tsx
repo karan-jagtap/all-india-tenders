@@ -5,7 +5,8 @@ import {
   HomeMetricsBar,
   HomeCapabilitiesSection,
   HomeSourcesDirectory,
-  HomeCtaBanner
+  HomeCtaBanner,
+  HomeFeedbackContactSection
 } from './components';
 
 export interface HomeScreenProps {
@@ -21,8 +22,8 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
   onTriggerSync,
   isSyncing
 }) => {
-  const activeTenders = stats?.active_tenders_count || 2688;
-  const acceptedTenders = stats?.accepted_tenders_count || 2602;
+  const activeTenders = stats?.active_tenders_count || 2718;
+  const acceptedTenders = stats?.accepted_tenders_count || 4393;
   const biddersCount = stats?.registered_bidders_count || 87;
   const totalValueCr = stats?.total_active_procurement_value_inr
     ? (stats.total_active_procurement_value_inr / 10000000).toLocaleString('en-IN', { maximumFractionDigits: 1 })
@@ -68,6 +69,9 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
 
       {/* 5. Bottom Call to Action Banner */}
       <HomeCtaBanner onNavigate={onNavigate} />
+
+      {/* 6. Feedback & Contact Us Section (Stores in DB & emails kmessilj@gmail.com) */}
+      <HomeFeedbackContactSection />
     </div>
   );
 };

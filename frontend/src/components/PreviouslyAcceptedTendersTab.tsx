@@ -810,7 +810,7 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
               </span>
             </div>
             <h2 className="text-lg font-bold text-white tracking-tight">
-              Previously Filled & Accepted Tenders Archive (10-Year Records: 2017 – 2026)
+              Previously Filled & Accepted Tenders Archive (17-Year Historical Records: 2010 – 2026)
             </h2>
             <p className="text-xs text-slate-300 mt-0.5 max-w-2xl leading-relaxed">
               Explore how winning contractors (L&T, Tata Projects, Afcons, Navayuga, Shapoorji Pallonji, Dilip Buildcon, Ashoka Buildcon, J. Kumar, B.G. Shirke, T&T Infra, NCC, GR Infra) structured their 3-cover submissions, satisfied turnover & 3-2-1 work formulas, and secured official Letters of Acceptance (LOA).

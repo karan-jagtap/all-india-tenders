@@ -1466,7 +1466,21 @@ def load_live_cppp_accepted_tenders() -> List[Dict[str, Any]]:
 
 
 def load_all_sources_accepted_tenders() -> List[Dict[str, Any]]:
-    """Loads awarded tenders from all 7 real portals across 2017-2026."""
+    """Loads awarded tenders directly from the persistent database."""
+    db_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "data", "all_india_tenders.db"))
+    if os.path.exists(db_path):
+        try:
+            import sqlite3
+            conn = sqlite3.connect(db_path)
+            conn.row_factory = sqlite3.Row
+            rows = conn.execute("SELECT raw_data FROM awarded_tenders WHERE raw_data IS NOT NULL").fetchall()
+            conn.close()
+            if rows:
+                return [json.loads(r["raw_data"]) if isinstance(r["raw_data"], str) else r["raw_data"] for r in rows]
+        except Exception as e:
+            print(f"[Accepted Tenders] DB load notice: {e}")
+
+    # Fallback to catalog file if DB is empty
     path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "data", "all_sources_accepted_catalog.json"))
     if os.path.exists(path):
         try:

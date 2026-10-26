@@ -52,6 +52,11 @@ export const CurrentTenderCard: React.FC<CurrentTenderCardProps> = ({
         >
           {sourceLabel}
         </span>
+        {tender.source_portal.includes('gem.gov.in') && (
+          <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-amber-100 dark:bg-amber-950/60 text-amber-900 dark:text-amber-300 border border-amber-300 dark:border-amber-800 flex items-center gap-1 shadow-2xs">
+            ⚡ GeM Portal
+          </span>
+        )}
         {(tender.is_ogd_open_data || tender.source_portal.includes('data.gov.in')) && (
           <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-cyan-100 dark:bg-cyan-950/60 text-cyan-900 dark:text-cyan-300 border border-cyan-300 dark:border-cyan-800 flex items-center gap-1 shadow-2xs">
             🏛️ data.gov.in (OGD)

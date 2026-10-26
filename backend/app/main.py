@@ -6,6 +6,9 @@ from app.api.system_routes import router as system_router
 from app.api.current_tenders_routes import router as current_tenders_router
 from app.api.accepted_tenders_routes import router as accepted_tenders_router
 from app.api.bidders_routes import router as bidders_router
+from app.api.feedback_routes import router as feedback_router
+from app.api.sources_routes import router as sources_router
+from app.db import init_db
 
 app = FastAPI(
     title="All India Tenders API",
@@ -27,12 +30,29 @@ app.include_router(system_router, prefix="/api")
 app.include_router(current_tenders_router, prefix="/api")
 app.include_router(accepted_tenders_router, prefix="/api")
 app.include_router(bidders_router, prefix="/api")
+app.include_router(feedback_router, prefix="/api")
+app.include_router(sources_router, prefix="/api")
 
 # Also mount under root for backwards compatibility
 app.include_router(system_router)
 app.include_router(current_tenders_router)
 app.include_router(accepted_tenders_router)
 app.include_router(bidders_router)
+app.include_router(feedback_router)
+app.include_router(sources_router)
+
+@app.on_event("startup")
+async def startup_event():
+    """Ensure persistent database schema is created on boot and start 3:00 AM daily cron scheduler."""
+    await init_db()
+    from app.services.cron_scheduler_service import start_cron_scheduler
+    start_cron_scheduler()
+
+@app.on_event("shutdown")
+async def shutdown_event():
+    """Cleanly terminate background schedulers."""
+    from app.services.cron_scheduler_service import shutdown_cron_scheduler
+    shutdown_cron_scheduler()
 
 @app.get("/")
 async def root():

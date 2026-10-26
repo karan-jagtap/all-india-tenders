@@ -616,6 +616,9 @@ def build_tender_documents(tender: Dict[str, Any]) -> List[Dict[str, Any]]:
     portal_url = tender.get("portal_url", "https://eprocure.gov.in/eprocure/app")
     clean_nit = re.sub(r'[^a-zA-Z0-9_-]', '_', nit)[:25]
 
+    sbd_direct_url = portal_url if "showbidDocument" in portal_url else f"{portal_url}#tender-documents"
+    boq_direct_url = portal_url if "showbidDocument" in portal_url else f"{portal_url}#boq-schedule"
+
     return [
         {
             "doc_id": "detailed_tender_doc",
@@ -627,7 +630,7 @@ def build_tender_documents(tender: Dict[str, Any]) -> List[Dict[str, Any]]:
             "badge": "Comprehensive SBD",
             "download_endpoint": f"/api/current-tenders/{tid}/tender-document",
             "portal_sourcing_section": "Work / Item Documents -> Tender Document (Volume I-IV)",
-            "portal_direct_url": f"{portal_url}#tender-documents",
+            "portal_direct_url": sbd_direct_url,
             "description": "Full Standard Bidding Document (SBD) containing Instructions to Bidders (ITB), GCC, SCC, Milestone Schedules, Liquidated Damages, Technical Specifications, and Statutory Annexures."
         },
         {
@@ -653,7 +656,7 @@ def build_tender_documents(tender: Dict[str, Any]) -> List[Dict[str, Any]]:
             "badge": "Financial BOQ",
             "download_endpoint": f"/api/current-tenders/{tid}/boq-pdf",
             "portal_sourcing_section": "Work / Item Documents -> BOQ Financial Schedule (xls / pdf)",
-            "portal_direct_url": f"{portal_url}#boq-schedule",
+            "portal_direct_url": boq_direct_url,
             "description": f"Itemized schedule of rates detailing quantities and departmental estimates totaling ₹ {est_cost:,.2f} for Cover-2 financial quotation."
         }
     ]
@@ -868,7 +871,24 @@ OFFICIAL_OPEN_DATA_FEEDS: List[Dict[str, Any]] = [
 
 
 def get_all_current_tenders_catalog() -> List[Dict[str, Any]]:
-    """Returns the unified live catalog of in-progress tenders across all real portals including data.gov.in."""
+    """Returns the unified live catalog of in-progress tenders retrieved directly from the persistent database."""
+    db_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "data", "all_india_tenders.db"))
+    if os.path.exists(db_path):
+        try:
+            import sqlite3
+            conn = sqlite3.connect(db_path)
+            conn.row_factory = sqlite3.Row
+            rows = conn.execute("SELECT raw_data FROM tenders WHERE raw_data IS NOT NULL").fetchall()
+            conn.close()
+            if rows:
+                db_tenders = [json.loads(r["raw_data"]) if isinstance(r["raw_data"], str) else r["raw_data"] for r in rows]
+                for t in db_tenders:
+                    if "tender_documents" not in t:
+                        t["tender_documents"] = build_tender_documents(t)
+                return db_tenders
+        except Exception as e:
+            print(f"[Current Tenders] DB load notice: {e}")
+
     path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "data", "all_sources_current_catalog.json"))
     raw_catalog = None
     if os.path.exists(path):
@@ -883,6 +903,15 @@ def get_all_current_tenders_catalog() -> List[Dict[str, Any]]:
 
     # Combine with Official Open Data Feeds (data.gov.in & departmental channels)
     combined: List[Dict[str, Any]] = list(OFFICIAL_OPEN_DATA_FEEDS) + list(raw_catalog)
+
+    # Ingest Live Government e-Marketplace (GeM) Bids into In-Memory RAM catalog
+    try:
+        from app.services.gem_service import get_gem_bids_catalog
+        gem_bids = get_gem_bids_catalog()
+        if gem_bids:
+            combined = list(gem_bids) + combined
+    except Exception as e:
+        print(f"[Current Tenders] GeM integration error: {e}")
 
     for t in combined:
         portal_name = t.get("source_portal", "")
@@ -934,6 +963,13 @@ def run_pure_scraping_sync() -> Dict[str, Any]:
     """
     global ALL_CURRENT_TENDERS
     start_time = time.time()
+
+    # Trigger live GeM scrape refresh across active BidPlus pages
+    try:
+        from app.services.gem_service import refresh_gem_bids
+        refresh_gem_bids(pages=3)
+    except Exception as e:
+        print(f"[Current Tenders] GeM live refresh notice: {e}")
 
     # Re-evaluate live catalog from scraping cache and portal feeds
     ALL_CURRENT_TENDERS = get_all_current_tenders_catalog()

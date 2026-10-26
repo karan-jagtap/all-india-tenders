@@ -13,7 +13,7 @@ export const HomeCtaBanner: React.FC<HomeCtaBannerProps> = ({ onNavigate }) => {
           Ready to explore India's public procurement tenders?
         </h3>
         <p className="text-xs text-slate-500 dark:text-slate-400 max-w-xl">
-          Choose a section to inspect live statutory notices, search 10-year awarded bid archives, or evaluate registered infrastructure contractors.
+          Choose a section to inspect live statutory notices, search 17-year awarded bid archives (2010 – 2026), or evaluate registered infrastructure contractors.
         </p>
       </div>
 

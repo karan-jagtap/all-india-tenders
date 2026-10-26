@@ -28,7 +28,7 @@ export const HomeHeroSection: React.FC<HomeHeroSectionProps> = ({
           <span className="text-base leading-none">🇮🇳</span>
           <span className="font-bold text-orange-400">National Public Procurement Platform</span>
           <span className="text-slate-500">•</span>
-          <span className="text-emerald-400 font-mono">100% In-Memory RAM Streaming</span>
+          <span className="text-emerald-400 font-mono">Hybrid Persistent DB + Vector Ready</span>
         </div>
 
         {/* Headline */}
@@ -41,7 +41,7 @@ export const HomeHeroSection: React.FC<HomeHeroSectionProps> = ({
 
         {/* Subtitle */}
         <p className="text-xs sm:text-base text-slate-300 leading-relaxed max-w-3xl">
-          Real-time statutory procurement intelligence platform aggregating unfilled in-progress tenders, complete 48-page Standard Bidding Documents (SBD / RFP), 10-year awarded bid records, and contractor intelligence from <strong>28+ official Central and State government portals</strong> — operating with <strong>Zero Database Requirements</strong>.
+          Real-time statutory procurement intelligence platform aggregating unfilled in-progress tenders, complete 48-page Standard Bidding Documents (SBD / RFP), 17-year awarded bid records (2010 – 2026), and contractor intelligence from <strong>28+ official Central and State government portals</strong> — powered by an <strong>Enterprise Hybrid Persistent Database Architecture</strong>.
         </p>
 
         {/* CTA Action Buttons */}

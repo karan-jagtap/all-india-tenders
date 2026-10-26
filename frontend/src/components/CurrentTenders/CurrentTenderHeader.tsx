@@ -98,6 +98,13 @@ export const CurrentTenderHeader: React.FC<CurrentTenderHeaderProps> = ({
             <span>🏛️ data.gov.in Feed • GODL</span>
           </span>
         )}
+
+        {/* GeM Badge */}
+        {selectedTender.source_portal?.includes('gem.gov.in') && (
+          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[11px] font-bold bg-amber-50 dark:bg-amber-950/40 text-amber-900 dark:text-amber-300 border border-amber-200 dark:border-amber-900/50 shadow-2xs whitespace-nowrap shrink-0">
+            <span>⚡ Government e-Marketplace (GeM)</span>
+          </span>
+        )}
       </div>
 
       {/* Tender Title & Authority Subtitle (Full-Width, Spacious) */}

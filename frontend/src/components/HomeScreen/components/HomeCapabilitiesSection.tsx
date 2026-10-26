@@ -65,14 +65,14 @@ export const HomeCapabilitiesSection: React.FC<HomeCapabilitiesSectionProps> = (
           </button>
         </div>
 
-        {/* Pillar 2: 10-Year Awarded Bids Archive */}
+        {/* Pillar 2: 17-Year Awarded Bids Archive */}
         <div className="bg-white dark:bg-[#0E1422] border border-slate-200/90 dark:border-slate-800 rounded-2xl p-6 shadow-xs hover:border-emerald-400/80 dark:hover:border-emerald-500/80 transition-all space-y-4 flex flex-col justify-between">
           <div className="space-y-3">
             <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-900/60 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
               <Award className="w-5 h-5" />
             </div>
             <h3 className="text-base font-bold text-slate-900 dark:text-white">
-              2. 10-Year Awarded Bids & Letters of Acceptance (LOA) Archive
+              2. 17-Year Awarded Bids & Letters of Acceptance (LOA) Archive
             </h3>
             <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
               Explore how leading contractors (L&T, Tata Projects, Afcons, Dilip Buildcon, NCC, B.G. Shirke) structured winning bids, technical submissions, and secured official government work orders.
@@ -80,7 +80,7 @@ export const HomeCapabilitiesSection: React.FC<HomeCapabilitiesSectionProps> = (
             <ul className="text-xs text-slate-600 dark:text-slate-300 space-y-1.5 pt-1">
               <li className="flex items-center gap-2">
                 <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
-                <span><strong>2,602 Historical Awarded Dossiers:</strong> Covering awarded contracts from 2017 to 2026 across India.</span>
+                <span><strong>4,350+ Historical Awarded Dossiers:</strong> Covering awarded contracts from 2010 to 2026 across India.</span>
               </li>
               <li className="flex items-center gap-2">
                 <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
