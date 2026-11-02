@@ -251,3 +251,41 @@ export async function listRegisteredBidders(params?: {
 
   return list;
 }
+
+export interface PoolContractorItem {
+  name: string;
+  hq: string;
+  cls: string;
+  turnoverCr: number;
+}
+
+export async function fetchContractorPools(): Promise<Record<string, PoolContractorItem[]>> {
+  try {
+    const res = await fetch(`${API_BASE}/contractors/pools?_t=${Date.now()}`, {
+      cache: 'no-store',
+      headers: {
+        'Cache-Control': 'no-cache',
+        'Pragma': 'no-cache'
+      }
+    });
+    if (res.ok) {
+      return await res.json();
+    }
+  } catch {
+    // Backend API unreachable, falling back to static database export
+  }
+
+  try {
+    const fallbackRes = await fetch(`/data/contractor_pools.json?_v=${Date.now()}`, {
+      cache: 'no-cache',
+      headers: { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' }
+    });
+    if (fallbackRes.ok) {
+      return await fallbackRes.json();
+    }
+  } catch {
+    // Fallback failed
+  }
+
+  return {};
+}

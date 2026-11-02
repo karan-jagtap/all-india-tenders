@@ -14,7 +14,7 @@ import {
   Check
 } from 'lucide-react';
 import { AcceptedTender } from '../../services/api';
-import { CONTRACTOR_POOLS } from '../../constants';
+import { getContractorPool } from '../../constants';
 import { hashString } from '../../utils';
 
 export interface EvaluatedBidder {
@@ -75,26 +75,8 @@ export const AllBidsEvaluationSubTab: React.FC<AllBidsEvaluationSubTabProps> = (
 
     const seed = hashString(tender.id + (tender.og_tender?.nit_number || 'eval-seed'));
 
-    // Select suitable contractor pool
-    let pool = CONTRACTOR_POOLS[tender.category];
-    if (!pool || pool.length < 5) {
-      const catLower = (tender.category || '').toLowerCase();
-      if (catLower.includes('health') || catLower.includes('medical')) {
-        pool = CONTRACTOR_POOLS['Healthcare, Medical & Hospital Infra'];
-      } else if (catLower.includes('defence') || catLower.includes('security')) {
-        pool = CONTRACTOR_POOLS['Defence, Border Security & Paramilitary'];
-      } else if (catLower.includes('highway') || catLower.includes('metro') || catLower.includes('rail')) {
-        pool = CONTRACTOR_POOLS['Highways, Metros & Rail Transport'];
-      } else if (catLower.includes('power') || catLower.includes('atomic') || catLower.includes('grid')) {
-        pool = CONTRACTOR_POOLS['Atomic Energy, Power & Grid Infra'];
-      } else if (catLower.includes('it') || catLower.includes('telecom')) {
-        pool = CONTRACTOR_POOLS['IT, Telecom & Semiconductor Works'];
-      } else if (catLower.includes('port') || catLower.includes('marine')) {
-        pool = CONTRACTOR_POOLS['Ports, Shipping & Maritime Works'];
-      } else {
-        pool = CONTRACTOR_POOLS['Civil & Infrastructure'];
-      }
-    }
+    // Select suitable contractor pool sourced dynamically from database
+    const pool = getContractorPool(tender.category);
 
     // Filter out winning company from competitor pool
     const competitors = (pool || []).filter(

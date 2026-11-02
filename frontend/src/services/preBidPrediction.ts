@@ -4,7 +4,7 @@ import {
   ClearingProbabilityBand,
   PreBidSimulationReport
 } from '../types';
-import { CONTRACTOR_POOLS } from '../constants';
+import { getContractorPool } from '../constants';
 import { hashString, formatCr } from '../utils';
 
 export * from '../types/prediction';
@@ -13,25 +13,8 @@ export function generatePreBidSimulation(tender: CurrentTender): PreBidSimulatio
   const cost = tender.estimated_cost_inr && tender.estimated_cost_inr > 0 ? tender.estimated_cost_inr : 250000000;
   const seed = hashString(tender.nit_number || tender.id || 'seed-default');
 
-  // Find suitable pool
-  let pool = CONTRACTOR_POOLS[tender.category];
-  if (!pool || pool.length < 5) {
-    if (tender.category.toLowerCase().includes('health') || tender.category.toLowerCase().includes('medical')) {
-      pool = CONTRACTOR_POOLS['Healthcare, Medical & Hospital Infra'];
-    } else if (tender.category.toLowerCase().includes('defence') || tender.category.toLowerCase().includes('police') || tender.category.toLowerCase().includes('security')) {
-      pool = CONTRACTOR_POOLS['Defence, Border Security & Paramilitary'];
-    } else if (tender.category.toLowerCase().includes('highway') || tender.category.toLowerCase().includes('metro') || tender.category.toLowerCase().includes('rail')) {
-      pool = CONTRACTOR_POOLS['Highways, Metros & Rail Transport'];
-    } else if (tender.category.toLowerCase().includes('power') || tender.category.toLowerCase().includes('atomic') || tender.category.toLowerCase().includes('grid')) {
-      pool = CONTRACTOR_POOLS['Atomic Energy, Power & Grid Infra'];
-    } else if (tender.category.toLowerCase().includes('it') || tender.category.toLowerCase().includes('telecom') || tender.category.toLowerCase().includes('semiconductor')) {
-      pool = CONTRACTOR_POOLS['IT, Telecom & Semiconductor Works'];
-    } else if (tender.category.toLowerCase().includes('port') || tender.category.toLowerCase().includes('marine') || tender.category.toLowerCase().includes('ship')) {
-      pool = CONTRACTOR_POOLS['Ports, Shipping & Maritime Works'];
-    } else {
-      pool = CONTRACTOR_POOLS['Civil & Infrastructure'];
-    }
-  }
+  // Find suitable pool sourced dynamically from database
+  const pool = getContractorPool(tender.category);
 
   // Shuffle pool deterministically based on seed
   const shuffled = [...pool];

@@ -1,3 +1,5 @@
+import { fetchContractorPools } from '../services/api';
+
 export interface PoolContractor {
   name: string;
   hq: string;
@@ -74,3 +76,67 @@ export const CONTRACTOR_POOLS: Record<string, PoolContractor[]> = {
     { name: 'Tata Projects Limited', hq: 'Mumbai / Noida', cls: 'Super Class-I Tier-1', turnoverCr: 14200 }
   ]
 };
+
+type PoolListener = (pools: Record<string, PoolContractor[]>) => void;
+const poolListeners: Set<PoolListener> = new Set();
+
+export function subscribeContractorPools(listener: PoolListener): () => void {
+  poolListeners.add(listener);
+  return () => poolListeners.delete(listener);
+}
+
+export function setContractorPools(newPools: Record<string, PoolContractor[]>) {
+  if (!newPools || Object.keys(newPools).length === 0) return;
+  // Mutate in-place so all consumers of CONTRACTOR_POOLS instantly see updated DB pools
+  for (const [key, val] of Object.entries(newPools)) {
+    CONTRACTOR_POOLS[key] = val;
+  }
+  poolListeners.forEach((l) => l(CONTRACTOR_POOLS));
+}
+
+export function getContractorPools(): Record<string, PoolContractor[]> {
+  return CONTRACTOR_POOLS;
+}
+
+export function getContractorPool(category: string): PoolContractor[] {
+  if (CONTRACTOR_POOLS[category] && CONTRACTOR_POOLS[category].length > 0) {
+    return CONTRACTOR_POOLS[category];
+  }
+  const catLower = (category || '').toLowerCase();
+  if (catLower.includes('health') || catLower.includes('medical')) {
+    return CONTRACTOR_POOLS['Healthcare, Medical & Hospital Infra'] || [];
+  }
+  if (catLower.includes('defence') || catLower.includes('security') || catLower.includes('police')) {
+    return CONTRACTOR_POOLS['Defence, Border Security & Paramilitary'] || [];
+  }
+  if (catLower.includes('highway') || catLower.includes('metro') || catLower.includes('rail')) {
+    return CONTRACTOR_POOLS['Highways, Metros & Rail Transport'] || [];
+  }
+  if (catLower.includes('power') || catLower.includes('atomic') || catLower.includes('grid')) {
+    return CONTRACTOR_POOLS['Atomic Energy, Power & Grid Infra'] || [];
+  }
+  if (catLower.includes('it') || catLower.includes('telecom') || catLower.includes('semiconductor')) {
+    return CONTRACTOR_POOLS['IT, Telecom & Semiconductor Works'] || [];
+  }
+  if (catLower.includes('port') || catLower.includes('marine') || catLower.includes('ship')) {
+    return CONTRACTOR_POOLS['Ports, Shipping & Maritime Works'] || [];
+  }
+  return CONTRACTOR_POOLS['Civil & Infrastructure'] || [];
+}
+
+let isPoolLoading = false;
+export async function loadContractorPools(): Promise<Record<string, PoolContractor[]>> {
+  if (isPoolLoading) return CONTRACTOR_POOLS;
+  isPoolLoading = true;
+  try {
+    const data = await fetchContractorPools();
+    if (data && Object.keys(data).length > 0) {
+      setContractorPools(data);
+    }
+  } catch (err) {
+    console.warn('Failed to load contractor pools from DB', err);
+  } finally {
+    isPoolLoading = false;
+  }
+  return CONTRACTOR_POOLS;
+}

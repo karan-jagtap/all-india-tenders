@@ -17,7 +17,7 @@ from app.db.session import async_session_factory, init_db, engine
 from app.db.models import (
     State, City, SourcePortal, PortalStateMapping,
     Category, Organisation, Contractor, ContractorContract,
-    ContractorStateMapping, ContractorCategoryMapping,
+    ContractorStateMapping, ContractorCategoryMapping, ContractorPool,
     Tender, AwardedTender, FeedbackSubmission
 )
 from app.services.current_tenders_service import (
@@ -445,6 +445,31 @@ async def seed_contractors_and_contracts(session):
     logger.info(f"Seeded {len(companies_map)} Registered Contractors and 17-year awards.")
 
 
+async def seed_contractor_pools(session):
+    """Seeds category-specific contractor pools into persistent DB."""
+    logger.info("Seeding Category-Specific Contractor Pools into Persistent DB...")
+    from app.constants.contractor_pools import CONTRACTOR_POOLS_DATA
+    await session.execute(delete(ContractorPool))
+    await session.flush()
+
+    pool_records = []
+    for cat, list_contractors in CONTRACTOR_POOLS_DATA.items():
+        for order, c in enumerate(list_contractors):
+            pool_records.append(ContractorPool(
+                category=cat,
+                contractor_name=c["name"],
+                hq=c["hq"],
+                contractor_class=c["cls"],
+                turnover_cr=float(c["turnoverCr"]),
+                display_order=order,
+                is_active=True
+            ))
+
+    session.add_all(pool_records)
+    await session.flush()
+    logger.info(f"Seeded {len(pool_records)} Contractor Pool rows across {len(CONTRACTOR_POOLS_DATA)} categories into DB.")
+
+
 async def seed_awarded_tenders(session):
     logger.info("Seeding Historical Awarded Tenders across 17-Year Archive (2010 - 2026)...")
     await session.execute(delete(AwardedTender))
@@ -597,6 +622,7 @@ async def run_seed():
         cat_id_map = await seed_categories(session)
         await seed_organisations(session, state_id_map, cat_id_map)
         await seed_contractors_and_contracts(session)
+        await seed_contractor_pools(session)
         await seed_awarded_tenders(session)
         await seed_live_tenders(session)
         await migrate_existing_feedback(session)

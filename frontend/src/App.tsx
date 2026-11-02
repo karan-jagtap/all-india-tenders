@@ -18,6 +18,7 @@ import { PreviouslyAcceptedTendersTab } from './components/PreviouslyAcceptedTen
 import { CurrentTendersTab } from './components/CurrentTendersTab';
 import { RegisteredBiddersTab } from './components/RegisteredBiddersTab';
 import { getPlatformStats, triggerLiveScrape, PlatformStats, ScrapeReport } from './services/api';
+import { loadContractorPools } from './constants/contractors';
 
 export const App: React.FC = () => {
   const { toggleTheme, isDark } = useTheme();
@@ -36,6 +37,7 @@ export const App: React.FC = () => {
 
   useEffect(() => {
     fetchStats();
+    loadContractorPools();
   }, []);
 
   // Close mobile hamburger menu on Escape key

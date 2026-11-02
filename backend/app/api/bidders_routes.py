@@ -8,10 +8,30 @@ from fastapi.responses import JSONResponse
 from typing import Optional
 from app.services.bidders_service import (
     list_registered_bidders,
-    get_bidder_by_slug
+    get_bidder_by_slug,
+    get_contractor_pools_from_db
 )
 
 router = APIRouter(tags=["Registered Bidders"])
+
+
+@router.get("/contractors/pools")
+@router.get("/bidders/pools")
+async def get_contractor_pools(
+    category: Optional[str] = Query(None, description="Optional category filter (e.g., 'Civil & Infrastructure')")
+):
+    """
+    Returns verified category-indexed contractor pools sourced directly from the database.
+    Used for pre-bid simulation, competitive evaluations, and peer contractor benchmarking.
+    """
+    pools = get_contractor_pools_from_db(category=category)
+    return JSONResponse(
+        content=pools,
+        headers={
+            "Cache-Control": "no-cache, no-store, must-revalidate",
+            "Pragma": "no-cache"
+        }
+    )
 
 
 @router.get("/bidders")

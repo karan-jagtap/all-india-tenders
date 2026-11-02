@@ -7,7 +7,7 @@ from app.db.session import engine, async_session_factory, get_db_session, init_d
 from app.db.models import (
     State, City, SourcePortal, PortalStateMapping,
     Category, Organisation, Contractor, ContractorContract,
-    ContractorStateMapping, ContractorCategoryMapping,
+    ContractorStateMapping, ContractorCategoryMapping, ContractorPool,
     Tender, AwardedTender, FeedbackSubmission, CronSyncLog
 )
 
@@ -29,6 +29,7 @@ __all__ = [
     "ContractorContract",
     "ContractorStateMapping",
     "ContractorCategoryMapping",
+    "ContractorPool",
     "Tender",
     "AwardedTender",
     "FeedbackSubmission",

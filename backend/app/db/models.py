@@ -199,6 +199,23 @@ class ContractorCategoryMapping(Base):
     category: Mapped["Category"] = relationship("Category")
 
 
+class ContractorPool(Base, TimestampMixin):
+    """
+    Contractor Pools for pre-bid simulation, competitive bid evaluations,
+    and category-specific contractor benchmarks.
+    """
+    __tablename__ = "contractor_pools"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    category: Mapped[str] = mapped_column(String(120), nullable=False, index=True)
+    contractor_name: Mapped[str] = mapped_column(String(200), nullable=False)
+    hq: Mapped[str] = mapped_column(String(150), nullable=False)
+    contractor_class: Mapped[str] = mapped_column(String(100), nullable=False)
+    turnover_cr: Mapped[float] = mapped_column(Float, nullable=False)
+    display_order: Mapped[int] = mapped_column(Integer, default=0)
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True)
+
+
 # ==============================================================================
 # 6. Live In-Progress Tenders
 # ==============================================================================

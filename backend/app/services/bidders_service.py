@@ -291,3 +291,48 @@ def get_bidder_by_slug(slug: str) -> Optional[Dict[str, Any]]:
         if b["slug"] == slug or slugify(b["name"]) == slug:
             return b
     return None
+
+def get_contractor_pools_from_db(category: Optional[str] = None) -> Dict[str, List[Dict[str, Any]]]:
+    """
+    Retrieves category-indexed contractor pools directly from the persistent database (contractor_pools table).
+    Falls back to CONTRACTOR_POOLS_DATA constant if database is not reachable.
+    """
+    import os
+    import sqlite3
+    from app.constants.contractor_pools import CONTRACTOR_POOLS_DATA
+
+    db_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "data", "all_india_tenders.db"))
+    pools: Dict[str, List[Dict[str, Any]]] = {}
+
+    if os.path.exists(db_path):
+        try:
+            conn = sqlite3.connect(db_path)
+            conn.row_factory = sqlite3.Row
+            cursor = conn.cursor()
+            if category and category != "ALL":
+                query = "SELECT category, contractor_name, hq, contractor_class, turnover_cr FROM contractor_pools WHERE is_active=1 AND category=? ORDER BY display_order"
+                rows = cursor.execute(query, (category,)).fetchall()
+            else:
+                query = "SELECT category, contractor_name, hq, contractor_class, turnover_cr FROM contractor_pools WHERE is_active=1 ORDER BY category, display_order"
+                rows = cursor.execute(query).fetchall()
+
+            for r in rows:
+                cat = r["category"]
+                if cat not in pools:
+                    pools[cat] = []
+                pools[cat].append({
+                    "name": r["contractor_name"],
+                    "hq": r["hq"],
+                    "cls": r["contractor_class"],
+                    "turnoverCr": float(r["turnover_cr"])
+                })
+            conn.close()
+        except Exception:
+            pass
+
+    if not pools:
+        if category and category != "ALL":
+            return {category: CONTRACTOR_POOLS_DATA.get(category, [])}
+        return CONTRACTOR_POOLS_DATA
+
+    return pools
