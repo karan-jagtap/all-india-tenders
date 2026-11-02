@@ -8,72 +8,1839 @@ export interface PoolContractor {
 }
 
 export const CONTRACTOR_POOLS: Record<string, PoolContractor[]> = {
-  'Civil & Infrastructure': [
-    { name: 'B.G. Shirke Construction Technology Pvt. Ltd.', hq: 'Pune, Maharashtra', cls: 'Super Class-I PWD', turnoverCr: 3820 },
-    { name: 'T&T Infra Limited', hq: 'Pune, Maharashtra', cls: 'Class-I PWD', turnoverCr: 1850 },
-    { name: 'Ashoka Buildcon Limited', hq: 'Nashik, Maharashtra', cls: 'Class-I A National', turnoverCr: 6800 },
-    { name: 'Dilip Buildcon Limited (DBL)', hq: 'Bhopal, Madhya Pradesh', cls: 'Class-I A EPC', turnoverCr: 9500 },
-    { name: 'Larsen & Toubro Limited (L&T)', hq: 'Mumbai, Maharashtra', cls: 'Super Class-I Tier-1', turnoverCr: 18500 },
-    { name: 'Tata Projects Limited', hq: 'Mumbai / Noida', cls: 'Super Class-I Tier-1', turnoverCr: 14200 },
-    { name: 'J. Kumar Infraprojects Limited', hq: 'Mumbai, Maharashtra', cls: 'Class-I A Metro/Flyover', turnoverCr: 4210 },
-    { name: 'KNR Constructions Limited', hq: 'Hyderabad, Telangana', cls: 'Class-I Highway EPC', turnoverCr: 3900 },
-    { name: 'Montecarlo Limited', hq: 'Ahmedabad, Gujarat', cls: 'Class-I Civil', turnoverCr: 4600 }
+  "Civil & Infrastructure": [
+    {
+      "name": "B.G. Shirke Construction Technology Pvt. Ltd.",
+      "hq": "Pune, Maharashtra",
+      "cls": "Super Class-I PWD",
+      "turnoverCr": 3820.0
+    },
+    {
+      "name": "T&T Infra Limited",
+      "hq": "Pune, Maharashtra",
+      "cls": "Class-I PWD",
+      "turnoverCr": 1850.0
+    },
+    {
+      "name": "Ashoka Buildcon Limited",
+      "hq": "Nashik, Maharashtra",
+      "cls": "Class-I A National",
+      "turnoverCr": 6800.0
+    },
+    {
+      "name": "Dilip Buildcon Limited (DBL)",
+      "hq": "Bhopal, Madhya Pradesh",
+      "cls": "Class-I A EPC",
+      "turnoverCr": 9500.0
+    },
+    {
+      "name": "Larsen & Toubro Limited (L&T)",
+      "hq": "Mumbai, Maharashtra",
+      "cls": "Super Class-I Tier-1",
+      "turnoverCr": 18500.0
+    },
+    {
+      "name": "Tata Projects Limited",
+      "hq": "Mumbai / Noida",
+      "cls": "Super Class-I Tier-1",
+      "turnoverCr": 14200.0
+    },
+    {
+      "name": "J. Kumar Infraprojects Limited",
+      "hq": "Mumbai, Maharashtra",
+      "cls": "Class-I A Metro/Flyover",
+      "turnoverCr": 4210.0
+    },
+    {
+      "name": "KNR Constructions Limited",
+      "hq": "Hyderabad, Telangana",
+      "cls": "Class-I Highway EPC",
+      "turnoverCr": 3900.0
+    },
+    {
+      "name": "Montecarlo Limited",
+      "hq": "Ahmedabad, Gujarat",
+      "cls": "Class-I Civil",
+      "turnoverCr": 4600.0
+    },
+    {
+      "name": "Afcons Infrastructure Limited",
+      "hq": "Veera Desai, Mumbai - 400053",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 11800.0
+    },
+    {
+      "name": "Afcons Infrastructure Limited (Shapoorji Pallonji Group)",
+      "hq": "Andheri (W), Mumbai - 400053",
+      "cls": "Class-I Local Supplier (Make in India Order 2017)",
+      "turnoverCr": 11800.0
+    },
+    {
+      "name": "Ahluwalia Contracts (India) Limited",
+      "hq": "Phase-I, New Delhi - 110020",
+      "cls": "Class-I Local Supplier (Make in India Order 2017)",
+      "turnoverCr": 3410.0
+    },
+    {
+      "name": "Ahluwalia Contracts (India) Ltd.",
+      "hq": "Phase-I, New Delhi - 110020",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 3410.0
+    },
+    {
+      "name": "Apco Infratech Private Limited",
+      "hq": "Gomti Nagar, Lucknow - 226010",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 4820.0
+    },
+    {
+      "name": "Apco Infratech Pvt. Ltd.",
+      "hq": "Lucknow - 226010, Uttar Pradesh",
+      "cls": "Class-I Local Supplier (MoRTH / Make in India)",
+      "turnoverCr": 4820.0
+    },
+    {
+      "name": "B.G. Shirke - Welspun JV (Pune)",
+      "hq": "Pune - 411036, Maharashtra",
+      "cls": "Class-I Local Supplier (100% Pune Region Operations)",
+      "turnoverCr": 3820.0
+    },
+    {
+      "name": "BGR Mining & Infra Limited",
+      "hq": "Banjara Hills, Hyderabad - 500034",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 2500.0
+    },
+    {
+      "name": "BSCPL Infrastructure Limited",
+      "hq": "Banjara Hills, Hyderabad - 500034",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 1850.0
+    },
+    {
+      "name": "Bridge & Roof Co. (India) Ltd.",
+      "hq": "6 Little Russell Street, Kolkata - 700071",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 3200.0
+    },
+    {
+      "name": "Ceigall India Limited",
+      "hq": "Tagor Nagar, Ludhiana - 141001",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 3100.0
+    },
+    {
+      "name": "Cherian Varkey Construction Co Pvt Ltd",
+      "hq": "Market Road, Ernakulam - 682035",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 1026.0
+    },
+    {
+      "name": "Dilip Buildcon Limited",
+      "hq": "Kolar Road, Bhopal - 462016",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 9500.0
+    },
+    {
+      "name": "Dineshchandra R. Agrawal Infracon Pvt. Ltd.",
+      "hq": "Ahmedabad - 380015",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 4100.0
+    },
+    {
+      "name": "EKK Infrastructure Limited",
+      "hq": "Perumbavoor, Kochi - 683542",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 1450.0
+    },
+    {
+      "name": "Engineers India Limited (EPC Division)",
+      "hq": "1 Bhikaiji Cama Place, New Delhi - 110066",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 2500.0
+    },
+    {
+      "name": "G R Infraprojects Limited (GRIL)",
+      "hq": "Udaipur - 313002, Rajasthan",
+      "cls": "Class-I Local Supplier (Make in India Order 2017)",
+      "turnoverCr": 2500.0
+    },
+    {
+      "name": "GPT Infraprojects Limited",
+      "hq": "Salt Lake, Kolkata - 700106",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 2500.0
+    },
+    {
+      "name": "GR Infraprojects Limited",
+      "hq": "Sector-11, Udaipur - 313002",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 7900.0
+    },
+    {
+      "name": "Gammon Engineers and Contractors Corp",
+      "hq": "Prabhadevi, Mumbai - 400025",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 2400.0
+    },
+    {
+      "name": "Gawar Construction Limited",
+      "hq": "Hisar, Haryana - 125005",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 4200.0
+    },
+    {
+      "name": "Goyal Construction Company",
+      "hq": "Sector 22-A, Chandigarh - 160022",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 2500.0
+    },
+    {
+      "name": "Gulermak Heavy Industries Construction",
+      "hq": "Barakhamba Road, New Delhi - 110001",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 2500.0
+    },
+    {
+      "name": "H.G. Infra Engineering Limited",
+      "hq": "Ratanada, Jodhpur - 342001",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 4800.0
+    },
+    {
+      "name": "Hindustan Construction Company (HCC)",
+      "hq": "Vikhroli (W), Mumbai - 400083",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 9500.0
+    },
+    {
+      "name": "IRB Infrastructure Developers Ltd.",
+      "hq": "Andheri (E), Mumbai - 400072",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 6400.0
+    },
+    {
+      "name": "ITD Cementation India (Southern Division)",
+      "hq": "Vile Parle, Mumbai - 400057",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 5400.0
+    },
+    {
+      "name": "ITD Cementation India Limited",
+      "hq": "Vile Parle (E), Mumbai - 400057",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 5400.0
+    },
+    {
+      "name": "Ircon International Limited (IRCON)",
+      "hq": "Saket, New Delhi - 110017",
+      "cls": "Class-I Local Supplier (Railway Public Enterprise)",
+      "turnoverCr": 10200.0
+    },
+    {
+      "name": "J. Kumar Infraprojects Limited (JKIL)",
+      "hq": "Mumbai - 400053 (Pune Zonal Office: Shivajinagar, Pune)",
+      "cls": "Class-I Local Supplier (Make in India Order 2017)",
+      "turnoverCr": 4210.0
+    },
+    {
+      "name": "J. Kumar Infraprojects Ltd.",
+      "hq": "Veera Desai Road, Mumbai - 400053",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 4210.0
+    },
+    {
+      "name": "KEC International Limited",
+      "hq": "Worli, Mumbai - 400030",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 16500.0
+    },
+    {
+      "name": "KEC International Limited (Civil Infrastructure SBU)",
+      "hq": "Worli, Mumbai - 400030",
+      "cls": "Class-I Local Supplier (Make in India Order 2017)",
+      "turnoverCr": 16500.0
+    },
+    {
+      "name": "Kalpataru Projects International Limited",
+      "hq": "Santacruz (E), Mumbai - 400055",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 14200.0
+    },
+    {
+      "name": "L&T - IHI Corporation Consortium",
+      "hq": "Ballard Estate, Mumbai - 400001 (Consortium Leader: Larsen & Toubro Limited)",
+      "cls": "Class-I Local Supplier (JICA / Make in India)",
+      "turnoverCr": 18500.0
+    },
+    {
+      "name": "Larsen & Toubro (Heavy Infrastructure)",
+      "hq": "Ballard Estate, Mumbai - 400001",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 18500.0
+    },
+    {
+      "name": "Larsen & Toubro (Power Transmission & Distribution)",
+      "hq": "Ballard Estate, Mumbai - 400001",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 18500.0
+    },
+    {
+      "name": "Larsen & Toubro Construction (Heavy Civil)",
+      "hq": "Ballard Estate, Mumbai - 400001",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 18500.0
+    },
+    {
+      "name": "Larsen & Toubro Heavy Civil",
+      "hq": "Mumbai - 400001",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 18500.0
+    },
+    {
+      "name": "Larsen & Toubro Limited (Heavy Civil & Buildings IC)",
+      "hq": "Mumbai - 400001 / Construction HQ: Manapakkam, Chennai",
+      "cls": "Class-I Local Supplier (Make in India Compliant)",
+      "turnoverCr": 18500.0
+    },
+    {
+      "name": "Larsen & Toubro Limited (Heavy Civil Infrastructure IC)",
+      "hq": "Mumbai - 400001, Maharashtra",
+      "cls": "Class-I Local Supplier (Make in India Order 2017)",
+      "turnoverCr": 18500.0
+    },
+    {
+      "name": "Larsen & Toubro Limited (Water & Effluent Treatment IC)",
+      "hq": "Ballard Estate, Mumbai - 400001 / Pune Office: Bund Garden Road",
+      "cls": "Class-I Local Supplier (MahaPWD / PMC Enlisted)",
+      "turnoverCr": 18500.0
+    },
+    {
+      "name": "Marymatha Construction Company",
+      "hq": "Muvattupuzha, Ernakulam - 686661",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 1150.0
+    },
+    {
+      "name": "Megha Engineering & Infrastructures Ltd (MEIL)",
+      "hq": "Hyderabad - 500037, Telangana",
+      "cls": "Class-I Local Supplier (MoRTH / Make in India)",
+      "turnoverCr": 21000.0
+    },
+    {
+      "name": "NBCC (India) Limited",
+      "hq": "Lodhi Road, New Delhi - 110003",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 9400.0
+    },
+    {
+      "name": "NCC Limited (Civil Infrastructure)",
+      "hq": "Madhapur, Hyderabad - 500081",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 14500.0
+    },
+    {
+      "name": "NCC Limited (Nagarjuna Construction Company)",
+      "hq": "Hyderabad - 500081, Telangana",
+      "cls": "Class-I Local Supplier (Make in India Order 2017)",
+      "turnoverCr": 14500.0
+    },
+    {
+      "name": "NCC Limited (Urban Infra Division)",
+      "hq": "Madhapur, Hyderabad - 500081",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 14500.0
+    },
+    {
+      "name": "National Projects Construction Corporation (NPCC)",
+      "hq": "Sector 44, Gurugram - 122003",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 2500.0
+    },
+    {
+      "name": "Navayuga Engineering Company Limited",
+      "hq": "Panjagutta, Hyderabad - 500082 / Pune Project Office: Baner",
+      "cls": "Class-I Local Supplier (MahaPWD Registered)",
+      "turnoverCr": 26100.0
+    },
+    {
+      "name": "Omaxe Limited (Infrastructure Division)",
+      "hq": "Kalka Road, New Delhi - 110019",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 1850.0
+    },
+    {
+      "name": "PNC Infratech Limited",
+      "hq": "Bypass Road, Agra - 282002",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 7200.0
+    },
+    {
+      "name": "Patel Engineering Limited",
+      "hq": "Jogeshwari (W), Mumbai - 400102",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 4200.0
+    },
+    {
+      "name": "Punj Lloyd Limited",
+      "hq": "17-18 Nehru Place, New Delhi - 110019",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 3100.0
+    },
+    {
+      "name": "Rajdeep Buildcon Pvt. Ltd.",
+      "hq": "Savedi Road, Ahmednagar - 414003 / Pune Office: Bund Garden Road",
+      "cls": "Class-I Local Supplier (100% Maharashtra Operations)",
+      "turnoverCr": 1250.0
+    },
+    {
+      "name": "Rajnish Infra Private Limited",
+      "hq": "Tonk Road, Jaipur - 302015",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 980.0
+    },
+    {
+      "name": "SP Singla Constructions Pvt. Ltd.",
+      "hq": "Sector 8-C, Chandigarh - 160009",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 2800.0
+    },
+    {
+      "name": "Shapoorji Pallonji & Co. Pvt. Ltd.",
+      "hq": "Colaba, Mumbai - 400005",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 28200.0
+    },
+    {
+      "name": "Shapoorji Pallonji Engineering & Construction (SP E&C)",
+      "hq": "Mumbai - 400005, Maharashtra",
+      "cls": "Class-I Local Supplier (Make in India Order 2017)",
+      "turnoverCr": 28200.0
+    },
+    {
+      "name": "Shapoorji Pallonji and Company Private Limited",
+      "hq": "Mumbai - 400005, Maharashtra",
+      "cls": "Class-I Local Supplier (Make in India Compliant)",
+      "turnoverCr": 28200.0
+    },
+    {
+      "name": "Simplex Infrastructures Limited",
+      "hq": "27 Shakespeare Sarani, Kolkata - 700017",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 2900.0
+    },
+    {
+      "name": "Soma Enterprise Limited",
+      "hq": "Banjara Hills, Hyderabad - 500034",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 1950.0
+    },
+    {
+      "name": "Sterling & Wilson Renewable Energy Ltd.",
+      "hq": "Chembur, Mumbai - 400043",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 5200.0
+    },
+    {
+      "name": "T and T Infra Limited (Pune)",
+      "hq": "Pune - 411041, Maharashtra",
+      "cls": "Class-I Local Supplier (Pune Headquartered)",
+      "turnoverCr": 1850.0
+    },
+    {
+      "name": "Tata Power Solar Systems Limited",
+      "hq": "Carnac Bunder, Mumbai - 400009",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 7800.0
+    },
+    {
+      "name": "Tata Projects Limited (Heavy Civil)",
+      "hq": "Powai, Mumbai - 400076",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 14200.0
+    },
+    {
+      "name": "Thriveni Earthmovers Private Limited",
+      "hq": "Fairlands, Salem - 636016",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 2500.0
+    },
+    {
+      "name": "Toyo Engineering India Private Limited",
+      "hq": "Kanjurmarg East, Mumbai - 400042",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 2500.0
+    },
+    {
+      "name": "URC Construction Private Limited",
+      "hq": "URC Nagar, Erode - 638012",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 1650.0
+    },
+    {
+      "name": "VA Tech WABAG Limited",
+      "hq": "Kovilambakkam, Chennai - 600117",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 2960.0
+    },
+    {
+      "name": "Vikram Solar Limited",
+      "hq": "1865 Rajdanga Main Road, Kolkata - 700107",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 2500.0
+    }
   ],
-  'Highways, Metros & Rail Transport': [
-    { name: 'Dilip Buildcon Limited (DBL)', hq: 'Bhopal, Madhya Pradesh', cls: 'Class-I A EPC', turnoverCr: 9500 },
-    { name: 'Ashoka Buildcon Limited', hq: 'Nashik, Maharashtra', cls: 'Class-I A National', turnoverCr: 6800 },
-    { name: 'Larsen & Toubro Limited (Heavy Civil)', hq: 'Chennai / Mumbai', cls: 'Super Class-I Tier-1', turnoverCr: 18500 },
-    { name: 'GR Infraprojects Limited', hq: 'Udaipur, Rajasthan', cls: 'Class-I A Highway BOT', turnoverCr: 7900 },
-    { name: 'Afcons Infrastructure Limited', hq: 'Mumbai, Maharashtra', cls: 'Class-I Viaduct & Marine', turnoverCr: 11800 },
-    { name: 'Megha Engineering & Infrastructures (MEIL)', hq: 'Hyderabad, Telangana', cls: 'Super Class-I EPC', turnoverCr: 21000 },
-    { name: 'IRB Infrastructure Developers Ltd.', hq: 'Mumbai, Maharashtra', cls: 'Class-I Expressway BOT', turnoverCr: 6400 }
+  "Highways, Metros & Rail Transport": [
+    {
+      "name": "Dilip Buildcon Limited (DBL)",
+      "hq": "Bhopal, Madhya Pradesh",
+      "cls": "Class-I A EPC",
+      "turnoverCr": 9500.0
+    },
+    {
+      "name": "Ashoka Buildcon Limited",
+      "hq": "Nashik, Maharashtra",
+      "cls": "Class-I A National",
+      "turnoverCr": 6800.0
+    },
+    {
+      "name": "Larsen & Toubro Limited (Heavy Civil)",
+      "hq": "Chennai / Mumbai",
+      "cls": "Super Class-I Tier-1",
+      "turnoverCr": 18500.0
+    },
+    {
+      "name": "GR Infraprojects Limited",
+      "hq": "Udaipur, Rajasthan",
+      "cls": "Class-I A Highway BOT",
+      "turnoverCr": 7900.0
+    },
+    {
+      "name": "Afcons Infrastructure Limited",
+      "hq": "Mumbai, Maharashtra",
+      "cls": "Class-I Viaduct & Marine",
+      "turnoverCr": 11800.0
+    },
+    {
+      "name": "Megha Engineering & Infrastructures (MEIL)",
+      "hq": "Hyderabad, Telangana",
+      "cls": "Super Class-I EPC",
+      "turnoverCr": 21000.0
+    },
+    {
+      "name": "IRB Infrastructure Developers Ltd.",
+      "hq": "Mumbai, Maharashtra",
+      "cls": "Class-I Expressway BOT",
+      "turnoverCr": 6400.0
+    },
+    {
+      "name": "Ahluwalia Contracts (India) Ltd.",
+      "hq": "Phase-I, New Delhi - 110020",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 3410.0
+    },
+    {
+      "name": "Apco Infratech Private Limited",
+      "hq": "Gomti Nagar, Lucknow - 226010",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 4820.0
+    },
+    {
+      "name": "B.G. Shirke Construction Technology Pvt. Ltd.",
+      "hq": "Pune - 411036, Maharashtra",
+      "cls": "Class-I Local Supplier (100% Maharashtra Operations)",
+      "turnoverCr": 3820.0
+    },
+    {
+      "name": "B.R. Construction Puducherry",
+      "hq": "Kamaraj Salai, Puducherry - 605011",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 2500.0
+    },
+    {
+      "name": "BGR Mining & Infra Limited",
+      "hq": "Banjara Hills, Hyderabad - 500034",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 2500.0
+    },
+    {
+      "name": "BSCPL Infrastructure Limited",
+      "hq": "Banjara Hills, Hyderabad - 500034",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 1850.0
+    },
+    {
+      "name": "Bridge & Roof Co. (India) Ltd.",
+      "hq": "6 Little Russell Street, Kolkata - 700071",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 3200.0
+    },
+    {
+      "name": "Ceigall India Limited",
+      "hq": "Tagor Nagar, Ludhiana - 141001",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 3100.0
+    },
+    {
+      "name": "Cherian Varkey Construction Co Pvt Ltd",
+      "hq": "Market Road, Ernakulam - 682035",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 1026.0
+    },
+    {
+      "name": "Dilip Buildcon Limited",
+      "hq": "Kolar Road, Bhopal - 462016",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 9500.0
+    },
+    {
+      "name": "Dineshchandra R. Agrawal Infracon Pvt. Ltd.",
+      "hq": "Ahmedabad - 380015",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 4100.0
+    },
+    {
+      "name": "EKK Infrastructure Limited",
+      "hq": "Perumbavoor, Kochi - 683542",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 1450.0
+    },
+    {
+      "name": "GPT Infraprojects Limited",
+      "hq": "Salt Lake, Kolkata - 700106",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 2500.0
+    },
+    {
+      "name": "Gammon Engineers and Contractors Corp",
+      "hq": "Prabhadevi, Mumbai - 400025",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 2400.0
+    },
+    {
+      "name": "Gawar Construction Limited",
+      "hq": "Hisar, Haryana - 125005",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 4200.0
+    },
+    {
+      "name": "Gayatri Projects Limited",
+      "hq": "Nanakramguda, Hyderabad - 500032",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 2200.0
+    },
+    {
+      "name": "Goyal Construction Company",
+      "hq": "Sector 22-A, Chandigarh - 160022",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 2500.0
+    },
+    {
+      "name": "Gulermak Heavy Industries Construction",
+      "hq": "Barakhamba Road, New Delhi - 110001",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 2500.0
+    },
+    {
+      "name": "H.G. Infra Engineering Limited",
+      "hq": "Ratanada, Jodhpur - 342001",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 4800.0
+    },
+    {
+      "name": "Hindustan Construction Company (HCC)",
+      "hq": "Vikhroli (W), Mumbai - 400083",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 9500.0
+    },
+    {
+      "name": "ITD Cementation India (Southern Division)",
+      "hq": "Vile Parle, Mumbai - 400057",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 5400.0
+    },
+    {
+      "name": "ITD Cementation India Limited",
+      "hq": "Vile Parle (E), Mumbai - 400057",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 5400.0
+    },
+    {
+      "name": "Ircon International Limited (IRCON)",
+      "hq": "Saket, New Delhi - 110017",
+      "cls": "Class-I Local Supplier (Railway Public Enterprise)",
+      "turnoverCr": 10200.0
+    },
+    {
+      "name": "J. Kumar Infraprojects Ltd.",
+      "hq": "Veera Desai Road, Mumbai - 400053",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 4210.0
+    },
+    {
+      "name": "KNR Constructions Limited",
+      "hq": "Jubilee Hills, Hyderabad - 500033",
+      "cls": "Class-I Local Supplier (Make in India Order 2017)",
+      "turnoverCr": 3900.0
+    },
+    {
+      "name": "Kernex Microsystems (India) Ltd.",
+      "hq": "Shamshabad, Hyderabad - 501218",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 680.0
+    },
+    {
+      "name": "L&T Construction (Heavy Civil Infrastructure)",
+      "hq": "Ballard Estate, Mumbai - 400001",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 18500.0
+    },
+    {
+      "name": "Larsen & Toubro (Heavy Infrastructure)",
+      "hq": "Ballard Estate, Mumbai - 400001",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 18500.0
+    },
+    {
+      "name": "Larsen & Toubro Construction (Transportation Infra)",
+      "hq": "Ballard Estate, Mumbai - 400001",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 18500.0
+    },
+    {
+      "name": "Larsen & Toubro Heavy Civil",
+      "hq": "Mumbai - 400001",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 18500.0
+    },
+    {
+      "name": "Larsen & Toubro Heavy Civil Infrastructure",
+      "hq": "Mount Poonamallee Road, Chennai - 600089",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 18500.0
+    },
+    {
+      "name": "Larsen & Toubro Limited (Railway SBU)",
+      "hq": "Manapakkam, Chennai - 600089",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 18500.0
+    },
+    {
+      "name": "Marymatha Construction Company",
+      "hq": "Muvattupuzha, Ernakulam - 686661",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 1150.0
+    },
+    {
+      "name": "Medha Servo Drives Pvt. Ltd.",
+      "hq": "IDA Nacharam, Hyderabad - 500076",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 1450.0
+    },
+    {
+      "name": "Megha Engineering & Infrastructures Ltd (MEIL)",
+      "hq": "Hyderabad - 500037, Telangana",
+      "cls": "Class-I Local Supplier (MoRTH / Make in India)",
+      "turnoverCr": 21000.0
+    },
+    {
+      "name": "Montecarlo Limited",
+      "hq": "Bodakdev, Ahmedabad - 380058",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 4600.0
+    },
+    {
+      "name": "NCC Limited",
+      "hq": "NCC House, Hyderabad - 500081",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 14500.0
+    },
+    {
+      "name": "NCC Limited (Infrastructure)",
+      "hq": "Madhapur, Hyderabad - 500081",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 14500.0
+    },
+    {
+      "name": "NCC Limited (Urban Infra Division)",
+      "hq": "Madhapur, Hyderabad - 500081",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 14500.0
+    },
+    {
+      "name": "Navayuga Engineering Company Limited",
+      "hq": "Panjagutta, Hyderabad - 500082 / Pune Project Office: Baner",
+      "cls": "Class-I Local Supplier (MahaPWD Registered)",
+      "turnoverCr": 26100.0
+    },
+    {
+      "name": "Niraj Cement Structurals Limited",
+      "hq": "Deonar, Mumbai - 400088",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 2500.0
+    },
+    {
+      "name": "Odisha Construction Corporation Ltd (OCCL)",
+      "hq": "Unit-VIII, Bhubaneswar - 751012",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 1100.0
+    },
+    {
+      "name": "Omaxe Limited (Infrastructure Division)",
+      "hq": "Kalka Road, New Delhi - 110019",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 1850.0
+    },
+    {
+      "name": "PNC Infratech Limited",
+      "hq": "Bypass Road, Agra - 282002",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 7200.0
+    },
+    {
+      "name": "PSP Projects Limited",
+      "hq": "Iscon-Ambli Road, Ahmedabad - 380058",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 2100.0
+    },
+    {
+      "name": "Patel Engineering Limited",
+      "hq": "Jogeshwari (W), Mumbai - 400102",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 4200.0
+    },
+    {
+      "name": "Rajnish Infra Private Limited",
+      "hq": "Tonk Road, Jaipur - 302015",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 980.0
+    },
+    {
+      "name": "SP Singla Constructions Pvt. Ltd.",
+      "hq": "Sector 8-C, Chandigarh - 160009",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 2800.0
+    },
+    {
+      "name": "Sadbhav Engineering Limited",
+      "hq": "Ellisbridge, Ahmedabad - 380006",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 2800.0
+    },
+    {
+      "name": "Shapoorji Pallonji & Co. Pvt. Ltd.",
+      "hq": "Colaba, Mumbai - 400005",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 28200.0
+    },
+    {
+      "name": "Simplex Infrastructures Limited",
+      "hq": "27 Shakespeare Sarani, Kolkata - 700017",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 2900.0
+    },
+    {
+      "name": "Soma Enterprise Limited",
+      "hq": "Banjara Hills, Hyderabad - 500034",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 1950.0
+    },
+    {
+      "name": "T&T Infra Limited",
+      "hq": "Vadgaon Bk, Pune - 411041",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 1850.0
+    },
+    {
+      "name": "Tata Projects Limited",
+      "hq": "Secunderabad - 500003, Telangana",
+      "cls": "Class-I Local Supplier (100% Indian Architectural Materials)",
+      "turnoverCr": 14200.0
+    },
+    {
+      "name": "Tata Projects Limited (Defense Civil)",
+      "hq": "Powai, Mumbai - 400076",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 14200.0
+    },
+    {
+      "name": "Tata Projects Limited (Heavy Civil)",
+      "hq": "Powai, Mumbai - 400076",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 14200.0
+    },
+    {
+      "name": "Texmaco Rail & Engineering Ltd.",
+      "hq": "Belgharia, Kolkata - 700056",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 3400.0
+    },
+    {
+      "name": "Thriveni Earthmovers Private Limited",
+      "hq": "Fairlands, Salem - 636016",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 2500.0
+    },
+    {
+      "name": "URC Construction Private Limited",
+      "hq": "URC Nagar, Erode - 638012",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 1650.0
+    },
+    {
+      "name": "VA Tech WABAG Limited",
+      "hq": "Kovilambakkam, Chennai - 600117",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 2960.0
+    }
   ],
-  'Healthcare, Medical & Hospital Infra': [
-    { name: 'Siemens Healthcare Private Limited', hq: 'Bengaluru / Gurugram', cls: 'Tier-1 MedTech OEM', turnoverCr: 6400 },
-    { name: 'GE Precision Healthcare India Ltd.', hq: 'Bengaluru, Karnataka', cls: 'Tier-1 Imaging & ICU', turnoverCr: 7200 },
-    { name: 'Philips India Limited (Healthcare Div)', hq: 'Gurugram, Haryana', cls: 'Tier-1 Diagnostic OEM', turnoverCr: 5800 },
-    { name: 'Allengers Medical Systems Limited', hq: 'Chandigarh, UT', cls: 'Class-I Medical Devices', turnoverCr: 1450 },
-    { name: 'Wipro GE Healthcare Private Limited', hq: 'Bengaluru, Karnataka', cls: 'Class-I Medical Systems', turnoverCr: 4900 },
-    { name: 'Mindray Medical India Pvt. Ltd.', hq: 'Gurugram, NCR', cls: 'Class-I OT Equipment', turnoverCr: 1100 }
+  "Healthcare, Medical & Hospital Infra": [
+    {
+      "name": "Siemens Healthcare Private Limited",
+      "hq": "Bengaluru / Gurugram",
+      "cls": "Tier-1 MedTech OEM",
+      "turnoverCr": 6400.0
+    },
+    {
+      "name": "GE Precision Healthcare India Ltd.",
+      "hq": "Bengaluru, Karnataka",
+      "cls": "Tier-1 Imaging & ICU",
+      "turnoverCr": 7200.0
+    },
+    {
+      "name": "Philips India Limited (Healthcare Div)",
+      "hq": "Gurugram, Haryana",
+      "cls": "Tier-1 Diagnostic OEM",
+      "turnoverCr": 5800.0
+    },
+    {
+      "name": "Allengers Medical Systems Limited",
+      "hq": "Chandigarh, UT",
+      "cls": "Class-I Medical Devices",
+      "turnoverCr": 1450.0
+    },
+    {
+      "name": "Wipro GE Healthcare Private Limited",
+      "hq": "Bengaluru, Karnataka",
+      "cls": "Class-I Medical Systems",
+      "turnoverCr": 4900.0
+    },
+    {
+      "name": "Mindray Medical India Pvt. Ltd.",
+      "hq": "Gurugram, NCR",
+      "cls": "Class-I OT Equipment",
+      "turnoverCr": 1100.0
+    },
+    {
+      "name": "Ahluwalia Contracts (India) Ltd.",
+      "hq": "Phase-I, New Delhi - 110020",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 3410.0
+    },
+    {
+      "name": "Capacit'e Infraprojects Limited",
+      "hq": "Chembur, Mumbai - 400071",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 2011.0
+    },
+    {
+      "name": "PSP Projects Limited",
+      "hq": "Iscon-Ambli Road, Ahmedabad - 380058",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 2100.0
+    }
   ],
-  'Defence, Border Security & Paramilitary': [
-    { name: 'Bharat Electronics Limited (BEL)', hq: 'Bengaluru, Karnataka', cls: 'Navratna Defence PSU', turnoverCr: 19800 },
-    { name: 'Tata Advanced Systems Limited (TASL)', hq: 'Hyderabad, Telangana', cls: 'Tier-1 Defence Private', turnoverCr: 6200 },
-    { name: 'Larsen & Toubro Limited (Defence IC)', hq: 'Mumbai, Maharashtra', cls: 'Super Class-I Strategic', turnoverCr: 8400 },
-    { name: 'BEML Limited', hq: 'Bengaluru, Karnataka', cls: 'Defence Mobility PSU', turnoverCr: 4300 },
-    { name: 'Zen Technologies Limited', hq: 'Hyderabad, Telangana', cls: 'Defence Systems & Radars', turnoverCr: 890 },
-    { name: 'Hindustan Aeronautics Limited (HAL)', hq: 'Bengaluru, Karnataka', cls: 'Maharatna Aerospace', turnoverCr: 26000 }
+  "Defence, Border Security & Paramilitary": [
+    {
+      "name": "Bharat Electronics Limited (BEL)",
+      "hq": "Bengaluru, Karnataka",
+      "cls": "Navratna Defence PSU",
+      "turnoverCr": 19800.0
+    },
+    {
+      "name": "Tata Advanced Systems Limited (TASL)",
+      "hq": "Hyderabad, Telangana",
+      "cls": "Tier-1 Defence Private",
+      "turnoverCr": 6200.0
+    },
+    {
+      "name": "Larsen & Toubro Limited (Defence IC)",
+      "hq": "Mumbai, Maharashtra",
+      "cls": "Super Class-I Strategic",
+      "turnoverCr": 8400.0
+    },
+    {
+      "name": "BEML Limited",
+      "hq": "Bengaluru, Karnataka",
+      "cls": "Defence Mobility PSU",
+      "turnoverCr": 4300.0
+    },
+    {
+      "name": "Zen Technologies Limited",
+      "hq": "Hyderabad, Telangana",
+      "cls": "Defence Systems & Radars",
+      "turnoverCr": 890.0
+    },
+    {
+      "name": "Hindustan Aeronautics Limited (HAL)",
+      "hq": "Bengaluru, Karnataka",
+      "cls": "Maharatna Aerospace",
+      "turnoverCr": 26000.0
+    },
+    {
+      "name": "Apco Infratech Private Limited",
+      "hq": "Gomti Nagar, Lucknow - 226010",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 4820.0
+    },
+    {
+      "name": "Ceigall India Limited",
+      "hq": "Tagor Nagar, Ludhiana - 141001",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 3100.0
+    },
+    {
+      "name": "Hindustan Construction Company (HCC)",
+      "hq": "Vikhroli (W), Mumbai - 400083",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 9500.0
+    },
+    {
+      "name": "Megha Engineering & Infrastructures Ltd (MEIL)",
+      "hq": "Hyderabad - 500037, Telangana",
+      "cls": "Class-I Local Supplier (MoRTH / Make in India)",
+      "turnoverCr": 21000.0
+    },
+    {
+      "name": "Niraj Cement Structurals Limited",
+      "hq": "Deonar, Mumbai - 400088",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 2500.0
+    },
+    {
+      "name": "Omaxe Limited (Infrastructure Division)",
+      "hq": "Kalka Road, New Delhi - 110019",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 1850.0
+    },
+    {
+      "name": "SP Singla Constructions Pvt. Ltd.",
+      "hq": "Sector 8-C, Chandigarh - 160009",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 2800.0
+    },
+    {
+      "name": "Tata Projects Limited",
+      "hq": "Secunderabad - 500003, Telangana",
+      "cls": "Class-I Local Supplier (100% Indian Architectural Materials)",
+      "turnoverCr": 14200.0
+    }
   ],
-  'Atomic Energy, Power & Grid Infra': [
-    { name: 'Bharat Heavy Electricals Limited (BHEL)', hq: 'New Delhi / Bhopal', cls: 'Maharatna Power PSU', turnoverCr: 23500 },
-    { name: 'Power Grid Corporation of India', hq: 'Gurugram, Haryana', cls: 'Maharatna T&D', turnoverCr: 45000 },
-    { name: 'ABB India Limited', hq: 'Bengaluru, Karnataka', cls: 'Tier-1 Substation GIS', turnoverCr: 9800 },
-    { name: 'Siemens Energy India Limited', hq: 'Mumbai, Maharashtra', cls: 'Tier-1 Grid Substation', turnoverCr: 8600 },
-    { name: 'Kalpataru Projects International Ltd.', hq: 'Gandhinagar / Mumbai', cls: 'Class-I Power Transmission', turnoverCr: 14200 },
-    { name: 'KEC International Limited', hq: 'Mumbai, Maharashtra', cls: 'Class-I Substation EPC', turnoverCr: 16500 }
+  "Atomic Energy, Power & Grid Infra": [
+    {
+      "name": "Bharat Heavy Electricals Limited (BHEL)",
+      "hq": "New Delhi / Bhopal",
+      "cls": "Maharatna Power PSU",
+      "turnoverCr": 23500.0
+    },
+    {
+      "name": "Power Grid Corporation of India",
+      "hq": "Gurugram, Haryana",
+      "cls": "Maharatna T&D",
+      "turnoverCr": 45000.0
+    },
+    {
+      "name": "ABB India Limited",
+      "hq": "Bengaluru, Karnataka",
+      "cls": "Tier-1 Substation GIS",
+      "turnoverCr": 9800.0
+    },
+    {
+      "name": "Siemens Energy India Limited",
+      "hq": "Mumbai, Maharashtra",
+      "cls": "Tier-1 Grid Substation",
+      "turnoverCr": 8600.0
+    },
+    {
+      "name": "Kalpataru Projects International Ltd.",
+      "hq": "Gandhinagar / Mumbai",
+      "cls": "Class-I Power Transmission",
+      "turnoverCr": 14200.0
+    },
+    {
+      "name": "KEC International Limited",
+      "hq": "Mumbai, Maharashtra",
+      "cls": "Class-I Substation EPC",
+      "turnoverCr": 16500.0
+    },
+    {
+      "name": "BSCPL Infrastructure Limited",
+      "hq": "Banjara Hills, Hyderabad - 500034",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 1850.0
+    },
+    {
+      "name": "BVG India Limited (Bharat Vikas Group)",
+      "hq": "Pune - 411019, Maharashtra",
+      "cls": "Class-I Local Supplier (100% Indian Manpower & Equipment)",
+      "turnoverCr": 1980.0
+    },
+    {
+      "name": "Bajaj Electricals Limited",
+      "hq": "45/47 Veer Nariman Road, Mumbai - 400001",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 2500.0
+    },
+    {
+      "name": "Bridge & Roof Co. (India) Ltd.",
+      "hq": "6 Little Russell Street, Kolkata - 700071",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 3200.0
+    },
+    {
+      "name": "Ceigall India Limited",
+      "hq": "Tagor Nagar, Ludhiana - 141001",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 3100.0
+    },
+    {
+      "name": "Cherian Varkey Construction Co Pvt Ltd",
+      "hq": "Market Road, Ernakulam - 682035",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 1026.0
+    },
+    {
+      "name": "EKK Infrastructure Limited",
+      "hq": "Perumbavoor, Kochi - 683542",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 1450.0
+    },
+    {
+      "name": "GPT Infraprojects Limited",
+      "hq": "Salt Lake, Kolkata - 700106",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 2500.0
+    },
+    {
+      "name": "GR Infraprojects Limited",
+      "hq": "Sector-11, Udaipur - 313002",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 7900.0
+    },
+    {
+      "name": "Gammon Engineers and Contractors Corp",
+      "hq": "Prabhadevi, Mumbai - 400025",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 2400.0
+    },
+    {
+      "name": "Gayatri Projects Limited",
+      "hq": "Nanakramguda, Hyderabad - 500032",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 2200.0
+    },
+    {
+      "name": "H.G. Infra Engineering Limited",
+      "hq": "Ratanada, Jodhpur - 342001",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 4800.0
+    },
+    {
+      "name": "ITD Cementation India (Southern Division)",
+      "hq": "Vile Parle, Mumbai - 400057",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 5400.0
+    },
+    {
+      "name": "KEC International Limited (Civil Infrastructure SBU)",
+      "hq": "Worli, Mumbai - 400030",
+      "cls": "Class-I Local Supplier (Make in India Order 2017)",
+      "turnoverCr": 16500.0
+    },
+    {
+      "name": "KNR Constructions Limited",
+      "hq": "Jubilee Hills, Hyderabad - 500033",
+      "cls": "Class-I Local Supplier (Make in India Order 2017)",
+      "turnoverCr": 3900.0
+    },
+    {
+      "name": "Kalpataru Projects International Limited",
+      "hq": "Santacruz (E), Mumbai - 400055",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 14200.0
+    },
+    {
+      "name": "Larsen & Toubro (Heavy Infrastructure)",
+      "hq": "Ballard Estate, Mumbai - 400001",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 18500.0
+    },
+    {
+      "name": "Larsen & Toubro (Power Transmission & Distribution)",
+      "hq": "Ballard Estate, Mumbai - 400001",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 18500.0
+    },
+    {
+      "name": "Marymatha Construction Company",
+      "hq": "Muvattupuzha, Ernakulam - 686661",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 1150.0
+    },
+    {
+      "name": "Megha Engineering & Infrastructures Ltd (MEIL)",
+      "hq": "Hyderabad - 500037, Telangana",
+      "cls": "Class-I Local Supplier (MoRTH / Make in India)",
+      "turnoverCr": 21000.0
+    },
+    {
+      "name": "NBCC (India) Limited",
+      "hq": "Lodhi Road, New Delhi - 110003",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 9400.0
+    },
+    {
+      "name": "NCC Limited (Civil Infrastructure)",
+      "hq": "Madhapur, Hyderabad - 500081",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 14500.0
+    },
+    {
+      "name": "NCC Limited (Infrastructure)",
+      "hq": "Madhapur, Hyderabad - 500081",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 14500.0
+    },
+    {
+      "name": "NCC Limited (Urban Infra Division)",
+      "hq": "Madhapur, Hyderabad - 500081",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 14500.0
+    },
+    {
+      "name": "Navayuga Engineering Company Limited",
+      "hq": "Panjagutta, Hyderabad - 500082 / Pune Project Office: Baner",
+      "cls": "Class-I Local Supplier (MahaPWD Registered)",
+      "turnoverCr": 26100.0
+    },
+    {
+      "name": "Omaxe Limited (Infrastructure Division)",
+      "hq": "Kalka Road, New Delhi - 110019",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 1850.0
+    },
+    {
+      "name": "Patel Engineering Limited",
+      "hq": "Jogeshwari (W), Mumbai - 400102",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 4200.0
+    },
+    {
+      "name": "Power Mech Projects Limited",
+      "hq": "Hitec City, Hyderabad - 500081",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 2500.0
+    },
+    {
+      "name": "Rajnish Infra Private Limited",
+      "hq": "Tonk Road, Jaipur - 302015",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 980.0
+    },
+    {
+      "name": "SP Singla Constructions Pvt. Ltd.",
+      "hq": "Sector 8-C, Chandigarh - 160009",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 2800.0
+    },
+    {
+      "name": "Simplex Infrastructures Limited",
+      "hq": "27 Shakespeare Sarani, Kolkata - 700017",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 2900.0
+    },
+    {
+      "name": "Soma Enterprise Limited",
+      "hq": "Banjara Hills, Hyderabad - 500034",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 1950.0
+    },
+    {
+      "name": "Sterling & Wilson Renewable Energy Ltd.",
+      "hq": "Chembur, Mumbai - 400043",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 5200.0
+    },
+    {
+      "name": "Sterling and Wilson Renewable Energy Limited",
+      "hq": "Chembur West, Mumbai - 400043",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 2500.0
+    },
+    {
+      "name": "Tata Power Solar Systems Limited",
+      "hq": "Carnac Bunder, Mumbai - 400009",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 7800.0
+    },
+    {
+      "name": "Tata Projects Limited",
+      "hq": "Secunderabad - 500003, Telangana",
+      "cls": "Class-I Local Supplier (100% Indian Architectural Materials)",
+      "turnoverCr": 14200.0
+    },
+    {
+      "name": "VA Tech WABAG Water Systems",
+      "hq": "Kovilambakkam, Chennai - 600117",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 2960.0
+    }
   ],
-  'IT, Telecom & Semiconductor Works': [
-    { name: 'Tata Consultancy Services Limited (TCS)', hq: 'Mumbai, Maharashtra', cls: 'Tier-1 Global IT System', turnoverCr: 240000 },
-    { name: 'Infosys Limited', hq: 'Bengaluru, Karnataka', cls: 'Tier-1 Enterprise Cloud', turnoverCr: 153000 },
-    { name: 'Wipro Limited', hq: 'Bengaluru, Karnataka', cls: 'Tier-1 Digital & Infra', turnoverCr: 89000 },
-    { name: 'Tech Mahindra Limited', hq: 'Pune, Maharashtra', cls: 'Tier-1 Telecom & Cloud', turnoverCr: 53000 },
-    { name: 'HFCL Limited (Himachal Futuristic)', hq: 'New Delhi', cls: 'Class-I OFC & 5G Telecom', turnoverCr: 4800 },
-    { name: 'ITI Limited', hq: 'Bengaluru, Karnataka', cls: 'Telecom PSU (Govt of India)', turnoverCr: 1750 }
+  "IT, Telecom & Semiconductor Works": [
+    {
+      "name": "Tata Consultancy Services Limited (TCS)",
+      "hq": "Mumbai, Maharashtra",
+      "cls": "Tier-1 Global IT System",
+      "turnoverCr": 240000.0
+    },
+    {
+      "name": "Infosys Limited",
+      "hq": "Bengaluru, Karnataka",
+      "cls": "Tier-1 Enterprise Cloud",
+      "turnoverCr": 153000.0
+    },
+    {
+      "name": "Wipro Limited",
+      "hq": "Bengaluru, Karnataka",
+      "cls": "Tier-1 Digital & Infra",
+      "turnoverCr": 89000.0
+    },
+    {
+      "name": "Tech Mahindra Limited",
+      "hq": "Pune, Maharashtra",
+      "cls": "Tier-1 Telecom & Cloud",
+      "turnoverCr": 53000.0
+    },
+    {
+      "name": "HFCL Limited (Himachal Futuristic)",
+      "hq": "New Delhi",
+      "cls": "Class-I OFC & 5G Telecom",
+      "turnoverCr": 4800.0
+    },
+    {
+      "name": "ITI Limited",
+      "hq": "Bengaluru, Karnataka",
+      "cls": "Telecom PSU (Govt of India)",
+      "turnoverCr": 1750.0
+    },
+    {
+      "name": "Afcons Infrastructure Limited",
+      "hq": "Veera Desai, Mumbai - 400053",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 11800.0
+    },
+    {
+      "name": "Ahluwalia Contracts (India) Ltd.",
+      "hq": "Phase-I, New Delhi - 110020",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 3410.0
+    },
+    {
+      "name": "Ashoka Buildcon Limited",
+      "hq": "Nashik - 422011, Maharashtra",
+      "cls": "Class-I Local Supplier (Make in India Order 2017)",
+      "turnoverCr": 6800.0
+    },
+    {
+      "name": "B.G. Shirke Construction Technology Pvt. Ltd.",
+      "hq": "Pune - 411036, Maharashtra",
+      "cls": "Class-I Local Supplier (100% Maharashtra Operations)",
+      "turnoverCr": 3820.0
+    },
+    {
+      "name": "B.R. Construction Puducherry",
+      "hq": "Kamaraj Salai, Puducherry - 605011",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 2500.0
+    },
+    {
+      "name": "BVG India Limited (Bharat Vikas Group)",
+      "hq": "Pune - 411019, Maharashtra",
+      "cls": "Class-I Local Supplier (100% Indian Manpower & Equipment)",
+      "turnoverCr": 1980.0
+    },
+    {
+      "name": "Bridge & Roof Co. (India) Ltd.",
+      "hq": "6 Little Russell Street, Kolkata - 700071",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 3200.0
+    },
+    {
+      "name": "Capacit'e Infraprojects Limited",
+      "hq": "Chembur, Mumbai - 400071",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 2011.0
+    },
+    {
+      "name": "Ceigall India Limited",
+      "hq": "Tagor Nagar, Ludhiana - 141001",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 3100.0
+    },
+    {
+      "name": "Dilip Buildcon Limited",
+      "hq": "Kolar Road, Bhopal - 462016",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 9500.0
+    },
+    {
+      "name": "GPT Infraprojects Limited",
+      "hq": "Salt Lake, Kolkata - 700106",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 2500.0
+    },
+    {
+      "name": "GR Infraprojects Limited",
+      "hq": "Sector-11, Udaipur - 313002",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 7900.0
+    },
+    {
+      "name": "Gawar Construction Limited",
+      "hq": "Hisar, Haryana - 125005",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 4200.0
+    },
+    {
+      "name": "Gayatri Projects Limited",
+      "hq": "Nanakramguda, Hyderabad - 500032",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 2200.0
+    },
+    {
+      "name": "Gulermak Heavy Industries Construction",
+      "hq": "Barakhamba Road, New Delhi - 110001",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 2500.0
+    },
+    {
+      "name": "H.G. Infra Engineering Limited",
+      "hq": "Ratanada, Jodhpur - 342001",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 4800.0
+    },
+    {
+      "name": "Hindustan Construction Company (HCC)",
+      "hq": "Vikhroli (W), Mumbai - 400083",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 9500.0
+    },
+    {
+      "name": "IRB Infrastructure Developers Ltd.",
+      "hq": "Andheri (E), Mumbai - 400072",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 6400.0
+    },
+    {
+      "name": "ITD Cementation India (Southern Division)",
+      "hq": "Vile Parle, Mumbai - 400057",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 5400.0
+    },
+    {
+      "name": "J. Kumar Infraprojects Ltd.",
+      "hq": "Veera Desai Road, Mumbai - 400053",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 4210.0
+    },
+    {
+      "name": "KCP Infra Limited",
+      "hq": "Race Course, Coimbatore - 641018",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 2500.0
+    },
+    {
+      "name": "Kernex Microsystems (India) Ltd.",
+      "hq": "Shamshabad, Hyderabad - 501218",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 680.0
+    },
+    {
+      "name": "Larsen & Toubro (Heavy Infrastructure)",
+      "hq": "Ballard Estate, Mumbai - 400001",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 18500.0
+    },
+    {
+      "name": "Larsen & Toubro Limited (Railway SBU)",
+      "hq": "Manapakkam, Chennai - 600089",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 18500.0
+    },
+    {
+      "name": "Medha Servo Drives Pvt. Ltd.",
+      "hq": "IDA Nacharam, Hyderabad - 500076",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 1450.0
+    },
+    {
+      "name": "Montecarlo Limited",
+      "hq": "Bodakdev, Ahmedabad - 380058",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 4600.0
+    },
+    {
+      "name": "NCC Limited",
+      "hq": "NCC House, Hyderabad - 500081",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 14500.0
+    },
+    {
+      "name": "NCC Limited (Infrastructure)",
+      "hq": "Madhapur, Hyderabad - 500081",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 14500.0
+    },
+    {
+      "name": "NCC Limited (Urban Infra Division)",
+      "hq": "Madhapur, Hyderabad - 500081",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 14500.0
+    },
+    {
+      "name": "Navayuga Engineering Company Limited",
+      "hq": "Panjagutta, Hyderabad - 500082 / Pune Project Office: Baner",
+      "cls": "Class-I Local Supplier (MahaPWD Registered)",
+      "turnoverCr": 26100.0
+    },
+    {
+      "name": "Odisha Construction Corporation Ltd (OCCL)",
+      "hq": "Unit-VIII, Bhubaneswar - 751012",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 1100.0
+    },
+    {
+      "name": "Omaxe Limited (Infrastructure Division)",
+      "hq": "Kalka Road, New Delhi - 110019",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 1850.0
+    },
+    {
+      "name": "PNC Infratech Limited",
+      "hq": "Bypass Road, Agra - 282002",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 7200.0
+    },
+    {
+      "name": "PSP Projects Limited",
+      "hq": "Iscon-Ambli Road, Ahmedabad - 380058",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 2100.0
+    },
+    {
+      "name": "Power Mech Projects Limited",
+      "hq": "Hitec City, Hyderabad - 500081",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 2500.0
+    },
+    {
+      "name": "Rajnish Infra Private Limited",
+      "hq": "Tonk Road, Jaipur - 302015",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 980.0
+    },
+    {
+      "name": "SP Singla Constructions Pvt. Ltd.",
+      "hq": "Sector 8-C, Chandigarh - 160009",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 2800.0
+    },
+    {
+      "name": "Sadbhav Engineering Limited",
+      "hq": "Ellisbridge, Ahmedabad - 380006",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 2800.0
+    },
+    {
+      "name": "Shapoorji Pallonji & Co. Pvt. Ltd.",
+      "hq": "Colaba, Mumbai - 400005",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 28200.0
+    },
+    {
+      "name": "Simplex Infrastructures Limited",
+      "hq": "27 Shakespeare Sarani, Kolkata - 700017",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 2900.0
+    },
+    {
+      "name": "Soma Enterprise Limited",
+      "hq": "Banjara Hills, Hyderabad - 500034",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 1950.0
+    },
+    {
+      "name": "T&T Infra Limited",
+      "hq": "Vadgaon Bk, Pune - 411041",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 1850.0
+    },
+    {
+      "name": "Tata Communications Transformation Services Ltd (TCTSL)",
+      "hq": "Mumbai - 400001, Maharashtra",
+      "cls": "Class-I Local Supplier (Make in India Order 2017)",
+      "turnoverCr": 2500.0
+    },
+    {
+      "name": "Texmaco Rail & Engineering Ltd.",
+      "hq": "Belgharia, Kolkata - 700056",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 3400.0
+    },
+    {
+      "name": "Toyo Engineering India Private Limited",
+      "hq": "Kanjurmarg East, Mumbai - 400042",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 2500.0
+    },
+    {
+      "name": "URC Construction Private Limited",
+      "hq": "URC Nagar, Erode - 638012",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 1650.0
+    }
   ],
-  'Ports, Shipping & Maritime Works': [
-    { name: 'Dredging Corporation of India Ltd.', hq: 'Visakhapatnam, AP', cls: 'Maritime PSU', turnoverCr: 1100 },
-    { name: 'Adani Ports & Special Economic Zone', hq: 'Ahmedabad, Gujarat', cls: 'Port & Dredging EPC', turnoverCr: 22000 },
-    { name: 'ITD Cementation India Limited', hq: 'Mumbai, Maharashtra', cls: 'Class-I Maritime & Jetty', turnoverCr: 5400 },
-    { name: 'Afcons Infrastructure Limited', hq: 'Mumbai, Maharashtra', cls: 'Class-I Marine & Berth', turnoverCr: 11800 },
-    { name: 'Essar Ports EPC Private Limited', hq: 'Mumbai / Hazira', cls: 'Deep Sea Terminal EPC', turnoverCr: 3200 }
+  "Ports, Shipping & Maritime Works": [
+    {
+      "name": "Dredging Corporation of India Ltd.",
+      "hq": "Visakhapatnam, AP",
+      "cls": "Maritime PSU",
+      "turnoverCr": 1100.0
+    },
+    {
+      "name": "Adani Ports & Special Economic Zone",
+      "hq": "Ahmedabad, Gujarat",
+      "cls": "Port & Dredging EPC",
+      "turnoverCr": 22000.0
+    },
+    {
+      "name": "ITD Cementation India Limited",
+      "hq": "Mumbai, Maharashtra",
+      "cls": "Class-I Maritime & Jetty",
+      "turnoverCr": 5400.0
+    },
+    {
+      "name": "Afcons Infrastructure Limited",
+      "hq": "Mumbai, Maharashtra",
+      "cls": "Class-I Marine & Berth",
+      "turnoverCr": 11800.0
+    },
+    {
+      "name": "Essar Ports EPC Private Limited",
+      "hq": "Mumbai / Hazira",
+      "cls": "Deep Sea Terminal EPC",
+      "turnoverCr": 3200.0
+    },
+    {
+      "name": "Bridge & Roof Co. (India) Limited",
+      "hq": "2/1 Russell Street, Kolkata - 700071",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 3200.0
+    },
+    {
+      "name": "Gayatri Projects Limited",
+      "hq": "Nanakramguda, Hyderabad - 500032",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 2200.0
+    },
+    {
+      "name": "ITD Cementation India (Southern Division)",
+      "hq": "Vile Parle, Mumbai - 400057",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 5400.0
+    },
+    {
+      "name": "Larsen & Toubro Construction (Transportation Infra)",
+      "hq": "Ballard Estate, Mumbai - 400001",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 18500.0
+    },
+    {
+      "name": "Montecarlo Limited",
+      "hq": "Bodakdev, Ahmedabad - 380058",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 4600.0
+    },
+    {
+      "name": "NCC Limited (Infrastructure)",
+      "hq": "Madhapur, Hyderabad - 500081",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 14500.0
+    },
+    {
+      "name": "Navayuga Engineering Company Limited",
+      "hq": "Panjagutta, Hyderabad - 500082 / Pune Project Office: Baner",
+      "cls": "Class-I Local Supplier (MahaPWD Registered)",
+      "turnoverCr": 26100.0
+    },
+    {
+      "name": "PSP Projects Limited",
+      "hq": "Iscon-Ambli Road, Ahmedabad - 380058",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 2100.0
+    },
+    {
+      "name": "Sadbhav Engineering Limited",
+      "hq": "Ellisbridge, Ahmedabad - 380006",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 2800.0
+    },
+    {
+      "name": "URC Construction Private Limited",
+      "hq": "URC Nagar, Erode - 638012",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 1650.0
+    }
   ],
-  'Central Government Procurement': [
-    { name: 'NBCC (India) Limited', hq: 'New Delhi', cls: 'Navratna Project PSU', turnoverCr: 9400 },
-    { name: 'Ahluwalia Contracts (India) Limited', hq: 'New Delhi', cls: 'Class-I CPWD Super', turnoverCr: 2800 },
-    { name: 'Bridge and Roof Company (India) Ltd.', hq: 'Kolkata, West Bengal', cls: 'Miniratna Central PSU', turnoverCr: 3200 },
-    { name: 'PSP Projects Limited', hq: 'Ahmedabad, Gujarat', cls: 'Class-I Institutional', turnoverCr: 2100 },
-    { name: 'Larsen & Toubro Limited', hq: 'Mumbai, Maharashtra', cls: 'Super Class-I Tier-1', turnoverCr: 18500 },
-    { name: 'Tata Projects Limited', hq: 'Mumbai / Noida', cls: 'Super Class-I Tier-1', turnoverCr: 14200 }
+  "Central Government Procurement": [
+    {
+      "name": "NBCC (India) Limited",
+      "hq": "New Delhi",
+      "cls": "Navratna Project PSU",
+      "turnoverCr": 9400.0
+    },
+    {
+      "name": "Ahluwalia Contracts (India) Limited",
+      "hq": "New Delhi",
+      "cls": "Class-I CPWD Super",
+      "turnoverCr": 2800.0
+    },
+    {
+      "name": "Bridge and Roof Company (India) Ltd.",
+      "hq": "Kolkata, West Bengal",
+      "cls": "Miniratna Central PSU",
+      "turnoverCr": 3200.0
+    },
+    {
+      "name": "PSP Projects Limited",
+      "hq": "Ahmedabad, Gujarat",
+      "cls": "Class-I Institutional",
+      "turnoverCr": 2100.0
+    },
+    {
+      "name": "Larsen & Toubro Limited",
+      "hq": "Mumbai, Maharashtra",
+      "cls": "Super Class-I Tier-1",
+      "turnoverCr": 18500.0
+    },
+    {
+      "name": "Tata Projects Limited",
+      "hq": "Mumbai / Noida",
+      "cls": "Super Class-I Tier-1",
+      "turnoverCr": 14200.0
+    },
+    {
+      "name": "Ahluwalia Contracts (India) Ltd.",
+      "hq": "Phase-I, New Delhi - 110020",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 3410.0
+    },
+    {
+      "name": "Bridge & Roof Co. (India) Limited",
+      "hq": "2/1 Russell Street, Kolkata - 700071",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 3200.0
+    },
+    {
+      "name": "Bridge & Roof Co. (India) Ltd.",
+      "hq": "6 Little Russell Street, Kolkata - 700071",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 3200.0
+    },
+    {
+      "name": "Capacit'e Infraprojects Limited",
+      "hq": "Chembur, Mumbai - 400071",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 2011.0
+    },
+    {
+      "name": "GR Infraprojects Limited",
+      "hq": "Sector-11, Udaipur - 313002",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 7900.0
+    },
+    {
+      "name": "Gawar Construction Limited",
+      "hq": "Hisar, Haryana - 125005",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 4200.0
+    },
+    {
+      "name": "H.G. Infra Engineering Limited",
+      "hq": "Ratanada, Jodhpur - 342001",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 4800.0
+    },
+    {
+      "name": "Hindustan Construction Company (HCC)",
+      "hq": "Vikhroli (W), Mumbai - 400083",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 9500.0
+    },
+    {
+      "name": "ITD Cementation India (Southern Division)",
+      "hq": "Vile Parle, Mumbai - 400057",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 5400.0
+    },
+    {
+      "name": "KCP Infra Limited",
+      "hq": "Race Course, Coimbatore - 641018",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 2500.0
+    },
+    {
+      "name": "Larsen & Toubro (Heavy Infrastructure)",
+      "hq": "Ballard Estate, Mumbai - 400001",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 18500.0
+    },
+    {
+      "name": "NCC Limited",
+      "hq": "NCC House, Hyderabad - 500081",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 14500.0
+    },
+    {
+      "name": "NCC Limited (Urban Infra Division)",
+      "hq": "Madhapur, Hyderabad - 500081",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 14500.0
+    },
+    {
+      "name": "Odisha Construction Corporation Ltd (OCCL)",
+      "hq": "Unit-VIII, Bhubaneswar - 751012",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 1100.0
+    },
+    {
+      "name": "PNC Infratech Limited",
+      "hq": "Bypass Road, Agra - 282002",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 7200.0
+    },
+    {
+      "name": "Rajnish Infra Private Limited",
+      "hq": "Tonk Road, Jaipur - 302015",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 980.0
+    },
+    {
+      "name": "Soma Enterprise Limited",
+      "hq": "Banjara Hills, Hyderabad - 500034",
+      "cls": "Class-I Local Supplier (Make in India Order)",
+      "turnoverCr": 1950.0
+    }
   ]
 };
 
