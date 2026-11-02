@@ -46,6 +46,9 @@ STATUTORY_PORTAL_STATE_BINDINGS = {
     "jharkhandtenders.gov.in": ("Jharkhand", "Ranchi"),
     "eprocure.goa.gov.in": ("Goa", "Panaji"),
     "eproc.andaman.gov.in": ("Andaman & Nicobar", "Port Blair"),
+    "etenders.chd.nic.in": ("Chandigarh", "Chandigarh"),
+    "tripuratenders.gov.in": ("Tripura", "Agartala"),
+    "pudutenders.gov.in": ("Puducherry", "Puducherry"),
 }
 
 STATUTORY_PORTAL_PATTERNS = [
@@ -71,6 +74,9 @@ STATUTORY_PORTAL_PATTERNS = [
     (["jharkhandtenders", "jharkhand e-procure"], "Jharkhand", "Ranchi"),
     (["eprocure.goa", "goa e-procurement"], "Goa", "Panaji"),
     (["eproc.andaman", "andaman & nicobar e-procure"], "Andaman & Nicobar", "Port Blair"),
+    (["etenders.chd", "chandigarh e-procurement", "chandigarh tenders"], "Chandigarh", "Chandigarh"),
+    (["tripuratenders", "tripura e-procurement", "tripura tenders"], "Tripura", "Agartala"),
+    (["pudutenders", "puducherry e-procurement", "puducherry tenders"], "Puducherry", "Puducherry"),
 ]
 
 def find_statutory_portal_binding(portal_str: str) -> Optional[Tuple[str, str]]:
@@ -90,9 +96,21 @@ def find_statutory_portal_binding(portal_str: str) -> Optional[Tuple[str, str]]:
         "defense procurement portal",
         "defproc.gov.in",
         "data.gov.in",
-        "iocletenders.nic.in"
+        "iocletenders.nic.in",
+        "pmgsytenders.gov.in",
+        "pmgsy",
+        "coalindiatenders.nic.in",
+        "coal india",
+        "eprocure.bhel.co.in",
+        "bhel",
+        "etender.ntpctender.co.in",
+        "ntpc",
+        "etender.powergrid.in",
+        "powergrid",
+        "etender.hpcl.co.in",
+        "hpcl"
     ])
-    has_state_partner = any(k in p_lower for k in ["mahatenders", "mmrda", "dmrc", "delhi e-procure", "etender.up", "tntenders", "kppp"])
+    has_state_partner = any(k in p_lower for k in ["mahatenders", "mmrda", "dmrc", "delhi e-procure", "etender.up", "tntenders", "kppp", "tripura", "puducherry", "chandigarh"])
     if is_central and not has_state_partner:
         return None
 
@@ -108,7 +126,7 @@ STATE_CITY_MAP = {
     'Delhi': ['Dwarka', 'Narela', 'Rohini', 'Jasola', 'Pitampura', 'Central Delhi', 'South Delhi', 'Siri Fort', 'New Delhi'],
     'Assam': ['Guwahati', 'Silchar', 'Dibrugarh', 'Jorhat', 'Tezpur', 'Nagaon', 'Tinsukia'],
     'Meghalaya': ['Shillong'],
-    'Tripura': ['Agartala'],
+    'Tripura': ['Agartala', 'Udaipur', 'Dharmanagar'],
     'Jammu & Kashmir': ['Srinagar', 'Jammu', 'Leh-Ladakh', 'Baramulla', 'Rajouri', 'Anantnag', 'Kupwara', 'Udhampur'],
     'Uttar Pradesh': ['Noida / NCR', 'Lucknow', 'Varanasi', 'Kanpur', 'Prayagraj', 'Ayodhya', 'Agra', 'Ghaziabad', 'Aligarh', 'Raebareli'],
     'West Bengal': ['Kolkata', 'Siliguri', 'Howrah', 'Asansol', 'Durgapur', 'Haldia', 'Kharagpur'],
@@ -130,6 +148,7 @@ STATE_CITY_MAP = {
     'Goa': ['Panaji', 'Vasco da Gama', 'Margao'],
     'Andaman & Nicobar': ['Port Blair'],
     'Chandigarh': ['Chandigarh'],
+    'Puducherry': ['Puducherry', 'Karaikal', 'Mahe', 'Yanam'],
     'Pan-India / Central': ['New Delhi', 'All India', 'National / Multi-State', 'Regional / Other'],
 }
 

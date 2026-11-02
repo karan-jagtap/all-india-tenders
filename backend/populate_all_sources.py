@@ -777,6 +777,260 @@ SOURCES = [
         ],
         'accepted_target_count': 65,
         'current_target_count': 12
+    },
+    # 26. PMGSY Rural Roads (MoRD / NRIDA)
+    {
+        'key': 'pmgsy',
+        'source_portal': 'PMGSY e-Procurement (pmgsytenders.gov.in)',
+        'portal_url_base': 'https://pmgsytenders.gov.in/nicgep/app?org=',
+        'state': 'Pan-India / Central',
+        'cities': ['Ranchi', 'Bhopal', 'Patna', 'Raipur', 'Guwahati', 'Dehradun', 'Jaipur'],
+        'orgs': [
+            'National Rural Infrastructure Development Agency (NRIDA)',
+            'Ministry of Rural Development (MoRD)',
+            'State Rural Roads Development Agency (SRRDA)',
+            'PMGSY Program Implementation Unit (PIU)'
+        ],
+        'categories': ['Rural Road Infrastructure', 'Bridges & Culverts', 'Rural Highway Upgradation'],
+        'project_templates': [
+            ("Construction of PMGSY-III Rural Road from {location} Village to District Highway ({code} km)", 185000000.0, 12),
+            ("Periodic Maintenance & Upgradation of Rural Through-Route under PMGSY Batch-II at {location}", 85000000.0, 9),
+            ("Construction of 45m Span RCC High-Level Bridge on Rural Road crossing {location} Stream", 120000000.0, 15)
+        ],
+        'winning_companies': [
+            ("Dilip Buildcon Limited", "L45201MP2006PLC018689", "Plot No. 5, Inside Govind Narayan Singh Gate, Chuna Bhatti, Kolar Road, Bhopal - 462016", "23AABCD1982K1Z8", "AABCD1982K", "SBI Bhopal"),
+            ("PNC Infratech Limited", "L45201DL1999PLC195937", "PNC Tower, 3/22-D, Civil Lines, Bypass Road, Agra - 282002", "09AAACP1982L1Z4", "AAACP1982L", "Punjab National Bank Agra"),
+            ("GR Infraprojects Limited", "L45201GJ1995PLC098652", "GR House, Hiran Magri, Sector 11, Udaipur - 313002", "08AAACG1982M1Z0", "AAACG1982M", "HDFC Bank Corporate")
+        ],
+        'accepted_target_count': 75,
+        'current_target_count': 16
+    },
+    # 27. Coal India Limited (CIL)
+    {
+        'key': 'coalindia',
+        'source_portal': 'Coal India e-Procurement (coalindiatenders.nic.in)',
+        'portal_url_base': 'https://coalindiatenders.nic.in/nicgep/app?org=',
+        'state': 'Pan-India / Central',
+        'cities': ['Dhanbad', 'Ranchi', 'Bilaspur', 'Nagpur', 'Kolkata', 'Singrauli', 'Sambalpur', 'Asansol'],
+        'orgs': [
+            'Coal India Limited (CIL Corporate)',
+            'Bharat Coking Coal Limited (BCCL Dhanbad)',
+            'Central Coalfields Limited (CCL Ranchi)',
+            'South Eastern Coalfields (SECL Bilaspur)',
+            'Western Coalfields Limited (WCL Nagpur)',
+            'Northern Coalfields Limited (NCL Singrauli)',
+            'Mahanadi Coalfields (MCL Sambalpur)'
+        ],
+        'categories': ['Coal Washery EPC', 'Mining Infrastructure & Haul Roads', 'Conveyor & Rail Siding Civil Works'],
+        'project_templates': [
+            ("Design, Engineering & Construction of 10 MTPA Automated Coal Handling Plant & Rail Siding at {location}", 4650000000.0, 24),
+            ("Construction of Heavy-Duty Heavy Earth Moving Equipment Haul Road ({code} km) at {location} Open Cast Mine", 780000000.0, 14),
+            ("Civil Offsite Infrastructure, Substation & Coal Sieve Crushing Unit at {location}", 1250000000.0, 18)
+        ],
+        'winning_companies': [
+            ("Larsen & Toubro Construction (Heavy Civil)", "L99999MH1946PLC004768", "L&T House, Ballard Estate, Mumbai - 400001", "27AAACL1892K1Z4", "AAACL1892K", "SBI CAG Mumbai"),
+            ("Thriveni Earthmovers Private Limited", "U14100TZ1999PTC008892", "22/110, Greenways Road, Fairlands, Salem - 636016", "33AAACT1982K1Z9", "AAACT1982K", "Canara Bank Salem"),
+            ("BGR Mining & Infra Limited", "U45201TG2011PLC074744", "8-2-502/1/A, Jivi Towers, Road No. 7, Banjara Hills, Hyderabad - 500034", "36AAACB1982L1Z2", "AAACB1982L", "SBI Large Corporate Hyderabad")
+        ],
+        'accepted_target_count': 60,
+        'current_target_count': 14
+    },
+    # 28. BHEL (Bharat Heavy Electricals Limited)
+    {
+        'key': 'bhel',
+        'source_portal': 'BHEL e-Procurement (eprocure.bhel.co.in)',
+        'portal_url_base': 'https://eprocure.bhel.co.in/nicgep/app?org=',
+        'state': 'Pan-India / Central',
+        'cities': ['New Delhi', 'Haridwar', 'Tiruchirappalli', 'Bhopal', 'Bengaluru', 'Hyderabad'],
+        'orgs': [
+            'BHEL Power Sector (Northern Region)',
+            'BHEL High Pressure Boiler Plant (Trichy)',
+            'BHEL Heavy Electrical Equipment Plant (HEEP Haridwar)',
+            'BHEL Heavy Power Equipment Plant (Hyderabad)',
+            'BHEL Bhopal Heavy Electricals'
+        ],
+        'categories': ['Thermal & Nuclear Power Equipment', 'Electrostatic Precipitator (ESP) Packages', 'Flue Gas Desulfurization (FGD) EPC'],
+        'project_templates': [
+            ("Civil and Structural Works for Wet Limestone Flue Gas Desulphurisation (FGD) Package at {location}", 1850000000.0, 18),
+            ("Erection, Testing & Commissioning of Supercritical Boiler & ESP Island Package ({code} MW) at {location}", 3400000000.0, 24),
+            ("Construction of GIS Building, Transformer Foundations & Cable Trenches for BHEL Project at {location}", 480000000.0, 12)
+        ],
+        'winning_companies': [
+            ("Tata Projects Limited", "U45201MH1979PLC021280", "One Boulevard, Lake Boulevard Road, Powai, Mumbai - 400076", "27AAACT1982L1Z0", "AAACT1982L", "SBI Corporate Branch"),
+            ("Power Mech Projects Limited", "L74140TG1999PLC032156", "Plot No. 77, Jubilee Enclave, Hitec City, Hyderabad - 500081", "36AAACP1982H1Z6", "AAACP1982H", "Union Bank of India Hyderabad"),
+            ("Bridge & Roof Co. (India) Limited", "U27310WB1920GOI003601", "Kankaria Centre, 2/1 Russell Street, Kolkata - 700071", "19AAACB1982M1Z3", "AAACB1982M", "SBI Commercial Kolkata")
+        ],
+        'accepted_target_count': 55,
+        'current_target_count': 12
+    },
+    # 29. NTPC Limited
+    {
+        'key': 'ntpc',
+        'source_portal': 'NTPC e-Procurement (etender.ntpctender.co.in)',
+        'portal_url_base': 'https://etender.ntpctender.co.in/nicgep/app?org=',
+        'state': 'Pan-India / Central',
+        'cities': ['New Delhi', 'Singrauli', 'Korba', 'Ramagundam', 'Vindhyachal', 'Rihand', 'Khavda'],
+        'orgs': [
+            'NTPC Limited (Corporate Center)',
+            'NTPC Renewable Energy Ltd (NTPC REL)',
+            'NTPC Vindhyachal Super Thermal Power Station',
+            'NTPC Korba Super Thermal Power Station',
+            'NTPC Ramagundam STPS',
+            'NTPC Khavda Ultra Mega Solar Park'
+        ],
+        'categories': ['Ultra Mega Solar PV Power Plants', 'Thermal Power BOP Civil Works', 'Ash Dyke Construction & Raising'],
+        'project_templates': [
+            ("Balance of System (BOS) Package for {code} MW Grid-Connected Ground Mounted Solar PV Project at {location}", 5800000000.0, 18),
+            ("Construction of Ash Dyke Lagoon Raising (Stage-{code}) with HDPE Geomembrane Lining at {location} STPS", 650000000.0, 12),
+            ("Civil, Structural & Architectural Works for Seawater Desalination Plant for NTPC Project at {location}", 1450000000.0, 16)
+        ],
+        'winning_companies': [
+            ("Sterling and Wilson Renewable Energy Limited", "L51909MH2017PLC292281", "Universal Majestic, P.L. Lokhande Marg, Chembur West, Mumbai - 400043", "27AAACS1982K1Z5", "AAACS1982K", "Standard Chartered Bank Mumbai"),
+            ("Larsen & Toubro (Power Transmission & Distribution)", "L99999MH1946PLC004768", "L&T House, Ballard Estate, Mumbai - 400001", "27AAACL1892K1Z4", "AAACL1892K", "SBI CAG Mumbai"),
+            ("Vikram Solar Limited", "U18101WB2005PLC255010", "The Chambers, 8th Floor, 1865 Rajdanga Main Road, Kolkata - 700107", "19AAACV1982L1Z8", "AAACV1982L", "State Bank of India Kolkata")
+        ],
+        'accepted_target_count': 65,
+        'current_target_count': 15
+    },
+    # 30. POWERGRID (Power Grid Corporation of India Limited)
+    {
+        'key': 'powergrid',
+        'source_portal': 'POWERGRID e-Procurement (etender.powergrid.in)',
+        'portal_url_base': 'https://etender.powergrid.in?org=',
+        'state': 'Pan-India / Central',
+        'cities': ['Gurugram', 'New Delhi', 'Nagpur', 'Bengaluru', 'Kolkata', 'Lucknow', 'Vadodara'],
+        'orgs': [
+            'Power Grid Corporation of India Limited (Corporate Office Gurugram)',
+            'POWERGRID Northern Region Transmission System-I',
+            'POWERGRID Western Region Transmission System-I',
+            'POWERGRID Southern Region Transmission System-II',
+            'POWERGRID Eastern Region-I'
+        ],
+        'categories': ['765kV/400kV EHV Substations', 'Transmission Line Tower Erection', 'Statcom & Reactive Power Compensation'],
+        'project_templates': [
+            ("Substation Package SS-{code} for Establishment of 765/400kV Gas Insulated Substation (GIS) at {location}", 4200000000.0, 20),
+            ("Transmission Line Package TL-{code} for 765kV D/C Hexa-Bundle Transmission Line crossing {location} Section", 2950000000.0, 18),
+            ("Installation of 400kV Bus Reactor & Associated Civil Works for Grid Stability at {location}", 580000000.0, 12)
+        ],
+        'winning_companies': [
+            ("KEC International Limited", "L74140MH1958PLC011096", "RPG House, 463 Dr. Annie Besant Road, Worli, Mumbai - 400030", "27AAACK1982J1Z3", "AAACK1982J", "HDFC Bank Mumbai"),
+            ("Kalpataru Projects International Limited", "L28920GJ1981PLC004652", "Kalpataru Synergy, Santacruz, Mumbai - 400055", "27AAACK1982H1Z1", "AAACK1982H", "Axis Bank Mumbai"),
+            ("Bajaj Electricals Limited", "L31501MH1938PLC009887", "45/47 Veer Nariman Road, Mumbai - 400001", "27AAACB1982K1Z2", "AAACB1982K", "SBI Corporate Branch Mumbai")
+        ],
+        'accepted_target_count': 60,
+        'current_target_count': 14
+    },
+    # 31. HPCL (Hindustan Petroleum Corporation Limited)
+    {
+        'key': 'hpcl',
+        'source_portal': 'HPCL e-Procurement (etender.hpcl.co.in)',
+        'portal_url_base': 'https://etender.hpcl.co.in?org=',
+        'state': 'Pan-India / Central',
+        'cities': ['Mumbai', 'Visakhapatnam', 'Bathinda', 'Mangalore', 'Hassan', 'Kanpur', 'Kolkata'],
+        'orgs': [
+            'HPCL Mumbai Refinery (BD Section)',
+            'HPCL Visakh Refinery Modernisation Project (VRMP)',
+            'HPCL Pipelines SBU',
+            'HPCL LPG Business Unit',
+            'HPCL Direct Sales & POL Terminals'
+        ],
+        'categories': ['Refinery Civil Works', 'POL Storage Terminal & Multi-Product Depots', 'Cross-Country LPG Pipeline Offsites'],
+        'project_templates': [
+            ("Composite Civil, Structural & Underground Piping Works for Bottom Upgradation Unit at {location} Refinery", 2400000000.0, 18),
+            ("Construction of Automated POL Railway Gantry Loading & Firewater Storage Tanks at {location} Terminal", 620000000.0, 12),
+            ("Laying of Multi-Product Petroleum Pipeline Section ({code} km) with Horizontal Directional Drilling (HDD) at {location}", 1450000000.0, 16)
+        ],
+        'winning_companies': [
+            ("Engineers India Limited (EPC Division)", "L74899DL1965GOI004352", "EI Bhawan, 1 Bhikaiji Cama Place, New Delhi - 110066", "07AAACE1982M1Z5", "AAACE1982M", "SBI CAG Delhi"),
+            ("Bridge & Roof Co. (India) Limited", "U27310WB1920GOI003601", "Kankaria Centre, 2/1 Russell Street, Kolkata - 700071", "19AAACB1982M1Z3", "AAACB1982M", "SBI Commercial Kolkata"),
+            ("Toyo Engineering India Private Limited", "U28920MH1976PTC018861", "Toyo Technology Centre, 71 Kanjur Village Road, Kanjurmarg East, Mumbai - 400042", "27AAACT1982P1Z2", "AAACT1982P", "Bank of Tokyo-Mitsubishi Mumbai")
+        ],
+        'accepted_target_count': 50,
+        'current_target_count': 12
+    },
+    # 32. Chandigarh Administration
+    {
+        'key': 'chandigarh',
+        'source_portal': 'Chandigarh e-Procurement (etenders.chd.nic.in)',
+        'portal_url_base': 'https://etenders.chd.nic.in/nicgep/app?org=',
+        'state': 'Chandigarh',
+        'cities': ['Chandigarh'],
+        'orgs': [
+            'Engineering Department, Chandigarh Administration',
+            'Municipal Corporation Chandigarh (MCC Civil Works)',
+            'Chandigarh Smart City Limited (CSCL)',
+            'Chandigarh Housing Board (CHB)',
+            'Chandigarh Transport Undertaking (CTU)'
+        ],
+        'categories': ['UT Smart City Infrastructure', 'Tertiary Water Treatment Networks', 'Urban Road Recarpeting & Stormwater'],
+        'project_templates': [
+            ("Upgradation & Comprehensive Recarpeting of V3 Arterial Roads ({code} km) in Sectors 17 to 43, {location}", 340000000.0, 9),
+            ("Augmentation of 24x7 Pan-City Water Supply System & Smart Metering Infrastructure across {location}", 850000000.0, 15),
+            ("Construction of 40 MLD Sewage Treatment Plant with SBR Technology at Diggian, {location}", 620000000.0, 18)
+        ],
+        'winning_companies': [
+            ("Ceigall India Limited", "U45202PB2002PLC025244", "A-898, Tagor Nagar, Ludhiana - 141001", "03AABCC1982K1Z2", "AABCC1982K", "HDFC Bank Ludhiana"),
+            ("SP Singla Constructions Pvt Ltd", "U45201CH1996PTC018447", "Plot No. 47, Industrial Area Phase-I, Chandigarh - 160002", "04AAACS1982L1Z9", "AAACS1982L", "SBI Chandigarh"),
+            ("Goyal Construction Company", "U45200CH2004PTC027118", "SCO 814, Sector 22-A, Chandigarh - 160022", "04AAACG1982M1Z7", "AAACG1982M", "Punjab National Bank Chandigarh")
+        ],
+        'accepted_target_count': 45,
+        'current_target_count': 10
+    },
+    # 33. Tripura e-Procurement
+    {
+        'key': 'tripura',
+        'source_portal': 'Tripura e-Procurement (tripuratenders.gov.in)',
+        'portal_url_base': 'https://tripuratenders.gov.in/nicgep/app?org=',
+        'state': 'Tripura',
+        'cities': ['Agartala', 'Udaipur', 'Dharmanagar'],
+        'orgs': [
+            'Public Works Department, Govt of Tripura (PWD Buildings/Roads)',
+            'Drinking Water and Sanitation Department (DWS Tripura)',
+            'Tripura State Electricity Corporation (TSECL)',
+            'Agartala Smart City Limited',
+            'Tripura Road Development Corporation'
+        ],
+        'categories': ['Border Roads & State Highways', 'Jal Jeevan Rural Piped Water Schemes', '132kV Substation Civil Works'],
+        'project_templates': [
+            ("Improvement & Widening to 2-Lane with Paved Shoulder of State Highway ({code} km) near {location}", 480000000.0, 15),
+            ("Implementation of Surface Water Based Multi-Village Rural Piped Water Supply Scheme around {location}", 280000000.0, 12),
+            ("Construction of Multi-Storeyed Administrative Block & Judicial Complex at {location}", 340000000.0, 14)
+        ],
+        'winning_companies': [
+            ("Niraj Cement Structurals Limited", "L26940MH1998PLC114307", "Niraj House, Sunder Baug, Deonar, Mumbai - 400088", "27AAACN1982H1Z6", "AAACN1982H", "SBI Mumbai"),
+            ("National Projects Construction Corporation (NPCC)", "U45202DL1957GOI002752", "Plot No. 148, Sector 44, Gurugram - 122003", "06AAACN1982L1Z4", "AAACN1982L", "Canara Bank Delhi"),
+            ("NBCC (India) Limited", "L74899DL1960GOI003335", "NBCC Bhawan, Lodhi Road, New Delhi - 110003", "07AAACN1982M1Z1", "AAACN1982M", "SBI Delhi")
+        ],
+        'accepted_target_count': 40,
+        'current_target_count': 8
+    },
+    # 34. Puducherry e-Procurement
+    {
+        'key': 'puducherry',
+        'source_portal': 'Puducherry e-Procurement (pudutenders.gov.in)',
+        'portal_url_base': 'https://pudutenders.gov.in/nicgep/app?org=',
+        'state': 'Puducherry',
+        'cities': ['Puducherry', 'Karaikal', 'Mahe', 'Yanam'],
+        'orgs': [
+            'Public Works Department, Govt of Puducherry (PWD Buildings & Roads)',
+            'Electricity Department, Govt of Puducherry',
+            'Puducherry Smart City Development Limited (PSCDL)',
+            'Local Administration Department (LAD)',
+            'Puducherry Port Department'
+        ],
+        'categories': ['Coastal Protection & Maritime Works', 'Heritage Precinct Conservation', 'Smart City Urban Utilities & Roadways'],
+        'project_templates': [
+            ("Construction of Submerged Groynes & Coastal Beach Restoration Works along {location} Promenade", 520000000.0, 14),
+            ("Comprehensive Underground Sewerage System & 17 MLD Modern STP Facility for {location} Urban Area", 460000000.0, 16),
+            ("Revitalization of Franco-Tamil Heritage Corridor & Pedestrian Smart Urban Mobility in {location}", 190000000.0, 10)
+        ],
+        'winning_companies': [
+            ("URC Construction Private Limited", "U45201TZ1991PTC003469", "URC Nagar, 3rd Street, Perundurai Road, Erode - 638012", "33AAACU1982K1Z2", "AAACU1982K", "SBI Corporate Erode"),
+            ("KCP Infra Limited", "U45201TN2008PLC067188", "16, KCP House, Race Course, Coimbatore - 641018", "33AAACK1982N1Z8", "AAACK1982N", "Indian Bank Coimbatore"),
+            ("B.R. Construction Puducherry", "U45200PY2006PTC001982", "54, Kamaraj Salai, Puducherry - 605011", "34AAACB1982L1Z5", "AAACB1982L", "IOB Puducherry")
+        ],
+        'accepted_target_count': 40,
+        'current_target_count': 8
     }
 ]
 
@@ -957,9 +1211,38 @@ for src in SOURCES:
             "emd_exemption_eligible": True
         })
 
-# Save accepted tenders catalog to JSON (current active catalog is managed by populate_255_cppp_catalog.py)
+# Save accepted tenders catalog to JSON in backend and frontend
 acc_path = os.path.join(DATA_DIR, "all_sources_accepted_catalog.json")
 with open(acc_path, "w", encoding="utf-8") as f:
     json.dump(all_accepted, f, indent=2, ensure_ascii=False)
 
+frontend_acc_path = os.path.abspath(os.path.join(DATA_DIR, "..", "..", "..", "frontend", "public", "data", "all_sources_accepted_catalog.json"))
+if os.path.exists(os.path.dirname(frontend_acc_path)):
+    with open(frontend_acc_path, "w", encoding="utf-8") as f:
+        json.dump(all_accepted, f, indent=2, ensure_ascii=False)
+
 print(f"Successfully generated {len(all_accepted)} previously accepted tenders across {len(SOURCES)} real portals.")
+
+# Augment current active tenders catalog with the new sources
+curr_path = os.path.join(DATA_DIR, "all_sources_current_catalog.json")
+existing_current = []
+if os.path.exists(curr_path):
+    try:
+        with open(curr_path, "r", encoding="utf-8") as f:
+            existing_current = json.load(f)
+    except Exception as e:
+        print(f"Notice reading existing current catalog: {e}")
+
+existing_ids = {t["id"] for t in existing_current}
+new_current_items = [t for t in all_current if t["id"] not in existing_ids]
+
+merged_current = existing_current + new_current_items
+with open(curr_path, "w", encoding="utf-8") as f:
+    json.dump(merged_current, f, indent=2, ensure_ascii=False)
+
+frontend_curr_path = os.path.abspath(os.path.join(DATA_DIR, "..", "..", "..", "frontend", "public", "data", "all_sources_current_catalog.json"))
+if os.path.exists(os.path.dirname(frontend_curr_path)):
+    with open(frontend_curr_path, "w", encoding="utf-8") as f:
+        json.dump(merged_current, f, indent=2, ensure_ascii=False)
+
+print(f"Current catalog updated: {len(merged_current)} active tenders (added {len(new_current_items)} new notices across new portals).")

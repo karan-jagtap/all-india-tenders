@@ -21,14 +21,18 @@ export const ALL_STATUTORY_PORTAL_SOURCES: string[] = [
   'Andaman & Nicobar e-Procure (eproc.andaman.gov.in)',
   'Andhra Pradesh e-Procure (tender.apeprocurement.gov.in)',
   'Assam Tenders (assamtenders.gov.in)',
+  'BHEL e-Procurement (eprocure.bhel.co.in)',
   'Bihar e-Procure (eproc2.bihar.gov.in)',
   'CPWD TenderWizard (tenderwizard.com/CPWD)',
   'Central Public Procurement Portal (eprocure.gov.in)',
+  'Chandigarh e-Procurement (etenders.chd.nic.in)',
+  'Coal India e-Procurement (coalindiatenders.nic.in)',
   'Defense Procurement Portal (defproc.gov.in)',
   'Delhi e-Procure (govtprocurement.delhi.gov.in)',
   'Goa e-Procurement (eprocure.goa.gov.in)',
   'Government e-Marketplace (gem.gov.in)',
   'Gujarat (n)Procure (tender.nprocure.com)',
+  'HPCL e-Procurement (etender.hpcl.co.in)',
   'Haryana e-Procurement (etenders.hry.nic.in)',
   'IREPS Railways (ireps.gov.in)',
   'J&K e-Procurement (jktenders.gov.in)',
@@ -37,32 +41,41 @@ export const ALL_STATUTORY_PORTAL_SOURCES: string[] = [
   'Kerala e-Tenders (etenders.kerala.gov.in)',
   'MP Tenders (mptenders.gov.in)',
   'MahaTenders (mahatenders.gov.in)',
+  'NTPC e-Procurement (etender.ntpctender.co.in)',
   'Odisha Tenders (tendersodisha.gov.in)',
   'Open Government Data Platform India (data.gov.in)',
+  'PMGSY e-Procurement (pmgsytenders.gov.in)',
+  'POWERGRID e-Procurement (etender.powergrid.in)',
+  'Puducherry e-Procurement (pudutenders.gov.in)',
   'Punjab e-Procurement (eproc.punjab.gov.in)',
   'Rajasthan e-Procure (eproc.rajasthan.gov.in)',
   'Tamil Nadu Tenders (tntenders.gov.in)',
   'Telangana e-Procurement (tender.telangana.gov.in)',
+  'Tripura e-Procurement (tripuratenders.gov.in)',
   'UP e-Procure (etender.up.nic.in)',
   'Uttarakhand e-Tenders (uktenders.gov.in)',
   'West Bengal Tenders (wbtenders.gov.in)'
 ];
 
 /**
- * Helper to normalize any incoming portal string into the canonical 28 statutory portals
+ * Helper to normalize any incoming portal string into the canonical statutory portals
  */
 export const canonicalizePortalSource = (portal?: string): string => {
   const p = (portal || '').toLowerCase();
   if (p.includes('andaman')) return 'Andaman & Nicobar e-Procure (eproc.andaman.gov.in)';
   if (p.includes('apeprocurement') || p.includes('andhra')) return 'Andhra Pradesh e-Procure (tender.apeprocurement.gov.in)';
   if (p.includes('assamtenders') || p.includes('assam')) return 'Assam Tenders (assamtenders.gov.in)';
+  if (p.includes('bhel')) return 'BHEL e-Procurement (eprocure.bhel.co.in)';
   if (p.includes('bihar')) return 'Bihar e-Procure (eproc2.bihar.gov.in)';
+  if (p.includes('chandigarh') || p.includes('etenders.chd')) return 'Chandigarh e-Procurement (etenders.chd.nic.in)';
+  if (p.includes('coalindia') || p.includes('coal india') || p.includes('coalindiatenders')) return 'Coal India e-Procurement (coalindiatenders.nic.in)';
   if (p.includes('cpwd') || p.includes('tenderwizard')) return 'CPWD TenderWizard (tenderwizard.com/CPWD)';
   if (p.includes('defproc') || p.includes('defense') || p.includes('defence')) return 'Defense Procurement Portal (defproc.gov.in)';
   if (p.includes('delhi') || p.includes('dmrc')) return 'Delhi e-Procure (govtprocurement.delhi.gov.in)';
   if (p.includes('goa')) return 'Goa e-Procurement (eprocure.goa.gov.in)';
   if (p.includes('gem') || p.includes('marketplace')) return 'Government e-Marketplace (gem.gov.in)';
   if (p.includes('nprocure') || p.includes('gujarat')) return 'Gujarat (n)Procure (tender.nprocure.com)';
+  if (p.includes('hpcl')) return 'HPCL e-Procurement (etender.hpcl.co.in)';
   if (p.includes('hry.nic.in') || p.includes('haryana')) return 'Haryana e-Procurement (etenders.hry.nic.in)';
   if (p.includes('ireps') || p.includes('railway')) return 'IREPS Railways (ireps.gov.in)';
   if (p.includes('jktenders') || p.includes('kashmir') || p.includes('j&k')) return 'J&K e-Procurement (jktenders.gov.in)';
@@ -71,12 +84,17 @@ export const canonicalizePortalSource = (portal?: string): string => {
   if (p.includes('kerala')) return 'Kerala e-Tenders (etenders.kerala.gov.in)';
   if (p.includes('mptenders') || p.includes('madhya')) return 'MP Tenders (mptenders.gov.in)';
   if (p.includes('mahatenders') || p.includes('maharashtra')) return 'MahaTenders (mahatenders.gov.in)';
+  if (p.includes('ntpc')) return 'NTPC e-Procurement (etender.ntpctender.co.in)';
   if (p.includes('odisha')) return 'Odisha Tenders (tendersodisha.gov.in)';
   if (p.includes('data.gov.in') || p.includes('ogd') || p.includes('open data')) return 'Open Government Data Platform India (data.gov.in)';
+  if (p.includes('pmgsy') || p.includes('pmgsytenders')) return 'PMGSY e-Procurement (pmgsytenders.gov.in)';
+  if (p.includes('powergrid')) return 'POWERGRID e-Procurement (etender.powergrid.in)';
+  if (p.includes('pudu') || p.includes('puducherry') || p.includes('pudutenders')) return 'Puducherry e-Procurement (pudutenders.gov.in)';
   if (p.includes('punjab')) return 'Punjab e-Procurement (eproc.punjab.gov.in)';
   if (p.includes('rajasthan')) return 'Rajasthan e-Procure (eproc.rajasthan.gov.in)';
   if (p.includes('tntenders') || p.includes('tamil')) return 'Tamil Nadu Tenders (tntenders.gov.in)';
   if (p.includes('telangana')) return 'Telangana e-Procurement (tender.telangana.gov.in)';
+  if (p.includes('tripura') || p.includes('tripuratenders')) return 'Tripura e-Procurement (tripuratenders.gov.in)';
   if (p.includes('etender.up') || p.includes('up e-procure') || p.includes('up e-procurement')) return 'UP e-Procure (etender.up.nic.in)';
   if (p.includes('uktenders') || p.includes('uttarakhand') || p.includes('hptenders') || p.includes('himachal')) return 'Uttarakhand e-Tenders (uktenders.gov.in)';
   if (p.includes('wbtenders') || p.includes('bengal')) return 'West Bengal Tenders (wbtenders.gov.in)';
@@ -92,6 +110,7 @@ export const STATUTORY_PORTAL_TO_STATE_MAP: Record<string, string> = {
   'Andhra Pradesh e-Procure (tender.apeprocurement.gov.in)': 'Andhra Pradesh',
   'Assam Tenders (assamtenders.gov.in)': 'Assam',
   'Bihar e-Procure (eproc2.bihar.gov.in)': 'Bihar',
+  'Chandigarh e-Procurement (etenders.chd.nic.in)': 'Chandigarh',
   'Delhi e-Procure (govtprocurement.delhi.gov.in)': 'Delhi',
   'Goa e-Procurement (eprocure.goa.gov.in)': 'Goa',
   'Gujarat (n)Procure (tender.nprocure.com)': 'Gujarat',
@@ -103,10 +122,12 @@ export const STATUTORY_PORTAL_TO_STATE_MAP: Record<string, string> = {
   'MP Tenders (mptenders.gov.in)': 'Madhya Pradesh',
   'MahaTenders (mahatenders.gov.in)': 'Maharashtra',
   'Odisha Tenders (tendersodisha.gov.in)': 'Odisha',
+  'Puducherry e-Procurement (pudutenders.gov.in)': 'Puducherry',
   'Punjab e-Procurement (eproc.punjab.gov.in)': 'Punjab',
   'Rajasthan e-Procure (eproc.rajasthan.gov.in)': 'Rajasthan',
   'Tamil Nadu Tenders (tntenders.gov.in)': 'Tamil Nadu',
   'Telangana e-Procurement (tender.telangana.gov.in)': 'Telangana',
+  'Tripura e-Procurement (tripuratenders.gov.in)': 'Tripura',
   'UP e-Procure (etender.up.nic.in)': 'Uttar Pradesh',
   'Uttarakhand e-Tenders (uktenders.gov.in)': 'Uttarakhand',
   'West Bengal Tenders (wbtenders.gov.in)': 'West Bengal'
@@ -597,5 +618,158 @@ export const REAL_PORTAL_SOURCES: PortalSourceInfo[] = [
     statutoryFramework: 'Jharkhand PWD Code • NIC-GEP',
     status: 'LIVE',
     activeCountEstimate: 62
+  },
+
+  // 29. PMGSY Rural Roads
+  {
+    id: 'pmgsy',
+    name: 'PMGSY e-Procurement (pmgsytenders.gov.in)',
+    domain: 'pmgsytenders.gov.in',
+    url: 'https://pmgsytenders.gov.in/nicgep/app',
+    category: 'Central',
+    state: 'Pan-India / Central',
+    region: 'National',
+    description: 'Nodal e-procurement platform for Pradhan Mantri Gram Sadak Yojana (PMGSY), connecting unconnected habitations with all-weather rural roads across India.',
+    keyAuthorities: ['National Rural Infrastructure Development Agency (NRIDA)', 'Ministry of Rural Development', 'State Rural Roads Development Agencies (SRRDA)'],
+    procurementTypes: ['PMGSY-III Rural Road Upgradation', 'Long-Span Bridges on Rural Roads', 'CD Works & Concrete Pavements'],
+    statutoryFramework: 'NRRDA Operational Manual • MoRD Guidelines • NIC-GEP',
+    status: 'LIVE',
+    activeCountEstimate: 340
+  },
+
+  // 30. Coal India Limited (CIL)
+  {
+    id: 'coalindia',
+    name: 'Coal India e-Procurement (coalindiatenders.nic.in)',
+    domain: 'coalindiatenders.nic.in',
+    url: 'https://coalindiatenders.nic.in/nicgep/app',
+    category: 'Defense & PSU',
+    state: 'Pan-India / Central',
+    region: 'National',
+    description: 'Maharatna PSU procurement system for Coal India Limited and its mining subsidiaries (ECL, BCCL, CCL, WCL, SECL, MCL, NCL, CMPDI).',
+    keyAuthorities: ['Coal India Limited (CIL)', 'BCCL Dhanbad', 'CCL Ranchi', 'SECL Bilaspur', 'MCL Sambalpur', 'WCL Nagpur'],
+    procurementTypes: ['Coal Handling Plants (CHP)', 'Heavy Haul Roads', 'Washery Construction', 'Rail Siding Civil Infrastructure'],
+    statutoryFramework: 'CIL Purchase Manual • Ministry of Coal Guidelines • NIC-GEP',
+    status: 'LIVE',
+    activeCountEstimate: 290
+  },
+
+  // 31. BHEL (Bharat Heavy Electricals Limited)
+  {
+    id: 'bhel',
+    name: 'BHEL e-Procurement (eprocure.bhel.co.in)',
+    domain: 'eprocure.bhel.co.in',
+    url: 'https://eprocure.bhel.co.in/nicgep/app',
+    category: 'Defense & PSU',
+    state: 'Pan-India / Central',
+    region: 'National',
+    description: 'Premier engineering and manufacturing enterprise e-procurement portal covering power generation, transmission, transportation, and renewable sectors.',
+    keyAuthorities: ['BHEL Power Sector Northern Region', 'BHEL Trichy', 'BHEL Haridwar', 'BHEL Hyderabad', 'BHEL Bhopal'],
+    procurementTypes: ['Flue Gas Desulfurization (FGD) Packages', 'Supercritical Boiler Structures', 'GIS Building Foundations', 'Electrostatic Precipitators'],
+    statutoryFramework: 'BHEL Works Policy • CVC Norms • NIC-GEP',
+    status: 'LIVE',
+    activeCountEstimate: 210
+  },
+
+  // 32. NTPC Limited
+  {
+    id: 'ntpc',
+    name: 'NTPC e-Procurement (etender.ntpctender.co.in)',
+    domain: 'etender.ntpctender.co.in',
+    url: 'https://etender.ntpctender.co.in/nicgep/app',
+    category: 'Defense & PSU',
+    state: 'Pan-India / Central',
+    region: 'National',
+    description: 'India\'s largest integrated power utility portal handling mega thermal, hydro, solar PV, and renewable energy procurement.',
+    keyAuthorities: ['NTPC Corporate Center', 'NTPC Renewable Energy Ltd (REL)', 'NTPC Vindhyachal', 'NTPC Korba', 'NTPC Ramagundam'],
+    procurementTypes: ['Utility-Scale Solar PV Projects', 'Thermal BOP Civil Works', 'Ash Dyke Raising with HDPE Lining', 'Flue Gas Civil Systems'],
+    statutoryFramework: 'NTPC Procurement Manual • Ministry of Power • NIC-GEP',
+    status: 'LIVE',
+    activeCountEstimate: 260
+  },
+
+  // 33. POWERGRID (Power Grid Corporation of India)
+  {
+    id: 'powergrid',
+    name: 'POWERGRID e-Procurement (etender.powergrid.in)',
+    domain: 'etender.powergrid.in',
+    url: 'https://etender.powergrid.in',
+    category: 'Defense & PSU',
+    state: 'Pan-India / Central',
+    region: 'National',
+    description: 'Transmission utility platform handling 765kV/400kV Extra High Voltage substations, HVDC bipole terminals, and national grid interconnections.',
+    keyAuthorities: ['Power Grid Corporation of India Limited (PGCIL)', 'POWERGRID Northern Region-I', 'POWERGRID Western Region-I', 'POWERGRID Southern Region-II'],
+    procurementTypes: ['765kV Gas Insulated Substations (GIS)', 'Transmission Line Foundations & Tower Erection', 'Statcom & Grid Substations'],
+    statutoryFramework: 'PGCIL PRANIT e-Tender Policy • Ministry of Power Norms',
+    status: 'LIVE',
+    activeCountEstimate: 195
+  },
+
+  // 34. HPCL (Hindustan Petroleum Corporation Limited)
+  {
+    id: 'hpcl',
+    name: 'HPCL e-Procurement (etender.hpcl.co.in)',
+    domain: 'etender.hpcl.co.in',
+    url: 'https://etender.hpcl.co.in',
+    category: 'Defense & PSU',
+    state: 'Pan-India / Central',
+    region: 'National',
+    description: 'Downstream oil and petrochemical Maharatna procurement portal covering refinery expansions, cross-country pipelines, and automated depots.',
+    keyAuthorities: ['HPCL Mumbai Refinery', 'HPCL Visakh Refinery', 'HPCL Pipelines SBU', 'HPCL LPG Business Unit'],
+    procurementTypes: ['Refinery Process Unit Civil Structures', 'POL Storage Terminals & Railway Gantries', 'LPG Pipeline Offsites'],
+    statutoryFramework: 'HPCL Procurement Manual • CVC Guidelines',
+    status: 'LIVE',
+    activeCountEstimate: 175
+  },
+
+  // 35. Chandigarh Administration
+  {
+    id: 'chandigarh',
+    name: 'Chandigarh e-Procurement (etenders.chd.nic.in)',
+    domain: 'etenders.chd.nic.in',
+    url: 'https://etenders.chd.nic.in/nicgep/app',
+    category: 'State',
+    state: 'Chandigarh',
+    region: 'North',
+    description: 'Union Territory procurement portal administering capital architecture, urban expressways, tertiary water utilities, and smart city infrastructure.',
+    keyAuthorities: ['Engineering Department, Chandigarh Administration', 'Municipal Corporation Chandigarh (MCC)', 'Chandigarh Smart City Limited (CSCL)'],
+    procurementTypes: ['Smart City Urban Mobility', '24x7 Pan-City Water Metering', 'Tertiary Sewage Treatment Plants', 'Sector Road Networks'],
+    statutoryFramework: 'UT Financial Rules • CPWD Manual • NIC-GEP',
+    status: 'LIVE',
+    activeCountEstimate: 95
+  },
+
+  // 36. Tripura e-Procurement
+  {
+    id: 'tripura',
+    name: 'Tripura e-Procurement (tripuratenders.gov.in)',
+    domain: 'tripuratenders.gov.in',
+    url: 'https://tripuratenders.gov.in/nicgep/app',
+    category: 'State',
+    state: 'Tripura',
+    region: 'North East',
+    description: 'Statutory platform for Government of Tripura, administering Northeast border highways, rural water infrastructure, and power distribution.',
+    keyAuthorities: ['Tripura PWD (Roads & Buildings)', 'Drinking Water & Sanitation (DWS)', 'Tripura State Electricity Corp (TSECL)', 'Agartala Smart City'],
+    procurementTypes: ['State Highway 2-Lane Widening', 'Multi-Village Piped Water Schemes', '132kV Substation Civil Works', 'Urban Flood Drainage'],
+    statutoryFramework: 'Tripura State Procurement Rules • NIC-GEP',
+    status: 'LIVE',
+    activeCountEstimate: 80
+  },
+
+  // 37. Puducherry e-Procurement
+  {
+    id: 'puducherry',
+    name: 'Puducherry e-Procurement (pudutenders.gov.in)',
+    domain: 'pudutenders.gov.in',
+    url: 'https://pudutenders.gov.in/nicgep/app',
+    category: 'State',
+    state: 'Puducherry',
+    region: 'South',
+    description: 'Statutory coastal procurement portal for Government of Puducherry, coastal flood protection, Franco-Tamil heritage restoration, and municipal works.',
+    keyAuthorities: ['PWD Puducherry (Buildings & Roads)', 'Electricity Department Puducherry', 'Puducherry Smart City (PSCDL)', 'Port Department'],
+    procurementTypes: ['Coastal Submerged Groynes & Promenade Protection', 'Underground Drainage & SBR Treatment Plants', 'Heritage Corridor Preservation'],
+    statutoryFramework: 'Puducherry Procurement Manual • NIC-GEP',
+    status: 'LIVE',
+    activeCountEstimate: 70
   }
 ];

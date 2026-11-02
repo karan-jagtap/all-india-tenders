@@ -496,41 +496,50 @@ async def seed_awarded_tenders(session):
 
 
 async def seed_live_tenders(session):
-    logger.info("Seeding Live In-Progress Tenders (2,738+ notices)...")
+    logger.info("Seeding Live In-Progress Tenders across all 34 portals...")
+    await session.execute(delete(Tender))
+    await session.flush()
+
+    path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "data", "all_sources_current_catalog.json"))
+    catalog = []
+    if os.path.exists(path):
+        with open(path, "r", encoding="utf-8") as f:
+            catalog = json.load(f)
+    if not catalog:
+        catalog = ALL_CURRENT_TENDERS
+
     batch = []
 
-    for t in ALL_CURRENT_TENDERS:
+    for t in catalog:
         t_id = t.get("id")
         if not t_id:
             continue
-        existing = await session.get(Tender, t_id)
-        if not existing:
-            batch.append(Tender(
-                id=t_id,
-                nit_number=t.get("nit_number"),
-                title=t.get("title", ""),
-                source_portal_id=slugify(t.get("source_portal", "Central CPPP")),
-                source_portal=t.get("source_portal"),
-                category_id=slugify(t.get("category", "Civil & Infrastructure Works")),
-                category=t.get("category"),
-                organisation_id=slugify(t.get("organisation", "")),
-                organisation=t.get("organisation"),
-                state_id=slugify(t.get("state", "Pan-India / Central")),
-                state=t.get("state"),
-                city_id=slugify(f"{t.get('state', '')}-{t.get('city', '')}"),
-                city=t.get("city"),
-                estimated_cost_inr=float(t.get("estimated_cost_inr", 0.0)),
-                emd_amount_inr=float(t.get("emd_amount_inr", 0.0)),
-                publish_date=str(t.get("publish_date", "")),
-                close_date=str(t.get("close_date", "")),
-                opening_date=str(t.get("opening_date", "")),
-                days_left=int(t.get("days_left", 0)),
-                status=str(t.get("status", "In-Progress")),
-                document_url=str(t.get("document_url", "")),
-                scope_summary=str(t.get("scope_summary", "")),
-                pqc_criteria=t.get("pqc_criteria"),
-                raw_data=t
-            ))
+        batch.append(Tender(
+            id=t_id,
+            nit_number=t.get("nit_number"),
+            title=t.get("title", ""),
+            source_portal_id=slugify(t.get("source_portal", "Central CPPP")),
+            source_portal=t.get("source_portal"),
+            category_id=slugify(t.get("category", "Civil & Infrastructure Works")),
+            category=t.get("category"),
+            organisation_id=slugify(t.get("organisation", "")),
+            organisation=t.get("organisation"),
+            state_id=slugify(t.get("state", "Pan-India / Central")),
+            state=t.get("state"),
+            city_id=slugify(f"{t.get('state', '')}-{t.get('city', '')}"),
+            city=t.get("city"),
+            estimated_cost_inr=float(t.get("estimated_cost_inr", 0.0)),
+            emd_amount_inr=float(t.get("emd_amount_inr", 0.0)),
+            publish_date=str(t.get("publish_date", "")),
+            close_date=str(t.get("close_date", "")),
+            opening_date=str(t.get("opening_date", "")),
+            days_left=int(t.get("days_left", 0)),
+            status=str(t.get("status", "In-Progress")),
+            document_url=str(t.get("document_url", "")),
+            scope_summary=str(t.get("scope_summary", "")),
+            pqc_criteria=t.get("pqc_criteria"),
+            raw_data=t
+        ))
 
         if len(batch) >= 500:
             session.add_all(batch)
@@ -541,7 +550,7 @@ async def seed_live_tenders(session):
         session.add_all(batch)
         await session.flush()
 
-    logger.info("Live tenders seeded.")
+    logger.info(f"Seeded {len(catalog)} Live Tenders across all 34 portals.")
 
 
 async def migrate_existing_feedback(session):
