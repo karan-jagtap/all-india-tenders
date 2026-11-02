@@ -25,6 +25,7 @@ export const RegisteredBiddersTab: React.FC = () => {
   const [copiedText, setCopiedText] = useState<string | null>(null);
 
   const [contractSearchQuery, setContractSearchQuery] = useState<string>('');
+  const [rightColumnHeight, setRightColumnHeight] = useState<number | null>(null);
   const dossierRef = useRef<HTMLDivElement>(null);
 
   const loadData = () => {
@@ -161,6 +162,34 @@ export const RegisteredBiddersTab: React.FC = () => {
     });
   }, [selectedBidder, contractSearchQuery]);
 
+  // Dynamically match the left list's max-height to the right dossier column
+  useEffect(() => {
+    const el = dossierRef.current;
+    if (!el) return;
+
+    const updateHeight = () => {
+      if (typeof window !== 'undefined' && window.innerWidth >= 1024 && el.offsetHeight > 0) {
+        setRightColumnHeight(el.offsetHeight);
+      } else {
+        setRightColumnHeight(null);
+      }
+    };
+
+    updateHeight();
+
+    const observer = new ResizeObserver(() => {
+      updateHeight();
+    });
+    observer.observe(el);
+
+    window.addEventListener('resize', updateHeight);
+
+    return () => {
+      observer.disconnect();
+      window.removeEventListener('resize', updateHeight);
+    };
+  }, [selectedBidderId, contractSearchQuery, filteredContracts?.length]);
+
   const totalContractsSum = useMemo(() => {
     return bidders.reduce((acc, b) => acc + (b.total_contracts_won || 0), 0);
   }, [bidders]);
@@ -215,9 +244,16 @@ export const RegisteredBiddersTab: React.FC = () => {
       )}
 
       {/* Main Master-Detail Layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
         {/* Left Column: Bidders Directory Cards (35% -> col-span-4) */}
-        <div className="lg:col-span-4 xl:col-span-4 space-y-2.5 max-h-[calc(100vh-250px)] overflow-y-auto pr-1">
+        <div
+          className="lg:col-span-4 xl:col-span-4 space-y-2.5 overflow-y-auto pr-1 transition-all duration-150 scroll-smooth custom-scrollbar"
+          style={{
+            maxHeight: rightColumnHeight
+              ? `${Math.max(rightColumnHeight, 550)}px`
+              : 'calc(100vh - 250px)',
+          }}
+        >
           <div className="text-xs text-slate-500 dark:text-slate-400 font-semibold px-1 flex items-center justify-between">
             <span>Registered Contractors ({filteredBidders.length})</span>
             <span className="text-[11px] text-slate-400 dark:text-slate-500">Sorted by {sortBy.replace('_DESC', '').toLowerCase()}</span>
