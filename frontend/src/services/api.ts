@@ -43,7 +43,10 @@ export async function listAcceptedTenders(): Promise<AcceptedTender[]> {
   }
 
   // Fallback to static catalog for Netlify / serverless deployment
-  const fallbackRes = await fetch('/data/all_sources_accepted_catalog.json');
+  const fallbackRes = await fetch(`/data/all_sources_accepted_catalog.json?_v=${Date.now()}`, {
+    cache: 'no-cache',
+    headers: { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' }
+  });
   if (!fallbackRes.ok) throw new Error('Failed to load accepted tenders');
   return fallbackRes.json();
 }
@@ -80,7 +83,10 @@ export async function listCurrentTenders(filters?: CurrentTenderFilters): Promis
   }
 
   // Fallback to static catalog for Netlify / serverless deployment
-  const fallbackRes = await fetch('/data/all_sources_current_catalog.json');
+  const fallbackRes = await fetch(`/data/all_sources_current_catalog.json?_v=${Date.now()}`, {
+    cache: 'no-cache',
+    headers: { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' }
+  });
   if (!fallbackRes.ok) throw new Error('Failed to load current tenders');
   let list: CurrentTender[] = await fallbackRes.json();
 
@@ -143,18 +149,21 @@ export async function getPlatformStats(): Promise<PlatformStats> {
     // Fallback to static stats
   }
 
-  const fallbackRes = await fetch('/data/platform_stats.json');
+  const fallbackRes = await fetch(`/data/platform_stats.json?_v=${Date.now()}`, {
+    cache: 'no-cache',
+    headers: { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' }
+  });
   if (fallbackRes.ok) {
     return fallbackRes.json();
   }
 
   return {
-    active_tenders_count: 2718,
-    accepted_tenders_count: 4393,
-    registered_bidders_count: 87,
+    active_tenders_count: 3293,
+    accepted_tenders_count: 5224,
+    registered_bidders_count: 103,
     database_required: true,
     architecture: 'Enterprise Hybrid (PostgreSQL 16 / SQLite Persistent DB + In-Memory RAM Stream)',
-    total_portals_monitored: 28,
+    total_portals_monitored: 58,
     portals_list: [
       'Central Public Procurement Portal (eprocure.gov.in)',
       'Defense Procurement Portal (defproc.gov.in)',
@@ -219,7 +228,10 @@ export async function listRegisteredBidders(params?: {
     // Fallback to static bidders list
   }
 
-  const fallbackRes = await fetch('/data/registered_bidders.json');
+  const fallbackRes = await fetch(`/data/registered_bidders.json?_v=${Date.now()}`, {
+    cache: 'no-cache',
+    headers: { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' }
+  });
   if (!fallbackRes.ok) throw new Error('Failed to load registered bidders directory');
   let list: RegisteredBidder[] = await fallbackRes.json();
 
