@@ -62,12 +62,36 @@ export const RegisteredBiddersTab: React.FC = () => {
     return Array.from(s).sort();
   }, [bidders]);
 
+  const categoryCounts = useMemo(() => {
+    const map = new Map<string, number>();
+    bidders.forEach((b) => {
+      if (b.categories) {
+        b.categories.forEach((c) => {
+          map.set(c, (map.get(c) || 0) + 1);
+        });
+      }
+    });
+    return map;
+  }, [bidders]);
+
   const allStates = useMemo(() => {
     const s = new Set<string>();
     bidders.forEach((b) => {
       if (b.states) b.states.forEach((st) => s.add(st));
     });
     return Array.from(s).sort();
+  }, [bidders]);
+
+  const stateCounts = useMemo(() => {
+    const map = new Map<string, number>();
+    bidders.forEach((b) => {
+      if (b.states) {
+        b.states.forEach((st) => {
+          map.set(st, (map.get(st) || 0) + 1);
+        });
+      }
+    });
+    return map;
   }, [bidders]);
 
   const filteredBidders = useMemo(() => {
@@ -171,9 +195,12 @@ export const RegisteredBiddersTab: React.FC = () => {
         selectedCategory={selectedCategory}
         setSelectedCategory={setSelectedCategory}
         allCategories={allCategories}
+        categoryCounts={categoryCounts}
         selectedState={selectedState}
         setSelectedState={setSelectedState}
         allStates={allStates}
+        stateCounts={stateCounts}
+        totalBidders={bidders.length}
         sortBy={sortBy}
         setSortBy={setSortBy}
         hasActiveFilters={hasActiveFilters}

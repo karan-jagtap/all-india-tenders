@@ -85,14 +85,22 @@ export const SearchableDropdown: React.FC<SearchableDropdownProps> = ({
   // Find currently selected option object
   const selectedOption = options.find((opt) => opt.value === value);
 
-  // Filter options based on search query
+  // Filter options based on search query (covering label, value, numeric count, and suffix)
   const query = searchQuery.trim().toLowerCase();
   const filteredOptions = query
-    ? options.filter((opt) => opt.label.toLowerCase().includes(query))
+    ? options.filter((opt) => {
+        const labelMatch = opt.label.toLowerCase().includes(query);
+        const valueMatch = opt.value.toLowerCase().includes(query);
+        const countMatch = typeof opt.count === 'number' && String(opt.count).includes(query);
+        const suffixMatch = opt.countSuffix ? opt.countSuffix.toLowerCase().includes(query) : false;
+        return labelMatch || valueMatch || countMatch || suffixMatch;
+      })
     : options;
 
-  // Does the query match "All ..."?
-  const matchesAll = !query || allOptionLabel.toLowerCase().includes(query);
+  // Does the query match "All ..." (including numeric count)?
+  const matchesAll = !query || 
+    allOptionLabel.toLowerCase().includes(query) || 
+    (typeof allOptionCount === 'number' && String(allOptionCount).includes(query));
 
   const getAccentBorderClass = () => {
     switch (accentColor) {
@@ -158,24 +166,30 @@ export const SearchableDropdown: React.FC<SearchableDropdownProps> = ({
             : 'border-slate-700 hover:border-slate-600'
         }`}
       >
-        <div className="flex items-center gap-2 truncate pr-2">
+        <div className="flex items-center gap-2 min-w-0 flex-1 pr-2">
           {icon && <span className="shrink-0">{icon}</span>}
           {value === 'ALL' || !selectedOption ? (
-            <span className="font-medium text-slate-200 truncate">
-              {allOptionLabel}
+            <div className="flex items-center gap-1.5 min-w-0">
+              <span className="font-medium text-slate-200 truncate">
+                {allOptionLabel}
+              </span>
               {typeof allOptionCount === 'number' && (
-                <span className="text-slate-400 ml-1">({allOptionCount})</span>
-              )}
-            </span>
-          ) : (
-            <span className="font-bold text-white truncate">
-              {selectedOption.label}
-              {typeof selectedOption.count === 'number' && (
-                <span className="text-slate-400 font-normal ml-1.5 text-[11px]">
-                  ({selectedOption.count} {selectedOption.countSuffix || 'notices'})
+                <span className="text-slate-400 font-mono text-[11px] shrink-0 bg-slate-700/60 px-1.5 py-0.5 rounded">
+                  ({allOptionCount})
                 </span>
               )}
-            </span>
+            </div>
+          ) : (
+            <div className="flex items-center gap-1.5 min-w-0">
+              <span className="font-bold text-white truncate">
+                {selectedOption.label}
+              </span>
+              {typeof selectedOption.count === 'number' && (
+                <span className="text-slate-400 font-normal text-[11px] shrink-0 bg-slate-700/60 px-1.5 py-0.5 rounded font-mono">
+                  ({selectedOption.count}{selectedOption.countSuffix ? ` ${selectedOption.countSuffix}` : ''})
+                </span>
+              )}
+            </div>
           )}
         </div>
 
@@ -247,10 +261,10 @@ export const SearchableDropdown: React.FC<SearchableDropdownProps> = ({
                     : 'text-slate-300 hover:bg-slate-800/70 hover:text-white'
                 }`}
               >
-                <div className="flex items-center gap-2 truncate">
+                <div className="flex items-center gap-2 min-w-0 pr-2">
                   <span className="truncate">{allOptionLabel}</span>
                   {typeof allOptionCount === 'number' && (
-                    <span className="text-[10px] text-slate-400 font-mono">
+                    <span className="text-[10px] text-slate-400 font-mono shrink-0 bg-slate-800/80 px-1.5 py-0.5 rounded border border-slate-700/80">
                       ({allOptionCount})
                     </span>
                   )}
@@ -286,8 +300,14 @@ export const SearchableDropdown: React.FC<SearchableDropdownProps> = ({
                   <span className="truncate pr-2">{opt.label}</span>
                   <div className="flex items-center gap-1.5 shrink-0">
                     {typeof opt.count === 'number' && (
-                      <span className={`text-[10px] font-mono ${opt.count === 0 ? 'text-slate-500' : 'text-slate-400'}`}>
-                        {opt.count} {opt.countSuffix || ''}
+                      <span className={`text-[10px] font-mono shrink-0 px-1.5 py-0.5 rounded border ${
+                        isSelected
+                          ? 'bg-slate-700 text-white border-slate-600'
+                          : opt.count === 0
+                            ? 'text-slate-500 bg-slate-800/50 border-slate-800'
+                            : 'text-slate-400 bg-slate-800/80 border-slate-700/80'
+                      }`}>
+                        {opt.count}{opt.countSuffix ? ` ${opt.countSuffix}` : ''}
                       </span>
                     )}
                     {isSelected && (
