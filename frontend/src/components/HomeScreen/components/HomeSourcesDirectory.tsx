@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Globe, Filter, RefreshCw } from 'lucide-react';
+import { Globe, Filter } from 'lucide-react';
 import {
   REAL_PORTAL_SOURCES,
   subscribePortalSources,
@@ -10,18 +10,20 @@ import {
 } from '../../../constants/portalSources';
 import { NavigableTab } from '../../../types';
 import { PortalSourceCard } from './PortalSourceCard';
-import { FilterSearchBar } from '../../common';
+import { FilterSearchBar, SyncLiveButton } from '../../common';
 
 export interface HomeSourcesDirectoryProps {
   onNavigate: (tab: NavigableTab) => void;
   onTriggerSync: () => void;
   isSyncing: boolean;
+  cooldownRemaining?: number;
 }
 
 export const HomeSourcesDirectory: React.FC<HomeSourcesDirectoryProps> = ({
   onNavigate,
   onTriggerSync,
-  isSyncing
+  isSyncing,
+  cooldownRemaining = 0
 }) => {
   const [portalSearch, setPortalSearch] = useState<string>('');
   const [selectedCategory, setSelectedCategory] = useState<'ALL' | PortalCategory>('ALL');
@@ -87,16 +89,12 @@ export const HomeSourcesDirectory: React.FC<HomeSourcesDirectoryProps> = ({
           <div className="text-xs text-slate-500 dark:text-slate-400 font-mono bg-slate-100 dark:bg-slate-800 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700">
             Showing <strong className="text-slate-900 dark:text-white">{filteredPortals.length}</strong> of {REAL_PORTAL_SOURCES.length} Real Portals
           </div>
-          <button
+          <SyncLiveButton
             onClick={onTriggerSync}
-            disabled={isSyncing}
-            className="px-3 py-1.5 rounded-lg text-xs font-bold bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white flex items-center gap-1.5 shadow-2xs transition-all cursor-pointer disabled:opacity-60"
-            title="Trigger live statutory scraper across all 28 real government tender portals"
-          >
-            <RefreshCw className={`w-3.5 h-3.5 ${isSyncing ? 'animate-spin' : ''}`} />
-            <span className="hidden sm:inline">{isSyncing ? 'Scraping Live...' : 'Sync Live Scraper'}</span>
-            <span className="sm:hidden">{isSyncing ? '...' : 'Sync'}</span>
-          </button>
+            isSyncing={isSyncing}
+            cooldownRemaining={cooldownRemaining}
+            variant="section"
+          />
         </div>
       </div>
 

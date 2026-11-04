@@ -196,6 +196,8 @@ export interface ScrapeReport {
   timestamp: string;
   next_cron_run?: string;
   trigger_type?: string;
+  cooldown_remaining_seconds?: number;
+  cooldown_total_seconds?: number;
 }
 
 export interface PlatformStats {
@@ -208,11 +210,16 @@ export interface PlatformStats {
   portals_list: string[];
   total_active_procurement_value_inr: number;
   states_covered: number;
+  cooldown_remaining_seconds?: number;
+  cooldown_seconds_total?: number;
+  is_sync_in_progress?: boolean;
   cron_sync?: {
     schedule: string;
     cron_expression?: string;
     timezone?: string;
     next_run?: string;
     scheduler_running?: boolean;
+    cooldown_remaining_seconds?: number;
+    cooldown_seconds_total?: number;
   };
 }

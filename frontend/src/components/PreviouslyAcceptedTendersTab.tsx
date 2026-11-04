@@ -703,12 +703,6 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
     setSearchQuery('');
   };
 
-  const totalContractValCr = useMemo(() => {
-    return (
-      filteredTenders.reduce((acc, t) => acc + (t.bid_submission?.quoted_amount_inr || 0), 0) / 10000000
-    ).toFixed(1);
-  }, [filteredTenders]);
-
   const pdfUrl = useMemo(() => {
     return selectedTender ? getAcceptedTenderPdfUrl(selectedTender.id) : '';
   }, [selectedTender?.id]);
@@ -885,50 +879,6 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
 
   return (
     <div className="space-y-4">
-      {/* Top Archive Header Banner */}
-      <div className="bg-gradient-to-r from-emerald-950 via-slate-900 to-slate-950 text-white rounded-xl p-5 shadow-sm border border-emerald-900/50">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div>
-            <div className="flex items-center gap-2 mb-1.5">
-              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-wider uppercase bg-emerald-500 text-slate-950 flex items-center gap-1 shadow-xs">
-                <Award className="w-3.5 h-3.5" />
-                Winning Bids & Awarded Proposals
-              </span>
-              <span className="text-xs text-emerald-400 font-mono">
-                Indian Public Procurement Records
-              </span>
-            </div>
-            <h2 className="text-lg font-bold text-white tracking-tight">
-              Previously Filled & Accepted Tenders Archive (17-Year Historical Records: 2010 – 2026)
-            </h2>
-            <p className="text-xs text-slate-300 mt-0.5 max-w-2xl leading-relaxed">
-              Explore how winning contractors (L&T, Tata Projects, Afcons, Navayuga, Shapoorji Pallonji, Dilip Buildcon, Ashoka Buildcon, J. Kumar, B.G. Shirke, T&T Infra, NCC, GR Infra) structured their 3-cover submissions, satisfied turnover & 3-2-1 work formulas, and secured official Letters of Acceptance (LOA).
-            </p>
-          </div>
-
-          <div className="flex items-center gap-3 shrink-0 flex-wrap">
-            <div className="bg-slate-800/80 border border-slate-700/80 px-4 py-2.5 rounded-lg text-center">
-              <span className="text-[10px] uppercase font-semibold text-slate-400 block">Sourced Portals</span>
-              <span className="text-base font-bold text-sky-400">
-                {availableSources.length} Sources
-              </span>
-            </div>
-            <div className="bg-slate-800/80 border border-slate-700/80 px-4 py-2.5 rounded-lg text-center">
-              <span className="text-[10px] uppercase font-semibold text-slate-400 block">
-                {hasActiveFilters ? 'Matching Bids' : 'Total Awarded Bids'}
-              </span>
-              <span className="text-base font-bold text-emerald-400">
-                {filteredTenders.length} {hasActiveFilters ? 'Found' : 'Records'}
-              </span>
-            </div>
-            <div className="bg-slate-800/80 border border-slate-700/80 px-4 py-2.5 rounded-lg text-center">
-              <span className="text-[10px] uppercase font-semibold text-slate-400 block">Total Awarded Value</span>
-              <span className="text-base font-bold text-orange-400">₹ {totalContractValCr} Cr</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
       {/* Top Filter and Search Bar: Search on LEFT, Filters on RIGHT */}
       <div className="bg-white dark:bg-[#0E1422] border border-slate-200/90 dark:border-slate-800 rounded-xl p-3 shadow-xs space-y-2.5 transition-colors">
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">

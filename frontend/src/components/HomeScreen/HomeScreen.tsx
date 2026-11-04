@@ -14,13 +14,15 @@ export interface HomeScreenProps {
   onNavigate: (tab: NavigableTab) => void;
   onTriggerSync: () => void;
   isSyncing: boolean;
+  cooldownRemaining?: number;
 }
 
 export const HomeScreen: React.FC<HomeScreenProps> = ({
   stats,
   onNavigate,
   onTriggerSync,
-  isSyncing
+  isSyncing,
+  cooldownRemaining = 0
 }) => {
   const activeTenders = stats?.active_tenders_count || 2718;
   const acceptedTenders = stats?.accepted_tenders_count || 4393;
@@ -65,6 +67,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
         onNavigate={onNavigate}
         onTriggerSync={onTriggerSync}
         isSyncing={isSyncing}
+        cooldownRemaining={cooldownRemaining}
       />
 
       {/* 5. Bottom Call to Action Banner */}

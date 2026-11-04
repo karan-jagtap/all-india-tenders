@@ -3,7 +3,6 @@ import {
   Home,
   Award,
   Radio,
-  RefreshCw,
   CheckCircle2,
   Users,
   Menu,
@@ -23,21 +22,43 @@ import { loadContractorPools } from './constants/contractors';
 import { loadPortalSources } from './constants/portalSources';
 import { loadMasterFilters } from './constants/masterFilters';
 import { loadUiFilters } from './constants/filters';
+import { SyncLiveButton } from './components/common';
 
 export const App: React.FC = () => {
   const { toggleTheme, isDark } = useTheme();
   const [activeTab, setActiveTab] = useState<NavigationTab>(NavigationTab.HOME);
   const [stats, setStats] = useState<PlatformStats | null>(null);
   const [isSyncing, setIsSyncing] = useState<boolean>(false);
+  const [cooldownRemaining, setCooldownRemaining] = useState<number>(0);
   const [syncNotice, setSyncNotice] = useState<string | null>(null);
   const [syncKey, setSyncKey] = useState<number>(0);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState<boolean>(false);
 
   const fetchStats = () => {
     getPlatformStats()
-      .then((data) => setStats(data))
+      .then((data) => {
+        setStats(data);
+        if (data?.cooldown_remaining_seconds && data.cooldown_remaining_seconds > 0) {
+          setCooldownRemaining(data.cooldown_remaining_seconds);
+        }
+      })
       .catch((err) => console.warn('Failed to load platform stats', err));
   };
+
+  // Live 1-second countdown interval for 5-minute cooldown
+  useEffect(() => {
+    if (cooldownRemaining <= 0) return;
+    const timer = setInterval(() => {
+      setCooldownRemaining((prev) => {
+        if (prev <= 1) {
+          clearInterval(timer);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [cooldownRemaining]);
 
   useEffect(() => {
     fetchStats();
@@ -71,7 +92,7 @@ export const App: React.FC = () => {
   }, [isMobileMenuOpen]);
 
   const handleSyncLive = async () => {
-    if (isSyncing) return;
+    if (isSyncing || cooldownRemaining > 0) return;
     setIsSyncing(true);
     setSyncNotice(null);
 
@@ -79,10 +100,21 @@ export const App: React.FC = () => {
       const report: ScrapeReport = await triggerLiveScrape();
       fetchStats();
       setSyncKey((prev) => prev + 1);
-      const portalCount = report.portals_scraped?.length || 28;
-      const count = report.total_in_progress_tenders || 2718;
-      const duration = report.execution_time_ms ? `${Math.round(report.execution_time_ms)}ms` : '2.3s';
-      setSyncNotice(`Synced ${count} live notices across ${portalCount} portals in ${duration} • Next scheduled cron: 4:00 AM IST`);
+
+      if (report.cooldown_remaining_seconds && report.cooldown_remaining_seconds > 0) {
+        setCooldownRemaining(report.cooldown_remaining_seconds);
+      } else if (report.status === 'success') {
+        setCooldownRemaining(300); // 5-minute safety cooldown
+      }
+
+      if (report.status === 'cooldown' || report.status === 'in_progress') {
+        setSyncNotice(report.message || 'Synchronization is currently in cooldown to protect portals.');
+      } else {
+        const portalCount = report.portals_scraped?.length || 28;
+        const count = report.total_in_progress_tenders || 2718;
+        const duration = report.execution_time_ms ? `${Math.round(report.execution_time_ms)}ms` : '2.3s';
+        setSyncNotice(`Synced ${count} live notices across ${portalCount} portals in ${duration} • Next scheduled cron: 4:00 AM IST`);
+      }
 
       setTimeout(() => {
         setSyncNotice(null);
@@ -200,17 +232,13 @@ export const App: React.FC = () => {
               </span>
             </button>
 
-            {/* Sync Live Button */}
-            <button
+            {/* Sync Live Button with 5-minute Cooldown & Hover Tooltip */}
+            <SyncLiveButton
               onClick={handleSyncLive}
-              disabled={isSyncing}
-              className="px-3 sm:px-4 py-2 bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 disabled:opacity-60 text-white font-bold text-xs rounded-lg flex items-center gap-1.5 shadow-sm transition-all cursor-pointer"
-              title="Runs official sync across all 28 real portals (Automated daily at 4:00 AM IST)"
-            >
-              <RefreshCw className={`w-3.5 h-3.5 ${isSyncing ? 'animate-spin' : ''}`} />
-              <span className="hidden xs:inline">{isSyncing ? 'Syncing...' : 'Sync Live'}</span>
-              <span className="xs:hidden">{isSyncing ? '...' : 'Sync'}</span>
-            </button>
+              isSyncing={isSyncing}
+              cooldownRemaining={cooldownRemaining}
+              variant="header"
+            />
 
             {/* Mobile Hamburger Button (< md) */}
             <button
@@ -393,17 +421,15 @@ export const App: React.FC = () => {
                 </button>
               </div>
 
-              <button
+              <SyncLiveButton
                 onClick={() => {
                   handleSyncLive();
                   setIsMobileMenuOpen(false);
                 }}
-                disabled={isSyncing}
-                className="w-full py-2.5 px-3 bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-2 transition-all cursor-pointer shadow-sm disabled:opacity-50"
-              >
-                <RefreshCw className={`w-3.5 h-3.5 ${isSyncing ? 'animate-spin' : ''}`} />
-                <span>{isSyncing ? 'Syncing Real Portals...' : 'Sync Live Notices'}</span>
-              </button>
+                isSyncing={isSyncing}
+                cooldownRemaining={cooldownRemaining}
+                variant="drawer"
+              />
 
               <div className="text-[10px] text-slate-500 text-center">
                 Automated Cron: Daily @ 4:00 AM IST • Hybrid Persistent DB
@@ -429,6 +455,7 @@ export const App: React.FC = () => {
             onNavigate={(tab) => setActiveTab(tab as NavigationTab)}
             onTriggerSync={handleSyncLive}
             isSyncing={isSyncing}
+            cooldownRemaining={cooldownRemaining}
           />
         ) : activeTab === NavigationTab.CURRENT ? (
           <CurrentTendersTab key={`curr-${syncKey}`} />

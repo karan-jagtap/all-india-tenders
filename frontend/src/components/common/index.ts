@@ -8,3 +8,4 @@ export * from './FilterSearchBar';
 export * from './TopFilterActionBar';
 export * from './ActiveFilterChipsBar';
 export * from './TenderFilterDrawer';
+export * from './SyncLiveButton';

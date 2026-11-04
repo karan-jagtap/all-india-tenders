@@ -1,0 +1,231 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1100" width="1600" height="1100">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#090d16"/>
+      <stop offset="50%" stop-color="#0e1422"/>
+      <stop offset="100%" stop-color="#050810"/>
+    </linearGradient>
+    <filter id="cardShadow" x="-5%" y="-5%" width="110%" height="110%">
+      <feDropShadow dx="0" dy="6" stdDeviation="8" flood-color="#000000" flood-opacity="0.6"/>
+    </filter>
+    <marker id="erd-dot" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6">
+      <circle cx="5" cy="5" r="3.5" fill="#38bdf8"/>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1600" height="1100" fill="url(#bg)"/>
+
+  <!-- Title Header -->
+  <g transform="translate(60, 35)">
+    <rect width="1480" height="70" rx="14" fill="#131b2e" stroke="#25324d" stroke-width="1.5" filter="url(#cardShadow)"/>
+    <text x="30" y="32" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="20" font-weight="800" fill="#f8fafc">All India Tenders — Database Entity Relationship Diagram (ERD)</text>
+    <text x="30" y="52" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="12" fill="#94a3b8">SQLAlchemy 2.0 ORM Schema • Primary Keys, Foreign Keys, Geographic &amp; Statutory Bidder Relationships</text>
+    <rect x="1310" y="20" width="140" height="30" rx="6" fill="#0284c7" opacity="0.2" stroke="#0284c7"/>
+    <text x="1328" y="39" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="700" fill="#38bdf8">11 SQL TABLES</text>
+  </g>
+
+  <!-- Row 1: Taxonomy & Sources -->
+
+  <!-- Table: states -->
+  <g transform="translate(60, 130)" filter="url(#cardShadow)">
+    <rect width="260" height="210" rx="10" fill="#131b2e" stroke="#25324d" stroke-width="1.5"/>
+    <rect width="260" height="34" rx="10" fill="#0284c7"/>
+    <text x="14" y="22" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="700" fill="#ffffff">states</text>
+    <text x="14" y="56" font-family="monospace" font-size="11" font-weight="bold" fill="#38bdf8">PK  id : VARCHAR(50)</text>
+    <text x="14" y="78" font-family="monospace" font-size="11" fill="#cbd5e1">    name : VARCHAR(100) UNIQUE</text>
+    <text x="14" y="100" font-family="monospace" font-size="11" fill="#cbd5e1">    code : VARCHAR(10)</text>
+    <text x="14" y="122" font-family="monospace" font-size="11" fill="#cbd5e1">    capital : VARCHAR(100)</text>
+    <text x="14" y="144" font-family="monospace" font-size="11" fill="#cbd5e1">    region : VARCHAR(50)</text>
+    <text x="14" y="166" font-family="monospace" font-size="11" fill="#64748b">    created_at : DATETIME</text>
+    <text x="14" y="188" font-family="monospace" font-size="11" fill="#64748b">    updated_at : DATETIME</text>
+  </g>
+
+  <!-- Table: cities -->
+  <g transform="translate(360, 130)" filter="url(#cardShadow)">
+    <rect width="260" height="210" rx="10" fill="#131b2e" stroke="#25324d" stroke-width="1.5"/>
+    <rect width="260" height="34" rx="10" fill="#0284c7"/>
+    <text x="14" y="22" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="700" fill="#ffffff">cities</text>
+    <text x="14" y="56" font-family="monospace" font-size="11" font-weight="bold" fill="#38bdf8">PK  id : VARCHAR(80)</text>
+    <text x="14" y="78" font-family="monospace" font-size="11" font-weight="bold" fill="#f59e0b">FK  state_id : VARCHAR(50)</text>
+    <text x="14" y="100" font-family="monospace" font-size="11" fill="#cbd5e1">    name : VARCHAR(100)</text>
+    <text x="14" y="122" font-family="monospace" font-size="11" fill="#cbd5e1">    is_capital : BOOLEAN</text>
+    <text x="14" y="144" font-family="monospace" font-size="11" fill="#cbd5e1">    aliases : JSON</text>
+    <text x="14" y="166" font-family="monospace" font-size="11" fill="#64748b">    created_at : DATETIME</text>
+    <text x="14" y="188" font-family="monospace" font-size="11" fill="#64748b">    updated_at : DATETIME</text>
+  </g>
+
+  <!-- Table: sources -->
+  <g transform="translate(660, 130)" filter="url(#cardShadow)">
+    <rect width="290" height="230" rx="10" fill="#131b2e" stroke="#25324d" stroke-width="1.5"/>
+    <rect width="290" height="34" rx="10" fill="#059669"/>
+    <text x="14" y="22" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="700" fill="#ffffff">sources (Real Portals Directory)</text>
+    <text x="14" y="56" font-family="monospace" font-size="11" font-weight="bold" fill="#38bdf8">PK  id : VARCHAR(80)</text>
+    <text x="14" y="78" font-family="monospace" font-size="11" fill="#cbd5e1">    name : VARCHAR(150) UNIQUE</text>
+    <text x="14" y="100" font-family="monospace" font-size="11" fill="#cbd5e1">    domain : VARCHAR(100)</text>
+    <text x="14" y="122" font-family="monospace" font-size="11" fill="#cbd5e1">    portal_type : VARCHAR(50)</text>
+    <text x="14" y="144" font-family="monospace" font-size="11" fill="#cbd5e1">    statutory_framework : VARCHAR(100)</text>
+    <text x="14" y="166" font-family="monospace" font-size="11" font-weight="bold" fill="#f59e0b">FK  bound_state_id : VARCHAR(50)</text>
+    <text x="14" y="188" font-family="monospace" font-size="11" fill="#cbd5e1">    is_active : BOOLEAN</text>
+    <text x="14" y="210" font-family="monospace" font-size="11" fill="#64748b">    total_notices_count : INT</text>
+  </g>
+
+  <!-- Table: categories -->
+  <g transform="translate(990, 130)" filter="url(#cardShadow)">
+    <rect width="260" height="210" rx="10" fill="#131b2e" stroke="#25324d" stroke-width="1.5"/>
+    <rect width="260" height="34" rx="10" fill="#d97706"/>
+    <text x="14" y="22" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="700" fill="#ffffff">categories</text>
+    <text x="14" y="56" font-family="monospace" font-size="11" font-weight="bold" fill="#38bdf8">PK  id : VARCHAR(80)</text>
+    <text x="14" y="78" font-family="monospace" font-size="11" fill="#cbd5e1">    name : VARCHAR(120) UNIQUE</text>
+    <text x="14" y="100" font-family="monospace" font-size="11" fill="#cbd5e1">    description : TEXT</text>
+    <text x="14" y="122" font-family="monospace" font-size="11" fill="#cbd5e1">    keywords : JSON</text>
+    <text x="14" y="144" font-family="monospace" font-size="11" fill="#cbd5e1">    color_badge : VARCHAR(50)</text>
+    <text x="14" y="166" font-family="monospace" font-size="11" fill="#64748b">    created_at : DATETIME</text>
+    <text x="14" y="188" font-family="monospace" font-size="11" fill="#64748b">    updated_at : DATETIME</text>
+  </g>
+
+  <!-- Table: organisations -->
+  <g transform="translate(1280, 130)" filter="url(#cardShadow)">
+    <rect width="260" height="210" rx="10" fill="#131b2e" stroke="#25324d" stroke-width="1.5"/>
+    <rect width="260" height="34" rx="10" fill="#7c3aed"/>
+    <text x="14" y="22" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="700" fill="#ffffff">organisations</text>
+    <text x="14" y="56" font-family="monospace" font-size="11" font-weight="bold" fill="#38bdf8">PK  id : VARCHAR(100)</text>
+    <text x="14" y="78" font-family="monospace" font-size="11" fill="#cbd5e1">    name : VARCHAR(200) UNIQUE</text>
+    <text x="14" y="100" font-family="monospace" font-size="11" fill="#cbd5e1">    org_type : VARCHAR(50)</text>
+    <text x="14" y="122" font-family="monospace" font-size="11" fill="#cbd5e1">    parent_ministry : VARCHAR(200)</text>
+    <text x="14" y="144" font-family="monospace" font-size="11" font-weight="bold" fill="#f59e0b">FK  state_id : VARCHAR(50)</text>
+    <text x="14" y="166" font-family="monospace" font-size="11" font-weight="bold" fill="#f59e0b">FK  default_category_id : VARCHAR(80)</text>
+    <text x="14" y="188" font-family="monospace" font-size="11" fill="#64748b">    tender_count : INT</text>
+  </g>
+
+  <!-- Row 2: Central Tenders (Live In-Progress & Historical Awarded) -->
+
+  <!-- Table: tenders (Central in-progress entity) -->
+  <g transform="translate(60, 390)" filter="url(#cardShadow)">
+    <rect width="450" height="380" rx="10" fill="#131b2e" stroke="#38bdf8" stroke-width="2"/>
+    <rect width="450" height="36" rx="10" fill="#0284c7"/>
+    <text x="14" y="24" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="700" fill="#ffffff">tenders (Live In-Progress Notices)</text>
+    <text x="14" y="60" font-family="monospace" font-size="11" font-weight="bold" fill="#38bdf8">PK  id : VARCHAR(100) (e.g. GEM-2026-B-89104)</text>
+    <text x="14" y="82" font-family="monospace" font-size="11" fill="#cbd5e1">    nit_number : VARCHAR(100)</text>
+    <text x="14" y="104" font-family="monospace" font-size="11" fill="#cbd5e1">    title : TEXT (Full NIT Work Title)</text>
+    <text x="14" y="126" font-family="monospace" font-size="11" font-weight="bold" fill="#f59e0b">FK  source_portal_id : VARCHAR(80) -&gt; sources.id</text>
+    <text x="14" y="148" font-family="monospace" font-size="11" font-weight="bold" fill="#f59e0b">FK  category_id : VARCHAR(80) -&gt; categories.id</text>
+    <text x="14" y="170" font-family="monospace" font-size="11" font-weight="bold" fill="#f59e0b">FK  organisation_id : VARCHAR(100) -&gt; organisations.id</text>
+    <text x="14" y="192" font-family="monospace" font-size="11" font-weight="bold" fill="#f59e0b">FK  state_id : VARCHAR(50) -&gt; states.id</text>
+    <text x="14" y="214" font-family="monospace" font-size="11" font-weight="bold" fill="#f59e0b">FK  city_id : VARCHAR(80) -&gt; cities.id</text>
+    <text x="14" y="236" font-family="monospace" font-size="11" fill="#cbd5e1">    estimated_cost_inr : FLOAT</text>
+    <text x="14" y="258" font-family="monospace" font-size="11" fill="#cbd5e1">    emd_amount_inr : FLOAT</text>
+    <text x="14" y="280" font-family="monospace" font-size="11" fill="#cbd5e1">    close_date : VARCHAR(50)</text>
+    <text x="14" y="302" font-family="monospace" font-size="11" fill="#34d399">    days_left : INT (Live Ticking Countdown)</text>
+    <text x="14" y="324" font-family="monospace" font-size="11" fill="#cbd5e1">    status : VARCHAR(50) [In-Progress]</text>
+    <text x="14" y="346" font-family="monospace" font-size="11" fill="#cbd5e1">    pqc_criteria : JSON (Turnover, Solvency, Similar Works)</text>
+    <text x="14" y="368" font-family="monospace" font-size="11" fill="#cbd5e1">    raw_data : JSON (Full Scraped Payload)</text>
+  </g>
+
+  <!-- Table: awarded_tenders -->
+  <g transform="translate(550, 390)" filter="url(#cardShadow)">
+    <rect width="450" height="380" rx="10" fill="#131b2e" stroke="#10b981" stroke-width="2"/>
+    <rect width="450" height="36" rx="10" fill="#059669"/>
+    <text x="14" y="24" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="700" fill="#ffffff">awarded_tenders (Historical Accepted Archive)</text>
+    <text x="14" y="60" font-family="monospace" font-size="11" font-weight="bold" fill="#38bdf8">PK  id : VARCHAR(100) (e.g. ACC-2025-MH-8921)</text>
+    <text x="14" y="82" font-family="monospace" font-size="11" fill="#cbd5e1">    title : TEXT (Awarded Work Contract Title)</text>
+    <text x="14" y="104" font-family="monospace" font-size="11" font-weight="bold" fill="#f59e0b">FK  source_portal_id : VARCHAR(80) -&gt; sources.id</text>
+    <text x="14" y="126" font-family="monospace" font-size="11" font-weight="bold" fill="#f59e0b">FK  category_id : VARCHAR(80) -&gt; categories.id</text>
+    <text x="14" y="148" font-family="monospace" font-size="11" font-weight="bold" fill="#f59e0b">FK  organisation_id : VARCHAR(100) -&gt; organisations.id</text>
+    <text x="14" y="170" font-family="monospace" font-size="11" font-weight="bold" fill="#f59e0b">FK  state_id : VARCHAR(50) -&gt; states.id</text>
+    <text x="14" y="192" font-family="monospace" font-size="11" font-weight="bold" fill="#34d399">FK  winning_contractor_id : VARCHAR(100) -&gt; contractors.id</text>
+    <text x="14" y="214" font-family="monospace" font-size="11" font-weight="bold" fill="#38bdf8">    year : INT (Fiscal Period: 2020-2025)</text>
+    <text x="14" y="236" font-family="monospace" font-size="11" fill="#cbd5e1">    award_date : VARCHAR(50)</text>
+    <text x="14" y="258" font-family="monospace" font-size="11" fill="#cbd5e1">    estimated_cost_inr : FLOAT</text>
+    <text x="14" y="280" font-family="monospace" font-size="11" fill="#34d399">    awarded_contract_value_inr : FLOAT</text>
+    <text x="14" y="302" font-family="monospace" font-size="11" fill="#cbd5e1">    quoted_discount_pct : FLOAT</text>
+    <text x="14" y="324" font-family="monospace" font-size="11" fill="#cbd5e1">    loa_number : VARCHAR(100)</text>
+    <text x="14" y="346" font-family="monospace" font-size="11" fill="#cbd5e1">    raw_data : JSON</text>
+    <text x="14" y="368" font-family="monospace" font-size="11" fill="#64748b">    created_at : DATETIME</text>
+  </g>
+
+  <!-- Table: contractors & contractor_contracts -->
+  <g transform="translate(1040, 390)" filter="url(#cardShadow)">
+    <rect width="500" height="380" rx="10" fill="#131b2e" stroke="#f59e0b" stroke-width="2"/>
+    <rect width="500" height="36" rx="10" fill="#d97706"/>
+    <text x="14" y="24" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="700" fill="#ffffff">contractors (Registered Bidders Directory)</text>
+    <text x="14" y="60" font-family="monospace" font-size="11" font-weight="bold" fill="#38bdf8">PK  id : VARCHAR(100) (e.g. larsen-toubro-limited)</text>
+    <text x="14" y="82" font-family="monospace" font-size="11" fill="#cbd5e1">    name : VARCHAR(200) (Legal Registered Name)</text>
+    <text x="14" y="104" font-family="monospace" font-size="11" fill="#cbd5e1">    cin : VARCHAR(50) (Corporate Identity Number)</text>
+    <text x="14" y="126" font-family="monospace" font-size="11" fill="#cbd5e1">    gstin : VARCHAR(50)</text>
+    <text x="14" y="148" font-family="monospace" font-size="11" fill="#cbd5e1">    pan : VARCHAR(50)</text>
+    <text x="14" y="170" font-family="monospace" font-size="11" fill="#cbd5e1">    contractor_class : VARCHAR(100) [Class 1A Super]</text>
+    <text x="14" y="192" font-family="monospace" font-size="11" fill="#cbd5e1">    msme_status : VARCHAR(100) [Class-I Local Supplier]</text>
+    <text x="14" y="214" font-family="monospace" font-size="11" font-weight="bold" fill="#34d399">    audited_turnover_inr : FLOAT (3-Yr Average)</text>
+    <text x="14" y="236" font-family="monospace" font-size="11" font-weight="bold" fill="#34d399">    solvency_certificate_inr : FLOAT</text>
+    <text x="14" y="258" font-family="monospace" font-size="11" fill="#cbd5e1">    ca_udin : VARCHAR(50) (Statutory CA Verified)</text>
+    <text x="14" y="280" font-family="monospace" font-size="11" font-weight="bold" fill="#f59e0b">    total_contracts_won : INT</text>
+    <text x="14" y="302" font-family="monospace" font-size="11" font-weight="bold" fill="#f59e0b">    total_awarded_value_inr : FLOAT (Sum of Won Bids)</text>
+    <text x="14" y="324" font-family="monospace" font-size="11" fill="#cbd5e1">    rating_score : FLOAT (4.9 / 5.0)</text>
+    <text x="14" y="346" font-family="monospace" font-size="11" fill="#64748b">    1:N -&gt; contractor_contracts (Past Awards)</text>
+    <text x="14" y="368" font-family="monospace" font-size="11" fill="#64748b">    N:M -&gt; contractor_state_mappings</text>
+  </g>
+
+  <!-- Row 3: Operational, Audit, Feedback Tables -->
+
+  <!-- Table: cron_sync_logs -->
+  <g transform="translate(60, 800)" filter="url(#cardShadow)">
+    <rect width="450" height="250" rx="10" fill="#131b2e" stroke="#25324d" stroke-width="1.5"/>
+    <rect width="450" height="34" rx="10" fill="#4338ca"/>
+    <text x="14" y="22" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="700" fill="#ffffff">cron_sync_logs (Sync Audit Trail)</text>
+    <text x="14" y="56" font-family="monospace" font-size="11" font-weight="bold" fill="#38bdf8">PK  id : INT AUTOINCREMENT</text>
+    <text x="14" y="78" font-family="monospace" font-size="11" font-weight="bold" fill="#fbbf24">    trigger_type : VARCHAR(50) ['SCHEDULED_CRON' | 'MANUAL_BUTTON']</text>
+    <text x="14" y="100" font-family="monospace" font-size="11" fill="#34d399">    status : VARCHAR(50) ['SUCCESS' | 'FAILED' | 'RUNNING']</text>
+    <text x="14" y="122" font-family="monospace" font-size="11" fill="#cbd5e1">    portals_scraped_count : INT (41 portals)</text>
+    <text x="14" y="144" font-family="monospace" font-size="11" fill="#cbd5e1">    total_in_progress_count : INT (3,293 notices)</text>
+    <text x="14" y="166" font-family="monospace" font-size="11" fill="#cbd5e1">    db_upserted_count : INT</text>
+    <text x="14" y="188" font-family="monospace" font-size="11" fill="#38bdf8">    execution_time_ms : FLOAT (~2,087.0ms)</text>
+    <text x="14" y="210" font-family="monospace" font-size="11" fill="#cbd5e1">    details : JSON (Per-portal breakdown)</text>
+    <text x="14" y="232" font-family="monospace" font-size="11" fill="#64748b">    created_at : DATETIME</text>
+  </g>
+
+  <!-- Table: feedback_submissions -->
+  <g transform="translate(550, 800)" filter="url(#cardShadow)">
+    <rect width="450" height="250" rx="10" fill="#131b2e" stroke="#25324d" stroke-width="1.5"/>
+    <rect width="450" height="34" rx="10" fill="#be185d"/>
+    <text x="14" y="22" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="700" fill="#ffffff">feedback_submissions (User Inquiries)</text>
+    <text x="14" y="56" font-family="monospace" font-size="11" font-weight="bold" fill="#38bdf8">PK  id : INT AUTOINCREMENT</text>
+    <text x="14" y="78" font-family="monospace" font-size="11" fill="#cbd5e1">    name : VARCHAR(120)</text>
+    <text x="14" y="100" font-family="monospace" font-size="11" fill="#cbd5e1">    email : VARCHAR(150)</text>
+    <text x="14" y="122" font-family="monospace" font-size="11" fill="#cbd5e1">    phone : VARCHAR(50)</text>
+    <text x="14" y="144" font-family="monospace" font-size="11" fill="#cbd5e1">    subject : VARCHAR(150)</text>
+    <text x="14" y="166" font-family="monospace" font-size="11" fill="#cbd5e1">    message : TEXT</text>
+    <text x="14" y="188" font-family="monospace" font-size="11" fill="#34d399">    email_recipient : VARCHAR(150) ['kmessilj@gmail.com']</text>
+    <text x="14" y="210" font-family="monospace" font-size="11" fill="#38bdf8">    email_status : VARCHAR(50) ['SENT' | 'PENDING' | 'LOGGED']</text>
+    <text x="14" y="232" font-family="monospace" font-size="11" fill="#64748b">    created_at : DATETIME</text>
+  </g>
+
+  <!-- Table: portal_sources & app_constants -->
+  <g transform="translate(1040, 800)" filter="url(#cardShadow)">
+    <rect width="500" height="250" rx="10" fill="#131b2e" stroke="#25324d" stroke-width="1.5"/>
+    <rect width="500" height="34" rx="10" fill="#475569"/>
+    <text x="14" y="22" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="700" fill="#ffffff">app_constants &amp; portal_sources</text>
+    <text x="14" y="56" font-family="monospace" font-size="11" font-weight="bold" fill="#38bdf8">app_constants:</text>
+    <text x="24" y="76" font-family="monospace" font-size="11" fill="#cbd5e1">PK  key : VARCHAR(100) (e.g. 'master_taxonomy_filters')</text>
+    <text x="24" y="96" font-family="monospace" font-size="11" fill="#cbd5e1">    data : JSON (Cached taxonomy, filter pills &amp; mappings)</text>
+    <text x="14" y="126" font-family="monospace" font-size="11" font-weight="bold" fill="#38bdf8">portal_sources (Directory of 37 Monitored Portals):</text>
+    <text x="24" y="146" font-family="monospace" font-size="11" fill="#cbd5e1">PK  id : VARCHAR(80) (e.g. 'gem', 'mahatenders')</text>
+    <text x="24" y="166" font-family="monospace" font-size="11" fill="#cbd5e1">    domain, url, category, state, region, status</text>
+    <text x="24" y="186" font-family="monospace" font-size="11" fill="#cbd5e1">    key_authorities, statutory_framework, active_count</text>
+    <text x="14" y="216" font-family="monospace" font-size="11" font-weight="bold" fill="#38bdf8">contractor_pools (Pre-Bid Simulation Models):</text>
+    <text x="24" y="234" font-family="monospace" font-size="11" fill="#cbd5e1">    category, contractor_name, hq, turnover_cr, class</text>
+  </g>
+
+  <!-- Connective lines between tables -->
+  <!-- states -> cities -->
+  <path d="M 320 200 L 360 200" stroke="#0284c7" stroke-width="2" marker-end="url(#erd-dot)"/>
+  
+  <!-- states -> tenders -->
+  <path d="M 190 340 L 190 390" stroke="#0284c7" stroke-width="2" marker-end="url(#erd-dot)"/>
+
+  <!-- sources -> tenders -->
+  <path d="M 750 360 L 750 375 L 350 375 L 350 390" stroke="#059669" stroke-width="2" marker-end="url(#erd-dot)"/>
+
+  <!-- contractors -> awarded_tenders -->
+  <path d="M 1040 500 L 1000 500" stroke="#f59e0b" stroke-width="2" marker-end="url(#erd-dot)"/>
+</svg>

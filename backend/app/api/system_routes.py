@@ -90,11 +90,16 @@ async def get_overview_stats():
         "database_engine": "PostgreSQL 16 (pgvector)" if IS_POSTGRES else "SQLite (aiosqlite)",
         "vector_ready": True,
         "architecture": "Enterprise Hybrid (PostgreSQL/SQLite Persistent DB + In-Memory RAM Stream)",
+        "cooldown_remaining_seconds": cron_info.get("cooldown_remaining_seconds", 0),
+        "cooldown_seconds_total": cron_info.get("cooldown_seconds_total", 300),
+        "is_sync_in_progress": cron_info.get("is_sync_in_progress", False),
         "cron_sync": {
             "schedule": cron_info["schedule"],
             "cron_expression": cron_info["cron_expression"],
             "timezone": cron_info["timezone"],
-            "next_run": cron_info["next_scheduled_run"]
+            "next_run": cron_info["next_scheduled_run"],
+            "cooldown_remaining_seconds": cron_info.get("cooldown_remaining_seconds", 0),
+            "cooldown_seconds_total": cron_info.get("cooldown_seconds_total", 300)
         },
         "total_portals_monitored": len(portals),
         "portals_list": sorted(list(portals)),

@@ -4,7 +4,6 @@ import { RegisteredBidder, BidderWonContract } from '../types';
 import { listRegisteredBidders } from '../services/api';
 import { FilterChipItem } from './common';
 import {
-  BidderBanner,
   BidderFilterBar,
   BidderFilterDrawer,
   BidderSortOption,
@@ -268,15 +267,6 @@ export const RegisteredBiddersTab: React.FC = () => {
     };
   }, [selectedBidderId, contractSearchQuery, filteredContracts?.length]);
 
-  const totalContractsSum = useMemo(() => {
-    return bidders.reduce((acc, b) => acc + (b.total_contracts_won || 0), 0);
-  }, [bidders]);
-
-  const totalValueSumCr = useMemo(() => {
-    const sum = bidders.reduce((acc, b) => acc + (b.total_awarded_value_inr || 0), 0);
-    return (sum / 10000000).toFixed(0);
-  }, [bidders]);
-
   const selectFirstBidderRecord = (bidderList: RegisteredBidder[]) => {
     const firstBidder = bidderList[0];
     const targetId = firstBidder ? firstBidder.id : '';
@@ -411,13 +401,6 @@ export const RegisteredBiddersTab: React.FC = () => {
 
   return (
     <div className="space-y-4">
-      {/* Top Banner with Stats */}
-      <BidderBanner
-        totalBidders={bidders.length}
-        totalContractsSum={totalContractsSum}
-        totalValueSumCr={totalValueSumCr}
-      />
-
       {/* Filter and Search Bar: Search on LEFT, Filters on RIGHT */}
       <BidderFilterBar
         searchQuery={searchQuery}
