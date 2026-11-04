@@ -43,7 +43,7 @@ app.include_router(sources_router)
 
 @app.on_event("startup")
 async def startup_event():
-    """Ensure persistent database schema is created on boot and start 3:00 AM daily cron scheduler."""
+    """Ensure persistent database schema is created on boot and start 4:00 AM daily cron scheduler."""
     await init_db()
     from app.services.cron_scheduler_service import start_cron_scheduler
     start_cron_scheduler()

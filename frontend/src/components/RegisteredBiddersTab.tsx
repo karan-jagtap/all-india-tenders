@@ -207,6 +207,17 @@ export const RegisteredBiddersTab: React.FC = () => {
       });
   }, [bidders, searchQuery, selectedCategory, selectedState, sortBy]);
 
+  // Whenever ANY filter is reset or changed, automatically select the first record in the refreshed list
+  const currentFilterKey = `${selectedCategory}|${selectedState}|${sortBy}|${searchQuery.trim()}`;
+  const [prevFilterKey, setPrevFilterKey] = useState<string>(currentFilterKey);
+
+  if (prevFilterKey !== currentFilterKey) {
+    setPrevFilterKey(currentFilterKey);
+    const firstBidder = filteredBidders[0];
+    const targetId = firstBidder ? firstBidder.id : '';
+    setSelectedBidderId(targetId);
+  }
+
   const selectedBidder = useMemo(() => {
     if (!filteredBidders.length) return null;
     return filteredBidders.find((b) => b.id === selectedBidderId) || filteredBidders[0];
@@ -284,6 +295,14 @@ export const RegisteredBiddersTab: React.FC = () => {
       listContainerRef.current.scrollTop = 0;
     }
   };
+
+  const handleFilterChangeScrollTop = () => {
+    scrollListContainerToTop();
+  };
+
+  useEffect(() => {
+    handleFilterChangeScrollTop();
+  }, [currentFilterKey]);
 
   const resetFilters = () => {
     resetFilterStateValues();

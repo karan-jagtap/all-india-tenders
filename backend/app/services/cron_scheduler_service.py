@@ -1,6 +1,6 @@
 """
 Cron Scheduler Service for Real-Time Statutory Portal Sync
-Schedules automated daily scraping synchronization at 3:00 AM IST (Asia/Kolkata)
+Schedules automated daily scraping synchronization at 4:00 AM IST (Asia/Kolkata)
 and supports on-demand execution triggered by user interface action.
 """
 
@@ -20,7 +20,7 @@ from app.db.models import CronSyncLog
 logger = logging.getLogger("cron_scheduler")
 
 IST = ZoneInfo("Asia/Kolkata")
-CRON_JOB_ID = "daily_real_sources_3am_sync"
+CRON_JOB_ID = "daily_real_sources_4am_sync"
 
 # Global scheduler instance
 scheduler = AsyncIOScheduler(timezone=IST)
@@ -141,23 +141,23 @@ async def run_statutory_sources_sync(trigger_type: str = "SCHEDULED_CRON") -> Di
 
 
 def get_next_cron_run_iso() -> Optional[str]:
-    """Calculates next upcoming 3:00 AM IST execution timestamp."""
+    """Calculates next upcoming 4:00 AM IST execution timestamp."""
     job = scheduler.get_job(CRON_JOB_ID)
     if job and job.next_run_time:
         return job.next_run_time.isoformat()
     
     # Calculate statically if job object is not yet running
-    trigger = CronTrigger(hour=3, minute=0, timezone=IST)
+    trigger = CronTrigger(hour=4, minute=0, timezone=IST)
     next_dt = trigger.get_next_fire_time(None, datetime.now(IST))
     return next_dt.isoformat() if next_dt else None
 
 
 def get_cron_status() -> Dict[str, Any]:
-    """Returns current scheduler configuration, next 3 AM run, and last run telemetry."""
+    """Returns current scheduler configuration, next 4 AM run, and last run telemetry."""
     return {
         "scheduler_running": scheduler.running,
-        "schedule": "Every day at 3:00 AM IST (03:00 Asia/Kolkata)",
-        "cron_expression": "0 3 * * *",
+        "schedule": "Every day at 4:00 AM IST (04:00 Asia/Kolkata)",
+        "cron_expression": "0 4 * * *",
         "timezone": "Asia/Kolkata (IST)",
         "next_scheduled_run": get_next_cron_run_iso(),
         "last_run": LAST_CRON_RUN_INFO
@@ -167,13 +167,13 @@ def get_cron_status() -> Dict[str, Any]:
 def start_cron_scheduler():
     """Initializes and starts the background AsyncIO scheduler."""
     if not scheduler.running:
-        # Cron trigger: At 03:00 AM everyday
-        trigger = CronTrigger(hour=3, minute=0, timezone=IST)
+        # Cron trigger: At 04:00 AM everyday
+        trigger = CronTrigger(hour=4, minute=0, timezone=IST)
         scheduler.add_job(
             run_statutory_sources_sync,
             trigger=trigger,
             id=CRON_JOB_ID,
-            name="Daily Real Sources Ingestion (3:00 AM IST)",
+            name="Daily Real Sources Ingestion (4:00 AM IST)",
             replace_existing=True,
             kwargs={"trigger_type": "SCHEDULED_CRON"}
         )

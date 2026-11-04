@@ -42,9 +42,11 @@ async def health_check():
 
 
 @router.post("/scraper/scrape-live")
+@router.post("/cron/trigger")
+@router.post("/cron/sync")
 async def trigger_live_scrape():
     """
-    Runs the official scraper synchronization job immediately (same job scheduled daily at 3:00 AM IST).
+    Runs the official scraper synchronization job immediately (same job scheduled daily at 4:00 AM IST).
     Upserts scraped notices into persistent database and synchronizes the in-memory streaming catalog.
     """
     report = await run_statutory_sources_sync(trigger_type="MANUAL_BUTTON")
@@ -61,7 +63,7 @@ async def trigger_live_scrape():
 @router.get("/cron/status")
 async def get_cron_sync_status():
     """
-    Returns the automated daily cron configuration (3:00 AM IST), next run timestamp, and last execution details.
+    Returns the automated daily cron configuration (4:00 AM IST), next run timestamp, and last execution details.
     """
     return get_cron_status()
 

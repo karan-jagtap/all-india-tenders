@@ -82,7 +82,7 @@ export const App: React.FC = () => {
       const portalCount = report.portals_scraped?.length || 28;
       const count = report.total_in_progress_tenders || 2718;
       const duration = report.execution_time_ms ? `${Math.round(report.execution_time_ms)}ms` : '2.3s';
-      setSyncNotice(`Synced ${count} live notices across ${portalCount} portals in ${duration} • Next scheduled cron: 3:00 AM IST`);
+      setSyncNotice(`Synced ${count} live notices across ${portalCount} portals in ${duration} • Next scheduled cron: 4:00 AM IST`);
 
       setTimeout(() => {
         setSyncNotice(null);
@@ -205,7 +205,7 @@ export const App: React.FC = () => {
               onClick={handleSyncLive}
               disabled={isSyncing}
               className="px-3 sm:px-4 py-2 bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 disabled:opacity-60 text-white font-bold text-xs rounded-lg flex items-center gap-1.5 shadow-sm transition-all cursor-pointer"
-              title="Runs official sync across all 28 real portals (Automated daily at 3:00 AM IST)"
+              title="Runs official sync across all 28 real portals (Automated daily at 4:00 AM IST)"
             >
               <RefreshCw className={`w-3.5 h-3.5 ${isSyncing ? 'animate-spin' : ''}`} />
               <span className="hidden xs:inline">{isSyncing ? 'Syncing...' : 'Sync Live'}</span>
@@ -406,7 +406,7 @@ export const App: React.FC = () => {
               </button>
 
               <div className="text-[10px] text-slate-500 text-center">
-                Automated Cron: Daily @ 3:00 AM IST • Hybrid Persistent DB
+                Automated Cron: Daily @ 4:00 AM IST • Hybrid Persistent DB
               </div>
             </div>
           </div>

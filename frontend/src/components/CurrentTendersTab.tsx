@@ -361,6 +361,25 @@ export const CurrentTendersTab: React.FC = () => {
   // Final intersection of all active filters
   const filteredTenders = useMemo(() => tenders.filter((t) => matchesFilter(t)), [tenders, matchesFilter]);
 
+  // Whenever ANY filter is reset or changed, automatically select the first record in the refreshed list
+  const currentFilterKey = `${selectedSource}|${selectedOrg}|${selectedState}|${selectedCity}|${selectedCategory}|${selectedValueRange}|${searchQuery.trim()}`;
+  const [prevFilterKey, setPrevFilterKey] = useState<string>(currentFilterKey);
+
+  if (prevFilterKey !== currentFilterKey) {
+    setPrevFilterKey(currentFilterKey);
+    const firstTender = filteredTenders[0];
+    const targetId = firstTender ? firstTender.id : '';
+    setSelectedTenderId(targetId);
+  }
+
+  const handleFilterChangeScrollTop = () => {
+    scrollListContainerToTop();
+  };
+
+  useEffect(() => {
+    handleFilterChangeScrollTop();
+  }, [currentFilterKey]);
+
   const selectedTender = useMemo(() => {
     return filteredTenders.find((t) => t.id === selectedTenderId) || filteredTenders[0] || null;
   }, [filteredTenders, selectedTenderId]);
