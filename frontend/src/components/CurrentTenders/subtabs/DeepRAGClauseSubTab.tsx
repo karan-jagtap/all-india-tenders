@@ -300,7 +300,7 @@ export const DeepRAGClauseSubTab: React.FC<DeepRAGClauseSubTabProps> = ({
             className="px-3.5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold flex items-center gap-1.5 shadow-xs transition-all"
           >
             <BookOpen className="w-3.5 h-3.5" />
-            <span>Download Full SBD (3.8 MB)</span>
+            <span>Download Full SBD (PDF)</span>
           </a>
           <a
             href={boqUrl}

@@ -144,7 +144,7 @@ export const CurrentTenderHeader: React.FC<CurrentTenderHeaderProps> = ({
           <button
             onClick={onOpenWholeDoc}
             className="px-3.5 py-2 bg-gradient-to-r from-indigo-700 via-indigo-600 to-blue-700 hover:from-indigo-600 hover:to-blue-600 text-white rounded-lg text-xs font-bold flex items-center gap-1.5 shadow-xs transition-all cursor-pointer ring-1 ring-indigo-400/30"
-            title="Open Whole 48-Page Standard Bidding Document in interactive viewer"
+            title="Open Whole 4-Page Standard Bidding Document in interactive viewer"
           >
             <Eye className="w-3.5 h-3.5" />
             <span>View Whole Tender Doc</span>
@@ -158,11 +158,11 @@ export const CurrentTenderHeader: React.FC<CurrentTenderHeaderProps> = ({
             href={sbdUrl}
             download={`${selectedTender.id}_Whole_Tender_Document_SBD.pdf`}
             className="px-3.5 py-2 bg-emerald-700 hover:bg-emerald-600 text-white rounded-lg text-xs font-bold flex items-center gap-1.5 shadow-xs transition-all"
-            title="Download Full 48-Page Standard Bidding Document (SBD / RFP - 3.8 MB PDF)"
+            title="Download Complete 4-Page Standard Bidding Document (SBD / RFP PDF)"
           >
             <Download className="w-3.5 h-3.5" />
             <span>Download Whole Doc</span>
-            <span className="text-[9px] bg-emerald-900/80 px-1 py-0.2 rounded font-mono">3.8 MB</span>
+            <span className="text-[9px] bg-emerald-900/80 px-1 py-0.2 rounded font-mono">PDF</span>
           </a>
         </div>
 

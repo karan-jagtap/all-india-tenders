@@ -41,7 +41,7 @@ export const HomeCapabilitiesSection: React.FC<HomeCapabilitiesSectionProps> = (
             <ul className="text-xs text-slate-600 dark:text-slate-300 space-y-1.5 pt-1">
               <li className="flex items-center gap-2">
                 <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
-                <span><strong>Full 48-Page Standard Bidding Document (SBD):</strong> In-app interactive viewer & 1-click PDF download.</span>
+                <span><strong>Full Standard Bidding Document (SBD / RFP):</strong> In-app interactive viewer & 1-click PDF download.</span>
               </li>
               <li className="flex items-center gap-2">
                 <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />

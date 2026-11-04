@@ -42,7 +42,7 @@ export const HomeHeroSection: React.FC<HomeHeroSectionProps> = ({
 
         {/* Subtitle */}
         <p className="text-xs sm:text-base text-slate-300 leading-relaxed max-w-3xl">
-          Real-time statutory procurement intelligence platform aggregating unfilled in-progress tenders, complete 48-page Standard Bidding Documents (SBD / RFP), 17-year awarded bid records (2010 – 2026), and contractor intelligence from <strong>28+ official Central and State government portals</strong> — powered by an <strong>Enterprise Hybrid Persistent Database Architecture</strong>.
+          Real-time statutory procurement intelligence platform aggregating unfilled in-progress tenders, complete Standard Bidding Documents (SBD / RFP), 17-year awarded bid records (2010 – 2026), and contractor intelligence from <strong>28+ official Central and State government portals</strong> — powered by an <strong>Enterprise Hybrid Persistent Database Architecture</strong>.
         </p>
 
         {/* CTA Action Buttons */}

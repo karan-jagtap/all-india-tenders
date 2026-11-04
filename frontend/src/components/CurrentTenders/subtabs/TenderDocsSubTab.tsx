@@ -92,7 +92,7 @@ export const TenderDocsSubTab: React.FC<TenderDocsSubTabProps> = ({
             <span className="px-2 py-0.5 rounded text-[9px] font-bold bg-indigo-100 dark:bg-indigo-900/60 text-indigo-800 dark:text-indigo-300 border border-indigo-300 dark:border-indigo-800">
               Comprehensive SBD
             </span>
-            <span className="text-[10px] font-mono text-slate-500 dark:text-slate-400">48 Pages • 3.8 MB</span>
+            <span className="text-[10px] font-mono text-slate-500 dark:text-slate-400">4 Pages • Detailed SBD</span>
           </div>
           <h5 className="font-bold text-slate-900 dark:text-white text-xs mb-1">
             Detailed Tender Document (SBD / RFP)

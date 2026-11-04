@@ -57,7 +57,7 @@ export const WholeTenderDocModal: React.FC<WholeTenderDocModalProps> = ({
                   Ref: {tender.nit_number}
                 </span>
                 <span className="text-[10px] text-indigo-300 bg-indigo-950/80 border border-indigo-800/80 px-2 py-0.5 rounded">
-                  48 Pages • 3.8 MB PDF
+                  4 Pages • Detailed SBD PDF
                 </span>
                 <span className="text-[10px] text-cyan-300 bg-cyan-950/80 border border-cyan-800/80 px-2 py-0.5 rounded">
                   {tender.source_portal}
@@ -90,12 +90,12 @@ export const WholeTenderDocModal: React.FC<WholeTenderDocModalProps> = ({
               href={sbdUrl}
               download={downloadFileName}
               className="px-4 py-2 bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 hover:from-emerald-500 hover:to-emerald-600 text-white rounded-xl text-xs font-bold flex items-center gap-2 shadow-md transition-all cursor-pointer ring-1 ring-emerald-400/40"
-              title="Download Complete 48-Page Standard Bidding Document"
+              title="Download Complete 4-Page Standard Bidding Document"
             >
               <Download className="w-4 h-4" />
               <span>Download Whole Doc (PDF)</span>
               <span className="text-[9px] bg-emerald-900/80 px-1.5 py-0.2 rounded font-mono">
-                3.8 MB
+                PDF
               </span>
             </a>
 

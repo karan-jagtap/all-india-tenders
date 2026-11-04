@@ -136,7 +136,7 @@ export const CurrentTenderCard: React.FC<CurrentTenderCardProps> = ({
             href={`/api/current-tenders/${tender.id}/tender-document`}
             download={`${tender.id}_Whole_Tender_Document_SBD.pdf`}
             onClick={(e) => e.stopPropagation()}
-            title="Download Whole 48-Page Standard Bidding Document (PDF)"
+            title="Download Whole 4-Page Standard Bidding Document (PDF)"
             className="px-2 py-0.5 rounded text-[10px] font-bold bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 dark:hover:bg-indigo-900/80 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 flex items-center gap-1 transition-colors shadow-2xs"
           >
             <Download className="w-2.5 h-2.5" />
