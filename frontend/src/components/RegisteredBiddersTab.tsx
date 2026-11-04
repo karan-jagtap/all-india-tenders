@@ -256,7 +256,6 @@ export const RegisteredBiddersTab: React.FC = () => {
         >
           <div className="text-xs text-slate-500 dark:text-slate-400 font-semibold px-1 flex items-center justify-between">
             <span>Registered Contractors ({filteredBidders.length})</span>
-            <span className="text-[11px] text-slate-400 dark:text-slate-500">Sorted by {sortBy.replace('_DESC', '').toLowerCase()}</span>
           </div>
 
           {loading ? (

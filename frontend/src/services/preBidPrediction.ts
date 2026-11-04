@@ -17,7 +17,15 @@ export function generatePreBidSimulation(tender: CurrentTender): PreBidSimulatio
   const pool = getContractorPool(tender.category);
 
   // Shuffle pool deterministically based on seed
-  const shuffled = [...pool];
+  const fallbackContenders = [
+    { name: 'National Heavy Infrastructure Ltd', hq: 'New Delhi', cls: 'Class-I Mega EPC', turnoverCr: 12000 },
+    { name: 'Bharat Engineering & Construction Corp', hq: 'Mumbai', cls: 'Class-I National Contractor', turnoverCr: 8500 },
+    { name: 'Hindustan Civil Projects Ltd', hq: 'Kolkata', cls: 'Class-I EPC Contractor', turnoverCr: 6200 },
+    { name: 'Continental Infra Solutions Ltd', hq: 'Hyderabad', cls: 'Class-I Local Supplier', turnoverCr: 4800 },
+    { name: 'Apex Infrastructure & Works Ltd', hq: 'Bengaluru', cls: 'Class-I Local Supplier', turnoverCr: 3900 }
+  ];
+  const candidates = pool && pool.length >= 3 ? pool : fallbackContenders;
+  const shuffled = [...candidates];
   for (let i = shuffled.length - 1; i > 0; i--) {
     const j = (seed + i * 17) % (i + 1);
     [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];

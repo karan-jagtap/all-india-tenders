@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import {
   Users,
   Award,
@@ -14,7 +14,7 @@ import {
   Check
 } from 'lucide-react';
 import { AcceptedTender } from '../../services/api';
-import { getContractorPool } from '../../constants';
+import { getContractorPool, subscribeContractorPools } from '../../constants';
 import { hashString } from '../../utils';
 
 export interface EvaluatedBidder {
@@ -46,6 +46,11 @@ interface AllBidsEvaluationSubTabProps {
 
 export const AllBidsEvaluationSubTab: React.FC<AllBidsEvaluationSubTabProps> = ({ tender }) => {
   const [expandedBidderRank, setExpandedBidderRank] = useState<string | null>('L1');
+  const [poolsTick, setPoolsTick] = useState(0);
+
+  useEffect(() => {
+    return subscribeContractorPools(() => setPoolsTick((t) => t + 1));
+  }, []);
 
   const formatINR = (val?: number) => {
     if (!val) return '₹ 0';
@@ -258,7 +263,7 @@ export const AllBidsEvaluationSubTab: React.FC<AllBidsEvaluationSubTabProps> = (
     ];
 
     return list;
-  }, [tender]);
+  }, [tender, poolsTick]);
 
   const estimatedCost = tender.og_tender?.estimated_cost_inr || 150000000;
   const l1Bid = evaluatedBids[0];

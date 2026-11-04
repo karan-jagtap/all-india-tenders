@@ -1,6 +1,6 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Globe, Filter, RefreshCw } from 'lucide-react';
-import { REAL_PORTAL_SOURCES } from '../../../constants/portalSources';
+import { REAL_PORTAL_SOURCES, subscribePortalSources } from '../../../constants/portalSources';
 import { PortalSourceCard } from './PortalSourceCard';
 import { FilterSearchBar } from '../../common';
 
@@ -18,6 +18,11 @@ export const HomeSourcesDirectory: React.FC<HomeSourcesDirectoryProps> = ({
   const [portalSearch, setPortalSearch] = useState<string>('');
   const [selectedCategory, setSelectedCategory] = useState<string>('ALL');
   const [selectedRegion, setSelectedRegion] = useState<string>('ALL');
+  const [tick, setTick] = useState<number>(0);
+
+  useEffect(() => {
+    return subscribePortalSources(() => setTick((t) => t + 1));
+  }, []);
 
   // Filtered Portal Sources
   const filteredPortals = useMemo(() => {
@@ -35,7 +40,7 @@ export const HomeSourcesDirectory: React.FC<HomeSourcesDirectoryProps> = ({
       }
       return true;
     });
-  }, [portalSearch, selectedCategory, selectedRegion]);
+  }, [portalSearch, selectedCategory, selectedRegion, tick]);
 
   return (
     <section id="real-sources-directory" className="space-y-5 pt-4">

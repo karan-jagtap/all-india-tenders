@@ -39,7 +39,9 @@ import {
   ALL_MASTER_CITIES,
   canonicalizeCategory,
   canonicalizeState,
-  canonicalizeCity
+  canonicalizeCity,
+  subscribeMasterFilters,
+  subscribePortalSources
 } from '../constants';
 
 export const CurrentTendersTab: React.FC = () => {
@@ -62,6 +64,16 @@ export const CurrentTendersTab: React.FC = () => {
 
   // Overlapping Filter Sidebar Drawer State
   const [isFilterSidebarOpen, setIsFilterSidebarOpen] = useState<boolean>(false);
+  const [filterConstantsTick, setFilterConstantsTick] = useState<number>(0);
+
+  useEffect(() => {
+    const unsub1 = subscribeMasterFilters(() => setFilterConstantsTick((t) => t + 1));
+    const unsub2 = subscribePortalSources(() => setFilterConstantsTick((t) => t + 1));
+    return () => {
+      unsub1();
+      unsub2();
+    };
+  }, []);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -264,7 +276,7 @@ export const CurrentTendersTab: React.FC = () => {
       set.add(selectedSource);
     }
     return Array.from(set).sort();
-  }, [tenders, selectedSource]);
+  }, [tenders, selectedSource, filterConstantsTick]);
 
   const contextForOrg = useMemo(() => tenders.filter((t) => matchesFilter(t, 'org')), [tenders, matchesFilter]);
   const orgCounts = useMemo(() => {
@@ -284,7 +296,7 @@ export const CurrentTendersTab: React.FC = () => {
       set.add(selectedOrg);
     }
     return Array.from(set).sort();
-  }, [tenders, selectedOrg]);
+  }, [tenders, selectedOrg, filterConstantsTick]);
 
   const contextForState = useMemo(() => tenders.filter((t) => matchesFilter(t, 'state')), [tenders, matchesFilter]);
   const stateCounts = useMemo(() => {
@@ -304,7 +316,7 @@ export const CurrentTendersTab: React.FC = () => {
       set.add(selectedState);
     }
     return Array.from(set).sort();
-  }, [tenders, selectedState]);
+  }, [tenders, selectedState, filterConstantsTick]);
 
   const contextForCity = useMemo(() => tenders.filter((t) => matchesFilter(t, 'city')), [tenders, matchesFilter]);
   const cityCounts = useMemo(() => {
@@ -324,7 +336,7 @@ export const CurrentTendersTab: React.FC = () => {
       set.add(selectedCity);
     }
     return Array.from(set).sort();
-  }, [tenders, selectedCity]);
+  }, [tenders, selectedCity, filterConstantsTick]);
 
   const contextForCategory = useMemo(() => tenders.filter((t) => matchesFilter(t, 'category')), [tenders, matchesFilter]);
   const categoryCounts = useMemo(() => {
@@ -344,7 +356,7 @@ export const CurrentTendersTab: React.FC = () => {
       set.add(selectedCategory);
     }
     return Array.from(set).sort();
-  }, [tenders, selectedCategory]);
+  }, [tenders, selectedCategory, filterConstantsTick]);
 
   // Final intersection of all active filters
   const filteredTenders = useMemo(() => tenders.filter((t) => matchesFilter(t)), [tenders, matchesFilter]);

@@ -19,6 +19,9 @@ import { CurrentTendersTab } from './components/CurrentTendersTab';
 import { RegisteredBiddersTab } from './components/RegisteredBiddersTab';
 import { getPlatformStats, triggerLiveScrape, PlatformStats, ScrapeReport } from './services/api';
 import { loadContractorPools } from './constants/contractors';
+import { loadPortalSources } from './constants/portalSources';
+import { loadMasterFilters } from './constants/masterFilters';
+import { loadUiFilters } from './constants/filters';
 
 export const App: React.FC = () => {
   const { toggleTheme, isDark } = useTheme();
@@ -38,6 +41,9 @@ export const App: React.FC = () => {
   useEffect(() => {
     fetchStats();
     loadContractorPools();
+    loadPortalSources();
+    loadMasterFilters();
+    loadUiFilters();
   }, []);
 
   // Close mobile hamburger menu on Escape key

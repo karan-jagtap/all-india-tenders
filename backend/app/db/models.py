@@ -216,6 +216,39 @@ class ContractorPool(Base, TimestampMixin):
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
 
 
+class PortalSourceRecord(Base, TimestampMixin):
+    """
+    Statutory procurement portals directory (37 portals across Central, State, Defense & PSU).
+    """
+    __tablename__ = "portal_sources"
+
+    id: Mapped[str] = mapped_column(String(80), primary_key=True)
+    name: Mapped[str] = mapped_column(String(150), nullable=False)
+    domain: Mapped[str] = mapped_column(String(100), nullable=False)
+    url: Mapped[str] = mapped_column(String(300), nullable=False)
+    category: Mapped[str] = mapped_column(String(50), nullable=False)
+    state: Mapped[str] = mapped_column(String(100), nullable=False)
+    region: Mapped[str] = mapped_column(String(50), nullable=False)
+    description: Mapped[str] = mapped_column(Text, nullable=False)
+    key_authorities: Mapped[Optional[List[str]]] = mapped_column(JSON, default=list)
+    procurement_types: Mapped[Optional[List[str]]] = mapped_column(JSON, default=list)
+    statutory_framework: Mapped[str] = mapped_column(String(150), nullable=False)
+    status: Mapped[str] = mapped_column(String(30), default="LIVE")
+    active_count_estimate: Mapped[int] = mapped_column(Integer, default=0)
+    bound_state: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
+
+
+class AppConstant(Base, TimestampMixin):
+    """
+    System and platform constants (master taxonomy filters, UI filter pills, portal mappings).
+    """
+    __tablename__ = "app_constants"
+
+    key: Mapped[str] = mapped_column(String(100), primary_key=True)
+    data: Mapped[Dict[str, Any]] = mapped_column(JSON, nullable=False)
+    description: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+
+
 # ==============================================================================
 # 6. Live In-Progress Tenders
 # ==============================================================================

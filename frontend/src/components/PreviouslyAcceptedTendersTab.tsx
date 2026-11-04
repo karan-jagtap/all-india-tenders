@@ -43,7 +43,9 @@ import {
   ALL_CANONICAL_CATEGORIES,
   canonicalizeCategory,
   ALL_STATUTORY_PORTAL_SOURCES,
-  canonicalizePortalSource
+  canonicalizePortalSource,
+  subscribeMasterFilters,
+  subscribePortalSources
 } from '../constants';
 
 const getTenderSource = (tender: AcceptedTender): string => {
@@ -281,6 +283,16 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
 
   // Overlapping Filter Sidebar Drawer State
   const [isFilterSidebarOpen, setIsFilterSidebarOpen] = useState<boolean>(false);
+  const [filterConstantsTick, setFilterConstantsTick] = useState<number>(0);
+
+  useEffect(() => {
+    const unsub1 = subscribeMasterFilters(() => setFilterConstantsTick((t) => t + 1));
+    const unsub2 = subscribePortalSources(() => setFilterConstantsTick((t) => t + 1));
+    return () => {
+      unsub1();
+      unsub2();
+    };
+  }, []);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -445,7 +457,7 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
       set.add(selectedCategory);
     }
     return Array.from(set).sort();
-  }, [tenders, selectedCategory]);
+  }, [tenders, selectedCategory, filterConstantsTick]);
 
   // 1. Faceted context & counts for Sources
   const contextForSource = useMemo(() => {
@@ -469,7 +481,7 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
       set.add(selectedSource);
     }
     return Array.from(set).sort();
-  }, [tenders, selectedSource]);
+  }, [tenders, selectedSource, filterConstantsTick]);
 
   // 2. Faceted context & counts for Organisations
   const contextForOrg = useMemo(() => {

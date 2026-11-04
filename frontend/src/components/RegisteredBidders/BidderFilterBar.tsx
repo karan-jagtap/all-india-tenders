@@ -1,6 +1,6 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import { Tag, MapPin, TrendingUp, RotateCcw } from "lucide-react";
-import { QUICK_SECTOR_CHIPS } from "../../constants";
+import { getQuickSectorChips, subscribeUiFilters } from "../../constants";
 import { FilterSearchBar, SearchableDropdown, DropdownOption } from "../common";
 
 export type BidderSortOption =
@@ -62,6 +62,15 @@ export const BidderFilterBar: React.FC<BidderFilterBarProps> = ({
       countSuffix: "bidders",
     }));
   }, [allStates, stateCounts]);
+
+  const [uiFiltersTick, setUiFiltersTick] = useState<number>(0);
+  useEffect(() => {
+    return subscribeUiFilters(() => setUiFiltersTick((t) => t + 1));
+  }, []);
+
+  const sectorChips = useMemo(() => {
+    return getQuickSectorChips(allCategories);
+  }, [allCategories, uiFiltersTick]);
 
   return (
     <div className="bg-slate-900 border border-slate-800 rounded-xl p-4 space-y-3 shadow-xs">
@@ -155,21 +164,33 @@ export const BidderFilterBar: React.FC<BidderFilterBarProps> = ({
         <span className="text-[11px] text-slate-400 font-semibold shrink-0">
           Quick Sector:
         </span>
-        {QUICK_SECTOR_CHIPS.map((chip) => {
+        {sectorChips.map((chip) => {
           const isActive =
             (chip.val === "ALL" && selectedCategory === "ALL") ||
             selectedCategory === chip.val;
+          const count = chip.val === "ALL" ? totalBidders : categoryCounts?.get(chip.val);
           return (
             <button
               key={chip.val}
               onClick={() => setSelectedCategory(chip.val)}
-              className={`px-2.5 py-1 rounded-lg text-[11px] font-medium shrink-0 transition-colors cursor-pointer ${
+              className={`px-2.5 py-1 rounded-lg text-[11px] font-medium shrink-0 transition-colors cursor-pointer flex items-center gap-1.5 ${
                 isActive
                   ? "bg-blue-600 text-white font-semibold shadow-xs"
                   : "bg-slate-800/90 text-slate-300 hover:bg-slate-700 hover:text-white border border-slate-700/60"
               }`}
             >
-              {chip.label}
+              <span>{chip.label}</span>
+              {count !== undefined && (
+                <span
+                  className={`text-[10px] px-1.5 py-0.2 rounded-full font-mono ${
+                    isActive
+                      ? "bg-blue-700 text-white"
+                      : "bg-slate-700/90 text-slate-300"
+                  }`}
+                >
+                  {count}
+                </span>
+              )}
             </button>
           );
         })}

@@ -7,7 +7,10 @@ from fastapi import APIRouter, HTTPException, Query
 from fastapi.responses import JSONResponse
 from sqlalchemy import select
 from app.db.session import async_session_factory
-from app.db.models import SourcePortal, State, City, Category, Organisation, PortalStateMapping
+from app.db.models import (
+    SourcePortal, State, City, Category, Organisation, PortalStateMapping,
+    PortalSourceRecord, AppConstant
+)
 
 router = APIRouter(prefix="/sources", tags=["Sources & Taxonomy"])
 
@@ -129,3 +132,96 @@ async def list_statutory_bindings():
                 for b in bindings
             ]
         })
+
+
+@router.get("/directory")
+async def list_portal_sources_directory():
+    """
+    Returns full metadata for the 37 official statutory procurement portals
+    from the persistent DB (sources directory with descriptions, key authorities, and frameworks).
+    """
+    async with async_session_factory() as session:
+        stmt = select(PortalSourceRecord).order_by(PortalSourceRecord.id.asc())
+        res = await session.execute(stmt)
+        records = res.scalars().all()
+
+        return JSONResponse(content=[
+            {
+                "id": p.id,
+                "name": p.name,
+                "domain": p.domain,
+                "url": p.url,
+                "category": p.category,
+                "state": p.state,
+                "region": p.region,
+                "description": p.description,
+                "keyAuthorities": p.key_authorities or [],
+                "procurementTypes": p.procurement_types or [],
+                "statutoryFramework": p.statutory_framework,
+                "status": p.status,
+                "activeCountEstimate": p.active_count_estimate
+            }
+            for p in records
+        ])
+
+
+@router.get("/statutory-map")
+async def get_statutory_portal_mappings():
+    """
+    Returns statutory portal-to-state bindings and canonical portals list from DB.
+    """
+    async with async_session_factory() as session:
+        stmt_map = select(AppConstant).where(AppConstant.key == "statutory_portal_to_state_map")
+        res_map = await session.execute(stmt_map)
+        row_map = res_map.scalar_one_or_none()
+
+        stmt_list = select(AppConstant).where(AppConstant.key == "all_statutory_portal_sources")
+        res_list = await session.execute(stmt_list)
+        row_list = res_list.scalar_one_or_none()
+
+        return JSONResponse(content={
+            "portalToStateMap": row_map.data if row_map else {},
+            "allPortals": row_list.data if row_list else []
+        })
+
+
+@router.get("/master-filters")
+async def get_master_filters():
+    """
+    Returns canonical categories, states, organisations, and state-city hierarchies from DB.
+    """
+    async with async_session_factory() as session:
+        stmt = select(AppConstant).where(AppConstant.key == "master_filters")
+        res = await session.execute(stmt)
+        row = res.scalar_one_or_none()
+        if not row:
+            raise HTTPException(status_code=404, detail="Master filters taxonomy constant not found in DB")
+        return JSONResponse(content=row.data)
+
+
+@router.get("/ui-filters")
+async def get_ui_filter_options():
+    """
+    Returns UI value range options, quick sector chips, and portal pills from DB.
+    """
+    async with async_session_factory() as session:
+        stmt = select(AppConstant).where(AppConstant.key == "ui_filters")
+        res = await session.execute(stmt)
+        row = res.scalar_one_or_none()
+        if not row:
+            raise HTTPException(status_code=404, detail="UI filter options constant not found in DB")
+        return JSONResponse(content=row.data)
+
+
+@router.get("/constants/{key}")
+async def get_app_constant(key: str):
+    """
+    Returns arbitrary app constant JSON by key from DB.
+    """
+    async with async_session_factory() as session:
+        stmt = select(AppConstant).where(AppConstant.key == key)
+        res = await session.execute(stmt)
+        row = res.scalar_one_or_none()
+        if not row:
+            raise HTTPException(status_code=404, detail=f"Constant '{key}' not found in DB")
+        return JSONResponse(content=row.data)

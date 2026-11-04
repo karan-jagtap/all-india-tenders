@@ -289,3 +289,140 @@ export async function fetchContractorPools(): Promise<Record<string, PoolContrac
 
   return {};
 }
+
+export async function fetchPortalSourcesDirectory(): Promise<any[]> {
+  try {
+    const res = await fetch(`${API_BASE}/sources/directory?_t=${Date.now()}`, {
+      cache: 'no-store',
+      headers: { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' }
+    });
+    if (res.ok) {
+      return await res.json();
+    }
+  } catch {
+    // Fallback to static export
+  }
+
+  try {
+    const fallbackRes = await fetch(`/data/portal_sources.json?_v=${Date.now()}`, {
+      cache: 'no-cache',
+      headers: { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' }
+    });
+    if (fallbackRes.ok) {
+      return await fallbackRes.json();
+    }
+  } catch {
+    // Fallback failed
+  }
+
+  return [];
+}
+
+export async function fetchStatutoryPortalMap(): Promise<{ portalToStateMap: Record<string, string>; allPortals: string[] }> {
+  try {
+    const res = await fetch(`${API_BASE}/sources/statutory-map?_t=${Date.now()}`, {
+      cache: 'no-store',
+      headers: { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' }
+    });
+    if (res.ok) {
+      return await res.json();
+    }
+  } catch {
+    // Fallback to static export
+  }
+
+  try {
+    const mapRes = await fetch(`/data/statutory_portal_map.json?_v=${Date.now()}`);
+    const listRes = await fetch(`/data/statutory_portals_list.json?_v=${Date.now()}`);
+    if (mapRes.ok && listRes.ok) {
+      return {
+        portalToStateMap: await mapRes.json(),
+        allPortals: await listRes.json()
+      };
+    }
+  } catch {
+    // Fallback failed
+  }
+
+  return { portalToStateMap: {}, allPortals: [] };
+}
+
+export async function fetchMasterFilters(): Promise<{
+  categories: string[];
+  states: string[];
+  organizations: string[];
+  stateCities: Record<string, { cities: string[]; defaultCity: string }>;
+  categoryKeywords?: Record<string, string[]>;
+  stateKeywords?: Record<string, string[]>;
+  authorityCityMap?: Record<string, Record<string, string>>;
+}> {
+  try {
+    const res = await fetch(`${API_BASE}/sources/master-filters?_t=${Date.now()}`, {
+      cache: 'no-store',
+      headers: { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' }
+    });
+    if (res.ok) {
+      return await res.json();
+    }
+  } catch {
+    // Fallback to static export
+  }
+
+  try {
+    const fallbackRes = await fetch(`/data/master_filters.json?_v=${Date.now()}`, {
+      cache: 'no-cache',
+      headers: { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' }
+    });
+    if (fallbackRes.ok) {
+      return await fallbackRes.json();
+    }
+  } catch {
+    // Fallback failed
+  }
+
+  return {
+    categories: [],
+    states: [],
+    organizations: [],
+    stateCities: {},
+    categoryKeywords: {},
+    stateKeywords: {},
+    authorityCityMap: {}
+  };
+}
+
+export async function fetchUiFilters(): Promise<{
+  valueRangeOptions: any[];
+  quickSectorChips: any[];
+  quickPortalPills: any[];
+}> {
+  try {
+    const res = await fetch(`${API_BASE}/sources/ui-filters?_t=${Date.now()}`, {
+      cache: 'no-store',
+      headers: { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' }
+    });
+    if (res.ok) {
+      return await res.json();
+    }
+  } catch {
+    // Fallback to static export
+  }
+
+  try {
+    const fallbackRes = await fetch(`/data/ui_filters.json?_v=${Date.now()}`, {
+      cache: 'no-cache',
+      headers: { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' }
+    });
+    if (fallbackRes.ok) {
+      return await fallbackRes.json();
+    }
+  } catch {
+    // Fallback failed
+  }
+
+  return {
+    valueRangeOptions: [],
+    quickSectorChips: [],
+    quickPortalPills: []
+  };
+}

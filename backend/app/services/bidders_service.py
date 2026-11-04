@@ -295,9 +295,10 @@ def get_bidder_by_slug(slug: str) -> Optional[Dict[str, Any]]:
 def get_contractor_pools_from_db(category: Optional[str] = None) -> Dict[str, List[Dict[str, Any]]]:
     """
     Retrieves category-indexed contractor pools directly from the persistent database (contractor_pools table).
-    Falls back to CONTRACTOR_POOLS_DATA constant if database is not reachable.
+    Supports exact, case-insensitive, and token-based fuzzy matching against DB category records.
     """
     import os
+    import re
     import sqlite3
     from app.constants.contractor_pools import CONTRACTOR_POOLS_DATA
 
@@ -310,8 +311,29 @@ def get_contractor_pools_from_db(category: Optional[str] = None) -> Dict[str, Li
             conn.row_factory = sqlite3.Row
             cursor = conn.cursor()
             if category and category != "ALL":
+                # 1. Exact match
                 query = "SELECT category, contractor_name, hq, contractor_class, turnover_cr FROM contractor_pools WHERE is_active=1 AND category=? ORDER BY display_order"
                 rows = cursor.execute(query, (category,)).fetchall()
+
+                # 2. Case-insensitive match
+                if not rows:
+                    query = "SELECT category, contractor_name, hq, contractor_class, turnover_cr FROM contractor_pools WHERE is_active=1 AND LOWER(category)=LOWER(?) ORDER BY display_order"
+                    rows = cursor.execute(query, (category.strip(),)).fetchall()
+
+                # 3. Partial substring match
+                if not rows:
+                    query = "SELECT category, contractor_name, hq, contractor_class, turnover_cr FROM contractor_pools WHERE is_active=1 AND category LIKE ? ORDER BY display_order"
+                    rows = cursor.execute(query, (f"%{category.strip()}%",)).fetchall()
+
+                # 4. Token overlap match
+                if not rows:
+                    tokens = [w for w in re.split(r'[\s,&/]+', category) if len(w) >= 3]
+                    for token in tokens:
+                        query = "SELECT category, contractor_name, hq, contractor_class, turnover_cr FROM contractor_pools WHERE is_active=1 AND category LIKE ? ORDER BY display_order"
+                        token_rows = cursor.execute(query, (f"%{token}%",)).fetchall()
+                        if token_rows:
+                            rows = token_rows
+                            break
             else:
                 query = "SELECT category, contractor_name, hq, contractor_class, turnover_cr FROM contractor_pools WHERE is_active=1 ORDER BY category, display_order"
                 rows = cursor.execute(query).fetchall()
