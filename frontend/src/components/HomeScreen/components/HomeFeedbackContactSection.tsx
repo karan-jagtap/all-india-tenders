@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { Mail, Send, MessageSquare, User, Phone, CheckCircle2, AlertCircle, Clock, Sparkles } from 'lucide-react';
+import { FeedbackSubject } from '../../../types';
 
 export const HomeFeedbackContactSection: React.FC = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
-  const [subject, setSubject] = useState<'Feedback' | 'Contact Us'>('Feedback');
+  const [subject, setSubject] = useState<FeedbackSubject>(FeedbackSubject.FEEDBACK);
   const [message, setMessage] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
@@ -54,7 +55,7 @@ export const HomeFeedbackContactSection: React.FC = () => {
       setEmail('');
       setPhone('');
       setMessage('');
-      setSubject('Feedback');
+      setSubject(FeedbackSubject.FEEDBACK);
     } catch (err: any) {
       console.error('Feedback submission error:', err);
       setErrorMessage(err.message || 'Network error. Please try again.');
@@ -214,11 +215,11 @@ export const HomeFeedbackContactSection: React.FC = () => {
                   <select
                     id="feedback-subject"
                     value={subject}
-                    onChange={(e) => setSubject(e.target.value as 'Feedback' | 'Contact Us')}
+                    onChange={(e) => setSubject(e.target.value as FeedbackSubject)}
                     className="w-full px-3.5 py-2 text-xs rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-[#0E1422] text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-orange-500"
                   >
-                    <option value="Feedback">Feedback</option>
-                    <option value="Contact Us">Contact Us</option>
+                    <option value={FeedbackSubject.FEEDBACK}>{FeedbackSubject.FEEDBACK}</option>
+                    <option value={FeedbackSubject.CONTACT_US}>{FeedbackSubject.CONTACT_US}</option>
                   </select>
                 </div>
               </div>

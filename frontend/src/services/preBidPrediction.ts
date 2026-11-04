@@ -2,7 +2,11 @@ import {
   CurrentTender,
   PredictedCompetitorBid,
   ClearingProbabilityBand,
-  PreBidSimulationReport
+  PreBidSimulationReport,
+  PredictedBidRank,
+  PricingPosture,
+  BidCoverStatus,
+  MatchingConfidenceLevel
 } from '../types';
 import { getContractorPool } from '../constants';
 import { hashString, formatCr } from '../utils';
@@ -49,12 +53,12 @@ export function generatePreBidSimulation(tender: CurrentTender): PreBidSimulatio
     { deltaPct: Number((7.0 + ((seed % 25) / 15)).toFixed(2)), techScore: 85.0 }
   ];
 
-  const ranks: Array<'L1 (Predicted Winner)' | 'L2' | 'L3' | 'L4' | 'L5'> = [
-    'L1 (Predicted Winner)',
-    'L2',
-    'L3',
-    'L4',
-    'L5'
+  const ranks: PredictedBidRank[] = [
+    PredictedBidRank.L1,
+    PredictedBidRank.L2,
+    PredictedBidRank.L3,
+    PredictedBidRank.L4,
+    PredictedBidRank.L5
   ];
 
   const strategies = [
@@ -65,12 +69,12 @@ export function generatePreBidSimulation(tender: CurrentTender): PreBidSimulatio
     'High-margin target bidder; frequently relies on technical scoring advantage and proprietary execution methodologies.'
   ];
 
-  const postures: Array<'Aggressive DSR Discounter' | 'Balanced EPC Contractor' | 'Conservative Margin-First'> = [
-    'Aggressive DSR Discounter',
-    'Balanced EPC Contractor',
-    'Balanced EPC Contractor',
-    'Conservative Margin-First',
-    'Conservative Margin-First'
+  const postures: PricingPosture[] = [
+    PricingPosture.AGGRESSIVE_DISCOUNTER,
+    PricingPosture.BALANCED_EPC,
+    PricingPosture.BALANCED_EPC,
+    PricingPosture.CONSERVATIVE_MARGIN,
+    PricingPosture.CONSERVATIVE_MARGIN
   ];
 
   const bids: PredictedCompetitorBid[] = selectedContenders.map((c, idx) => {
@@ -104,7 +108,7 @@ export function generatePreBidSimulation(tender: CurrentTender): PreBidSimulatio
       headToHeadRecord: idx === 0 ? `Won 5 of last 7 sector bids (Highest L1 conversion)` : `Won ${Math.max(1, 4 - idx)} of last 6 sector tenders`,
       pricingPosture: postures[idx],
       fleetMobilityIndex: idx === 0 ? 'Tier-1 Immediate Fleet Mobilization (Same District)' : `Regional Hub Transit (~${50 + idx * 45} km)`,
-      coverStatus: 'COVER 1 & 2 PASSED'
+      coverStatus: BidCoverStatus.PASSED
     };
   });
 
@@ -117,10 +121,10 @@ export function generatePreBidSimulation(tender: CurrentTender): PreBidSimulatio
   const curseInr = Math.round(cost * (1 + cursePct / 100));
 
   const confidenceScore = 84 + (seed % 13);
-  const confidenceLevel =
+  const confidenceLevel: MatchingConfidenceLevel =
     confidenceScore >= 90
-      ? 'HIGH (Level-1/2 Authority Benchmark)'
-      : 'MEDIUM (Regional DSR Curve)';
+      ? MatchingConfidenceLevel.HIGH
+      : MatchingConfidenceLevel.MEDIUM;
 
   const probabilityBands: ClearingProbabilityBand[] = [
     {

@@ -1,5 +1,6 @@
 import React from 'react';
 import { SlidersHorizontal, RotateCcw, RefreshCw } from 'lucide-react';
+import { FilterAccentColor } from '../../types';
 
 export interface TopFilterActionBarProps {
   onOpenFilters: () => void;
@@ -10,7 +11,7 @@ export interface TopFilterActionBarProps {
   isLoading?: boolean;
   totalCount?: number;
   reloadLabel?: string;
-  accentColor?: 'orange' | 'emerald' | 'blue';
+  accentColor?: FilterAccentColor;
   className?: string;
 }
 

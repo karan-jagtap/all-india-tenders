@@ -1,10 +1,11 @@
 import React from 'react';
 import { ExternalLink, ChevronRight } from 'lucide-react';
 import { PortalSourceInfo } from '../../../constants/portalSources';
+import { NavigableTab } from '../../../types';
 
 export interface PortalSourceCardProps {
   portal: PortalSourceInfo;
-  onNavigate: (tab: 'current' | 'accepted' | 'bidders') => void;
+  onNavigate: (tab: NavigableTab) => void;
 }
 
 export const PortalSourceCard: React.FC<PortalSourceCardProps> = ({ portal, onNavigate }) => {

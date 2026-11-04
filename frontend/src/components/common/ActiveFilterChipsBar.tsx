@@ -1,12 +1,13 @@
 import React from 'react';
 import { X, RotateCcw } from 'lucide-react';
+import { FilterAccentColor } from '../../types';
 
 export interface FilterChipItem {
   id: string;
   label: string;
   value: string;
   icon?: React.ReactNode;
-  color?: 'orange' | 'emerald' | 'blue' | 'rose' | 'amber' | 'slate' | 'violet';
+  color?: FilterAccentColor;
   onRemove: () => void;
 }
 

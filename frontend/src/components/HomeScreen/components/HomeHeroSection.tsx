@@ -1,11 +1,12 @@
 import React from 'react';
 import { Radio, Award, Users, Globe, ArrowRight } from 'lucide-react';
+import { NavigableTab } from '../../../types';
 
 export interface HomeHeroSectionProps {
   activeTenders: number;
   acceptedTenders: number;
   biddersCount: number;
-  onNavigate: (tab: 'current' | 'accepted' | 'bidders') => void;
+  onNavigate: (tab: NavigableTab) => void;
   onScrollToSources: () => void;
 }
 

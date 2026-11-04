@@ -38,6 +38,7 @@ import {
   listAcceptedTenders,
   getAcceptedTenderPdfUrl
 } from '../services/api';
+import { DetailModalTab, AcceptedTenderModalTab } from '../types';
 import { AllBidsEvaluationSubTab } from './AcceptedTenders/AllBidsEvaluationSubTab';
 import {
   ALL_CANONICAL_CATEGORIES,
@@ -267,9 +268,7 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
 
   const [selectedTenderId, setSelectedTenderId] = useState<string>('');
-  const [activeSubTab, setActiveSubTab] = useState<
-    'comparison' | 'company' | 'covers' | 'pqc' | 'boq' | 'compliance' | 'milestones' | 'loa' | 'pdf' | 'all_bids'
-  >('comparison');
+  const [activeSubTab, setActiveSubTab] = useState<DetailModalTab>(AcceptedTenderModalTab.COMPARISON);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedCategory, setSelectedCategory] = useState<string>('ALL');
   const [selectedSource, setSelectedSource] = useState<string>('ALL');
@@ -617,13 +616,80 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
     return count;
   }, [selectedCategory, selectedSource, selectedOrg, selectedState, selectedCity, selectedYear, searchQuery]);
 
-  const resetAllFilters = () => {
+  const selectFirstAcceptedTenderRecord = (tenderList: EnrichedAcceptedTender[]) => {
+    const firstTender = tenderList[0];
+    const targetId = firstTender ? firstTender.id : '';
+    setSelectedTenderId(targetId);
+  };
+
+  const resetFilterStateValues = () => {
     setSelectedCategory('ALL');
     setSelectedSource('ALL');
     setSelectedOrg('ALL');
     setSelectedState('ALL');
     setSelectedCity('ALL');
     setSelectedYear('ALL');
+    setSearchQuery('');
+  };
+
+  const scrollListContainerToTop = () => {
+    if (listContainerRef.current) {
+      listContainerRef.current.scrollTop = 0;
+    }
+  };
+
+  const resetAllFilters = () => {
+    resetFilterStateValues();
+    selectFirstAcceptedTenderRecord(tenders);
+    scrollListContainerToTop();
+  };
+
+  const handleOpenFilterDrawer = () => {
+    setIsFilterSidebarOpen(true);
+  };
+
+  const handleCloseFilterDrawer = () => {
+    setIsFilterSidebarOpen(false);
+  };
+
+  const handleReload = () => {
+    loadData();
+  };
+
+  const handleSelectTenderCard = (tender: EnrichedAcceptedTender) => {
+    setSelectedTenderId(tender.id);
+    setActiveSubTab(AcceptedTenderModalTab.COMPARISON);
+    if (window.innerWidth < 1024) {
+      dossierRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
+  const handleRemoveCategoryChip = () => {
+    setSelectedCategory('ALL');
+  };
+
+  const handleRemoveSourceChip = () => {
+    setSelectedSource('ALL');
+  };
+
+  const handleRemoveOrgChip = () => {
+    setSelectedOrg('ALL');
+  };
+
+  const handleRemoveStateChip = () => {
+    setSelectedState('ALL');
+    setSelectedCity('ALL');
+  };
+
+  const handleRemoveCityChip = () => {
+    setSelectedCity('ALL');
+  };
+
+  const handleRemoveYearChip = () => {
+    setSelectedYear('ALL');
+  };
+
+  const handleRemoveQueryChip = () => {
     setSearchQuery('');
   };
 
@@ -697,7 +763,7 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
         value: selectedCategory,
         icon: <Tag className="w-3 h-3 text-emerald-600" />,
         color: 'emerald',
-        onRemove: () => setSelectedCategory('ALL')
+        onRemove: handleRemoveCategoryChip
       });
     }
 
@@ -708,7 +774,7 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
         value: selectedSource,
         icon: <Globe className="w-3 h-3 text-orange-600" />,
         color: 'orange',
-        onRemove: () => setSelectedSource('ALL')
+        onRemove: handleRemoveSourceChip
       });
     }
 
@@ -719,7 +785,7 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
         value: selectedOrg,
         icon: <Building2 className="w-3 h-3 text-blue-600" />,
         color: 'blue',
-        onRemove: () => setSelectedOrg('ALL')
+        onRemove: handleRemoveOrgChip
       });
     }
 
@@ -730,10 +796,7 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
         value: selectedState,
         icon: <MapPin className="w-3 h-3 text-rose-600" />,
         color: 'rose',
-        onRemove: () => {
-          setSelectedState('ALL');
-          setSelectedCity('ALL');
-        }
+        onRemove: handleRemoveStateChip
       });
     }
 
@@ -744,7 +807,7 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
         value: selectedCity,
         icon: <MapPin className="w-3 h-3 text-amber-600" />,
         color: 'amber',
-        onRemove: () => setSelectedCity('ALL')
+        onRemove: handleRemoveCityChip
       });
     }
 
@@ -755,7 +818,7 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
         value: `FY ${selectedYear}`,
         icon: <Calendar className="w-3 h-3 text-amber-600" />,
         color: 'amber',
-        onRemove: () => setSelectedYear('ALL')
+        onRemove: handleRemoveYearChip
       });
     }
 
@@ -765,7 +828,7 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
         label: 'Query',
         value: `"${searchQuery}"`,
         color: 'slate',
-        onRemove: () => setSearchQuery('')
+        onRemove: handleRemoveQueryChip
       });
     }
 
@@ -866,11 +929,11 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
           />
 
           <TopFilterActionBar
-            onOpenFilters={() => setIsFilterSidebarOpen(true)}
+            onOpenFilters={handleOpenFilterDrawer}
             activeFiltersCount={activeFiltersCount}
             hasActiveFilters={hasActiveFilters}
             onResetFilters={resetAllFilters}
-            onReload={loadData}
+            onReload={handleReload}
             isLoading={loading}
             totalCount={tenders.length}
             reloadLabel="Reload"
@@ -888,7 +951,7 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
       {/* Overlapping Filter Drawer (Slides from Right) */}
       <TenderFilterDrawer
         isOpen={isFilterSidebarOpen}
-        onClose={() => setIsFilterSidebarOpen(false)}
+        onClose={handleCloseFilterDrawer}
         title="Awarded Tender Filters"
         subtitle="Refine historical government awarded contracts"
         accentColor="emerald"
@@ -1007,13 +1070,7 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
               return (
                 <div
                   key={tender.id}
-                  onClick={() => {
-                    setSelectedTenderId(tender.id);
-                    setActiveSubTab('comparison');
-                    if (window.innerWidth < 1024) {
-                      dossierRef.current?.scrollIntoView({ behavior: 'smooth' });
-                    }
-                  }}
+                  onClick={() => handleSelectTenderCard(tender)}
                   className={`cursor-pointer rounded-xl p-4 border transition-all text-xs relative ${
                     isSelected
                       ? 'bg-white dark:bg-[#131A2B] border-emerald-500 shadow-md ring-1 ring-emerald-500'

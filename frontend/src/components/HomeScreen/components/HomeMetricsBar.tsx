@@ -1,12 +1,13 @@
 import React from 'react';
 import { Radio, TrendingDown, Award, Users, Globe, Cpu, ChevronRight } from 'lucide-react';
+import { NavigableTab } from '../../../types';
 
 export interface HomeMetricsBarProps {
   activeTenders: number;
   totalValueCr: string;
   acceptedTenders: number;
   biddersCount: number;
-  onNavigate: (tab: 'current' | 'accepted' | 'bidders') => void;
+  onNavigate: (tab: NavigableTab) => void;
   onScrollToSources: () => void;
 }
 

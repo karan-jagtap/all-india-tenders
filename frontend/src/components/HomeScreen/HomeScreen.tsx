@@ -1,5 +1,5 @@
 import React from 'react';
-import { PlatformStats } from '../../types';
+import { PlatformStats, NavigableTab } from '../../types';
 import {
   HomeHeroSection,
   HomeMetricsBar,
@@ -11,7 +11,7 @@ import {
 
 export interface HomeScreenProps {
   stats: PlatformStats | null;
-  onNavigate: (tab: 'current' | 'accepted' | 'bidders') => void;
+  onNavigate: (tab: NavigableTab) => void;
   onTriggerSync: () => void;
   isSyncing: boolean;
 }

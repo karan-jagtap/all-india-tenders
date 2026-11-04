@@ -72,6 +72,10 @@ export const BidderFilterBar: React.FC<BidderFilterBarProps> = ({
     return getQuickSectorChips(allCategories);
   }, [allCategories, uiFiltersTick]);
 
+  const handleSelectSectorChip = (sectorVal: string) => {
+    setSelectedCategory(sectorVal);
+  };
+
   return (
     <div className="bg-slate-900 border border-slate-800 rounded-xl p-4 space-y-3 shadow-xs">
       {/* Primary Bar: Search on LEFT, Filters & Sort on RIGHT */}
@@ -172,7 +176,7 @@ export const BidderFilterBar: React.FC<BidderFilterBarProps> = ({
           return (
             <button
               key={chip.val}
-              onClick={() => setSelectedCategory(chip.val)}
+              onClick={() => handleSelectSectorChip(chip.val)}
               className={`px-2.5 py-1 rounded-lg text-[11px] font-medium shrink-0 transition-colors cursor-pointer flex items-center gap-1.5 ${
                 isActive
                   ? "bg-blue-600 text-white font-semibold shadow-xs"

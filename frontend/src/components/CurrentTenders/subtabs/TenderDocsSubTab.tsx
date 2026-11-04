@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Layers, Download, ExternalLink, Eye } from 'lucide-react';
-import { EnrichedCurrentTender } from '../../../types';
+import { EnrichedCurrentTender, TenderDocType } from '../../../types';
 import { formatINR } from '../../../utils';
 
 export interface TenderDocsSubTabProps {
@@ -20,14 +20,14 @@ export const TenderDocsSubTab: React.FC<TenderDocsSubTabProps> = ({
   onOpenPortalBridge,
   onOpenWholeDoc
 }) => {
-  const [selectedDocType, setSelectedDocType] = useState<'sbd' | 'nit' | 'boq'>('sbd');
+  const [selectedDocType, setSelectedDocType] = useState<TenderDocType>(TenderDocType.SBD);
 
   const activeDocUrl =
-    selectedDocType === 'sbd' ? sbdUrl : selectedDocType === 'nit' ? pdfUrl : boqUrl;
+    selectedDocType === TenderDocType.SBD ? sbdUrl : selectedDocType === TenderDocType.NIT ? pdfUrl : boqUrl;
   const activeDocFileName =
-    selectedDocType === 'sbd'
+    selectedDocType === TenderDocType.SBD
       ? `${selectedTender.id}_Whole_Tender_Document_SBD.pdf`
-      : selectedDocType === 'nit'
+      : selectedDocType === TenderDocType.NIT
       ? `${selectedTender.id}_NIT_Notice.pdf`
       : `${selectedTender.id}_Bill_of_Quantities_BOQ.csv`;
 
@@ -81,9 +81,9 @@ export const TenderDocsSubTab: React.FC<TenderDocsSubTabProps> = ({
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
         {/* Doc 1: SBD / Detailed Tender Doc */}
         <div
-          onClick={() => setSelectedDocType('sbd')}
+          onClick={() => setSelectedDocType(TenderDocType.SBD)}
           className={`p-3.5 rounded-xl border text-xs cursor-pointer transition-all ${
-            selectedDocType === 'sbd'
+            selectedDocType === TenderDocType.SBD
               ? 'bg-indigo-50/70 dark:bg-indigo-950/40 border-indigo-600 shadow-sm ring-1 ring-indigo-600'
               : 'bg-slate-50/60 dark:bg-slate-800/40 border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 hover:bg-slate-100/70 dark:hover:bg-slate-800/70'
           }`}
@@ -102,7 +102,7 @@ export const TenderDocsSubTab: React.FC<TenderDocsSubTabProps> = ({
           </p>
           <div className="mt-2.5 pt-2 border-t border-slate-200/60 dark:border-slate-700/60 flex items-center justify-between text-[10px]">
             <span className="text-indigo-700 dark:text-indigo-400 font-semibold">
-              {selectedDocType === 'sbd' ? '● Active in Viewer' : 'Click to View'}
+              {selectedDocType === TenderDocType.SBD ? '● Active in Viewer' : 'Click to View'}
             </span>
             <a
               href={sbdUrl}
@@ -117,9 +117,9 @@ export const TenderDocsSubTab: React.FC<TenderDocsSubTabProps> = ({
 
         {/* Doc 2: Notice Inviting Tender (NIT) */}
         <div
-          onClick={() => setSelectedDocType('nit')}
+          onClick={() => setSelectedDocType(TenderDocType.NIT)}
           className={`p-3.5 rounded-xl border text-xs cursor-pointer transition-all ${
-            selectedDocType === 'nit'
+            selectedDocType === TenderDocType.NIT
               ? 'bg-orange-50/70 dark:bg-orange-950/40 border-orange-600 shadow-sm ring-1 ring-orange-600'
               : 'bg-slate-50/60 dark:bg-slate-800/40 border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 hover:bg-slate-100/70 dark:hover:bg-slate-800/70'
           }`}
@@ -138,7 +138,7 @@ export const TenderDocsSubTab: React.FC<TenderDocsSubTabProps> = ({
           </p>
           <div className="mt-2.5 pt-2 border-t border-slate-200/60 dark:border-slate-700/60 flex items-center justify-between text-[10px]">
             <span className="text-orange-700 dark:text-orange-400 font-semibold">
-              {selectedDocType === 'nit' ? '● Active in Viewer' : 'Click to View'}
+              {selectedDocType === TenderDocType.NIT ? '● Active in Viewer' : 'Click to View'}
             </span>
             <a
               href={pdfUrl}
@@ -153,9 +153,9 @@ export const TenderDocsSubTab: React.FC<TenderDocsSubTabProps> = ({
 
         {/* Doc 3: Bill of Quantities (BOQ) */}
         <div
-          onClick={() => setSelectedDocType('boq')}
+          onClick={() => setSelectedDocType(TenderDocType.BOQ)}
           className={`p-3.5 rounded-xl border text-xs cursor-pointer transition-all ${
-            selectedDocType === 'boq'
+            selectedDocType === TenderDocType.BOQ
               ? 'bg-emerald-50/70 dark:bg-emerald-950/40 border-emerald-600 shadow-sm ring-1 ring-emerald-600'
               : 'bg-slate-50/60 dark:bg-slate-800/40 border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 hover:bg-slate-100/70 dark:hover:bg-slate-800/70'
           }`}
@@ -174,7 +174,7 @@ export const TenderDocsSubTab: React.FC<TenderDocsSubTabProps> = ({
           </p>
           <div className="mt-2.5 pt-2 border-t border-slate-200/60 dark:border-slate-700/60 flex items-center justify-between text-[10px]">
             <span className="text-emerald-700 dark:text-emerald-400 font-semibold">
-              {selectedDocType === 'boq' ? '● Active in Viewer' : 'Click to View'}
+              {selectedDocType === TenderDocType.BOQ ? '● Active in Viewer' : 'Click to View'}
             </span>
             <a
               href={boqUrl}

@@ -16,9 +16,15 @@ import {
 import { AcceptedTender } from '../../services/api';
 import { getContractorPool, subscribeContractorPools } from '../../constants';
 import { hashString } from '../../utils';
+import {
+  AwardBidRank,
+  EvaluationCover1Status,
+  EvaluationCover2Status,
+  UiAccentColor
+} from '../../types';
 
 export interface EvaluatedBidder {
-  rank: 'L1' | 'L2' | 'L3' | 'L4' | 'L5';
+  rank: AwardBidRank;
   isWinner: boolean;
   name: string;
   hq: string;
@@ -29,12 +35,12 @@ export interface EvaluatedBidder {
   marginOverL1Inr: number;
   marginOverL1Pct: number;
   techScore: number;
-  cover1Status: 'Compliant & Verified' | 'Verified';
-  cover2Status: 'Qualified (100% PQC Met)' | 'Disqualified (Criteria Shortfall)';
+  cover1Status: EvaluationCover1Status;
+  cover2Status: EvaluationCover2Status;
   isDisqualified: boolean;
   emdStatus: string;
   statusBadge: string;
-  statusBadgeColor: 'emerald' | 'blue' | 'slate' | 'rose' | 'amber';
+  statusBadgeColor: UiAccentColor | 'emerald' | 'blue' | 'slate' | 'rose' | 'amber';
   evaluationSummary: string;
   equipmentDeclared: string;
   turnoverCited: string;
@@ -137,7 +143,7 @@ export const AllBidsEvaluationSubTab: React.FC<AllBidsEvaluationSubTabProps> = (
     const list: EvaluatedBidder[] = [
       // 1. L1 Winner
       {
-        rank: 'L1',
+        rank: AwardBidRank.L1,
         isWinner: true,
         name: l1WinnerName,
         hq: tender.winning_company?.registered_office?.split(',').slice(-2).join(',').trim() || 'India',
@@ -148,12 +154,12 @@ export const AllBidsEvaluationSubTab: React.FC<AllBidsEvaluationSubTabProps> = (
         marginOverL1Inr: 0,
         marginOverL1Pct: 0,
         techScore: 97.5,
-        cover1Status: 'Compliant & Verified',
-        cover2Status: 'Qualified (100% PQC Met)',
+        cover1Status: EvaluationCover1Status.COMPLIANT_AND_VERIFIED,
+        cover2Status: EvaluationCover2Status.QUALIFIED,
         isDisqualified: false,
         emdStatus: tender.bid_submission?.emd_mode || 'Bank Guarantee Verified',
         statusBadge: 'AWARDED CONTRACT (L1)',
-        statusBadgeColor: 'emerald',
+        statusBadgeColor: UiAccentColor.EMERALD,
         evaluationSummary:
           tender.acceptance_and_loa?.committee_verdict ||
           'Lowest responsive bidder conforming to all technical qualification benchmarks, CA UDIN turnover criteria, and equipment mobilization schedule. Approved for LOA.',
@@ -165,7 +171,7 @@ export const AllBidsEvaluationSubTab: React.FC<AllBidsEvaluationSubTabProps> = (
 
       // 2. L2 Runner-Up
       {
-        rank: 'L2',
+        rank: AwardBidRank.L2,
         isWinner: false,
         name: c2.name,
         hq: c2.hq,
@@ -176,12 +182,12 @@ export const AllBidsEvaluationSubTab: React.FC<AllBidsEvaluationSubTabProps> = (
         marginOverL1Inr: quoteL2 - l1Quote,
         marginOverL1Pct: deltaL2Pct,
         techScore: 94.0,
-        cover1Status: 'Compliant & Verified',
-        cover2Status: 'Qualified (100% PQC Met)',
+        cover1Status: EvaluationCover1Status.COMPLIANT_AND_VERIFIED,
+        cover2Status: EvaluationCover2Status.QUALIFIED,
         isDisqualified: false,
         emdStatus: 'Bank Guarantee from Nationalized Bank',
         statusBadge: 'RUNNER-UP (L2 STANDBY)',
-        statusBadgeColor: 'blue',
+        statusBadgeColor: UiAccentColor.BLUE,
         evaluationSummary: `Technically qualified in both Cover-1 and Cover-2 envelopes. Quoted +${deltaL2Pct}% over L1. Placed on statutory standby in accordance with CPWD Works Manual / GFR Rule 173.`,
         equipmentDeclared: 'Adequate deployment of road/structural equipment meeting all Schedule-C technical capacity criteria.',
         turnoverCited: `₹ ${c2.turnoverCr.toLocaleString()} Cr (3-Year Audited Average)`
@@ -189,7 +195,7 @@ export const AllBidsEvaluationSubTab: React.FC<AllBidsEvaluationSubTabProps> = (
 
       // 3. L3 Second Runner-Up
       {
-        rank: 'L3',
+        rank: AwardBidRank.L3,
         isWinner: false,
         name: c3.name,
         hq: c3.hq,
@@ -200,12 +206,12 @@ export const AllBidsEvaluationSubTab: React.FC<AllBidsEvaluationSubTabProps> = (
         marginOverL1Inr: quoteL3 - l1Quote,
         marginOverL1Pct: deltaL3Pct,
         techScore: 91.5,
-        cover1Status: 'Compliant & Verified',
-        cover2Status: 'Qualified (100% PQC Met)',
+        cover1Status: EvaluationCover1Status.COMPLIANT_AND_VERIFIED,
+        cover2Status: EvaluationCover2Status.QUALIFIED,
         isDisqualified: false,
         emdStatus: 'Online Gateway E-Payment Receipt',
         statusBadge: 'RESPONSIVE (L3)',
-        statusBadgeColor: 'slate',
+        statusBadgeColor: UiAccentColor.SLATE,
         evaluationSummary: `Technically compliant. Higher rate quoted on sub-structure reinforced concrete and specialized electrical/MEP work lines (+${deltaL3Pct}% over L1).`,
         equipmentDeclared: 'Owned fabrication yard, cranes, and tipper fleets declared in Technical Cover-2.',
         turnoverCited: `₹ ${c3.turnoverCr.toLocaleString()} Cr (3-Year Audited Average)`
@@ -213,7 +219,7 @@ export const AllBidsEvaluationSubTab: React.FC<AllBidsEvaluationSubTabProps> = (
 
       // 4. L4 Participant
       {
-        rank: 'L4',
+        rank: AwardBidRank.L4,
         isWinner: false,
         name: c4.name,
         hq: c4.hq,
@@ -224,12 +230,12 @@ export const AllBidsEvaluationSubTab: React.FC<AllBidsEvaluationSubTabProps> = (
         marginOverL1Inr: quoteL4 - l1Quote,
         marginOverL1Pct: deltaL4Pct,
         techScore: 88.0,
-        cover1Status: 'Compliant & Verified',
-        cover2Status: 'Qualified (100% PQC Met)',
+        cover1Status: EvaluationCover1Status.COMPLIANT_AND_VERIFIED,
+        cover2Status: EvaluationCover2Status.QUALIFIED,
         isDisqualified: false,
         emdStatus: 'Bank Guarantee from Scheduled Bank',
         statusBadge: 'RESPONSIVE (L4)',
-        statusBadgeColor: 'slate',
+        statusBadgeColor: UiAccentColor.SLATE,
         evaluationSummary: `Technically qualified. Factored higher corporate mobilization contingencies and supply chain escalation risk buffer (+${deltaL4Pct}% over L1).`,
         equipmentDeclared: 'Standard equipment fleet satisfying minimum tender qualification requirements.',
         turnoverCited: `₹ ${c4.turnoverCr.toLocaleString()} Cr (3-Year Audited Average)`
@@ -237,7 +243,7 @@ export const AllBidsEvaluationSubTab: React.FC<AllBidsEvaluationSubTabProps> = (
 
       // 5. L5 (High Quote or Disqualified)
       {
-        rank: 'L5',
+        rank: AwardBidRank.L5,
         isWinner: false,
         name: c5.name,
         hq: c5.hq,
@@ -248,12 +254,12 @@ export const AllBidsEvaluationSubTab: React.FC<AllBidsEvaluationSubTabProps> = (
         marginOverL1Inr: isL5Disqualified ? 0 : quoteL5 - l1Quote,
         marginOverL1Pct: isL5Disqualified ? 0 : deltaL5Pct,
         techScore: isL5Disqualified ? 64.0 : 85.0,
-        cover1Status: 'Compliant & Verified',
-        cover2Status: isL5Disqualified ? 'Disqualified (Criteria Shortfall)' : 'Qualified (100% PQC Met)',
+        cover1Status: EvaluationCover1Status.COMPLIANT_AND_VERIFIED,
+        cover2Status: isL5Disqualified ? EvaluationCover2Status.DISQUALIFIED : EvaluationCover2Status.QUALIFIED,
         isDisqualified: isL5Disqualified,
         emdStatus: 'Online Gateway E-Payment',
         statusBadge: isL5Disqualified ? 'COVER-2 DISQUALIFIED' : 'HIGH QUOTE (L5)',
-        statusBadgeColor: isL5Disqualified ? 'rose' : 'slate',
+        statusBadgeColor: isL5Disqualified ? UiAccentColor.ROSE : UiAccentColor.SLATE,
         evaluationSummary: isL5Disqualified
           ? 'Disqualified in Technical Evaluation: Banker Solvency certificate dated prior to mandatory 6-month validity window. Financial Cover-3 unopened in accordance with GFR Rule 173.'
           : `Fully responsive, but quoted highest unit rates (+${deltaL5Pct}% over L1).`,

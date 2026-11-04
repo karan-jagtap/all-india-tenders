@@ -1,8 +1,9 @@
 import React from 'react';
 import { Radio, Award, Users, Sparkles, CheckCircle2, ChevronRight } from 'lucide-react';
+import { NavigableTab } from '../../../types';
 
 export interface HomeCapabilitiesSectionProps {
-  onNavigate: (tab: 'current' | 'accepted' | 'bidders') => void;
+  onNavigate: (tab: NavigableTab) => void;
 }
 
 export const HomeCapabilitiesSection: React.FC<HomeCapabilitiesSectionProps> = ({ onNavigate }) => {

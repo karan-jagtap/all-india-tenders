@@ -1,8 +1,9 @@
 import React from 'react';
 import { Radio, Award, Users } from 'lucide-react';
+import { NavigableTab } from '../../../types';
 
 export interface HomeCtaBannerProps {
-  onNavigate: (tab: 'current' | 'accepted' | 'bidders') => void;
+  onNavigate: (tab: NavigableTab) => void;
 }
 
 export const HomeCtaBanner: React.FC<HomeCtaBannerProps> = ({ onNavigate }) => {

@@ -1,3 +1,10 @@
+import {
+  PredictedBidRank,
+  PricingPosture,
+  BidCoverStatus,
+  MatchingConfidenceLevel
+} from './enums';
+
 export interface ClearingProbabilityBand {
   bandLabel: string;
   discountRange: string;
@@ -10,7 +17,7 @@ export interface ClearingProbabilityBand {
 }
 
 export interface PredictedCompetitorBid {
-  rank: 'L1 (Predicted Winner)' | 'L2' | 'L3' | 'L4' | 'L5';
+  rank: PredictedBidRank;
   bidderName: string;
   headquarters: string;
   contractorClass: string;
@@ -26,9 +33,9 @@ export interface PredictedCompetitorBid {
   solvencyRatio: number;
   orderBookCr: number;
   headToHeadRecord: string;
-  pricingPosture: 'Aggressive DSR Discounter' | 'Balanced EPC Contractor' | 'Conservative Margin-First';
+  pricingPosture: PricingPosture;
   fleetMobilityIndex: string;
-  coverStatus: 'COVER 1 & 2 PASSED' | 'EVALUATED RESPONSIVE';
+  coverStatus: BidCoverStatus;
 }
 
 export interface PreBidSimulationReport {
@@ -47,7 +54,7 @@ export interface PreBidSimulationReport {
   winnersCurseThresholdPct: number;
   estimatedTurnoutCount: number;
   confidenceScorePct: number;
-  matchingConfidenceLevel: 'HIGH (Level-1/2 Authority Benchmark)' | 'MEDIUM (Regional DSR Curve)' | 'ESTIMATE (GFR PQC Capacity Model)';
+  matchingConfidenceLevel: MatchingConfidenceLevel;
   authorityHistoricalClearancePattern: string;
   bids: PredictedCompetitorBid[];
   probabilityBands: ClearingProbabilityBand[];

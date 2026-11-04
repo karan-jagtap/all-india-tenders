@@ -1,5 +1,6 @@
 import React from 'react';
 import { Search, Mic, MicOff, X } from 'lucide-react';
+import { FilterAccentColor, ComponentVariant } from '../../types';
 
 export interface FilterSearchBarProps {
   searchQuery: string;
@@ -7,9 +8,9 @@ export interface FilterSearchBarProps {
   placeholder?: string;
   isVoiceSearching?: boolean;
   toggleVoiceSearch?: () => void;
-  accentColor?: 'orange' | 'emerald' | 'blue' | 'slate';
+  accentColor?: FilterAccentColor;
   className?: string;
-  variant?: 'light' | 'dark';
+  variant?: ComponentVariant;
 }
 
 export const FilterSearchBar: React.FC<FilterSearchBarProps> = ({

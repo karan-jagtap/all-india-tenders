@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Search, ChevronDown, Check, X } from 'lucide-react';
+import { FilterAccentColor } from '../../types';
 
 export interface DropdownOption {
   value: string;
@@ -16,7 +17,7 @@ export interface SearchableDropdownProps {
   allOptionCount?: number;
   placeholder?: string;
   icon?: React.ReactNode;
-  accentColor?: 'emerald' | 'orange' | 'blue' | 'rose' | 'amber';
+  accentColor?: FilterAccentColor;
   emptyMessage?: string;
   className?: string;
 }
@@ -150,6 +151,24 @@ export const SearchableDropdown: React.FC<SearchableDropdownProps> = ({
     }
   };
 
+  const handleToggleOpen = () => {
+    setIsOpen(!isOpen);
+  };
+
+  const handleClearSearch = () => {
+    setSearchQuery('');
+  };
+
+  const handleSelectAll = () => {
+    onChange('ALL');
+    setIsOpen(false);
+  };
+
+  const handleSelectOption = (optValue: string) => {
+    onChange(optValue);
+    setIsOpen(false);
+  };
+
   return (
     <div
       ref={containerRef}
@@ -159,7 +178,7 @@ export const SearchableDropdown: React.FC<SearchableDropdownProps> = ({
       {/* Trigger Button */}
       <button
         type="button"
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={handleToggleOpen}
         className={`w-full bg-slate-800 border rounded-lg px-3 py-2 text-xs text-white flex items-center justify-between transition-colors cursor-pointer ${
           isOpen
             ? 'border-slate-500 ring-1 ring-slate-600'
@@ -222,7 +241,7 @@ export const SearchableDropdown: React.FC<SearchableDropdownProps> = ({
             {searchQuery && (
               <button
                 type="button"
-                onClick={() => setSearchQuery('')}
+                onClick={handleClearSearch}
                 className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white p-0.5 rounded cursor-pointer"
                 title="Clear search"
               >
@@ -237,7 +256,7 @@ export const SearchableDropdown: React.FC<SearchableDropdownProps> = ({
               <span>{filteredOptions.length} matching result{filteredOptions.length === 1 ? '' : 's'}</span>
               <button
                 type="button"
-                onClick={() => setSearchQuery('')}
+                onClick={handleClearSearch}
                 className={`${getAccentTextClass()} hover:underline cursor-pointer`}
               >
                 Clear
@@ -251,10 +270,7 @@ export const SearchableDropdown: React.FC<SearchableDropdownProps> = ({
             {matchesAll && (
               <button
                 type="button"
-                onClick={() => {
-                  onChange('ALL');
-                  setIsOpen(false);
-                }}
+                onClick={handleSelectAll}
                 className={`w-full text-left px-2.5 py-1.5 rounded-lg flex items-center justify-between transition-colors cursor-pointer ${
                   value === 'ALL'
                     ? 'bg-slate-800 text-white font-bold'
@@ -287,10 +303,7 @@ export const SearchableDropdown: React.FC<SearchableDropdownProps> = ({
                 <button
                   key={opt.value}
                   type="button"
-                  onClick={() => {
-                    onChange(opt.value);
-                    setIsOpen(false);
-                  }}
+                  onClick={() => handleSelectOption(opt.value)}
                   className={`w-full text-left px-2.5 py-1.5 rounded-lg flex items-center justify-between transition-colors cursor-pointer ${
                     isSelected
                       ? 'bg-slate-800 text-white font-bold'
@@ -324,7 +337,7 @@ export const SearchableDropdown: React.FC<SearchableDropdownProps> = ({
                 <p>{emptyMessage} for "{searchQuery}"</p>
                 <button
                   type="button"
-                  onClick={() => setSearchQuery('')}
+                  onClick={handleClearSearch}
                   className={`mt-1.5 text-xs ${getAccentTextClass()} hover:underline font-semibold cursor-pointer`}
                 >
                   Clear search query

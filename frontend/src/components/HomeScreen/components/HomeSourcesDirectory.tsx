@@ -1,11 +1,19 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Globe, Filter, RefreshCw } from 'lucide-react';
-import { REAL_PORTAL_SOURCES, subscribePortalSources } from '../../../constants/portalSources';
+import {
+  REAL_PORTAL_SOURCES,
+  subscribePortalSources,
+  PortalCategory,
+  PortalRegion,
+  PORTAL_CATEGORY_OPTIONS,
+  PORTAL_REGION_OPTIONS
+} from '../../../constants/portalSources';
+import { NavigableTab } from '../../../types';
 import { PortalSourceCard } from './PortalSourceCard';
 import { FilterSearchBar } from '../../common';
 
 export interface HomeSourcesDirectoryProps {
-  onNavigate: (tab: 'current' | 'accepted' | 'bidders') => void;
+  onNavigate: (tab: NavigableTab) => void;
   onTriggerSync: () => void;
   isSyncing: boolean;
 }
@@ -16,8 +24,8 @@ export const HomeSourcesDirectory: React.FC<HomeSourcesDirectoryProps> = ({
   isSyncing
 }) => {
   const [portalSearch, setPortalSearch] = useState<string>('');
-  const [selectedCategory, setSelectedCategory] = useState<string>('ALL');
-  const [selectedRegion, setSelectedRegion] = useState<string>('ALL');
+  const [selectedCategory, setSelectedCategory] = useState<'ALL' | PortalCategory>('ALL');
+  const [selectedRegion, setSelectedRegion] = useState<'ALL' | PortalRegion>('ALL');
   const [tick, setTick] = useState<number>(0);
 
   useEffect(() => {
@@ -41,6 +49,20 @@ export const HomeSourcesDirectory: React.FC<HomeSourcesDirectoryProps> = ({
       return true;
     });
   }, [portalSearch, selectedCategory, selectedRegion, tick]);
+
+  const resetPortalFilters = () => {
+    setPortalSearch('');
+    setSelectedCategory('ALL');
+    setSelectedRegion('ALL');
+  };
+
+  const handleSelectCategory = (catId: 'ALL' | PortalCategory) => {
+    setSelectedCategory(catId);
+  };
+
+  const handleRegionChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedRegion(e.target.value as 'ALL' | PortalRegion);
+  };
 
   return (
     <section id="real-sources-directory" className="space-y-5 pt-4">
@@ -96,16 +118,14 @@ export const HomeSourcesDirectory: React.FC<HomeSourcesDirectoryProps> = ({
             <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">Region:</span>
             <select
               value={selectedRegion}
-              onChange={(e) => setSelectedRegion(e.target.value)}
+              onChange={handleRegionChange}
               className="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-700 dark:text-slate-200 focus:outline-none cursor-pointer font-medium"
             >
-              <option value="ALL">All Regions (India)</option>
-              <option value="National">National / Central</option>
-              <option value="North">North India</option>
-              <option value="South">South India</option>
-              <option value="West">West India</option>
-              <option value="East & Central">East & Central</option>
-              <option value="North East">North East</option>
+              {PORTAL_REGION_OPTIONS.map((opt) => (
+                <option key={opt.value} value={opt.value}>
+                  {opt.label}
+                </option>
+              ))}
             </select>
           </div>
         </div>
@@ -116,24 +136,17 @@ export const HomeSourcesDirectory: React.FC<HomeSourcesDirectoryProps> = ({
             <Filter className="w-3 h-3" />
             Jurisdiction:
           </span>
-          {[
-            { id: 'ALL', label: `All Portals (${REAL_PORTAL_SOURCES.length})` },
-            { id: 'Central', label: 'Central Government' },
-            { id: 'State', label: 'State Governments' },
-            { id: 'Defense & PSU', label: 'Defense & Energy PSUs' },
-            { id: 'Railways', label: 'Railways (IREPS)' },
-            { id: 'Open Data', label: 'Open Data (data.gov.in)' }
-          ].map((cat) => (
+          {PORTAL_CATEGORY_OPTIONS.map((cat) => (
             <button
               key={cat.id}
-              onClick={() => setSelectedCategory(cat.id)}
+              onClick={() => handleSelectCategory(cat.id)}
               className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-colors cursor-pointer ${
                 selectedCategory === cat.id
                   ? 'bg-cyan-600 text-white shadow-2xs'
                   : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
               }`}
             >
-              {cat.label}
+              {cat.id === 'ALL' ? `All Portals (${REAL_PORTAL_SOURCES.length})` : cat.label}
             </button>
           ))}
         </div>
@@ -155,7 +168,7 @@ export const HomeSourcesDirectory: React.FC<HomeSourcesDirectoryProps> = ({
           <Globe className="w-8 h-8 mx-auto text-slate-300 dark:text-slate-600" />
           <p className="font-semibold text-slate-800 dark:text-slate-200">No portal matched your search "{portalSearch}".</p>
           <button
-            onClick={() => { setPortalSearch(''); setSelectedCategory('ALL'); setSelectedRegion('ALL'); }}
+            onClick={resetPortalFilters}
             className="text-xs text-cyan-600 dark:text-cyan-400 underline font-semibold cursor-pointer"
           >
             Reset portal search & filters

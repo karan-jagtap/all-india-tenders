@@ -27,6 +27,7 @@ export const RegisteredBiddersTab: React.FC = () => {
   const [contractSearchQuery, setContractSearchQuery] = useState<string>('');
   const [rightColumnHeight, setRightColumnHeight] = useState<number | null>(null);
   const dossierRef = useRef<HTMLDivElement>(null);
+  const listContainerRef = useRef<HTMLDivElement>(null);
 
   const loadData = () => {
     setLoading(true);
@@ -199,11 +200,37 @@ export const RegisteredBiddersTab: React.FC = () => {
     return (sum / 10000000).toFixed(0);
   }, [bidders]);
 
-  const resetFilters = () => {
+  const selectFirstBidderRecord = (bidderList: RegisteredBidder[]) => {
+    const firstBidder = bidderList[0];
+    const targetId = firstBidder ? firstBidder.id : '';
+    setSelectedBidderId(targetId);
+  };
+
+  const resetFilterStateValues = () => {
     setSearchQuery('');
     setSelectedCategory('ALL');
     setSelectedState('ALL');
     setSortBy('NAME_ASC');
+  };
+
+  const scrollListContainerToTop = () => {
+    if (listContainerRef.current) {
+      listContainerRef.current.scrollTop = 0;
+    }
+  };
+
+  const resetFilters = () => {
+    resetFilterStateValues();
+    selectFirstBidderRecord(bidders);
+    scrollListContainerToTop();
+  };
+
+  const handleSelectBidderCard = (bidder: RegisteredBidder) => {
+    setSelectedBidderId(bidder.id);
+    setContractSearchQuery('');
+    if (window.innerWidth < 1024) {
+      dossierRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }
   };
 
   const hasActiveFilters = searchQuery.trim() !== '' || selectedCategory !== 'ALL' || selectedState !== 'ALL';
@@ -247,6 +274,7 @@ export const RegisteredBiddersTab: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
         {/* Left Column: Bidders Directory Cards (35% -> col-span-4) */}
         <div
+          ref={listContainerRef}
           className="lg:col-span-4 xl:col-span-4 space-y-2.5 overflow-y-auto pr-1 transition-all duration-150 scroll-smooth custom-scrollbar"
           style={{
             maxHeight: rightColumnHeight
@@ -283,13 +311,7 @@ export const RegisteredBiddersTab: React.FC = () => {
                   key={b.id}
                   bidder={b}
                   isSelected={isSelected}
-                  onSelect={() => {
-                    setSelectedBidderId(b.id);
-                    setContractSearchQuery('');
-                    if (window.innerWidth < 1024) {
-                      dossierRef.current?.scrollIntoView({ behavior: 'smooth' });
-                    }
-                  }}
+                  onSelect={() => handleSelectBidderCard(b)}
                 />
               );
             })

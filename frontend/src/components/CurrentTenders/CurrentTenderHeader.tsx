@@ -19,10 +19,11 @@ import {
   Globe,
   Shield
 } from 'lucide-react';
-import { EnrichedCurrentTender } from '../../types';
+import { EnrichedCurrentTender, SubTabType, CurrentTenderSubTab } from '../../types';
 import { formatINR } from '../../utils';
 
-export type SubTabType = 'specs' | 'pqc' | 'msme' | 'pdf' | 'scraping' | 'prediction' | 'rag_analysis';
+export type { SubTabType };
+export { CurrentTenderSubTab };
 
 export interface CurrentTenderHeaderProps {
   selectedTender: EnrichedCurrentTender;

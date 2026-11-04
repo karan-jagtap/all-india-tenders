@@ -64,6 +64,35 @@ export const CurrentTendersTopBar: React.FC<CurrentTendersTopBarProps> = ({
   loading,
   totalTendersCount
 }) => {
+  const handleRemoveCategoryChip = () => {
+    setSelectedCategory('ALL');
+  };
+
+  const handleRemoveSourceChip = () => {
+    setSelectedSource('ALL');
+  };
+
+  const handleRemoveOrgChip = () => {
+    setSelectedOrg('ALL');
+  };
+
+  const handleRemoveStateChip = () => {
+    setSelectedState('ALL');
+    setSelectedCity('ALL');
+  };
+
+  const handleRemoveCityChip = () => {
+    setSelectedCity('ALL');
+  };
+
+  const handleRemoveValueRangeChip = () => {
+    setSelectedValueRange('ALL');
+  };
+
+  const handleRemoveQueryChip = () => {
+    setSearchQuery('');
+  };
+
   // Construct memoized chip items for ActiveFilterChipsBar
   const chips: FilterChipItem[] = useMemo(() => {
     const list: FilterChipItem[] = [];
@@ -75,7 +104,7 @@ export const CurrentTendersTopBar: React.FC<CurrentTendersTopBarProps> = ({
         value: selectedCategory,
         icon: <Tag className="w-3 h-3 text-emerald-600" />,
         color: 'emerald',
-        onRemove: () => setSelectedCategory('ALL')
+        onRemove: handleRemoveCategoryChip
       });
     }
 
@@ -86,7 +115,7 @@ export const CurrentTendersTopBar: React.FC<CurrentTendersTopBarProps> = ({
         value: selectedSource,
         icon: <Globe className="w-3 h-3 text-orange-600" />,
         color: 'orange',
-        onRemove: () => setSelectedSource('ALL')
+        onRemove: handleRemoveSourceChip
       });
     }
 
@@ -97,7 +126,7 @@ export const CurrentTendersTopBar: React.FC<CurrentTendersTopBarProps> = ({
         value: selectedOrg,
         icon: <Building2 className="w-3 h-3 text-blue-600" />,
         color: 'blue',
-        onRemove: () => setSelectedOrg('ALL')
+        onRemove: handleRemoveOrgChip
       });
     }
 
@@ -108,10 +137,7 @@ export const CurrentTendersTopBar: React.FC<CurrentTendersTopBarProps> = ({
         value: selectedState,
         icon: <MapPin className="w-3 h-3 text-rose-600" />,
         color: 'rose',
-        onRemove: () => {
-          setSelectedState('ALL');
-          setSelectedCity('ALL');
-        }
+        onRemove: handleRemoveStateChip
       });
     }
 
@@ -122,7 +148,7 @@ export const CurrentTendersTopBar: React.FC<CurrentTendersTopBarProps> = ({
         value: selectedCity,
         icon: <MapPin className="w-3 h-3 text-amber-600" />,
         color: 'amber',
-        onRemove: () => setSelectedCity('ALL')
+        onRemove: handleRemoveCityChip
       });
     }
 
@@ -141,7 +167,7 @@ export const CurrentTendersTopBar: React.FC<CurrentTendersTopBarProps> = ({
         value: labelVal,
         icon: <Clock className="w-3 h-3 text-amber-600" />,
         color: 'amber',
-        onRemove: () => setSelectedValueRange('ALL')
+        onRemove: handleRemoveValueRangeChip
       });
     }
 
@@ -151,7 +177,7 @@ export const CurrentTendersTopBar: React.FC<CurrentTendersTopBarProps> = ({
         label: 'Query',
         value: `"${searchQuery}"`,
         color: 'slate',
-        onRemove: () => setSearchQuery('')
+        onRemove: handleRemoveQueryChip
       });
     }
 

@@ -1,18 +1,50 @@
 import { fetchPortalSourcesDirectory, fetchStatutoryPortalMap } from '../services/api';
+import { PortalCategory, PortalRegion, PortalStatus } from '../types/enums';
+
+export { PortalCategory, PortalRegion, PortalStatus };
+
+export interface PortalCategoryFilterOption {
+  id: 'ALL' | PortalCategory;
+  label: string;
+}
+
+export interface PortalRegionOption {
+  value: 'ALL' | PortalRegion;
+  label: string;
+}
+
+export const PORTAL_CATEGORY_OPTIONS: readonly PortalCategoryFilterOption[] = [
+  { id: 'ALL', label: 'All Portals' },
+  { id: PortalCategory.CENTRAL, label: 'Central Government' },
+  { id: PortalCategory.STATE, label: 'State Governments' },
+  { id: PortalCategory.DEFENSE_PSU, label: 'Defense & Energy PSUs' },
+  { id: PortalCategory.RAILWAYS, label: 'Railways (IREPS)' },
+  { id: PortalCategory.OPEN_DATA, label: 'Open Data (data.gov.in)' },
+] as const;
+
+export const PORTAL_REGION_OPTIONS: readonly PortalRegionOption[] = [
+  { value: 'ALL', label: 'All Regions (India)' },
+  { value: PortalRegion.NATIONAL, label: 'National / Central' },
+  { value: PortalRegion.NORTH, label: 'North India' },
+  { value: PortalRegion.SOUTH, label: 'South India' },
+  { value: PortalRegion.WEST, label: 'West India' },
+  { value: PortalRegion.EAST_CENTRAL, label: 'East & Central' },
+  { value: PortalRegion.NORTH_EAST, label: 'North East' },
+] as const;
 
 export interface PortalSourceInfo {
   id: string;
   name: string;
   domain: string;
   url: string;
-  category: 'Central' | 'State' | 'Defense & PSU' | 'Railways' | 'Open Data';
+  category: PortalCategory;
   state: string;
-  region: 'National' | 'North' | 'South' | 'West' | 'East & Central' | 'North East';
+  region: PortalRegion;
   description: string;
   keyAuthorities: string[];
   procurementTypes: string[];
   statutoryFramework: string;
-  status: 'LIVE' | 'ACTIVE';
+  status: PortalStatus;
   activeCountEstimate: number;
 }
 

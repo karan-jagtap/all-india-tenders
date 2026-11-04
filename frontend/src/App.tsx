@@ -18,6 +18,7 @@ import { PreviouslyAcceptedTendersTab } from './components/PreviouslyAcceptedTen
 import { CurrentTendersTab } from './components/CurrentTendersTab';
 import { RegisteredBiddersTab } from './components/RegisteredBiddersTab';
 import { getPlatformStats, triggerLiveScrape, PlatformStats, ScrapeReport } from './services/api';
+import { NavigationTab } from './types';
 import { loadContractorPools } from './constants/contractors';
 import { loadPortalSources } from './constants/portalSources';
 import { loadMasterFilters } from './constants/masterFilters';
@@ -25,7 +26,7 @@ import { loadUiFilters } from './constants/filters';
 
 export const App: React.FC = () => {
   const { toggleTheme, isDark } = useTheme();
-  const [activeTab, setActiveTab] = useState<'home' | 'current' | 'accepted' | 'bidders'>('home');
+  const [activeTab, setActiveTab] = useState<NavigationTab>(NavigationTab.HOME);
   const [stats, setStats] = useState<PlatformStats | null>(null);
   const [isSyncing, setIsSyncing] = useState<boolean>(false);
   const [syncNotice, setSyncNotice] = useState<string | null>(null);
@@ -97,7 +98,7 @@ export const App: React.FC = () => {
 
   const tabs = [
     {
-      id: 'home' as const,
+      id: NavigationTab.HOME,
       label: 'Home / Overview',
       subtitle: 'Landing dashboard & platform telemetry',
       icon: Home,
@@ -107,7 +108,7 @@ export const App: React.FC = () => {
       badge: undefined
     },
     {
-      id: 'current' as const,
+      id: NavigationTab.CURRENT,
       label: 'InProgress Tenders',
       subtitle: 'Live active notices & technical RFPs',
       icon: Radio,
@@ -118,7 +119,7 @@ export const App: React.FC = () => {
       badgeColor: 'bg-orange-700 text-white'
     },
     {
-      id: 'accepted' as const,
+      id: NavigationTab.ACCEPTED,
       label: 'Previously Accepted Tenders',
       subtitle: 'L1 awarded contracts & BOQ prices',
       icon: Award,
@@ -129,7 +130,7 @@ export const App: React.FC = () => {
       badgeColor: 'bg-emerald-700 text-white'
     },
     {
-      id: 'bidders' as const,
+      id: NavigationTab.BIDDERS,
       label: 'Registered Bidders',
       subtitle: 'Contractor directories & solvency books',
       icon: Users,
@@ -158,7 +159,7 @@ export const App: React.FC = () => {
           {/* Logo & Platform Name */}
           <div
             onClick={() => {
-              setActiveTab('home');
+              setActiveTab(NavigationTab.HOME);
               setIsMobileMenuOpen(false);
             }}
             className="flex items-center gap-2.5 sm:gap-3 min-w-0 cursor-pointer group"
@@ -422,16 +423,16 @@ export const App: React.FC = () => {
 
       {/* 4. Main Content Container (Mobile-Optimized Padding) */}
       <main className="w-full px-2.5 sm:px-6 py-4 max-w-[1920px] mx-auto flex-1">
-        {activeTab === 'home' ? (
+        {activeTab === NavigationTab.HOME ? (
           <HomeScreen
             stats={stats}
-            onNavigate={(tab) => setActiveTab(tab)}
+            onNavigate={(tab) => setActiveTab(tab as NavigationTab)}
             onTriggerSync={handleSyncLive}
             isSyncing={isSyncing}
           />
-        ) : activeTab === 'current' ? (
+        ) : activeTab === NavigationTab.CURRENT ? (
           <CurrentTendersTab key={`curr-${syncKey}`} />
-        ) : activeTab === 'accepted' ? (
+        ) : activeTab === NavigationTab.ACCEPTED ? (
           <PreviouslyAcceptedTendersTab key={`acc-${syncKey}`} />
         ) : (
           <RegisteredBiddersTab key={`bidders-${syncKey}`} />

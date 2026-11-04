@@ -1,13 +1,21 @@
+import {
+  RiskLevel,
+  AuthorityStrictness,
+  VolatilityRisk,
+  RiskVerdict,
+  StatutoryChecklistStatus
+} from './enums';
+
 export interface TenderClauseRiskAnalysis {
   id: string;
   clauseName: string;
   standardSbdReference: string;
   volumeSection: string;
-  riskLevel: 'LOW' | 'MEDIUM' | 'HIGH';
+  riskLevel: RiskLevel;
   extractedFormulaOrRule: string;
   riskAssessmentSummary: string;
   contractorMitigationAdvice: string;
-  authorityStrictness: 'STRICT ENFORCEMENT' | 'STANDARD GFR BENCHMARK' | 'DISCRETIONARY';
+  authorityStrictness: AuthorityStrictness;
 }
 
 export interface BOQParetoCostDriver {
@@ -21,7 +29,7 @@ export interface BOQParetoCostDriver {
   cumulativeParetoPct: number;
   isParetoDriver80_20: boolean;
   materialSensitivity: string;
-  volatilityRisk: 'HIGH SENSITIVITY' | 'MEDIUM SENSITIVITY' | 'LOW SENSITIVITY';
+  volatilityRisk: VolatilityRisk;
   hedgingStrategy: string;
 }
 
@@ -32,7 +40,7 @@ export interface DeepDocumentRAGReport {
   organization: string;
   estimatedCostInr: number;
   overallRiskScore: number;
-  riskVerdict: 'HIGHLY BANKABLE (LOW RISK)' | 'MODERATE COMMERCIAL RISK' | 'HIGH LEGAL EXPOSURE';
+  riskVerdict: RiskVerdict;
   pvcProtectionAvailable: boolean;
   mobilizationAdvanceAvailable: boolean;
   ldCapPct: number;
@@ -42,7 +50,7 @@ export interface DeepDocumentRAGReport {
   paretoCostDrivers: BOQParetoCostDriver[];
   statutoryChecklist: Array<{
     title: string;
-    status: 'COMPLIANT' | 'CRITICAL ATTENTION' | 'VERIFIED GFR';
+    status: StatutoryChecklistStatus;
     detail: string;
   }>;
 }

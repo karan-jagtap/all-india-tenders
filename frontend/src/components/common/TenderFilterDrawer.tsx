@@ -10,6 +10,7 @@ import {
   ChevronRight
 } from 'lucide-react';
 import { QUICK_PORTAL_PILLS } from '../../constants';
+import { FilterAccentColor } from '../../types';
 import { SearchableDropdown, DropdownOption } from './SearchableDropdown';
 
 export interface TenderFilterDrawerProps {
@@ -17,7 +18,7 @@ export interface TenderFilterDrawerProps {
   onClose: () => void;
   title?: string;
   subtitle?: string;
-  accentColor?: 'orange' | 'emerald' | 'blue';
+  accentColor?: FilterAccentColor;
   activeFiltersCount: number;
   hasActiveFilters: boolean;
   resetAllFilters: () => void;
@@ -206,6 +207,10 @@ export const TenderFilterDrawer: React.FC<TenderFilterDrawerProps> = ({
     }
   };
 
+  const handleToggleSourcePill = (pillVal: string) => {
+    setSelectedSource(selectedSource === pillVal ? 'ALL' : pillVal);
+  };
+
   return (
     <div className="fixed inset-0 z-50 overflow-hidden">
       {/* Backdrop overlay */}
@@ -310,7 +315,7 @@ export const TenderFilterDrawer: React.FC<TenderFilterDrawerProps> = ({
                   <button
                     key={pill.val}
                     type="button"
-                    onClick={() => setSelectedSource(selectedSource === pill.val ? 'ALL' : pill.val)}
+                    onClick={() => handleToggleSourcePill(pill.val)}
                     className={`px-2 py-1 rounded text-[10px] font-semibold flex items-center gap-1 transition-colors cursor-pointer ${
                       selectedSource === pill.val
                         ? pill.activeClass

@@ -392,7 +392,13 @@ export const CurrentTendersTab: React.FC = () => {
     return count;
   }, [selectedSource, selectedOrg, selectedState, selectedCity, selectedCategory, selectedValueRange, searchQuery]);
 
-  const resetAllFilters = () => {
+  const selectFirstTenderRecord = (tenderList: EnrichedCurrentTender[]) => {
+    const firstTender = tenderList[0];
+    const targetId = firstTender ? firstTender.id : '';
+    setSelectedTenderId(targetId);
+  };
+
+  const resetFilterStateValues = () => {
     setSelectedSource('ALL');
     setSelectedOrg('ALL');
     setSelectedState('ALL');
@@ -400,6 +406,46 @@ export const CurrentTendersTab: React.FC = () => {
     setSelectedCategory('ALL');
     setSelectedValueRange('ALL');
     setSearchQuery('');
+  };
+
+  const scrollListContainerToTop = () => {
+    if (listContainerRef.current) {
+      listContainerRef.current.scrollTop = 0;
+    }
+  };
+
+  const resetAllFilters = () => {
+    resetFilterStateValues();
+    selectFirstTenderRecord(tenders);
+    scrollListContainerToTop();
+  };
+
+  const handleOpenFilterDrawer = () => {
+    setIsFilterSidebarOpen(true);
+  };
+
+  const handleCloseFilterDrawer = () => {
+    setIsFilterSidebarOpen(false);
+  };
+
+  const handleOpenWholeDocModal = () => {
+    setIsWholeDocModalOpen(true);
+  };
+
+  const handleCloseWholeDocModal = () => {
+    setIsWholeDocModalOpen(false);
+  };
+
+  const handleClosePortalModal = () => {
+    setIsPortalModalOpen(false);
+  };
+
+  const handleSelectTenderCard = (tender: EnrichedCurrentTender) => {
+    setSelectedTenderId(tender.id);
+    setActiveSubTab('specs');
+    if (window.innerWidth < 1024) {
+      dossierRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }
   };
 
   const pdfUrl = useMemo(() => (selectedTender ? getCurrentTenderPdfUrl(selectedTender.id) : ''), [selectedTender?.id]);
@@ -513,7 +559,7 @@ export const CurrentTendersTab: React.FC = () => {
         activeFiltersCount={activeFiltersCount}
         hasActiveFilters={hasActiveFilters}
         resetAllFilters={resetAllFilters}
-        onOpenFilterDrawer={() => setIsFilterSidebarOpen(true)}
+        onOpenFilterDrawer={handleOpenFilterDrawer}
         loadData={handleRunLiveScraper}
         loading={isScrapingLive}
         totalTendersCount={tenders.length}
@@ -522,7 +568,7 @@ export const CurrentTendersTab: React.FC = () => {
       {/* Overlapping Filter Drawer (Slides from Right) */}
       <CurrentTenderFilterDrawer
         isOpen={isFilterSidebarOpen}
-        onClose={() => setIsFilterSidebarOpen(false)}
+        onClose={handleCloseFilterDrawer}
         activeFiltersCount={activeFiltersCount}
         hasActiveFilters={hasActiveFilters}
         resetAllFilters={resetAllFilters}
@@ -584,13 +630,7 @@ export const CurrentTendersTab: React.FC = () => {
                   key={tender.id}
                   tender={tender}
                   isSelected={isSelected}
-                  onSelect={() => {
-                    setSelectedTenderId(tender.id);
-                    setActiveSubTab('specs');
-                    if (window.innerWidth < 1024) {
-                      dossierRef.current?.scrollIntoView({ behavior: 'smooth' });
-                    }
-                  }}
+                  onSelect={() => handleSelectTenderCard(tender)}
                   onCopyNit={handleCopyNit}
                   copiedNit={copiedNit}
                 />
@@ -655,7 +695,7 @@ export const CurrentTendersTab: React.FC = () => {
                 onCopyNit={handleCopyNit}
                 copiedNit={copiedNit}
                 onOpenPortalBridge={handleOpenPortalBridge}
-                onOpenWholeDoc={() => setIsWholeDocModalOpen(true)}
+                onOpenWholeDoc={handleOpenWholeDocModal}
                 activeSubTab={activeSubTab}
                 setActiveSubTab={setActiveSubTab}
                 sbdUrl={sbdUrl}
@@ -686,7 +726,7 @@ export const CurrentTendersTab: React.FC = () => {
                   pdfUrl={pdfUrl}
                   boqUrl={boqUrl}
                   onOpenPortalBridge={handleOpenPortalBridge}
-                  onOpenWholeDoc={() => setIsWholeDocModalOpen(true)}
+                  onOpenWholeDoc={handleOpenWholeDocModal}
                 />
               )}
 
@@ -720,7 +760,7 @@ export const CurrentTendersTab: React.FC = () => {
       {/* Official Portal Direct Navigation Modal */}
       <PortalBridgeModal
         isOpen={isPortalModalOpen}
-        onClose={() => setIsPortalModalOpen(false)}
+        onClose={handleClosePortalModal}
         tender={selectedTender}
         copiedNit={copiedNit}
         onCopyNit={handleCopyNit}
@@ -729,7 +769,7 @@ export const CurrentTendersTab: React.FC = () => {
       {/* Whole Tender Document In-App Reader Modal (Downloadable) */}
       <WholeTenderDocModal
         isOpen={isWholeDocModalOpen}
-        onClose={() => setIsWholeDocModalOpen(false)}
+        onClose={handleCloseWholeDocModal}
         tender={selectedTender}
         sbdUrl={sbdUrl}
       />
