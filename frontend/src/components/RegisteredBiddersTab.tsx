@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
-import { Building2, AlertCircle } from 'lucide-react';
+import { Building2, AlertCircle, Tag, MapPin, TrendingUp } from 'lucide-react';
 import { RegisteredBidder, BidderWonContract } from '../types';
 import { listRegisteredBidders } from '../services/api';
+import { FilterChipItem } from './common';
 import {
   BidderBanner,
   BidderFilterBar,
+  BidderFilterDrawer,
   BidderSortOption,
   BidderCard,
   BidderDossier,
@@ -26,8 +28,72 @@ export const RegisteredBiddersTab: React.FC = () => {
 
   const [contractSearchQuery, setContractSearchQuery] = useState<string>('');
   const [rightColumnHeight, setRightColumnHeight] = useState<number | null>(null);
+  const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState<boolean>(false);
+  const [isVoiceSearching, setIsVoiceSearching] = useState<boolean>(false);
+  const voiceSearchRef = useRef<any>(null);
   const dossierRef = useRef<HTMLDivElement>(null);
   const listContainerRef = useRef<HTMLDivElement>(null);
+
+  const toggleVoiceSearch = () => {
+    const SpeechRecognition =
+      (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+
+    if (!SpeechRecognition) {
+      alert('Voice search is not supported in this browser. Please use Chrome, Edge, or Safari.');
+      return;
+    }
+
+    if (isVoiceSearching) {
+      if (voiceSearchRef.current) {
+        voiceSearchRef.current.stop();
+      }
+      setIsVoiceSearching(false);
+      return;
+    }
+
+    try {
+      const recognition = new SpeechRecognition();
+      recognition.lang = 'en-IN';
+      recognition.continuous = false;
+      recognition.interimResults = true;
+
+      recognition.onstart = () => {
+        setIsVoiceSearching(true);
+      };
+
+      recognition.onresult = (event: any) => {
+        const transcript = Array.from(event.results)
+          .map((res: any) => res[0].transcript)
+          .join('');
+        setSearchQuery(transcript);
+      };
+
+      recognition.onerror = (event: any) => {
+        console.warn('Voice search error:', event.error);
+        setIsVoiceSearching(false);
+      };
+
+      recognition.onend = () => {
+        setIsVoiceSearching(false);
+      };
+
+      voiceSearchRef.current = recognition;
+      recognition.start();
+    } catch (e) {
+      console.error('Failed to start voice search', e);
+      setIsVoiceSearching(false);
+    }
+  };
+
+  useEffect(() => {
+    return () => {
+      if (voiceSearchRef.current) {
+        try {
+          voiceSearchRef.current.stop();
+        } catch (_) {}
+      }
+    };
+  }, []);
 
   const loadData = () => {
     setLoading(true);
@@ -233,7 +299,96 @@ export const RegisteredBiddersTab: React.FC = () => {
     }
   };
 
-  const hasActiveFilters = searchQuery.trim() !== '' || selectedCategory !== 'ALL' || selectedState !== 'ALL';
+  const handleOpenFilterDrawer = () => {
+    setIsFilterDrawerOpen(true);
+  };
+
+  const handleCloseFilterDrawer = () => {
+    setIsFilterDrawerOpen(false);
+  };
+
+  const handleRemoveCategoryChip = () => {
+    setSelectedCategory('ALL');
+  };
+
+  const handleRemoveStateChip = () => {
+    setSelectedState('ALL');
+  };
+
+  const handleResetSortChip = () => {
+    setSortBy('NAME_ASC');
+  };
+
+  const handleRemoveSearchChip = () => {
+    setSearchQuery('');
+  };
+
+  const activeChips: FilterChipItem[] = useMemo(() => {
+    const list: FilterChipItem[] = [];
+
+    if (selectedCategory !== 'ALL') {
+      list.push({
+        id: 'category',
+        label: 'Specialization',
+        value: selectedCategory,
+        color: 'blue',
+        icon: <Tag className="w-3 h-3 text-blue-500" />,
+        onRemove: handleRemoveCategoryChip
+      });
+    }
+
+    if (selectedState !== 'ALL') {
+      list.push({
+        id: 'state',
+        label: 'State',
+        value: selectedState,
+        color: 'rose',
+        icon: <MapPin className="w-3 h-3 text-rose-500" />,
+        onRemove: handleRemoveStateChip
+      });
+    }
+
+    if (sortBy !== 'NAME_ASC') {
+      const sortLabelMap: Record<BidderSortOption, string> = {
+        NAME_ASC: 'Alphabetical (A → Z)',
+        NAME_DESC: 'Alphabetical (Z → A)',
+        CONTRACTS_DESC: 'Most Contracts',
+        VALUE_DESC: 'Highest Value',
+        TURNOVER_DESC: 'Highest Turnover'
+      };
+      list.push({
+        id: 'sort',
+        label: 'Sort',
+        value: sortLabelMap[sortBy],
+        color: 'emerald',
+        icon: <TrendingUp className="w-3 h-3 text-emerald-500" />,
+        onRemove: handleResetSortChip
+      });
+    }
+
+    if (searchQuery.trim() !== '') {
+      list.push({
+        id: 'query',
+        label: 'Query',
+        value: `"${searchQuery.trim()}"`,
+        color: 'slate',
+        onRemove: handleRemoveSearchChip
+      });
+    }
+
+    return list;
+  }, [selectedCategory, selectedState, sortBy, searchQuery]);
+
+  const activeFiltersCount = useMemo(() => {
+    let count = 0;
+    if (selectedCategory !== 'ALL') count++;
+    if (selectedState !== 'ALL') count++;
+    if (sortBy !== 'NAME_ASC') count++;
+    if (searchQuery.trim() !== '') count++;
+    return count;
+  }, [selectedCategory, selectedState, sortBy, searchQuery]);
+
+  const hasActiveFilters = activeFiltersCount > 0;
 
   return (
     <div className="space-y-4">
@@ -248,19 +403,37 @@ export const RegisteredBiddersTab: React.FC = () => {
       <BidderFilterBar
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
+        isVoiceSearching={isVoiceSearching}
+        toggleVoiceSearch={toggleVoiceSearch}
+        onOpenFilterDrawer={handleOpenFilterDrawer}
+        activeFiltersCount={activeFiltersCount}
+        hasActiveFilters={hasActiveFilters}
+        resetFilters={resetFilters}
+        onReload={loadData}
+        isLoading={loading}
+        totalBidders={bidders.length}
+        chips={activeChips}
+      />
+
+      {/* Overlapping Filter Drawer (Slides from Right) */}
+      <BidderFilterDrawer
+        isOpen={isFilterDrawerOpen}
+        onClose={handleCloseFilterDrawer}
+        activeFiltersCount={activeFiltersCount}
+        hasActiveFilters={hasActiveFilters}
+        resetAllFilters={resetFilters}
+        totalFilteredCount={filteredBidders.length}
         selectedCategory={selectedCategory}
         setSelectedCategory={setSelectedCategory}
         allCategories={allCategories}
         categoryCounts={categoryCounts}
+        totalBidders={bidders.length}
         selectedState={selectedState}
         setSelectedState={setSelectedState}
         allStates={allStates}
         stateCounts={stateCounts}
-        totalBidders={bidders.length}
         sortBy={sortBy}
         setSortBy={setSortBy}
-        hasActiveFilters={hasActiveFilters}
-        resetFilters={resetFilters}
       />
 
       {error && (

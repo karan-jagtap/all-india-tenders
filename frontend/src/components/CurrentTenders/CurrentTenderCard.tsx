@@ -1,5 +1,5 @@
 import React from 'react';
-import { Calendar, Building2, MapPin, ChevronRight, Copy, Check, Download, ShieldCheck } from 'lucide-react';
+import { Calendar, Building2, MapPin, Copy, Check, Download, ShieldCheck } from 'lucide-react';
 import { EnrichedCurrentTender } from '../../types';
 import { formatINR, getUrgencyBadge } from '../../utils';
 
@@ -145,12 +145,6 @@ export const CurrentTenderCard: React.FC<CurrentTenderCardProps> = ({
           <span className="text-orange-700 dark:text-orange-400 font-medium">Bids Open</span>
         </div>
       </div>
-
-      {isSelected && (
-        <div className="absolute right-2 top-1/2 -translate-y-1/2 text-orange-500">
-          <ChevronRight className="w-5 h-5" />
-        </div>
-      )}
     </div>
   );
 };

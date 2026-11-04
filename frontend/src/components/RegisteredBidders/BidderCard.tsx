@@ -1,5 +1,5 @@
 import React from 'react';
-import { MapPin, ChevronRight } from 'lucide-react';
+import { MapPin } from 'lucide-react';
 import { RegisteredBidder } from '../../types';
 import { formatCr } from '../../utils';
 
@@ -87,12 +87,6 @@ export const BidderCard: React.FC<BidderCardProps> = ({
           Make in India {bidder.local_content_pct}%
         </span>
       </div>
-
-      {isSelected && (
-        <div className="absolute right-2 top-1/2 -translate-y-1/2 text-blue-600">
-          <ChevronRight className="w-5 h-5" />
-        </div>
-      )}
     </div>
   );
 };
