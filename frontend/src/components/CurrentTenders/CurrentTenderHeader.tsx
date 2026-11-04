@@ -16,8 +16,7 @@ import {
   Download,
   Building2,
   MapPin,
-  Globe,
-  Shield
+  Globe
 } from 'lucide-react';
 import { EnrichedCurrentTender, SubTabType, CurrentTenderSubTab } from '../../types';
 import { formatINR } from '../../utils';
@@ -84,14 +83,6 @@ export const CurrentTenderHeader: React.FC<CurrentTenderHeaderProps> = ({
           <Globe className="w-3 h-3 text-slate-500 dark:text-slate-400" />
           <span>{selectedTender.source_portal}</span>
         </span>
-
-        {/* Procurement / Tender Type Badge */}
-        {selectedTender.tender_type && (
-          <span className="inline-flex items-center gap-1 text-[11px] bg-blue-50 dark:bg-blue-950/40 text-blue-800 dark:text-blue-300 px-2.5 py-1 rounded-md border border-blue-200 dark:border-blue-900/50 font-medium whitespace-nowrap shrink-0">
-            <Shield className="w-3 h-3 text-blue-600 dark:text-blue-400" />
-            <span>{selectedTender.tender_type}</span>
-          </span>
-        )}
 
         {/* OGD / data.gov.in Badge */}
         {(selectedTender.is_ogd_open_data || selectedTender.source_portal?.includes('data.gov.in')) && (

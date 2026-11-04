@@ -1,5 +1,5 @@
 import React from 'react';
-import { Calendar, Building2, MapPin, Copy, Check, Download, ShieldCheck } from 'lucide-react';
+import { Calendar, Building2, MapPin, Copy, Check, Download } from 'lucide-react';
 import { EnrichedCurrentTender } from '../../types';
 import { formatINR, getUrgencyBadge } from '../../utils';
 
@@ -88,10 +88,6 @@ export const CurrentTenderCard: React.FC<CurrentTenderCardProps> = ({
         </span>
         <span className="inline-flex items-center gap-1 bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-200 dark:border-indigo-900/60 px-1.5 py-0.5 rounded text-[9px] text-indigo-700 dark:text-indigo-300 font-semibold">
           📑 SBD & NIT Docs
-        </span>
-        <span className="inline-flex items-center gap-1 bg-emerald-50/80 dark:bg-emerald-950/40 border border-emerald-200/80 dark:border-emerald-900/60 px-1.5 py-0.5 rounded text-[9px] text-emerald-800 dark:text-emerald-300 font-semibold">
-          <ShieldCheck className="w-2.5 h-2.5 text-emerald-600 dark:text-emerald-400" />
-          <span>{tender.tender_type ? tender.tender_type.split('(')[0].trim() : 'Open e-Tender'}</span>
         </span>
       </div>
 

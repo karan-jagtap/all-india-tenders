@@ -26,8 +26,8 @@ export const ScopeAndSpecsSubTab: React.FC<ScopeAndSpecsSubTabProps> = ({ select
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-3 border-t border-slate-200 dark:border-slate-700">
           <div>
-            <span className="text-[10px] text-slate-400 uppercase font-semibold block">Tender Type</span>
-            <span className="font-semibold text-slate-800 dark:text-slate-200">{selectedTender.tender_type || 'Open e-Tender'}</span>
+            <span className="text-[10px] text-slate-400 uppercase font-semibold block">Bidding Procedure</span>
+            <span className="font-semibold text-slate-800 dark:text-slate-200">Open Competitive Bidding (Two-Cover System)</span>
           </div>
           <div>
             <span className="text-[10px] text-slate-400 uppercase font-semibold block">Published Date</span>
