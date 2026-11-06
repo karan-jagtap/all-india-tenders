@@ -26,7 +26,8 @@ async def get_current_tenders(
     category: Optional[str] = Query(None, description="Filter by Category"),
     search: Optional[str] = Query(None, description="Keyword search in title, authority, ref no, location"),
     min_cost: Optional[float] = Query(None, description="Minimum estimated cost in INR"),
-    max_cost: Optional[float] = Query(None, description="Maximum estimated cost in INR")
+    max_cost: Optional[float] = Query(None, description="Maximum estimated cost in INR"),
+    include_closed: bool = Query(True, description="Include closed / expired notices under technical evaluation")
 ):
     """
     Returns live, active tenders currently open for bid submission across Indian portals.
@@ -39,7 +40,8 @@ async def get_current_tenders(
         category=category,
         search=search,
         min_cost=min_cost,
-        max_cost=max_cost
+        max_cost=max_cost,
+        include_closed=include_closed
     )
     return JSONResponse(
         content=tenders,

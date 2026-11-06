@@ -1027,20 +1027,28 @@ def list_current_tenders(
     category: Optional[str] = None,
     search: Optional[str] = None,
     min_cost: Optional[float] = None,
-    max_cost: Optional[float] = None
+    max_cost: Optional[float] = None,
+    include_closed: bool = True
 ) -> List[Dict[str, Any]]:
     """Filters current tenders by portal, organization, state, city, category, value, and search.
-    Strictly includes ONLY tenders that are actively in progress, open for bidding, and NOT yet filled or awarded."""
+    When include_closed=True, includes tenders whose submission deadline has elapsed (under technical evaluation)."""
     today_str = date.today().strftime("%Y-%m-%d")
-    items = [
-        t for t in ALL_CURRENT_TENDERS
-        if not t.get("is_filled", False)
-        and not t.get("is_awarded", False)
-        and (t.get("days_left", 1) > 0)
-        and (t.get("closing_date", "9999-12-31") >= today_str)
-        and ("AWARDED" not in t.get("status", "").upper())
-        and ("CLOSED" not in t.get("status", "").upper())
-    ]
+    if include_closed:
+        items = [
+            t for t in ALL_CURRENT_TENDERS
+            if not t.get("is_awarded", False)
+            and ("AWARDED" not in t.get("status", "").upper())
+        ]
+    else:
+        items = [
+            t for t in ALL_CURRENT_TENDERS
+            if not t.get("is_filled", False)
+            and not t.get("is_awarded", False)
+            and (t.get("days_left", 1) > 0)
+            and (t.get("closing_date", "9999-12-31") >= today_str)
+            and ("AWARDED" not in t.get("status", "").upper())
+            and ("CLOSED" not in t.get("status", "").upper())
+        ]
 
     if source_portal and source_portal != "ALL":
         items = [t for t in items if t["source_portal"] == source_portal]

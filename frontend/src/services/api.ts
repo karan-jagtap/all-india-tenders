@@ -24,6 +24,7 @@ export interface CurrentTenderFilters {
   search?: string;
   min_cost?: number;
   max_cost?: number;
+  include_closed?: boolean;
 }
 
 export async function listAcceptedTenders(): Promise<AcceptedTender[]> {
@@ -65,6 +66,7 @@ export async function listCurrentTenders(filters?: CurrentTenderFilters): Promis
   if (filters?.search) params.append('search', filters.search);
   if (filters?.min_cost) params.append('min_cost', String(filters.min_cost));
   if (filters?.max_cost) params.append('max_cost', String(filters.max_cost));
+  if (filters?.include_closed !== undefined) params.append('include_closed', String(filters.include_closed));
   params.append('_t', String(Date.now()));
 
   try {

@@ -49,15 +49,25 @@ export const CurrentTenderHeader: React.FC<CurrentTenderHeaderProps> = ({
   nitPdfUrl,
   boqUrl
 }) => {
+  const todayStr = new Date().toISOString().split('T')[0];
+  const isClosed = (selectedTender.days_left !== undefined && selectedTender.days_left <= 0) || (Boolean(selectedTender.closing_date) && selectedTender.closing_date < todayStr);
+
   return (
     <div className="bg-white dark:bg-[#0E1422] rounded-xl border border-slate-200/90 dark:border-slate-800 p-5 shadow-xs transition-colors">
       {/* Top Meta Badges Bar */}
       <div className="flex flex-wrap items-center gap-2 mb-3">
         {/* Status Badge */}
-        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-bold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800/60 shadow-2xs shrink-0">
-          <span className="w-2 h-2 rounded-full bg-emerald-600 animate-ping inline-block" />
-          <span>IN PROGRESS • UNFILLED</span>
-        </span>
+        {isClosed ? (
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-bold bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 border border-amber-300 dark:border-amber-800/60 shadow-2xs shrink-0">
+            <span className="w-2 h-2 rounded-full bg-amber-600 inline-block" />
+            <span>UNDER EVALUATION • BIDS CLOSED</span>
+          </span>
+        ) : (
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-bold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800/60 shadow-2xs shrink-0">
+            <span className="w-2 h-2 rounded-full bg-emerald-600 animate-ping inline-block" />
+            <span>IN PROGRESS • UNFILLED (OPEN)</span>
+          </span>
+        )}
 
         {/* Reference ID Pill */}
         <div className="inline-flex items-center gap-1.5 bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 px-2.5 py-1 rounded-md text-xs font-mono text-slate-700 dark:text-slate-300 whitespace-nowrap shrink-0">
@@ -216,7 +226,11 @@ export const CurrentTenderHeader: React.FC<CurrentTenderHeaderProps> = ({
               <span className="font-mono text-rose-700 dark:text-rose-400">{selectedTender.closing_date} at {selectedTender.submission_deadline_time}</span>
             </div>
             <div className="text-[11px] text-orange-800 dark:text-orange-300">
-              {selectedTender.days_left > 0 ? (
+              {isClosed ? (
+                <span className="text-slate-600 dark:text-slate-400 font-semibold">
+                  🔒 Bid submission deadline elapsed on {selectedTender.closing_date} • Technical & financial evaluation in progress.
+                </span>
+              ) : selectedTender.days_left > 0 ? (
                 <span>⚡ Exactly <strong>{selectedTender.days_left} calendar days left</strong> before submission window closes.</span>
               ) : (
                 <span className="text-rose-700 dark:text-rose-400 font-bold">Closing today! Final hours.</span>

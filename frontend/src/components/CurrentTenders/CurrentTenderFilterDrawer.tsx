@@ -49,6 +49,12 @@ export interface CurrentTenderFilterDrawerProps {
   // Value Range
   selectedValueRange: string;
   setSelectedValueRange: (v: string) => void;
+
+  // Closed / Expired Toggle
+  includeClosed: boolean;
+  setIncludeClosed: (inc: boolean) => void;
+  openCount: number;
+  totalAvailableCount: number;
 }
 
 export const CurrentTenderFilterDrawer: React.FC<CurrentTenderFilterDrawerProps> = ({
@@ -84,7 +90,11 @@ export const CurrentTenderFilterDrawer: React.FC<CurrentTenderFilterDrawerProps>
   categoryCounts,
   contextCategoryCount,
   selectedValueRange,
-  setSelectedValueRange
+  setSelectedValueRange,
+  includeClosed,
+  setIncludeClosed,
+  openCount,
+  totalAvailableCount
 }) => {
   return (
     <TenderFilterDrawer
@@ -123,24 +133,68 @@ export const CurrentTenderFilterDrawer: React.FC<CurrentTenderFilterDrawerProps>
       cityCounts={cityCounts}
       contextCityCount={contextCityCount}
       extraFilters={
-        <div className="space-y-1.5">
-          <div className="flex items-center justify-between">
-            <label className="text-xs font-bold text-slate-200 flex items-center gap-1.5">
-              <Clock className="w-3.5 h-3.5 text-yellow-400" />
-              <span>Estimated Value & Urgency</span>
-            </label>
+        <div className="space-y-4">
+          {/* Include Closed / Expired Notices Toggle */}
+          <div className="bg-slate-800/80 border border-slate-700/80 rounded-xl p-3.5 space-y-2">
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <label
+                  className="text-xs font-bold text-white flex items-center gap-1.5 cursor-pointer"
+                  onClick={() => setIncludeClosed(!includeClosed)}
+                >
+                  <Clock className="w-3.5 h-3.5 text-amber-400" />
+                  <span>Include Closed / Expired Notices</span>
+                </label>
+                <p className="text-[11px] text-slate-400 mt-1 leading-relaxed">
+                  Include notices whose bid submission deadline has elapsed (under technical & financial evaluation).
+                </p>
+              </div>
+              <button
+                type="button"
+                role="switch"
+                aria-checked={includeClosed}
+                onClick={() => setIncludeClosed(!includeClosed)}
+                className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
+                  includeClosed ? 'bg-orange-600' : 'bg-slate-700'
+                }`}
+              >
+                <span
+                  className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-lg ring-0 transition duration-200 ease-in-out ${
+                    includeClosed ? 'translate-x-5' : 'translate-x-0'
+                  }`}
+                />
+              </button>
+            </div>
+            <div className="flex items-center gap-2 pt-1.5 border-t border-slate-700/60 text-[10px] text-slate-300">
+              <span className={`px-2 py-0.5 rounded font-semibold ${!includeClosed ? 'bg-emerald-950/80 text-emerald-300 border border-emerald-800' : 'bg-slate-900 text-slate-400'}`}>
+                Open Bids: {openCount.toLocaleString()}
+              </span>
+              <span className={`px-2 py-0.5 rounded font-semibold ${includeClosed ? 'bg-orange-950/80 text-orange-300 border border-orange-800' : 'bg-slate-900 text-slate-400'}`}>
+                All Notices: {totalAvailableCount.toLocaleString()}
+              </span>
+            </div>
           </div>
-          <select
-            value={selectedValueRange}
-            onChange={(e) => setSelectedValueRange(e.target.value)}
-            className="w-full bg-slate-800 border border-slate-700 hover:border-slate-600 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-orange-500 cursor-pointer"
-          >
-            {VALUE_RANGE_OPTIONS.map((opt) => (
-              <option key={opt.value} value={opt.value} className="bg-slate-900 text-white">
-                {opt.label}
-              </option>
-            ))}
-          </select>
+
+          {/* Value Range Filter */}
+          <div className="space-y-1.5">
+            <div className="flex items-center justify-between">
+              <label className="text-xs font-bold text-slate-200 flex items-center gap-1.5">
+                <Clock className="w-3.5 h-3.5 text-yellow-400" />
+                <span>Estimated Value & Urgency</span>
+              </label>
+            </div>
+            <select
+              value={selectedValueRange}
+              onChange={(e) => setSelectedValueRange(e.target.value)}
+              className="w-full bg-slate-800 border border-slate-700 hover:border-slate-600 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-orange-500 cursor-pointer"
+            >
+              {VALUE_RANGE_OPTIONS.map((opt) => (
+                <option key={opt.value} value={opt.value} className="bg-slate-900 text-white">
+                  {opt.label}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
       }
     />

@@ -37,6 +37,9 @@ export interface CurrentTendersTopBarProps {
   loadData: () => void;
   loading: boolean;
   totalTendersCount: number;
+  includeClosed: boolean;
+  setIncludeClosed: (inc: boolean) => void;
+  openCount: number;
 }
 
 export const CurrentTendersTopBar: React.FC<CurrentTendersTopBarProps> = ({
@@ -62,7 +65,10 @@ export const CurrentTendersTopBar: React.FC<CurrentTendersTopBarProps> = ({
   onOpenFilterDrawer,
   loadData,
   loading,
-  totalTendersCount
+  totalTendersCount,
+  includeClosed,
+  setIncludeClosed,
+  openCount
 }) => {
   const handleRemoveCategoryChip = () => {
     setSelectedCategory('ALL');
@@ -181,6 +187,16 @@ export const CurrentTendersTopBar: React.FC<CurrentTendersTopBarProps> = ({
       });
     }
 
+    if (includeClosed) {
+      list.push({
+        id: 'includeClosed',
+        label: 'Scope',
+        value: 'All Notices (Incl. Closed)',
+        color: 'blue',
+        onRemove: () => setIncludeClosed(false)
+      });
+    }
+
     return list;
   }, [
     selectedCategory,
@@ -190,6 +206,8 @@ export const CurrentTendersTopBar: React.FC<CurrentTendersTopBarProps> = ({
     selectedCity,
     selectedValueRange,
     searchQuery,
+    includeClosed,
+    setIncludeClosed,
     setSelectedCategory,
     setSelectedSource,
     setSelectedOrg,
@@ -201,8 +219,8 @@ export const CurrentTendersTopBar: React.FC<CurrentTendersTopBarProps> = ({
 
   return (
     <div className="bg-white dark:bg-[#0E1422] border border-slate-200/90 dark:border-slate-800 rounded-xl p-3 shadow-xs space-y-2.5">
-      {/* Clean Single Row Toolbar: Search on LEFT, Filter button & Reload on RIGHT */}
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+      {/* Clean Single Row Toolbar: Search on LEFT, Toggle & Action buttons on RIGHT */}
+      <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3">
         {/* Reusable Search Bar Component */}
         <FilterSearchBar
           searchQuery={searchQuery}
@@ -214,18 +232,49 @@ export const CurrentTendersTopBar: React.FC<CurrentTendersTopBarProps> = ({
           className="max-w-xl"
         />
 
-        {/* Reusable Top Action Bar Component */}
-        <TopFilterActionBar
-          onOpenFilters={onOpenFilterDrawer}
-          activeFiltersCount={activeFiltersCount}
-          hasActiveFilters={hasActiveFilters}
-          onResetFilters={resetAllFilters}
-          onReload={loadData}
-          isLoading={loading}
-          totalCount={totalTendersCount}
-          reloadLabel="Reload"
-          accentColor="orange"
-        />
+        <div className="flex flex-wrap items-center justify-end gap-2">
+          {/* Quick Lifecycle Toggle Pill */}
+          <div className="flex items-center bg-slate-100 dark:bg-slate-800 p-0.5 rounded-lg border border-slate-200 dark:border-slate-700/80 text-xs shrink-0">
+            <button
+              type="button"
+              onClick={() => setIncludeClosed(false)}
+              className={`px-2.5 py-1.5 rounded-md font-semibold transition-all flex items-center gap-1.5 cursor-pointer text-xs ${
+                !includeClosed
+                  ? 'bg-white dark:bg-slate-700 text-emerald-700 dark:text-emerald-300 shadow-2xs'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+              }`}
+              title="Show only open tenders actively accepting bids"
+            >
+              <span className={`w-2 h-2 rounded-full ${!includeClosed ? 'bg-emerald-500 animate-pulse' : 'bg-slate-400'}`} />
+              <span>Open Bids ({openCount.toLocaleString()})</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setIncludeClosed(true)}
+              className={`px-2.5 py-1.5 rounded-md font-semibold transition-all flex items-center gap-1.5 cursor-pointer text-xs ${
+                includeClosed
+                  ? 'bg-white dark:bg-slate-700 text-orange-700 dark:text-orange-300 shadow-2xs'
+                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+              }`}
+              title="Show all notices including closed / under technical evaluation"
+            >
+              <span>All Notices ({totalTendersCount.toLocaleString()})</span>
+            </button>
+          </div>
+
+          {/* Reusable Top Action Bar Component */}
+          <TopFilterActionBar
+            onOpenFilters={onOpenFilterDrawer}
+            activeFiltersCount={activeFiltersCount}
+            hasActiveFilters={hasActiveFilters}
+            onResetFilters={resetAllFilters}
+            onReload={loadData}
+            isLoading={loading}
+            totalCount={totalTendersCount}
+            reloadLabel="Reload"
+            accentColor="orange"
+          />
+        </div>
       </div>
 
       {/* Reusable Applied Filters Tag Chips Bar */}
