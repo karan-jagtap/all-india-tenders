@@ -1,5 +1,5 @@
 import React from 'react';
-import { Radio, TrendingDown, Award, Users, Globe, Cpu, ChevronRight } from 'lucide-react';
+import { Radio, TrendingDown, Award, Users, Globe, ChevronRight } from 'lucide-react';
 import { NavigableTab } from '../../../types';
 
 export interface HomeMetricsBarProps {
@@ -20,7 +20,7 @@ export const HomeMetricsBar: React.FC<HomeMetricsBarProps> = ({
   onScrollToSources
 }) => {
   return (
-    <section className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
+    <section className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
       {/* Metric 1: Live Notices */}
       <div
         onClick={() => onNavigate('current')}
@@ -114,22 +114,6 @@ export const HomeMetricsBar: React.FC<HomeMetricsBarProps> = ({
         <span className="text-[11px] text-cyan-700 dark:text-cyan-400 font-medium flex items-center gap-1 mt-0.5">
           <span>51 Endpoints Monitored</span>
           <ChevronRight className="w-3 h-3" />
-        </span>
-      </div>
-
-      {/* Metric 6: Architecture */}
-      <div className="bg-white dark:bg-[#0E1422] border border-slate-200/90 dark:border-slate-800 rounded-xl p-4 shadow-[0_1px_3px_rgba(15,23,42,0.04)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.3)]">
-        <div className="flex items-center justify-between text-slate-400 mb-1">
-          <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-            Architecture
-          </span>
-          <Cpu className="w-4 h-4 text-purple-600 dark:text-purple-400" />
-        </div>
-        <div className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white font-mono tracking-tight">
-          0 DB
-        </div>
-        <span className="text-[11px] text-purple-700 dark:text-purple-400 font-mono font-medium">
-          100% In-Memory RAM
         </span>
       </div>
     </section>
