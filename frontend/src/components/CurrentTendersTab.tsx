@@ -594,9 +594,6 @@ export const CurrentTendersTab: React.FC = () => {
         loadData={handleRunLiveScraper}
         loading={isScrapingLive}
         totalTendersCount={tenders.length}
-        includeClosed={includeClosed}
-        setIncludeClosed={setIncludeClosed}
-        openCount={openCount}
       />
 
       {/* Overlapping Filter Drawer (Slides from Right) */}
