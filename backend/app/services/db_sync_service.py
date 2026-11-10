@@ -9,7 +9,8 @@ from typing import Dict, Any, List
 from sqlalchemy import select, update
 from app.db.session import async_session_factory
 from app.db.models import Tender, SourcePortal
-from app.services.current_tenders_service import run_pure_scraping_sync, ALL_CURRENT_TENDERS
+import app.services.current_tenders_service as cts
+from app.services.current_tenders_service import run_pure_scraping_sync
 from app.services.gem_service import fetch_live_gem_bids
 
 logger = logging.getLogger("db_sync")
@@ -23,23 +24,22 @@ async def sync_scraped_data_to_db() -> Dict[str, Any]:
     
     # 1. Run statutory scraping sync (in-memory)
     sync_result = run_pure_scraping_sync()
-    logger.info(f"[DBSync] Ingestion complete. In-memory count: {len(ALL_CURRENT_TENDERS)}")
+    all_tenders = cts.ALL_CURRENT_TENDERS
+    logger.info(f"[DBSync] Ingestion complete. In-memory count: {len(all_tenders)}")
 
-    # 2. Persist to Database
+    # 2. Persist to Database with optimized bulk checking
     db_upserted = 0
     async with async_session_factory() as session:
-        for t in ALL_CURRENT_TENDERS:
+        # Retrieve all currently tracked IDs in a single query
+        existing_res = await session.execute(select(Tender.id))
+        existing_ids = set(existing_res.scalars().all())
+
+        for t in all_tenders:
             t_id = t.get("id")
             if not t_id:
                 continue
 
-            existing = await session.get(Tender, t_id)
-            if existing:
-                # Update dynamic fields
-                existing.days_left = int(t.get("days_left", 0))
-                existing.status = str(t.get("status", "In-Progress"))
-                existing.close_date = str(t.get("close_date", ""))
-            else:
+            if t_id not in existing_ids:
                 session.add(Tender(
                     id=t_id,
                     nit_number=t.get("nit_number"),
@@ -48,8 +48,8 @@ async def sync_scraped_data_to_db() -> Dict[str, Any]:
                     source_portal=t.get("source_portal"),
                     category_id=t.get("category", "Civil & Infrastructure Works").lower().replace(" ", "-")[:80],
                     category=t.get("category"),
-                    organisation_id=t.get("organisation", "").lower().replace(" ", "-")[:100],
-                    organisation=t.get("organisation"),
+                    organisation_id=t.get("organisation", t.get("organization", "")).lower().replace(" ", "-")[:100],
+                    organisation=t.get("organisation", t.get("organization")),
                     state_id=t.get("state", "Pan-India / Central").lower().replace(" ", "-")[:50],
                     state=t.get("state"),
                     city_id=f"{t.get('state', '')}-{t.get('city', '')}".lower().replace(" ", "-")[:80],
@@ -67,13 +67,15 @@ async def sync_scraped_data_to_db() -> Dict[str, Any]:
                     raw_data=t
                 ))
                 db_upserted += 1
+                existing_ids.add(t_id)
 
-        await session.commit()
+        if db_upserted > 0:
+            await session.commit()
 
     logger.info(f"[DBSync] Database sync complete. Upserted {db_upserted} notices.")
     return {
         "status": "success",
-        "total_in_memory": len(ALL_CURRENT_TENDERS),
+        "total_in_memory": len(all_tenders),
         "db_upserted": db_upserted,
         "sync_details": sync_result
     }

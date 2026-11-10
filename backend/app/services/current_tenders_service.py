@@ -970,28 +970,95 @@ ALL_CURRENT_TENDERS = get_all_current_tenders_catalog()
 def run_pure_scraping_sync() -> Dict[str, Any]:
     """
     Executes a pure live scraping refresh across public government tender endpoints:
-    1. eprocure.gov.in (Central CPPP)
-    2. mahatenders.gov.in (MahaTenders)
-    3. gem.gov.in (GeM BidPlus)
-    4. ireps.gov.in (Indian Railways e-Procurement)
-    5. tenderwizard.com/CPWD (CPWD E-Tender)
-    6. govtprocurement.delhi.gov.in (Delhi e-Procure)
-    7. etender.up.nic.in (UP e-Procure)
+    1. eprocure.gov.in (Central CPPP — Live Tenders by Organisation)
+    2. mahatenders.gov.in (MahaTenders — Live Tenders by Organisation)
+    3. etender.up.nic.in (UP e-Procure — Live Tenders by Organisation)
+    4. etenders.gov.in (Central State eProc — Live Tenders by Organisation)
+    5. defproc.gov.in (Defence eProc — Live Tenders by Organisation)
+    6. gem.gov.in (GeM BidPlus — Live Active Bids)
+    7. ireps.gov.in (Indian Railways e-Procurement)
+    8. tenderwizard.com/CPWD (CPWD E-Tender)
 
-    ZERO Database Requirement: All tenders are processed and served directly in RAM.
+    CAPTCHA-Free Architecture:
+    Uses the official statutory hierarchical route (page=FrontEndTendersByOrganisation)
+    which requires ZERO CAPTCHA and returns 100% genuine live government notices.
     """
     global ALL_CURRENT_TENDERS
     start_time = time.time()
 
-    # Trigger live GeM scrape refresh across active BidPlus pages
+    # 1. Trigger live GeM scrape refresh across active BidPlus pages
+    new_gem_count = 0
     try:
-        from app.services.gem_service import refresh_gem_bids
+        from app.services.gem_service import refresh_gem_bids, get_gem_bids_catalog
         refresh_gem_bids(pages=3)
+        gem_bids = get_gem_bids_catalog()
+        new_gem_count = len(gem_bids) if gem_bids else 0
     except Exception as e:
         print(f"[Current Tenders] GeM live refresh notice: {e}")
 
-    # Re-evaluate live catalog from scraping cache and portal feeds
-    ALL_CURRENT_TENDERS = get_all_current_tenders_catalog()
+    # 2. Trigger live statutory GePNIC multi-portal scrape (CPPP, MahaTenders, UP, etc.)
+    gepnic_scraped: List[Dict[str, Any]] = []
+    try:
+        from app.services.gepnic_scraper_service import scrape_all_statutory_portals
+        gepnic_scraped = scrape_all_statutory_portals(max_orgs_per_portal=4)
+        print(f"[Current Tenders] GePNIC scrape retrieved {len(gepnic_scraped)} live notices.")
+    except Exception as e:
+        print(f"[Current Tenders] GePNIC scrape error: {e}")
+
+    # 3. Load current baseline catalog
+    baseline = get_all_current_tenders_catalog()
+
+    # 4. Deduplicate and merge newly scraped tenders
+    existing_by_nit = {str(t.get("nit_number")).strip(): t for t in baseline if t.get("nit_number")}
+    existing_by_id = {str(t.get("id")).strip(): t for t in baseline if t.get("id")}
+    existing_by_title = {str(t.get("title")).strip().lower(): t for t in baseline if t.get("title")}
+
+    new_tenders: List[Dict[str, Any]] = []
+    for t in (gepnic_scraped or []):
+        nit = str(t.get("nit_number", "")).strip()
+        tid = str(t.get("id", "")).strip()
+        title_key = str(t.get("title", "")).strip().lower()
+
+        existing = (existing_by_nit.get(nit) if nit else None) or \
+                   (existing_by_id.get(tid) if tid else None) or \
+                   (existing_by_title.get(title_key) if title_key else None)
+
+        if existing:
+            # Update dynamic properties
+            existing["days_left"] = t.get("days_left", existing.get("days_left", 0))
+            existing["status"] = t.get("status", existing.get("status", ""))
+            existing["closing_date"] = t.get("closing_date", existing.get("closing_date", ""))
+            existing["submission_deadline_time"] = t.get("submission_deadline_time", existing.get("submission_deadline_time", ""))
+            if "tender_documents" not in existing or not existing["tender_documents"]:
+                existing["tender_documents"] = build_tender_documents(existing)
+        else:
+            if "tender_documents" not in t or not t["tender_documents"]:
+                t["tender_documents"] = build_tender_documents(t)
+            new_tenders.append(t)
+            if nit:
+                existing_by_nit[nit] = t
+            if tid:
+                existing_by_id[tid] = t
+            if title_key:
+                existing_by_title[title_key] = t
+
+    merged_catalog = new_tenders + baseline
+    ALL_CURRENT_TENDERS = merged_catalog
+
+    # 5. Persist merged catalog to JSON data files
+    try:
+        backend_json_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "data", "all_sources_current_catalog.json"))
+        frontend_json_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..", "frontend", "public", "data", "all_sources_current_catalog.json"))
+        
+        with open(backend_json_path, "w", encoding="utf-8") as f:
+            json.dump(merged_catalog, f, ensure_ascii=False, indent=2)
+            
+        if os.path.exists(os.path.dirname(frontend_json_path)):
+            with open(frontend_json_path, "w", encoding="utf-8") as f:
+                json.dump(merged_catalog, f, ensure_ascii=False, indent=2)
+    except Exception as save_err:
+        print(f"[Current Tenders] Error persisting JSON catalog: {save_err}")
+
     elapsed_ms = round((time.time() - start_time) * 1000, 2)
 
     portal_breakdown = {}
@@ -1001,10 +1068,11 @@ def run_pure_scraping_sync() -> Dict[str, Any]:
 
     return {
         "status": "success",
-        "message": f"Pure live scraping refresh completed. {len(ALL_CURRENT_TENDERS)} in-progress tenders active in memory.",
+        "message": f"Pure live scraping refresh completed. {len(ALL_CURRENT_TENDERS)} in-progress tenders active in memory ({len(new_tenders)} newly scraped).",
         "database_used": False,
         "database_note": "Zero database dependency. Application is purely scraping-based (In-Memory RAM Streaming).",
         "total_in_progress_tenders": len(ALL_CURRENT_TENDERS),
+        "newly_scraped_count": len(new_tenders),
         "execution_time_ms": elapsed_ms,
         "portals_scraped": [
             {
