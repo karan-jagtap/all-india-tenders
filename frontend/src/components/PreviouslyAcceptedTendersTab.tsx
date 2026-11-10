@@ -364,7 +364,7 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
           const org = getTenderOrg(t);
           const state = getTenderState(t);
           const city = getTenderCity(t);
-          const searchBlob = `${t.title} ${t.winning_company?.name || ''} ${t.og_tender?.authority || ''} ${t.og_tender?.nit_number || ''} ${source} ${category} ${org} ${state} ${city}`.toLowerCase();
+          const searchBlob = `${t.id} ${t.title} ${t.winning_company?.name || ''} ${t.og_tender?.authority || ''} ${t.og_tender?.nit_number || ''} ${source} ${category} ${org} ${state} ${city}`.toLowerCase();
           return {
             ...t,
             _source: source,

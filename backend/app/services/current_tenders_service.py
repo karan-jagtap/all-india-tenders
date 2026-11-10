@@ -1075,7 +1075,8 @@ def list_current_tenders(
         q = search.lower().strip()
         items = [
             t for t in items
-            if q in t["title"].lower()
+            if q in t.get("id", "").lower()
+            or q in t["title"].lower()
             or q in t["organization"].lower()
             or q in t["nit_number"].lower()
             or q in t.get("state", "").lower()

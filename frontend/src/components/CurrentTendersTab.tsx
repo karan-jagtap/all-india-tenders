@@ -183,7 +183,7 @@ export const CurrentTendersTab: React.FC = () => {
             city: canonicalCt,
             category: canonicalCat,
             _sourceLabel: canonicalSource.split('(')[0].trim(),
-            _searchBlob: `${t.title} ${t.organization} ${t.nit_number} ${canonicalSt} ${canonicalCt} ${canonicalSource} ${canonicalCat} ${t.scope_summary || ''} ${t.ogd_resource_id || ''} ${t.departmental_channel || ''}`.toLowerCase()
+            _searchBlob: `${t.id} ${t.title} ${t.organization} ${t.nit_number} ${canonicalSt} ${canonicalCt} ${canonicalSource} ${canonicalCat} ${t.scope_summary || ''} ${t.ogd_resource_id || ''} ${t.departmental_channel || ''}`.toLowerCase()
           };
         });
         setTenders(enriched);
