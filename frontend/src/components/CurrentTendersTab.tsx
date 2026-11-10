@@ -58,7 +58,7 @@ export const CurrentTendersTab: React.FC = () => {
   const [selectedCity, setSelectedCity] = useState<string>('ALL');
   const [selectedCategory, setSelectedCategory] = useState<string>('ALL');
   const [selectedValueRange, setSelectedValueRange] = useState<string>('ALL');
-  const [includeClosed, setIncludeClosed] = useState<boolean>(true);
+  const [includeClosed, setIncludeClosed] = useState<boolean>(false);
   const [isVoiceSearching, setIsVoiceSearching] = useState<boolean>(false);
   const voiceSearchRef = useRef<any>(null);
   const dossierRef = useRef<HTMLDivElement>(null);
@@ -407,7 +407,7 @@ export const CurrentTendersTab: React.FC = () => {
     selectedCategory !== 'ALL' ||
     selectedValueRange !== 'ALL' ||
     searchQuery.trim() !== '' ||
-    !includeClosed;
+    includeClosed;
 
   const activeFiltersCount = useMemo(() => {
     let count = 0;
@@ -418,7 +418,7 @@ export const CurrentTendersTab: React.FC = () => {
     if (selectedCategory !== 'ALL') count++;
     if (selectedValueRange !== 'ALL') count++;
     if (searchQuery.trim() !== '') count++;
-    if (!includeClosed) count++;
+    if (includeClosed) count++;
     return count;
   }, [selectedSource, selectedOrg, selectedState, selectedCity, selectedCategory, selectedValueRange, searchQuery, includeClosed]);
 
@@ -436,7 +436,7 @@ export const CurrentTendersTab: React.FC = () => {
     setSelectedCategory('ALL');
     setSelectedValueRange('ALL');
     setSearchQuery('');
-    setIncludeClosed(true);
+    setIncludeClosed(false);
   };
 
   const scrollListContainerToTop = () => {
@@ -593,7 +593,7 @@ export const CurrentTendersTab: React.FC = () => {
         onOpenFilterDrawer={handleOpenFilterDrawer}
         loadData={handleRunLiveScraper}
         loading={isScrapingLive}
-        totalTendersCount={tenders.length}
+        totalTendersCount={includeClosed ? tenders.length : openCount}
       />
 
       {/* Overlapping Filter Drawer (Slides from Right) */}
