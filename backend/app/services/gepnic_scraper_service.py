@@ -454,3 +454,249 @@ def scrape_all_statutory_portals(max_orgs_per_portal: Optional[int] = None) -> L
         f"Retrieved {len(combined_tenders)} notices across {len(GEPNIC_PORTALS)} portals concurrently in {elapsed}s."
     )
     return combined_tenders
+
+
+def resolve_and_ingest_tender_by_id(tender_id: str) -> Optional[Dict[str, Any]]:
+    """
+    Dynamically searches and scrapes a specific statutory tender from GePNIC portals on demand.
+    If a tender belongs to an authority not included in the standard scheduled sync,
+    this function identifies the procuring authority from the tender ID code, fetches the
+    live organization notices directly, and ingests them into RAM, SQLite, and JSON catalogs.
+    """
+    clean_id = tender_id.strip()
+    parts = clean_id.split("_")
+    code = parts[1] if len(parts) > 1 else clean_id
+    code_upper = code.upper()
+
+    session = requests.Session()
+    session.headers.update({
+        "User-Agent": STANDARD_USER_AGENT,
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+        "Accept-Language": "en-US,en;q=0.9",
+    })
+
+    # Search across GePNIC portals (CPPP first, then state portals)
+    for portal_cfg in GEPNIC_PORTALS:
+        base_url = portal_cfg["base_url"]
+        portal_root = base_url.replace("/nicgep/app", "").replace("/eprocure/app", "")
+        index_url = f"{base_url}?page=FrontEndTendersByOrganisation&service=page"
+
+        try:
+            res = _safe_get(session, index_url, timeout=(5, 15), retries=1)
+            if not res or res.status_code != 200:
+                continue
+            html = res.text
+        except Exception:
+            continue
+
+        matches = ORG_ROW_PATTERN.findall(html)
+        matching_orgs = []
+        for org_name, href, cnt_str in matches:
+            org_u = org_name.upper()
+            cnt = int(cnt_str)
+            if cnt == 0:
+                continue
+            # Direct match
+            if code_upper in org_u:
+                matching_orgs.append((org_name, href.replace("&amp;", "&"), cnt))
+                continue
+            # Initials acronym match (e.g. 'IISRP' -> Indian Institute of Science Education and Research - Pune)
+            words = [w for w in re.split(r'[^A-Za-z0-9]+', org_u) if w and w not in ('AND', 'OF', 'THE', 'IN')]
+            initials = ''.join(w[0] for w in words)
+            if code_upper == initials or all(c in initials for c in code_upper):
+                matching_orgs.append((org_name, href.replace("&amp;", "&"), cnt))
+
+        if not matching_orgs:
+            continue
+
+        # Fetch matching org pages
+        for org_name, org_href, _ in matching_orgs:
+            try:
+                res_org = _safe_get(session, portal_root + org_href, timeout=(5, 15), retries=1)
+                if not res_org or res_org.status_code != 200:
+                    continue
+                org_html = res_org.text
+            except Exception:
+                continue
+
+            if clean_id not in org_html:
+                continue
+
+            # Target found! Parse all tenders from this organisation
+            row_matches = TENDER_ROW_PATTERN.findall(org_html)
+            if not row_matches:
+                alt_pattern = re.compile(
+                    r'<td align=\"center\">(\d+)</td>\s*'
+                    r'<td align=\"center\">([^<]+)</td>\s*'
+                    r'<td align=\"center\">([^<]+)</td>\s*'
+                    r'<td align=\"center\">([^<]+)</td>\s*'
+                    r'<td align=\"center\">\s*<a[^>]+href=\"([^\"]+)\"[^>]*>\[(.*?)\]</a>\s*(?:\[(.*?)\])?\s*(?:\[(.*?)\])?\s*</td>\s*'
+                    r'<td align=\"center\">([^<]+)</td>',
+                    re.DOTALL
+                )
+                row_matches = alt_pattern.findall(org_html)
+
+            try:
+                from app.services.current_tenders_service import (
+                    detect_state_and_city, find_statutory_portal_binding, build_tender_documents
+                )
+                import app.services.current_tenders_service as cts
+            except Exception:
+                detect_state_and_city = lambda t, s, o, p: (portal_cfg.get("default_state", "Pan-India / Central"), portal_cfg.get("default_city", "New Delhi"))
+                find_statutory_portal_binding = lambda p: None
+                build_tender_documents = lambda t: []
+                cts = None
+
+            binding = find_statutory_portal_binding(portal_cfg["name"])
+            target_record: Optional[Dict[str, Any]] = None
+            new_records: List[Dict[str, Any]] = []
+
+            for row in row_matches:
+                sno = row[0].strip()
+                pub_date_raw = row[1].strip()
+                close_date_raw = row[2].strip()
+                open_date_raw = row[3].strip()
+                detail_link = row[4].replace("&amp;", "&").strip()
+                title = row[5].strip()
+                ref_or_id_1 = row[6].strip() if len(row) > 6 else ""
+                ref_or_id_2 = row[7].strip() if len(row) > 7 else ""
+                org_chain = row[8].strip() if len(row) > 8 else org_name
+
+                if ref_or_id_2:
+                    ref_no = ref_or_id_1
+                    row_tender_id = ref_or_id_2
+                elif ref_or_id_1:
+                    row_tender_id = ref_or_id_1
+                    ref_no = ref_or_id_1
+                else:
+                    row_tender_id = f"{portal_cfg['id'].upper()}_{sno}_{int(time.time())}"
+                    ref_no = row_tender_id
+
+                pub_iso, _, _ = parse_gepnic_date_time(pub_date_raw)
+                close_iso, close_time, days_left = parse_gepnic_date_time(close_date_raw)
+                open_iso, _, _ = parse_gepnic_date_time(open_date_raw)
+
+                category = detect_category_from_text(title, org_chain)
+                cost_inr, emd_inr, fee_inr, pbg = estimate_tender_value_and_emd(title, row_tender_id, category)
+
+                if binding:
+                    t_state, default_city = binding
+                    _, detected_city = detect_state_and_city(title, org_chain, org_name, portal_cfg["name"])
+                    t_city = detected_city or default_city
+                else:
+                    t_state, t_city = detect_state_and_city(title, org_chain, org_name, portal_cfg["name"])
+
+                clean_id_suffix = re.sub(r'[^a-zA-Z0-9_-]', '-', row_tender_id).strip('-')
+                tender_unique_id = f"{portal_cfg['id_prefix']}-{clean_id_suffix.lower()}"
+
+                is_open = days_left >= 0
+                status_text = "OPEN / ACTIVE" if is_open else "CLOSED (TECHNICAL EVALUATION)"
+                bidding_status_text = "IN PROGRESS (NOT YET FILLED / OPEN FOR BIDDING)" if is_open else "CLOSED / EVALUATION"
+
+                ministry = org_name
+                if "||" in org_chain:
+                    parts_chain = [p.strip() for p in org_chain.split("||") if p.strip()]
+                    if parts_chain:
+                        ministry = parts_chain[0]
+                        if len(parts_chain) > 1:
+                            org_name = parts_chain[-1]
+
+                scope_summary = (
+                    f"Official Notice Inviting Tender Ref: {ref_no} (Tender ID: {row_tender_id}). {title}. "
+                    f"Procuring Authority: {org_chain}. Published on {pub_date_raw} with bid submission closing "
+                    f"on {close_date_raw}. Sourced directly via statutory GePNIC procurement portal."
+                )
+
+                t_dict: Dict[str, Any] = {
+                    "id": tender_unique_id,
+                    "nit_number": row_tender_id,
+                    "title": title,
+                    "organization": org_name,
+                    "ministry": ministry,
+                    "source_portal": portal_cfg["name"],
+                    "portal_url": base_url,
+                    "portal_search_url": f"{base_url}?page=FrontEndAdvancedSearch&service=page",
+                    "document_url": portal_root + detail_link,
+                    "category": category,
+                    "tender_type": portal_cfg["tender_type"],
+                    "estimated_cost_inr": cost_inr,
+                    "emd_amount_inr": emd_inr,
+                    "tender_fee_inr": fee_inr,
+                    "pbg_pct": pbg,
+                    "published_date": pub_iso or date.today().strftime("%Y-%m-%d"),
+                    "closing_date": close_iso or date.today().strftime("%Y-%m-%d"),
+                    "opening_date": open_iso or date.today().strftime("%Y-%m-%d"),
+                    "days_left": max(0, days_left),
+                    "submission_deadline_time": close_time or "17:30 Hrs IST",
+                    "scope_summary": scope_summary,
+                    "state": t_state,
+                    "city": t_city,
+                    "status": status_text,
+                    "bidding_status": bidding_status_text,
+                    "is_filled": False,
+                    "is_awarded": False,
+                    "scraping_source": f"{portal_cfg['name']} — Live Organisation Parser",
+                    "database_required": False,
+                    "emd_exemption_eligible": True,
+                    "is_ogd_open_data": False,
+                    "turnover_criteria": f"Average audited turnover of minimum ₹ {round(cost_inr * 0.04 / 10000000, 2)} Cr over past 3 financial years conforming to GFR 2017.",
+                    "solvency_criteria": f"Banker's Solvency Certificate of minimum ₹ {round(cost_inr * 0.02 / 10000000, 2)} Cr from any RBI Scheduled Bank.",
+                    "experience_criteria": f"Mandatory completed similar works conforming to GFR 2017 & statutory procurement guidelines."
+                }
+                t_dict["tender_documents"] = build_tender_documents(t_dict)
+                new_records.append(t_dict)
+
+                if row_tender_id == clean_id or clean_id in (row_tender_id, tender_unique_id, ref_no):
+                    target_record = t_dict
+
+            # Ingest into memory, DB, and JSON files
+            if new_records and cts is not None:
+                existing_nits = {t.get("nit_number") for t in cts.ALL_CURRENT_TENDERS}
+                to_add = [r for r in new_records if r.get("nit_number") not in existing_nits]
+                if to_add:
+                    cts.ALL_CURRENT_TENDERS = to_add + cts.ALL_CURRENT_TENDERS
+                    # Persist to JSON files
+                    try:
+                        import os, json
+                        b_json = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "data", "all_sources_current_catalog.json"))
+                        f_json = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..", "frontend", "public", "data", "all_sources_current_catalog.json"))
+                        with open(b_json, "w", encoding="utf-8") as f:
+                            json.dump(cts.ALL_CURRENT_TENDERS, f, ensure_ascii=False, indent=2)
+                        if os.path.exists(os.path.dirname(f_json)):
+                            with open(f_json, "w", encoding="utf-8") as f:
+                                json.dump(cts.ALL_CURRENT_TENDERS, f, ensure_ascii=False, indent=2)
+                    except Exception as e:
+                        logger.warning(f"[GePNIC Resolver] JSON persist error: {e}")
+
+                    # Upsert into SQLite
+                    try:
+                        import os, sqlite3, json
+                        db_p = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "data", "all_india_tenders.db"))
+                        if os.path.exists(db_p):
+                            now_str = datetime.now().isoformat()
+                            conn = sqlite3.connect(db_p)
+                            for item in to_add:
+                                conn.execute("""
+                                    INSERT OR REPLACE INTO tenders (
+                                        id, nit_number, title, source_portal, category,
+                                        organisation, state, city, estimated_cost_inr,
+                                        emd_amount_inr, publish_date, close_date, opening_date,
+                                        days_left, status, document_url, scope_summary,
+                                        raw_data, created_at, updated_at
+                                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                                """, (
+                                    item["id"], item["nit_number"], item["title"], item["source_portal"], item["category"],
+                                    item["organization"], item["state"], item["city"], item["estimated_cost_inr"],
+                                    item["emd_amount_inr"], item["published_date"], item["closing_date"], item["opening_date"],
+                                    item["days_left"], item["status"], item["document_url"], item["scope_summary"],
+                                    json.dumps(item), now_str, now_str
+                                ))
+                            conn.commit()
+                            conn.close()
+                    except Exception as e:
+                        logger.warning(f"[GePNIC Resolver] DB persist error: {e}")
+
+            if target_record:
+                return target_record
+
+    return None

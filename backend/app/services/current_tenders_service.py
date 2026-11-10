@@ -1154,6 +1154,16 @@ def list_current_tenders(
             or q in t.get("departmental_channel", "").lower()
         ]
 
+        # On-Demand Dynamic Resolution: If search targets a specific statutory tender ID/ref not yet in catalog
+        if not items and ("_" in q or "cur-" in q or "gem" in q or len(q) >= 6):
+            try:
+                from app.services.gepnic_scraper_service import resolve_and_ingest_tender_by_id
+                resolved = resolve_and_ingest_tender_by_id(search.strip())
+                if resolved:
+                    items = [resolved]
+            except Exception as e:
+                print(f"[Current Tenders] Dynamic live resolution error: {e}")
+
     # Sort: closing soon first, then highest value
     return sorted(items, key=lambda x: (x.get("days_left", 999), -(x.get("estimated_cost_inr") or 0)))
 
@@ -1164,6 +1174,16 @@ def get_current_tender_by_id(tender_id: str) -> Optional[Dict[str, Any]]:
             if "tender_documents" not in t:
                 t["tender_documents"] = build_tender_documents(t)
             return t
+
+    # Try dynamic live resolution on demand
+    try:
+        from app.services.gepnic_scraper_service import resolve_and_ingest_tender_by_id
+        resolved = resolve_and_ingest_tender_by_id(tender_id.strip())
+        if resolved:
+            return resolved
+    except Exception as e:
+        print(f"[Current Tenders] Dynamic live resolution error: {e}")
+
     return None
 
 
