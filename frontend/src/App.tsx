@@ -9,7 +9,8 @@ import {
   X,
   ChevronRight,
   Sun,
-  Moon
+  Moon,
+  Database
 } from 'lucide-react';
 import { useTheme } from './context/ThemeContext';
 import { HomeScreen } from './components/HomeScreen';
@@ -22,7 +23,7 @@ import { loadContractorPools } from './constants/contractors';
 import { loadPortalSources } from './constants/portalSources';
 import { loadMasterFilters } from './constants/masterFilters';
 import { loadUiFilters } from './constants/filters';
-import { SyncLiveButton } from './components/common';
+import { SyncLiveButton, SyncHistoryModal } from './components/common';
 
 export const App: React.FC = () => {
   const { toggleTheme, isDark } = useTheme();
@@ -33,6 +34,7 @@ export const App: React.FC = () => {
   const [syncNotice, setSyncNotice] = useState<string | null>(null);
   const [syncKey, setSyncKey] = useState<number>(0);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState<boolean>(false);
+  const [isSyncHistoryOpen, setIsSyncHistoryOpen] = useState<boolean>(false);
 
   const fetchStats = () => {
     getPlatformStats()
@@ -240,6 +242,16 @@ export const App: React.FC = () => {
               variant="header"
             />
 
+            {/* Sync History / Audit Logs Button */}
+            <button
+              onClick={() => setIsSyncHistoryOpen(true)}
+              className="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700/80 text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer shadow-xs"
+              title="View Persistent Database Sync & Automated Cron Audit Logs (cron_sync_logs)"
+            >
+              <Database className="w-3.5 h-3.5 text-purple-400" />
+              <span className="hidden xl:inline">Sync History</span>
+            </button>
+
             {/* Mobile Hamburger Button (< md) */}
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -431,6 +443,17 @@ export const App: React.FC = () => {
                 variant="drawer"
               />
 
+              <button
+                onClick={() => {
+                  setIsSyncHistoryOpen(true);
+                  setIsMobileMenuOpen(false);
+                }}
+                className="w-full py-2 px-3 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700/80 text-xs font-semibold flex items-center justify-center gap-2 transition-all cursor-pointer"
+              >
+                <Database className="w-3.5 h-3.5 text-purple-400" />
+                <span>View Sync & Cron Audit Logs</span>
+              </button>
+
               <div className="text-[10px] text-slate-500 text-center">
                 Automated Cron: Daily @ 4:00 AM IST • Hybrid Persistent DB
               </div>
@@ -472,6 +495,11 @@ export const App: React.FC = () => {
           <span>All India Tenders • Statutory Public Procurement Intelligence Platform</span>
         </div>
       </footer>
+      {/* Sync History Audit Modal */}
+      <SyncHistoryModal
+        isOpen={isSyncHistoryOpen}
+        onClose={() => setIsSyncHistoryOpen(false)}
+      />
     </div>
   );
 };

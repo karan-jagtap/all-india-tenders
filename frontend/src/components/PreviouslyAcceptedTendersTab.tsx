@@ -36,15 +36,19 @@ import {
 import {
   AcceptedTender,
   listAcceptedTenders,
-  getAcceptedTenderPdfUrl
+  getAcceptedTenderPdfUrl,
+  AcceptedTenderFilters
 } from '../services/api';
 import { DetailModalTab, AcceptedTenderModalTab, AcceptedTenderSortOption } from '../types';
 import { formatDate } from '../utils';
 import { AllBidsEvaluationSubTab } from './AcceptedTenders/AllBidsEvaluationSubTab';
 import {
   ALL_CANONICAL_CATEGORIES,
-  canonicalizeCategory,
   ALL_STATUTORY_PORTAL_SOURCES,
+  ALL_MASTER_ORGANIZATIONS,
+  ALL_CANONICAL_STATES,
+  ALL_MASTER_CITIES,
+  canonicalizeCategory,
   canonicalizePortalSource,
   subscribeMasterFilters,
   subscribePortalSources
@@ -310,6 +314,7 @@ export const ACCEPTED_TENDER_SORT_OPTIONS: ToolbarSortOption<AcceptedTenderSortO
 
 export const PreviouslyAcceptedTendersTab: React.FC = () => {
   const [tenders, setTenders] = useState<EnrichedAcceptedTender[]>([]);
+  const [totalDbCount, setTotalDbCount] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -401,44 +406,108 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
     }
   };
 
-  const loadData = () => {
-    setLoading(true);
-    listAcceptedTenders()
-      .then((data) => {
-        const enriched: EnrichedAcceptedTender[] = data.map((t) => {
-          const source = getTenderSource(t);
-          const sourceLabel = source.split('(')[0].trim();
-          const category = canonicalizeCategory(t.category, t.title, t.og_tender?.scope_summary);
-          const org = getTenderOrg(t);
-          const state = getTenderState(t);
-          const city = getTenderCity(t);
-          const searchBlob = `${t.id} ${t.title} ${t.winning_company?.name || ''} ${t.og_tender?.authority || ''} ${t.og_tender?.nit_number || ''} ${source} ${category} ${org} ${state} ${city}`.toLowerCase();
-          return {
-            ...t,
-            _source: source,
-            _sourceLabel: sourceLabel,
-            _category: category,
-            _org: org,
-            _state: state,
-            _city: city,
-            _searchBlob: searchBlob
-          };
-        });
-        setTenders(enriched);
-        if (enriched.length > 0 && !selectedTenderId) {
-          setSelectedTenderId(enriched[0].id);
-        }
-        setLoading(false);
-      })
-      .catch((err) => {
-        setError(err.message || 'Failed to load accepted tenders');
-        setLoading(false);
-      });
-  };
+  const PAGE_SIZE = 12;
 
+  const buildApiFilters = useCallback(
+    (customOffset: number = 0, customSearch?: string): AcceptedTenderFilters => {
+      const q = customSearch !== undefined ? customSearch : (searchQuery.trim() || undefined);
+      const filters: AcceptedTenderFilters = {
+        sort_by: sortBy,
+        limit: PAGE_SIZE,
+        offset: customOffset
+      };
+
+      if (q) filters.search = q;
+      if (!isAll(selectedCategory)) filters.category = selectedCategory.join(',');
+      if (selectedYear !== 'ALL') filters.year = selectedYear;
+      if (!isAll(selectedSource)) filters.source_portal = selectedSource.join(',');
+      if (!isAll(selectedOrg)) filters.organization = selectedOrg.join(',');
+      if (!isAll(selectedState)) filters.state = selectedState.join(',');
+      if (!isAll(selectedCity)) filters.city = selectedCity.join(',');
+
+      return filters;
+    },
+    [searchQuery, sortBy, selectedCategory, selectedYear, selectedSource, selectedOrg, selectedState, selectedCity]
+  );
+
+  const loadData = useCallback(
+    (searchParam?: string) => {
+      setLoading(true);
+      const filters = buildApiFilters(0, searchParam);
+      listAcceptedTenders(filters)
+        .then(({ tenders: data, totalCount }) => {
+          setTotalDbCount(totalCount);
+          const enriched: EnrichedAcceptedTender[] = data.map((t) => {
+            const source = getTenderSource(t);
+            const sourceLabel = source.split('(')[0].trim();
+            const category = canonicalizeCategory(t.category, t.title, t.og_tender?.scope_summary);
+            const org = getTenderOrg(t);
+            const state = getTenderState(t);
+            const city = getTenderCity(t);
+            const searchBlob = `${t.id} ${t.title} ${t.winning_company?.name || ''} ${t.og_tender?.authority || ''} ${t.og_tender?.nit_number || ''} ${source} ${category} ${org} ${state} ${city}`.toLowerCase();
+            return {
+              ...t,
+              _source: source,
+              _sourceLabel: sourceLabel,
+              _category: category,
+              _org: org,
+              _state: state,
+              _city: city,
+              _searchBlob: searchBlob
+            };
+          });
+          setTenders(enriched);
+          if (enriched.length > 0 && (!selectedTenderId || !enriched.some((t) => t.id === selectedTenderId))) {
+            setSelectedTenderId(enriched[0].id);
+          } else if (enriched.length === 0) {
+            setSelectedTenderId('');
+          }
+          setLoading(false);
+        })
+        .catch((err) => {
+          setError(err.message || 'Failed to load accepted tenders');
+          setLoading(false);
+        });
+    },
+    [buildApiFilters, selectedTenderId]
+  );
+
+  // Initial load
   useEffect(() => {
     loadData();
   }, []);
+
+  // When filters change (category, source, org, state, city, year, sortBy), reload first 12 items and reset scroll
+  useEffect(() => {
+    loadData();
+    if (listContainerRef.current) {
+      listContainerRef.current.scrollTop = 0;
+    }
+  }, [
+    selectedCategory,
+    selectedSource,
+    selectedOrg,
+    selectedState,
+    selectedCity,
+    selectedYear,
+    sortBy
+  ]);
+
+  // Debounced server search
+  useEffect(() => {
+    const q = searchQuery.trim();
+    if (q.length >= 3) {
+      const timer = setTimeout(() => {
+        loadData(q);
+        if (listContainerRef.current) {
+          listContainerRef.current.scrollTop = 0;
+        }
+      }, 350);
+      return () => clearTimeout(timer);
+    } else if (q.length === 0) {
+      loadData('');
+    }
+  }, [searchQuery]);
 
   const formatINR = (val?: number) => {
     if (!val) return 'N/A';
@@ -452,7 +521,7 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
   const query = searchQuery.toLowerCase().trim();
   const isAll = (arr: string[]) => !arr || arr.length === 0 || arr.includes('ALL');
 
-  // Faceted matcher for historical accepted bids
+  // Faceted matcher for historical accepted bids in current batch
   const matchesFilter = useCallback(
     (t: EnrichedAcceptedTender, excludeDimension?: string) => {
       if (query && !t._searchBlob.includes(query)) return false;
@@ -544,14 +613,15 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
   }, [contextForOrg]);
 
   const availableOrgs = useMemo(() => {
-    const list = Array.from(orgCounts.keys()).sort();
+    const set = new Set<string>(ALL_MASTER_ORGANIZATIONS);
+    for (const t of tenders) {
+      if (t._org) set.add(t._org);
+    }
     selectedOrg.forEach((org) => {
-      if (org !== 'ALL' && !list.includes(org)) {
-        list.push(org);
-      }
+      if (org !== 'ALL') set.add(org);
     });
-    return list.sort();
-  }, [orgCounts, selectedOrg]);
+    return Array.from(set).sort();
+  }, [tenders, selectedOrg, filterConstantsTick]);
 
   // 3. Faceted context & counts for States
   const contextForState = useMemo(() => {
@@ -569,14 +639,15 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
   }, [contextForState]);
 
   const availableStates = useMemo(() => {
-    const list = Array.from(stateCounts.keys()).sort();
+    const set = new Set<string>(ALL_CANONICAL_STATES);
+    for (const t of tenders) {
+      if (t._state) set.add(t._state);
+    }
     selectedState.forEach((st) => {
-      if (st !== 'ALL' && !list.includes(st)) {
-        list.push(st);
-      }
+      if (st !== 'ALL') set.add(st);
     });
-    return list.sort();
-  }, [stateCounts, selectedState]);
+    return Array.from(set).sort();
+  }, [tenders, selectedState, filterConstantsTick]);
 
   // 4. Faceted context & counts for Cities
   const contextForCity = useMemo(() => {
@@ -594,14 +665,15 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
   }, [contextForCity]);
 
   const availableCities = useMemo(() => {
-    const list = Array.from(cityCounts.keys()).sort();
+    const set = new Set<string>(ALL_MASTER_CITIES);
+    for (const t of tenders) {
+      if (t._city) set.add(t._city);
+    }
     selectedCity.forEach((ct) => {
-      if (ct !== 'ALL' && !list.includes(ct)) {
-        list.push(ct);
-      }
+      if (ct !== 'ALL') set.add(ct);
     });
-    return list.sort();
-  }, [cityCounts, selectedCity]);
+    return Array.from(set).sort();
+  }, [tenders, selectedCity, filterConstantsTick]);
 
   // 5. Faceted context & counts for Years
   const contextForYear = useMemo(() => {
@@ -618,57 +690,16 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
   }, [contextForYear]);
 
   const availableYears = useMemo(() => {
-    const list = Array.from(yearCounts.keys()).sort().reverse();
-    if (selectedYear !== 'ALL' && !list.includes(selectedYear)) {
-      list.push(selectedYear);
-      list.sort().reverse();
+    const set = new Set<string>(['2026', '2025', '2024', '2023', '2022', '2021', '2020', '2019', '2018', '2017']);
+    for (const t of tenders) {
+      if (t.year) set.add(String(t.year));
     }
-    return list;
-  }, [yearCounts, selectedYear]);
+    if (selectedYear !== 'ALL') set.add(selectedYear);
+    return Array.from(set).sort().reverse();
+  }, [tenders, selectedYear]);
 
-  // Final filtered tenders intersection & active sorting
-  const filteredTenders = useMemo(() => {
-    const list = tenders.filter((t) => matchesFilter(t));
-    return list.sort((a, b) => {
-      switch (sortBy) {
-        case 'AWARD_DATE_DESC': {
-          const bDate = b.award_date ? new Date(b.award_date).getTime() : (b.year ? b.year * 10000 : 0);
-          const aDate = a.award_date ? new Date(a.award_date).getTime() : (a.year ? a.year * 10000 : 0);
-          return bDate - aDate;
-        }
-        case 'AWARD_DATE_ASC': {
-          const aDate = a.award_date ? new Date(a.award_date).getTime() : (a.year ? a.year * 10000 : 0);
-          const bDate = b.award_date ? new Date(b.award_date).getTime() : (b.year ? b.year * 10000 : 0);
-          return aDate - bDate;
-        }
-        case 'VALUE_DESC': {
-          const bVal = b.bid_submission?.quoted_amount_inr || b.og_tender?.estimated_cost_inr || 0;
-          const aVal = a.bid_submission?.quoted_amount_inr || a.og_tender?.estimated_cost_inr || 0;
-          return bVal - aVal;
-        }
-        case 'VALUE_ASC': {
-          const aVal = a.bid_submission?.quoted_amount_inr || a.og_tender?.estimated_cost_inr || 0;
-          const bVal = b.bid_submission?.quoted_amount_inr || b.og_tender?.estimated_cost_inr || 0;
-          return aVal - bVal;
-        }
-        case 'DISCOUNT_DESC': {
-          const bDisc = b.bid_submission?.quoted_discount_pct || 0;
-          const aDisc = a.bid_submission?.quoted_discount_pct || 0;
-          return bDisc - aDisc;
-        }
-        case 'CONTRACTOR_ASC': {
-          const aName = a.winning_company?.name || '';
-          const bName = b.winning_company?.name || '';
-          return aName.localeCompare(bName);
-        }
-        case 'TITLE_ASC': {
-          return a.title.localeCompare(b.title);
-        }
-        default:
-          return 0;
-      }
-    });
-  }, [tenders, matchesFilter, sortBy]);
+  // Filtered tenders are streamed directly from backend in 12-item batches
+  const filteredTenders = tenders;
 
   // Whenever ANY filter is reset or changed, automatically select the first record in the refreshed list
   const currentFilterKey = `${selectedCategory.slice().sort().join(',')}|${selectedSource.slice().sort().join(',')}|${selectedOrg.slice().sort().join(',')}|${selectedState.slice().sort().join(',')}|${selectedCity.slice().sort().join(',')}|${selectedYear}|${sortBy}|${searchQuery.trim()}`;
@@ -808,26 +839,52 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
     return selectedTender ? getAcceptedTenderPdfUrl(selectedTender.id) : '';
   }, [selectedTender?.id]);
 
-  // Infinite scrolling state & handlers
-  const PAGE_SIZE = 12;
-  const [visibleCount, setVisibleCount] = useState<number>(PAGE_SIZE);
+  // Infinite scroll (server-paginated 12 tenders per batch based on offset)
   const [isLoadingMore, setIsLoadingMore] = useState<boolean>(false);
   const listContainerRef = useRef<HTMLDivElement>(null);
-  const sentinelRef = useRef<HTMLDivElement>(null);
+  const observerRef = useRef<IntersectionObserver | null>(null);
 
-  const visibleTenders = filteredTenders.slice(0, visibleCount);
+  const visibleTenders = tenders;
+  const hasMoreToRender = tenders.length < totalDbCount;
 
   const loadMore = useCallback(() => {
-    if (isLoadingMore || visibleCount >= filteredTenders.length) return;
+    if (isLoadingMore || loading || !hasMoreToRender) return;
     setIsLoadingMore(true);
-    setTimeout(() => {
-      setVisibleCount((prev) => Math.min(prev + PAGE_SIZE, filteredTenders.length));
-      setIsLoadingMore(false);
-    }, 200);
-  }, [isLoadingMore, visibleCount, filteredTenders.length]);
+
+    const filters = buildApiFilters(tenders.length);
+    listAcceptedTenders(filters)
+      .then(({ tenders: nextBatch }) => {
+        if (nextBatch.length > 0) {
+          const enrichedBatch: EnrichedAcceptedTender[] = nextBatch.map((t) => {
+            const source = getTenderSource(t);
+            const sourceLabel = source.split('(')[0].trim();
+            const category = canonicalizeCategory(t.category, t.title, t.og_tender?.scope_summary);
+            const org = getTenderOrg(t);
+            const state = getTenderState(t);
+            const city = getTenderCity(t);
+            const searchBlob = `${t.id} ${t.title} ${t.winning_company?.name || ''} ${t.og_tender?.authority || ''} ${t.og_tender?.nit_number || ''} ${source} ${category} ${org} ${state} ${city}`.toLowerCase();
+            return {
+              ...t,
+              _source: source,
+              _sourceLabel: sourceLabel,
+              _category: category,
+              _org: org,
+              _state: state,
+              _city: city,
+              _searchBlob: searchBlob
+            };
+          });
+          setTenders((prev) => [...prev, ...enrichedBatch]);
+        }
+        setIsLoadingMore(false);
+      })
+      .catch((err) => {
+        console.error('Failed to stream next accepted tenders batch:', err);
+        setIsLoadingMore(false);
+      });
+  }, [isLoadingMore, loading, hasMoreToRender, buildApiFilters, tenders.length]);
 
   const handleFilterChangeResetScroll = () => {
-    setVisibleCount(PAGE_SIZE);
     if (listContainerRef.current) {
       listContainerRef.current.scrollTop = 0;
     }
@@ -837,22 +894,39 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
     handleFilterChangeResetScroll();
   }, [currentFilterKey]);
 
-  useEffect(() => {
-    const sentinel = sentinelRef.current;
-    if (!sentinel) return;
+  // Observe the 2nd-to-last card to trigger loading the next batch of 12
+  const secondLastCardRef = useCallback(
+    (node: HTMLDivElement | null) => {
+      if (observerRef.current) {
+        observerRef.current.disconnect();
+      }
+      if (!node || !hasMoreToRender) return;
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting) {
-          loadMore();
+      observerRef.current = new IntersectionObserver(
+        (entries) => {
+          if (entries[0]?.isIntersecting) {
+            loadMore();
+          }
+        },
+        {
+          root: listContainerRef.current || null,
+          rootMargin: '100px 0px',
+          threshold: 0.05,
         }
-      },
-      { root: listContainerRef.current, threshold: 0.1, rootMargin: '100px' }
-    );
+      );
 
-    observer.observe(sentinel);
-    return () => observer.disconnect();
-  }, [loadMore]);
+      observerRef.current.observe(node);
+    },
+    [hasMoreToRender, loadMore]
+  );
+
+  useEffect(() => {
+    return () => {
+      if (observerRef.current) {
+        observerRef.current.disconnect();
+      }
+    };
+  }, []);
 
   const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
     const { scrollTop, scrollHeight, clientHeight } = e.currentTarget;
@@ -980,7 +1054,7 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
       <div className="bg-white dark:bg-[#0E1422] rounded-xl border border-slate-200/90 dark:border-slate-800 p-12 text-center text-slate-500 dark:text-slate-400 shadow-xs flex flex-col items-center justify-center">
         <div className="w-8 h-8 border-3 border-emerald-500 border-t-transparent rounded-full animate-spin mb-3" />
         <span className="text-sm font-semibold text-slate-800">Loading Historical Accepted Bids Archive...</span>
-        <span className="text-xs text-slate-400 mt-1">Retrieving 843 awarded Indian public procurement tenders, submissions & LOA orders</span>
+        <span className="text-xs text-slate-400 mt-1">Retrieving awarded Indian public procurement tenders, submissions & LOA orders</span>
       </div>
     );
   }
@@ -992,7 +1066,7 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
         <h3 className="text-sm font-bold">Could not load accepted tenders archive</h3>
         <p className="text-xs text-slate-500 mt-1">{error}</p>
         <button
-          onClick={loadData}
+          onClick={() => loadData()}
           className="mt-3 px-3 py-1.5 bg-red-600 text-white rounded-lg text-xs font-semibold"
         >
           Retry
@@ -1023,7 +1097,7 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
             onResetFilters={resetAllFilters}
             onReload={handleReload}
             isLoading={loading}
-            totalCount={tenders.length}
+            totalCount={totalDbCount || tenders.length}
             reloadLabel="Reload"
             accentColor="emerald"
             sortControl={
@@ -1055,7 +1129,7 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
         activeFiltersCount={activeFiltersCount}
         hasActiveFilters={hasActiveFilters}
         resetAllFilters={resetAllFilters}
-        totalFilteredCount={filteredTenders.length}
+        totalFilteredCount={totalDbCount || filteredTenders.length}
         selectedCategory={selectedCategory}
         setSelectedCategory={setSelectedCategory}
         availableCategories={availableCategories}
@@ -1121,12 +1195,11 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
             <span className="flex items-center gap-1.5">
               <span>Awarded Contracts</span>
               <span className="text-[11px] font-mono font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
-                {visibleTenders.length < filteredTenders.length
-                  ? `${visibleTenders.length} of ${filteredTenders.length}`
-                  : `${filteredTenders.length}`}
+                {visibleTenders.length < totalDbCount
+                  ? `${visibleTenders.length} of ${totalDbCount.toLocaleString('en-IN')}`
+                  : `${(totalDbCount || visibleTenders.length).toLocaleString('en-IN')}`}
               </span>
             </span>
-            <span className="text-[10px] text-slate-400 font-normal">Click tender to inspect proposal</span>
           </div>
 
           <div
@@ -1134,12 +1207,17 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
             onScroll={handleScroll}
             className="space-y-2.5 max-h-[780px] overflow-y-auto pr-1 scroll-smooth"
           >
-            {visibleTenders.map((tender) => {
+            {visibleTenders.map((tender, index) => {
               const isSelected = selectedTender ? tender.id === selectedTender.id : false;
               const sourceLabel = tender._sourceLabel;
+              // Trigger next batch when the 2nd-to-last card comes into view
+              const secondLastIndex = visibleTenders.length >= 2 ? visibleTenders.length - 2 : 0;
+              const isSecondLast = hasMoreToRender && index === secondLastIndex;
+
               return (
                 <div
                   key={tender.id}
+                  ref={isSecondLast ? secondLastCardRef : undefined}
                   onClick={() => handleSelectTenderCard(tender)}
                   className={`cursor-pointer rounded-xl p-4 border transition-all text-xs relative hover:z-20 ${
                     isSelected
@@ -1273,22 +1351,21 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
               );
             })}
 
-            {/* Infinite Scroll Sentinel */}
-            {visibleCount < filteredTenders.length && (
+            {/* Infinite Scroll Loading Indicator */}
+            {isLoadingMore && (
               <div
-                ref={sentinelRef}
                 className="py-3 flex items-center justify-center gap-2 text-slate-500 dark:text-slate-400 text-xs bg-slate-50/70 dark:bg-slate-900/60 rounded-xl border border-dashed border-slate-200 dark:border-slate-800 my-1"
               >
                 <div className="w-4 h-4 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
                 <span className="text-[11px] font-medium text-slate-500 dark:text-slate-400">
-                  {isLoadingMore ? 'Loading more awarded contracts...' : 'Scroll down for more contracts...'}
+                  Loading next 12 awarded contracts...
                 </span>
               </div>
             )}
 
-            {visibleCount >= filteredTenders.length && filteredTenders.length > 0 && (
+            {!hasMoreToRender && filteredTenders.length > 0 && (
               <div className="py-2.5 text-center text-[11px] text-slate-400 dark:text-slate-500 font-medium border-t border-slate-100 dark:border-slate-800">
-                ✓ Showing all {filteredTenders.length} contracts
+                ✓ Showing all {filteredTenders.length.toLocaleString('en-IN')} contracts
               </div>
             )}
 

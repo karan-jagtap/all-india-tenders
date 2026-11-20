@@ -23,25 +23,33 @@ async def get_accepted_tenders(
     organization: Optional[str] = Query(None, description="Procuring authority filter"),
     state: Optional[str] = Query(None, description="State / geography filter"),
     city: Optional[str] = Query(None, description="City / municipal district filter"),
-    search: Optional[str] = Query(None, description="Full-text keyword search")
+    search: Optional[str] = Query(None, description="Full-text keyword search"),
+    sort_by: Optional[str] = Query(None, description="Sort order: AWARD_DATE_DESC, VALUE_DESC, etc."),
+    limit: Optional[int] = Query(None, ge=1, le=5000, description="Max records to return for pagination"),
+    offset: int = Query(0, ge=0, description="Offset for pagination")
 ):
     """
-    Returns all previously awarded tenders and winning bid dossiers with optional multi-dimensional filtering.
+    Returns all previously awarded tenders and winning bid dossiers with optional multi-dimensional filtering, sorting, and pagination.
     """
-    tenders = list_accepted_tenders(
+    tenders, total_count = list_accepted_tenders(
         category=category,
         year=year,
         source_portal=source_portal,
         organization=organization,
         state=state,
         city=city,
-        search=search
+        search=search,
+        sort_by=sort_by,
+        limit=limit,
+        offset=offset
     )
     return JSONResponse(
         content=tenders,
         headers={
             "Cache-Control": "no-cache, no-store, must-revalidate",
-            "Pragma": "no-cache"
+            "Pragma": "no-cache",
+            "X-Total-Count": str(total_count),
+            "Access-Control-Expose-Headers": "X-Total-Count, Content-Length"
         }
     )
 

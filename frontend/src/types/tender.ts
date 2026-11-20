@@ -84,6 +84,10 @@ export interface AcceptedTender {
   category: string;
   status?: string;
   award_date: string;
+  state?: string;
+  city?: string;
+  source_portal?: string;
+  organization?: string;
   winning_company: {
     name: string;
     cin: string;
@@ -115,6 +119,8 @@ export interface AcceptedTender {
     similar_work_criteria?: string;
     published_date?: string;
     closing_date?: string;
+    state?: string;
+    city?: string;
   };
   bid_submission: {
     quoted_amount_inr: number;

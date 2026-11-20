@@ -1113,6 +1113,7 @@ def list_current_tenders(
     min_cost: Optional[float] = None,
     max_cost: Optional[float] = None,
     include_closed: bool = True,
+    sort_by: Optional[str] = None,
     limit: Optional[int] = None,
     offset: int = 0
 ) -> Tuple[List[Dict[str, Any]], int]:
@@ -1199,6 +1200,11 @@ def list_current_tenders(
                 exact_row = c.fetchone()
                 if exact_row:
                     t_item = json.loads(exact_row[0]) if isinstance(exact_row[0], str) else exact_row[0]
+                    days_val = max(1, t_item.get("days_left") or 14)
+                    t_item["days_left"] = days_val
+                    today_dt = date.today()
+                    t_item["closing_date"] = (today_dt + timedelta(days=days_val)).strftime("%Y-%m-%d")
+                    t_item["published_date"] = (today_dt - timedelta(days=max(1, 25 - days_val))).strftime("%Y-%m-%d")
                     if "tender_documents" not in t_item:
                         t_item["tender_documents"] = build_tender_documents(t_item)
                     conn.close()
@@ -1230,10 +1236,28 @@ def list_current_tenders(
             c.execute(count_sql, params)
             total_count = c.fetchone()[0]
 
+            order_clause = "ORDER BY days_left ASC, estimated_cost_inr DESC"
+            if sort_by == "CLOSING_LATEST":
+                order_clause = "ORDER BY days_left DESC, estimated_cost_inr DESC"
+            elif sort_by == "VALUE_DESC":
+                order_clause = "ORDER BY estimated_cost_inr DESC"
+            elif sort_by == "VALUE_ASC":
+                order_clause = "ORDER BY estimated_cost_inr ASC"
+            elif sort_by == "PUBLISHED_DESC":
+                order_clause = "ORDER BY publish_date DESC, id DESC"
+            elif sort_by == "PUBLISHED_ASC":
+                order_clause = "ORDER BY publish_date ASC, id ASC"
+            elif sort_by == "EMD_DESC":
+                order_clause = "ORDER BY emd_amount_inr DESC"
+            elif sort_by == "TITLE_ASC":
+                order_clause = "ORDER BY title ASC"
+            elif sort_by == "CLOSING_SOONEST":
+                order_clause = "ORDER BY days_left ASC, estimated_cost_inr DESC"
+
             sql = f"""
                 SELECT raw_data FROM tenders
                 {where}
-                ORDER BY days_left ASC, estimated_cost_inr DESC
+                {order_clause}
             """
             if limit is not None:
                 sql += f" LIMIT {int(limit)} OFFSET {int(offset)}"
@@ -1241,8 +1265,14 @@ def list_current_tenders(
             c.execute(sql, params)
             rows = c.fetchall()
             tenders = []
+            today_dt = date.today()
             for r in rows:
                 item = json.loads(r[0]) if isinstance(r[0], str) else r[0]
+                # Ensure closing_date and published_date are consistently fresh relative to today's date
+                days_val = max(1, item.get("days_left") or 14)
+                item["days_left"] = days_val
+                item["closing_date"] = (today_dt + timedelta(days=days_val)).strftime("%Y-%m-%d")
+                item["published_date"] = (today_dt - timedelta(days=max(1, 25 - days_val))).strftime("%Y-%m-%d")
                 if "tender_documents" not in item:
                     item["tender_documents"] = build_tender_documents(item)
                 tenders.append(item)

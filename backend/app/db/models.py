@@ -337,12 +337,13 @@ class CronSyncLog(Base, TimestampMixin):
     __tablename__ = "cron_sync_logs"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    trigger_type: Mapped[str] = mapped_column(String(50), default="SCHEDULED_CRON")  # 'SCHEDULED_CRON' or 'MANUAL_BUTTON'
-    status: Mapped[str] = mapped_column(String(50), default="SUCCESS")  # 'SUCCESS', 'FAILED', 'RUNNING'
+    trigger_type: Mapped[str] = mapped_column(String(50), default="SCHEDULED_CRON", index=True)  # 'SCHEDULED_CRON' or 'MANUAL_BUTTON'
+    status: Mapped[str] = mapped_column(String(50), default="SUCCESS", index=True)  # 'SUCCESS', 'FAILED', 'RUNNING'
     portals_scraped_count: Mapped[int] = mapped_column(Integer, default=0)
     total_in_progress_count: Mapped[int] = mapped_column(Integer, default=0)
     db_upserted_count: Mapped[int] = mapped_column(Integer, default=0)
     execution_time_ms: Mapped[float] = mapped_column(Float, default=0.0)
+    initiated_by: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
     details: Mapped[Optional[Dict[str, Any]]] = mapped_column(JSON, nullable=True)
     error_message: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
 

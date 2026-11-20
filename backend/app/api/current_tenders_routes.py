@@ -28,6 +28,7 @@ async def get_current_tenders(
     min_cost: Optional[float] = Query(None, description="Minimum estimated cost in INR"),
     max_cost: Optional[float] = Query(None, description="Maximum estimated cost in INR"),
     include_closed: bool = Query(True, description="Include closed / expired notices under technical evaluation"),
+    sort_by: Optional[str] = Query(None, description="Sort order: CLOSING_SOONEST, VALUE_DESC, etc."),
     limit: Optional[int] = Query(None, ge=1, le=5000, description="Max records to return for pagination"),
     offset: int = Query(0, ge=0, description="Offset for pagination")
 ):
@@ -44,6 +45,7 @@ async def get_current_tenders(
         min_cost=min_cost,
         max_cost=max_cost,
         include_closed=include_closed,
+        sort_by=sort_by,
         limit=limit,
         offset=offset
     )

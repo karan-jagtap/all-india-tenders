@@ -11,7 +11,7 @@ import io
 import re
 import json
 import hashlib
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any, Optional, Tuple
 from reportlab.lib.pagesizes import letter
 from reportlab.lib import colors
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
@@ -1550,6 +1550,18 @@ for _t in ACCEPTED_TENDERS_CATALOG:
 from app.services.filter_utils import matches_keyword_search, matches_exact_or_all
 
 
+def _matches_filter_csv(val: Optional[str], filter_str: Optional[str]) -> bool:
+    if not filter_str or filter_str.strip().upper() == "ALL":
+        return True
+    if not val:
+        return False
+    val_clean = val.strip().lower()
+    items = [x.strip().lower() for x in filter_str.split(",") if x.strip() and x.strip().upper() != "ALL"]
+    if not items:
+        return True
+    return any(item in val_clean or val_clean in item for item in items)
+
+
 def list_accepted_tenders(
     category: Optional[str] = None,
     year: Optional[int] = None,
@@ -1557,43 +1569,50 @@ def list_accepted_tenders(
     organization: Optional[str] = None,
     state: Optional[str] = None,
     city: Optional[str] = None,
-    search: Optional[str] = None
-) -> List[Dict[str, Any]]:
-    """Filters accepted tenders across sector, fiscal year, portal, authority, state, and search terms."""
+    search: Optional[str] = None,
+    sort_by: Optional[str] = None,
+    limit: Optional[int] = None,
+    offset: int = 0
+) -> Tuple[List[Dict[str, Any]], int]:
+    """Filters accepted tenders across sector, fiscal year, portal, authority, state, and search terms with sorting and pagination."""
     results = ACCEPTED_TENDERS_CATALOG
 
-    if category and category.upper() != "ALL":
-        results = [t for t in results if matches_exact_or_all(t.get("category"), category)]
+    if category and category.strip().upper() != "ALL":
+        results = [t for t in results if _matches_filter_csv(t.get("category"), category)]
 
-    if year:
-        results = [t for t in results if t.get("year") == year]
+    if year and str(year).strip().upper() != "ALL":
+        try:
+            yr_int = int(year)
+            results = [t for t in results if t.get("year") == yr_int]
+        except (ValueError, TypeError):
+            results = [t for t in results if str(t.get("year")) == str(year).strip()]
 
-    if source_portal and source_portal.upper() != "ALL":
+    if source_portal and source_portal.strip().upper() != "ALL":
         results = [
             t for t in results
-            if matches_exact_or_all(t.get("og_tender", {}).get("portal"), source_portal)
-            or matches_exact_or_all(t.get("source_portal"), source_portal)
+            if _matches_filter_csv(t.get("og_tender", {}).get("portal"), source_portal)
+            or _matches_filter_csv(t.get("source_portal"), source_portal)
         ]
 
-    if organization and organization.upper() != "ALL":
+    if organization and organization.strip().upper() != "ALL":
         results = [
             t for t in results
-            if matches_exact_or_all(t.get("og_tender", {}).get("authority"), organization)
-            or matches_exact_or_all(t.get("organization"), organization)
+            if _matches_filter_csv(t.get("og_tender", {}).get("authority"), organization)
+            or _matches_filter_csv(t.get("organization"), organization)
         ]
 
-    if state and state.upper() != "ALL":
+    if state and state.strip().upper() != "ALL":
         results = [
             t for t in results
-            if matches_exact_or_all(t.get("state"), state)
-            or matches_exact_or_all(t.get("og_tender", {}).get("state"), state)
+            if _matches_filter_csv(t.get("state"), state)
+            or _matches_filter_csv(t.get("og_tender", {}).get("state"), state)
         ]
 
-    if city and city.upper() != "ALL":
+    if city and city.strip().upper() != "ALL":
         results = [
             t for t in results
-            if matches_exact_or_all(t.get("city"), city)
-            or matches_exact_or_all(t.get("og_tender", {}).get("city"), city)
+            if _matches_filter_csv(t.get("city"), city)
+            or _matches_filter_csv(t.get("og_tender", {}).get("city"), city)
         ]
 
     if search and search.strip():
@@ -1616,7 +1635,78 @@ def list_accepted_tenders(
             )
         ]
 
-    return results
+    if sort_by:
+        sb = sort_by.upper()
+        if sb == "AWARD_DATE_DESC":
+            results = sorted(
+                results,
+                key=lambda t: t.get("award_date") or f"{t.get('year', 2024)}-01-01",
+                reverse=True
+            )
+        elif sb == "AWARD_DATE_ASC":
+            results = sorted(
+                results,
+                key=lambda t: t.get("award_date") or f"{t.get('year', 2024)}-01-01",
+                reverse=False
+            )
+        elif sb == "VALUE_DESC":
+            results = sorted(
+                results,
+                key=lambda t: (
+                    t.get("bid_submission", {}).get("quoted_amount_inr")
+                    or t.get("og_tender", {}).get("estimated_cost_inr")
+                    or 0.0
+                ),
+                reverse=True
+            )
+        elif sb == "VALUE_ASC":
+            results = sorted(
+                results,
+                key=lambda t: (
+                    t.get("bid_submission", {}).get("quoted_amount_inr")
+                    or t.get("og_tender", {}).get("estimated_cost_inr")
+                    or 0.0
+                ),
+                reverse=False
+            )
+        elif sb == "DISCOUNT_DESC":
+            results = sorted(
+                results,
+                key=lambda t: t.get("bid_submission", {}).get("quoted_discount_pct") or 0.0,
+                reverse=True
+            )
+        elif sb == "CONTRACTOR_ASC":
+            results = sorted(
+                results,
+                key=lambda t: (t.get("winning_company", {}).get("name") or "").lower(),
+                reverse=False
+            )
+        elif sb == "TITLE_ASC":
+            results = sorted(
+                results,
+                key=lambda t: (t.get("title") or "").lower(),
+                reverse=False
+            )
+        else:
+            results = sorted(
+                results,
+                key=lambda t: t.get("award_date") or f"{t.get('year', 2024)}-01-01",
+                reverse=True
+            )
+    else:
+        results = sorted(
+            results,
+            key=lambda t: t.get("award_date") or f"{t.get('year', 2024)}-01-01",
+            reverse=True
+        )
+
+    total_count = len(results)
+    if limit is not None:
+        paged = results[offset : offset + limit]
+    else:
+        paged = results[offset:]
+
+    return paged, total_count
 
 
 def get_accepted_tender_by_id(tender_id: str) -> Optional[Dict[str, Any]]:

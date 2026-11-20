@@ -44,7 +44,7 @@ LAST_CRON_RUN_INFO: Dict[str, Any] = {
 }
 
 
-async def run_statutory_sources_sync(trigger_type: str = "SCHEDULED_CRON") -> Dict[str, Any]:
+async def run_statutory_sources_sync(trigger_type: str = "SCHEDULED_CRON", initiated_by: Optional[str] = None) -> Dict[str, Any]:
     """
     Executes real sources synchronization, updates persistent database,
     refreshes in-memory RAM streaming caches, and logs execution audit.
@@ -122,6 +122,7 @@ async def run_statutory_sources_sync(trigger_type: str = "SCHEDULED_CRON") -> Di
                         total_in_progress_count=total_in_prog,
                         db_upserted_count=db_upserted,
                         execution_time_ms=elapsed_ms,
+                        initiated_by=initiated_by,
                         details={
                             "portals_scraped": portals_scraped,
                             "sync_summary": sync_details.get("message", "Sync successful"),
@@ -168,6 +169,7 @@ async def run_statutory_sources_sync(trigger_type: str = "SCHEDULED_CRON") -> Di
                         trigger_type=trigger_type,
                         status="FAILED",
                         execution_time_ms=elapsed_ms,
+                        initiated_by=initiated_by,
                         error_message=err_msg
                     )
                     session.add(log_entry)
@@ -213,6 +215,86 @@ def get_cron_status() -> Dict[str, Any]:
         "is_sync_in_progress": SYNC_LOCK.locked(),
         "last_run": LAST_CRON_RUN_INFO
     }
+
+
+async def get_sync_logs(
+    limit: int = 50,
+    offset: int = 0,
+    trigger_type: Optional[str] = None
+) -> Dict[str, Any]:
+    """
+    Retrieves paginated synchronization audit logs from database with summary metrics.
+    """
+    async with async_session_factory() as session:
+        from sqlalchemy import select, func, desc
+
+        # Base query
+        stmt = select(CronSyncLog)
+        if trigger_type:
+            stmt = stmt.where(CronSyncLog.trigger_type == trigger_type)
+        
+        # Total count
+        count_stmt = select(func.count()).select_from(stmt.subquery())
+        total_res = await session.execute(count_stmt)
+        total_count = total_res.scalar_one_or_none() or 0
+
+        # Fetch records
+        stmt = stmt.order_by(desc(CronSyncLog.id)).offset(offset).limit(limit)
+        result = await session.execute(stmt)
+        log_rows = result.scalars().all()
+
+        # Summary stats across all logs
+        stats_stmt = select(
+            func.count(CronSyncLog.id).label("total"),
+            func.count(CronSyncLog.id).filter(CronSyncLog.trigger_type == "MANUAL_BUTTON").label("manual_count"),
+            func.count(CronSyncLog.id).filter(CronSyncLog.trigger_type == "SCHEDULED_CRON").label("cron_count"),
+            func.count(CronSyncLog.id).filter(CronSyncLog.status == "SUCCESS").label("success_count"),
+            func.count(CronSyncLog.id).filter(CronSyncLog.status == "FAILED").label("failed_count"),
+            func.avg(CronSyncLog.execution_time_ms).label("avg_duration")
+        )
+        stats_res = await session.execute(stats_stmt)
+        stats_row = stats_res.one_or_none()
+
+        total_runs = stats_row.total if stats_row else total_count
+        manual_runs = stats_row.manual_count if stats_row else 0
+        cron_runs = stats_row.cron_count if stats_row else 0
+        success_runs = stats_row.success_count if stats_row else 0
+        failed_runs = stats_row.failed_count if stats_row else 0
+        avg_duration = round(float(stats_row.avg_duration or 0.0), 2) if stats_row else 0.0
+        success_rate = round((success_runs / total_runs * 100), 1) if total_runs > 0 else 100.0
+
+        serialized_logs = []
+        for l in log_rows:
+            serialized_logs.append({
+                "id": l.id,
+                "trigger_type": l.trigger_type,
+                "status": l.status,
+                "portals_scraped_count": l.portals_scraped_count,
+                "total_in_progress_count": l.total_in_progress_count,
+                "db_upserted_count": l.db_upserted_count,
+                "execution_time_ms": round(l.execution_time_ms, 2) if l.execution_time_ms else 0.0,
+                "initiated_by": l.initiated_by,
+                "details": l.details,
+                "error_message": l.error_message,
+                "created_at": l.created_at.isoformat() if l.created_at else None
+            })
+
+        return {
+            "total_logs": total_count,
+            "limit": limit,
+            "offset": offset,
+            "summary": {
+                "total_runs": total_runs,
+                "total_manual_runs": manual_runs,
+                "total_cron_runs": cron_runs,
+                "success_runs": success_runs,
+                "failed_runs": failed_runs,
+                "success_rate_pct": success_rate,
+                "avg_duration_ms": avg_duration,
+                "last_run": LAST_CRON_RUN_INFO
+            },
+            "logs": serialized_logs
+        }
 
 
 def start_cron_scheduler():

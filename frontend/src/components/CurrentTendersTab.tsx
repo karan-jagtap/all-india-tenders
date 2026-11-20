@@ -9,6 +9,7 @@ import {
 } from '../types';
 import {
   listCurrentTenders,
+  CurrentTenderFilters,
   getCurrentTenderPdfUrl,
   getCurrentTenderSbdDocUrl,
   getCurrentTenderBoqUrl,
@@ -189,28 +190,62 @@ export const CurrentTendersTab: React.FC = () => {
     }
   };
 
-  const loadData = (searchParam?: string) => {
-    setLoading(true);
-    const q = searchParam !== undefined ? searchParam : (searchQuery.trim() || undefined);
-    listCurrentTenders({
-      include_closed: true,
-      search: q,
-      limit: q ? 300 : 1000
-    })
-      .then(({ tenders: data, totalCount }) => {
-        setTotalDbCount(totalCount);
-        const enriched = enrichTenderList(data);
-        setTenders(enriched);
-        if (enriched.length > 0 && (!selectedTenderId || !enriched.some(t => t.id === selectedTenderId))) {
-          setSelectedTenderId(enriched[0].id);
-        }
-        setLoading(false);
-      })
-      .catch((err) => {
-        setError(err.message || 'Failed to load in-progress tenders');
-        setLoading(false);
-      });
-  };
+  const PAGE_SIZE = 12;
+
+  const buildApiFilters = useCallback(
+    (customOffset: number = 0, customSearch?: string): CurrentTenderFilters => {
+      const q = customSearch !== undefined ? customSearch : (searchQuery.trim() || undefined);
+      const filters: CurrentTenderFilters = {
+        include_closed: includeClosed,
+        sort_by: sortBy,
+        limit: PAGE_SIZE,
+        offset: customOffset
+      };
+
+      if (q) filters.search = q;
+      if (!isAll(selectedSource)) filters.source_portal = selectedSource.join(',');
+      if (!isAll(selectedOrg)) filters.organization = selectedOrg.join(',');
+      if (!isAll(selectedState)) filters.state = selectedState.join(',');
+      if (!isAll(selectedCity)) filters.city = selectedCity.join(',');
+      if (!isAll(selectedCategory)) filters.category = selectedCategory.join(',');
+
+      if (selectedValueRange === 'UNDER_10CR') {
+        filters.max_cost = 100000000;
+      } else if (selectedValueRange === '10CR_50CR') {
+        filters.min_cost = 100000000;
+        filters.max_cost = 500000000;
+      } else if (selectedValueRange === 'OVER_50CR') {
+        filters.min_cost = 500000000;
+      }
+
+      return filters;
+    },
+    [searchQuery, includeClosed, sortBy, selectedSource, selectedOrg, selectedState, selectedCity, selectedCategory, selectedValueRange]
+  );
+
+  const loadData = useCallback(
+    (searchParam?: string) => {
+      setLoading(true);
+      const filters = buildApiFilters(0, searchParam);
+      listCurrentTenders(filters)
+        .then(({ tenders: data, totalCount }) => {
+          setTotalDbCount(totalCount);
+          const enriched = enrichTenderList(data);
+          setTenders(enriched);
+          if (enriched.length > 0 && (!selectedTenderId || !enriched.some((t) => t.id === selectedTenderId))) {
+            setSelectedTenderId(enriched[0].id);
+          } else if (enriched.length === 0) {
+            setSelectedTenderId('');
+          }
+          setLoading(false);
+        })
+        .catch((err) => {
+          setError(err.message || 'Failed to load in-progress tenders');
+          setLoading(false);
+        });
+    },
+    [buildApiFilters, selectedTenderId]
+  );
 
   const handleRunLiveScraper = async () => {
     setIsScrapingLive(true);
@@ -228,7 +263,19 @@ export const CurrentTendersTab: React.FC = () => {
 
   useEffect(() => {
     loadData();
-  }, []);
+    if (listContainerRef.current) {
+      listContainerRef.current.scrollTop = 0;
+    }
+  }, [
+    selectedSource,
+    selectedOrg,
+    selectedState,
+    selectedCity,
+    selectedCategory,
+    selectedValueRange,
+    sortBy,
+    includeClosed
+  ]);
 
   // Debounced server-side DB search for target tender IDs or keywords
   useEffect(() => {
@@ -236,7 +283,10 @@ export const CurrentTendersTab: React.FC = () => {
     if (q.length >= 3) {
       const timer = setTimeout(() => {
         loadData(q);
-      }, 400);
+        if (listContainerRef.current) {
+          listContainerRef.current.scrollTop = 0;
+        }
+      }, 350);
       return () => clearTimeout(timer);
     } else if (q.length === 0) {
       loadData('');
@@ -255,8 +305,12 @@ export const CurrentTendersTab: React.FC = () => {
 
       // Status / Due filter
       if (!includeClosed) {
-        const isExpired = (t.days_left !== undefined && t.days_left <= 0) || (Boolean(t.closing_date) && t.closing_date < todayStr);
-        if (isExpired) return false;
+        if (t.status === 'CLOSED' || t.status === 'AWARDED') return false;
+        if (t.days_left !== undefined && t.days_left !== null) {
+          if (t.days_left <= 0) return false;
+        } else if (Boolean(t.closing_date) && t.closing_date < todayStr) {
+          return false;
+        }
       }
 
       if (excludeDimension !== 'source' && !isAll(selectedSource) && !selectedSource.includes(t.source_portal)) {
@@ -392,50 +446,8 @@ export const CurrentTendersTab: React.FC = () => {
     return Array.from(set).sort();
   }, [tenders, selectedCategory, filterConstantsTick]);
 
-  // Final intersection of all active filters & active sorting
-  const filteredTenders = useMemo(() => {
-    const list = tenders.filter((t) => matchesFilter(t));
-    return list.sort((a, b) => {
-      switch (sortBy) {
-        case 'CLOSING_SOONEST': {
-          const aDays = a.days_left !== undefined ? a.days_left : 999999;
-          const bDays = b.days_left !== undefined ? b.days_left : 999999;
-          if (aDays !== bDays) return aDays - bDays;
-          return (a.closing_date || '').localeCompare(b.closing_date || '');
-        }
-        case 'CLOSING_LATEST': {
-          const aDays = a.days_left !== undefined ? a.days_left : -1;
-          const bDays = b.days_left !== undefined ? b.days_left : -1;
-          if (aDays !== bDays) return bDays - aDays;
-          return (b.closing_date || '').localeCompare(a.closing_date || '');
-        }
-        case 'VALUE_DESC': {
-          return (b.estimated_cost_inr || 0) - (a.estimated_cost_inr || 0);
-        }
-        case 'VALUE_ASC': {
-          return (a.estimated_cost_inr || 0) - (b.estimated_cost_inr || 0);
-        }
-        case 'PUBLISHED_DESC': {
-          const bDate = b.published_date ? new Date(b.published_date).getTime() : 0;
-          const aDate = a.published_date ? new Date(a.published_date).getTime() : 0;
-          return bDate - aDate;
-        }
-        case 'PUBLISHED_ASC': {
-          const aDate = a.published_date ? new Date(a.published_date).getTime() : 0;
-          const bDate = b.published_date ? new Date(b.published_date).getTime() : 0;
-          return aDate - bDate;
-        }
-        case 'EMD_DESC': {
-          return (b.emd_amount_inr || 0) - (a.emd_amount_inr || 0);
-        }
-        case 'TITLE_ASC': {
-          return a.title.localeCompare(b.title);
-        }
-        default:
-          return 0;
-      }
-    });
-  }, [tenders, matchesFilter, sortBy]);
+  // Filtered tenders are streamed directly from the indexed SQLite database in 12-item batches
+  const filteredTenders = tenders;
 
   // Whenever ANY filter is reset or changed, automatically select the first record in the refreshed list
   const currentFilterKey = `${selectedSource.slice().sort().join(',')}|${selectedOrg.slice().sort().join(',')}|${selectedState.slice().sort().join(',')}|${selectedCity.slice().sort().join(',')}|${selectedCategory.slice().sort().join(',')}|${selectedValueRange}|${sortBy}|${searchQuery.trim()}`;
@@ -568,76 +580,66 @@ export const CurrentTendersTab: React.FC = () => {
     return generateDeepDocumentRAG(selectedTender);
   }, [selectedTender]);
 
-  // Infinite scroll
-  const PAGE_SIZE = 12;
-  const [visibleCount, setVisibleCount] = useState<number>(PAGE_SIZE);
+  // Infinite scroll (server-paginated 12 tenders per batch based on offset)
   const [isLoadingMore, setIsLoadingMore] = useState<boolean>(false);
-  const [isFetchingBatch, setIsFetchingBatch] = useState<boolean>(false);
   const listContainerRef = useRef<HTMLDivElement>(null);
-  const sentinelRef = useRef<HTMLDivElement>(null);
+  const observerRef = useRef<IntersectionObserver | null>(null);
 
-  const visibleTenders = filteredTenders.slice(0, visibleCount);
-
-  const hasMoreToRender = visibleCount < filteredTenders.length;
-  const hasMoreInDb = !hasActiveFilters && tenders.length < totalDbCount;
+  const visibleTenders = tenders;
+  const hasMore = tenders.length < totalDbCount;
 
   const loadMore = useCallback(() => {
-    if (isLoadingMore || isFetchingBatch) return;
+    if (isLoadingMore || loading || !hasMore) return;
+    setIsLoadingMore(true);
 
-    if (hasMoreToRender) {
-      setIsLoadingMore(true);
-      setTimeout(() => {
-        setVisibleCount((prev) => Math.min(prev + PAGE_SIZE, filteredTenders.length));
-        setIsLoadingMore(false);
-      }, 100);
-      return;
-    }
-
-    if (hasMoreInDb) {
-      setIsFetchingBatch(true);
-      listCurrentTenders({
-        include_closed: true,
-        limit: 1000,
-        offset: tenders.length
-      })
-        .then(({ tenders: nextBatch }) => {
-          if (nextBatch.length > 0) {
-            const enrichedBatch = enrichTenderList(nextBatch);
-            setTenders((prev) => [...prev, ...enrichedBatch]);
-            setVisibleCount((prev) => prev + PAGE_SIZE);
-          }
-          setIsFetchingBatch(false);
-        })
-        .catch((err) => {
-          console.error('Failed to stream next tenders batch:', err);
-          setIsFetchingBatch(false);
-        });
-    }
-  }, [isLoadingMore, isFetchingBatch, hasMoreToRender, hasMoreInDb, filteredTenders.length, tenders.length, totalDbCount]);
-
-  useEffect(() => {
-    setVisibleCount(PAGE_SIZE);
-    if (listContainerRef.current) {
-      listContainerRef.current.scrollTop = 0;
-    }
-  }, [currentFilterKey]);
-
-  useEffect(() => {
-    const sentinel = sentinelRef.current;
-    if (!sentinel) return;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting) {
-          loadMore();
+    const filters = buildApiFilters(tenders.length);
+    listCurrentTenders(filters)
+      .then(({ tenders: nextBatch }) => {
+        if (nextBatch.length > 0) {
+          const enrichedBatch = enrichTenderList(nextBatch);
+          setTenders((prev) => [...prev, ...enrichedBatch]);
         }
-      },
-      { root: listContainerRef.current, rootMargin: '120px' }
-    );
+        setIsLoadingMore(false);
+      })
+      .catch((err) => {
+        console.error('Failed to stream next tenders batch:', err);
+        setIsLoadingMore(false);
+      });
+  }, [isLoadingMore, loading, hasMore, buildApiFilters, tenders.length]);
 
-    observer.observe(sentinel);
-    return () => observer.disconnect();
-  }, [loadMore]);
+  // Observe the 2nd-to-last card to trigger loading the next batch of 12
+  const secondLastCardRef = useCallback(
+    (node: HTMLDivElement | null) => {
+      if (observerRef.current) {
+        observerRef.current.disconnect();
+      }
+      if (!node || !hasMore) return;
+
+      observerRef.current = new IntersectionObserver(
+        (entries) => {
+          if (entries[0]?.isIntersecting) {
+            loadMore();
+          }
+        },
+        {
+          root: listContainerRef.current || null,
+          rootMargin: '100px 0px',
+          threshold: 0.05,
+        }
+      );
+
+      observerRef.current.observe(node);
+    },
+    [hasMore, loadMore]
+  );
+
+  useEffect(() => {
+    return () => {
+      if (observerRef.current) {
+        observerRef.current.disconnect();
+      }
+    };
+  }, []);
 
   const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
     const { scrollTop, scrollHeight, clientHeight } = e.currentTarget;
@@ -751,13 +753,9 @@ export const CurrentTendersTab: React.FC = () => {
             <span className="flex items-center gap-1.5">
               <span>{includeClosed ? 'All Procurement Notices' : 'Open In-Progress Notices'}</span>
               <span className="text-[11px] font-mono font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
-                {hasActiveFilters
-                  ? visibleTenders.length < filteredTenders.length
-                    ? `${visibleTenders.length} of ${filteredTenders.length.toLocaleString('en-IN')}`
-                    : `${filteredTenders.length.toLocaleString('en-IN')}`
-                  : visibleTenders.length < totalDbCount
-                    ? `${visibleTenders.length} of ${totalDbCount.toLocaleString('en-IN')}`
-                    : `${totalDbCount.toLocaleString('en-IN')}`}
+                {visibleTenders.length < totalDbCount
+                  ? `${visibleTenders.length} of ${totalDbCount.toLocaleString('en-IN')}`
+                  : `${totalDbCount.toLocaleString('en-IN')}`}
               </span>
             </span>
           </div>
@@ -767,38 +765,54 @@ export const CurrentTendersTab: React.FC = () => {
             onScroll={handleScroll}
             className="space-y-2.5 max-h-[780px] overflow-y-auto pr-1 scroll-smooth"
           >
-            {visibleTenders.map((tender) => {
+            {visibleTenders.map((tender, index) => {
               const isSelected = selectedTender ? tender.id === selectedTender.id : false;
+              // Trigger next batch when the 2nd-to-last card comes into view
+              const secondLastIndex = visibleTenders.length >= 2 ? visibleTenders.length - 2 : 0;
+              const isSecondLast = hasMore && index === secondLastIndex;
+
               return (
-                <CurrentTenderCard
+                <div
                   key={tender.id}
-                  tender={tender}
-                  isSelected={isSelected}
-                  onSelect={() => handleSelectTenderCard(tender)}
-                  onCopyNit={handleCopyNit}
-                  copiedNit={copiedNit}
-                />
+                  ref={isSecondLast ? secondLastCardRef : undefined}
+                >
+                  <CurrentTenderCard
+                    tender={tender}
+                    isSelected={isSelected}
+                    onSelect={() => handleSelectTenderCard(tender)}
+                    onCopyNit={handleCopyNit}
+                    copiedNit={copiedNit}
+                  />
+                </div>
               );
             })}
 
-            {/* Infinite Scroll Sentinel */}
-            {(hasMoreToRender || hasMoreInDb) && (
+            {/* Infinite Scroll Loading Indicator */}
+            {isLoadingMore && (
               <div
-                ref={sentinelRef}
-                className="py-4 text-center text-xs text-slate-500 dark:text-slate-400 flex items-center justify-center gap-2 bg-slate-50/80 dark:bg-slate-900/60 rounded-xl border border-dashed border-slate-200 dark:border-slate-800"
+                className="py-3 text-center text-xs text-slate-500 dark:text-slate-400 flex items-center justify-center gap-2 bg-slate-50/80 dark:bg-slate-900/60 rounded-xl border border-dashed border-slate-200 dark:border-slate-800"
               >
                 <RefreshCw className="w-3.5 h-3.5 animate-spin text-orange-600 dark:text-orange-400" />
-                <span>
-                  {isFetchingBatch
-                    ? 'Loading next batch from indexed database...'
-                    : `Loading ${Math.min(PAGE_SIZE, hasMoreToRender ? filteredTenders.length - visibleCount : 12)} more notices...`}
-                </span>
+                <span>Loading next 12 notices from indexed database...</span>
               </div>
             )}
 
-            {!hasMoreToRender && !hasMoreInDb && (filteredTenders.length > 0 || totalDbCount > 0) && (
+            {!hasMore && (visibleTenders.length > 0 || totalDbCount > 0) && (
               <div className="py-2.5 text-center text-[11px] text-slate-400 dark:text-slate-500 font-medium">
-                ✓ Showing all {hasActiveFilters ? filteredTenders.length.toLocaleString('en-IN') : totalDbCount.toLocaleString('en-IN')} {includeClosed ? 'notices (including closed / under evaluation)' : 'open in-progress notices'}
+                ✓ Showing all {totalDbCount.toLocaleString('en-IN')} {includeClosed ? 'notices (including closed / under evaluation)' : 'open in-progress notices'}
+              </div>
+            )}
+
+            {visibleTenders.length === 0 && !loading && (
+              <div className="text-center py-12 px-4 bg-white dark:bg-[#0E1422] rounded-xl border border-slate-200/90 dark:border-slate-800 text-xs text-slate-500 dark:text-slate-400 space-y-2">
+                <Radio className="w-8 h-8 text-slate-300 dark:text-slate-600 mx-auto" />
+                <p className="font-semibold text-slate-800 dark:text-slate-200">No in-progress tenders matched the active filters.</p>
+                <button
+                  onClick={resetAllFilters}
+                  className="px-3 py-1.5 bg-orange-600 hover:bg-orange-700 text-white rounded text-xs font-semibold cursor-pointer"
+                >
+                  Clear all filters
+                </button>
               </div>
             )}
 

@@ -3,7 +3,8 @@ System & Platform Management API Routes
 Handles health checks, real-time scraping synchronization, and platform aggregate metrics.
 """
 
-from fastapi import APIRouter
+from typing import Optional
+from fastapi import APIRouter, Query, Request
 from fastapi.responses import JSONResponse
 from app.services.current_tenders_service import (
     ALL_CURRENT_TENDERS,
@@ -13,7 +14,7 @@ from app.services.current_tenders_service import (
 from app.services.accepted_tenders_service import ACCEPTED_TENDERS_CATALOG
 from app.services.bidders_service import ALL_BIDDERS_CATALOG
 from app.services.db_sync_service import sync_scraped_data_to_db
-from app.services.cron_scheduler_service import run_statutory_sources_sync, get_cron_status
+from app.services.cron_scheduler_service import run_statutory_sources_sync, get_cron_status, get_sync_logs
 from app.db.session import IS_POSTGRES, DATABASE_URL
 
 router = APIRouter(tags=["System & Platform"])
@@ -44,12 +45,13 @@ async def health_check():
 @router.post("/scraper/scrape-live")
 @router.post("/cron/trigger")
 @router.post("/cron/sync")
-async def trigger_live_scrape():
+async def trigger_live_scrape(request: Request = None):
     """
     Runs the official scraper synchronization job immediately (same job scheduled daily at 4:00 AM IST).
     Upserts scraped notices into persistent database and synchronizes the in-memory streaming catalog.
     """
-    report = await run_statutory_sources_sync(trigger_type="MANUAL_BUTTON")
+    client_ip = request.client.host if (request and request.client) else "web"
+    report = await run_statutory_sources_sync(trigger_type="MANUAL_BUTTON", initiated_by=f"Manual UI ({client_ip})")
     return JSONResponse(
         content=report,
         headers={
@@ -66,6 +68,28 @@ async def get_cron_sync_status():
     Returns the automated daily cron configuration (4:00 AM IST), next run timestamp, and last execution details.
     """
     return get_cron_status()
+
+
+@router.get("/system/sync-logs")
+@router.get("/cron/logs")
+@router.get("/scraper/logs")
+async def get_sync_audit_logs(
+    limit: int = Query(50, ge=1, le=200, description="Max logs to return"),
+    offset: int = Query(0, ge=0, description="Offset for pagination"),
+    trigger_type: Optional[str] = Query(None, description="Filter by MANUAL_BUTTON or SCHEDULED_CRON")
+):
+    """
+    Returns historical synchronization audit logs from the persistent database,
+    logging every manual sync and automated 4:00 AM IST scheduled cron run.
+    """
+    logs_data = await get_sync_logs(limit=limit, offset=offset, trigger_type=trigger_type)
+    return JSONResponse(
+        content=logs_data,
+        headers={
+            "Cache-Control": "no-cache, no-store, must-revalidate",
+            "Pragma": "no-cache"
+        }
+    )
 
 
 @router.get("/stats")
