@@ -52,11 +52,30 @@ export async function listAcceptedTenders(): Promise<AcceptedTender[]> {
   return fallbackRes.json();
 }
 
+export interface CurrentTenderFilters {
+  source_portal?: string;
+  organization?: string;
+  state?: string;
+  city?: string;
+  category?: string;
+  search?: string;
+  min_cost?: number;
+  max_cost?: number;
+  include_closed?: boolean;
+  limit?: number;
+  offset?: number;
+}
+
 export function getAcceptedTenderPdfUrl(id: string): string {
   return `${API_BASE}/accepted-tenders/${id}/pdf`;
 }
 
-export async function listCurrentTenders(filters?: CurrentTenderFilters): Promise<CurrentTender[]> {
+export interface CurrentTendersResponse {
+  tenders: CurrentTender[];
+  totalCount: number;
+}
+
+export async function listCurrentTenders(filters?: CurrentTenderFilters): Promise<CurrentTendersResponse> {
   const params = new URLSearchParams();
   if (filters?.source_portal && filters.source_portal !== 'ALL') params.append('source_portal', filters.source_portal);
   if (filters?.organization && filters.organization !== 'ALL') params.append('organization', filters.organization);
@@ -67,66 +86,27 @@ export async function listCurrentTenders(filters?: CurrentTenderFilters): Promis
   if (filters?.min_cost) params.append('min_cost', String(filters.min_cost));
   if (filters?.max_cost) params.append('max_cost', String(filters.max_cost));
   if (filters?.include_closed !== undefined) params.append('include_closed', String(filters.include_closed));
+  if (filters?.limit !== undefined) params.append('limit', String(filters.limit));
+  if (filters?.offset !== undefined) params.append('offset', String(filters.offset));
   params.append('_t', String(Date.now()));
 
-  try {
-    const res = await fetch(`${API_BASE}/current-tenders?${params.toString()}`, {
-      cache: 'no-store',
-      headers: {
-        'Cache-Control': 'no-cache',
-        'Pragma': 'no-cache'
-      }
-    });
-    if (res.ok) {
-      return await res.json();
+  const res = await fetch(`${API_BASE}/current-tenders?${params.toString()}`, {
+    cache: 'no-store',
+    headers: {
+      'Cache-Control': 'no-cache',
+      'Pragma': 'no-cache'
     }
-  } catch {
-    // Backend API unreachable, falling back to static catalog
-  }
-
-  // Fallback to static catalog for Netlify / serverless deployment
-  const fallbackRes = await fetch(`/data/all_sources_current_catalog.json?_v=${Date.now()}`, {
-    cache: 'no-cache',
-    headers: { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' }
   });
-  if (!fallbackRes.ok) throw new Error('Failed to load current tenders');
-  let list: CurrentTender[] = await fallbackRes.json();
 
-  if (filters) {
-    if (filters.source_portal && filters.source_portal !== 'ALL') {
-      list = list.filter((t) => t.source_portal === filters.source_portal);
-    }
-    if (filters.organization && filters.organization !== 'ALL') {
-      list = list.filter((t) => t.organization === filters.organization);
-    }
-    if (filters.state && filters.state !== 'ALL') {
-      list = list.filter((t) => t.state === filters.state);
-    }
-    if (filters.city && filters.city !== 'ALL') {
-      list = list.filter((t) => t.city === filters.city);
-    }
-    if (filters.category && filters.category !== 'ALL') {
-      list = list.filter((t) => t.category === filters.category);
-    }
-    if (filters.search) {
-      const q = filters.search.toLowerCase();
-      list = list.filter(
-        (t) =>
-          t.title?.toLowerCase().includes(q) ||
-          t.organization?.toLowerCase().includes(q) ||
-          t.city?.toLowerCase().includes(q) ||
-          t.source_portal?.toLowerCase().includes(q)
-      );
-    }
-    if (filters.min_cost) {
-      list = list.filter((t) => (t.estimated_cost_inr || 0) >= filters.min_cost!);
-    }
-    if (filters.max_cost) {
-      list = list.filter((t) => (t.estimated_cost_inr || 0) <= filters.max_cost!);
-    }
+  if (!res.ok) {
+    throw new Error(`Failed to query live tenders from database (${res.status} ${res.statusText})`);
   }
 
-  return list;
+  const rawCountHeader = res.headers.get('X-Total-Count');
+  const tenders: CurrentTender[] = await res.json();
+  const totalCount = rawCountHeader ? parseInt(rawCountHeader, 10) : tenders.length;
+
+  return { tenders, totalCount };
 }
 
 export function getCurrentTenderPdfUrl(id: string): string {

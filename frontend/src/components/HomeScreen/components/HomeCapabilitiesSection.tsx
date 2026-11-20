@@ -153,7 +153,7 @@ export const HomeCapabilitiesSection: React.FC<HomeCapabilitiesSectionProps> = (
               <Sparkles className="w-5 h-5" />
             </div>
             <h3 className="text-base font-bold text-slate-900 dark:text-white">
-              4. AI Competitor Simulation & Deep RAG Clause Analytics
+              [RAG] 4. AI Competitor Simulation & Deep Clause Analytics
             </h3>
             <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
               Advanced analytical models evaluating tender competition probability and parsing dense contract clauses from RFP documents in real time.
@@ -161,15 +161,15 @@ export const HomeCapabilitiesSection: React.FC<HomeCapabilitiesSectionProps> = (
             <ul className="text-xs text-slate-600 dark:text-slate-300 space-y-1.5 pt-1">
               <li className="flex items-center gap-2">
                 <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
-                <span><strong>AI L1 Bidder Prediction:</strong> Mathematical simulation predicting top competing bidders and win probabilities.</span>
+                <span><strong>[RAG] AI L1 Bidder Prediction:</strong> Mathematical simulation predicting top competing bidders and win probabilities.</span>
               </li>
               <li className="flex items-center gap-2">
                 <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
-                <span><strong>Clause-by-Clause RAG Querying:</strong> Instant retrieval of critical liquidated damages, defect liability & mobilization terms.</span>
+                <span><strong>[RAG] Clause-by-Clause Querying:</strong> Instant retrieval of critical liquidated damages, defect liability & mobilization terms.</span>
               </li>
               <li className="flex items-center gap-2">
                 <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
-                <span><strong>BOQ Rate Schedule Insights:</strong> Historical unit pricing benchmarks for cement, steel, earthwork, and bitumen.</span>
+                <span><strong>[RAG] BOQ Rate Schedule Insights:</strong> Historical unit pricing benchmarks for cement, steel, earthwork, and bitumen.</span>
               </li>
               <li className="flex items-center gap-2">
                 <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
@@ -181,7 +181,7 @@ export const HomeCapabilitiesSection: React.FC<HomeCapabilitiesSectionProps> = (
             onClick={() => onNavigate('current')}
             className="w-full py-2.5 px-4 bg-purple-50 dark:bg-purple-950/40 hover:bg-purple-100 dark:hover:bg-purple-900/60 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800/60 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-colors cursor-pointer"
           >
-            <span>Explore AI Analytics on Tenders</span>
+            <span>[RAG] Explore AI Analytics on Tenders</span>
             <ChevronRight className="w-4 h-4" />
           </button>
         </div>

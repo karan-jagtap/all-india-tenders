@@ -1627,6 +1627,17 @@ def get_accepted_tender_by_id(tender_id: str) -> Optional[Dict[str, Any]]:
     return None
 
 
+def format_date_dmy(val: Any) -> str:
+    if not val:
+        return ""
+    val_str = str(val).strip()
+    m = re.match(r'^(\d{4})[-/](\d{1,2})[-/](\d{1,2})', val_str)
+    if m:
+        y, mo, d = m.groups()
+        return f"{int(d):02d}-{int(mo):02d}-{y}"
+    return val_str
+
+
 def generate_accepted_bid_pdf(tender_data: Dict[str, Any]) -> bytes:
     """
     Generates a high-resolution, multi-page official government procurement dossier
@@ -1708,10 +1719,10 @@ def generate_accepted_bid_pdf(tender_data: Dict[str, Any]) -> bytes:
             Paragraph("<b>GOVERNMENT OF INDIA • PUBLIC PROCUREMENT e-PORTAL</b>", header_sub_style),
         ],
         [
-            Paragraph("<b>OFFICIAL ACCEPTED TENDER & AWARDED BID DOSSIER</b>", title_style),
+            Paragraph("<b>[RAG] OFFICIAL ACCEPTED TENDER & AWARDED BID DOSSIER</b>", title_style),
         ],
         [
-            Paragraph(f"Tender Ref: <b>{tender_data['og_tender']['nit_number']}</b> • Award Date: <b>{tender_data['award_date']}</b>", header_sub_style)
+            Paragraph(f"Tender Ref: <b>{tender_data['og_tender']['nit_number']}</b> • Award Date: <b>{format_date_dmy(tender_data['award_date'])}</b>", header_sub_style)
         ]
     ]
     header_table = Table(header_data, colWidths=[540])
@@ -1845,9 +1856,9 @@ def generate_accepted_bid_pdf(tender_data: Dict[str, Any]) -> bytes:
     loa = tender_data['acceptance_and_loa']
     loa_data = [
         [Paragraph("<b>LOA Reference Number</b>", bold_body_style), Paragraph(loa['loa_number'], bold_body_style)],
-        [Paragraph("<b>Date of LOA Issuance</b>", bold_body_style), Paragraph(loa['loa_date'], body_style)],
+        [Paragraph("<b>Date of LOA Issuance</b>", bold_body_style), Paragraph(format_date_dmy(loa['loa_date']), body_style)],
         [Paragraph("<b>Awarding Authority</b>", bold_body_style), Paragraph(loa['awarding_authority'], body_style)],
-        [Paragraph("<b>Contract Agreement Date</b>", bold_body_style), Paragraph(loa['contract_agreement_date'], body_style)],
+        [Paragraph("<b>Contract Agreement Date</b>", bold_body_style), Paragraph(format_date_dmy(loa['contract_agreement_date']), body_style)],
         [Paragraph("<b>Evaluation Committee Verdict & Acceptance Rationale</b>", bold_body_style), Paragraph(loa['committee_verdict'], body_style)],
     ]
     loa_table = Table(loa_data, colWidths=[150, 390])

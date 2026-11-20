@@ -31,7 +31,7 @@ export const DeepRAGClauseSubTab: React.FC<DeepRAGClauseSubTabProps> = ({
             <div className="flex items-center gap-2 mb-1.5 flex-wrap">
               <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-wider uppercase bg-indigo-500 text-slate-950 flex items-center gap-1 shadow-xs">
                 <Sparkles className="w-3.5 h-3.5" />
-                RAG CONTRACT DOCUMENT INTELLIGENCE
+                [RAG] CONTRACT DOCUMENT INTELLIGENCE
               </span>
               <span className="px-2 py-0.5 rounded text-[10px] bg-slate-800 text-slate-300 font-mono border border-slate-700">
                 SBD & BOQ Schedule Synthesis
@@ -41,7 +41,7 @@ export const DeepRAGClauseSubTab: React.FC<DeepRAGClauseSubTabProps> = ({
               </span>
             </div>
             <h4 className="text-base font-bold text-white tracking-tight">
-              Standard Bidding Document (SBD) Clause Breakdown & BOQ Cost Drivers
+              [RAG] SBD Contract Clause Breakdown & BOQ Cost Drivers
             </h4>
             <p className="text-xs text-slate-300 mt-1 max-w-3xl leading-relaxed">
               AI Retrieval-Augmented Generation extracts and risk-scores critical contractual liabilities: Liquidated Damages formulas, RBI/MoSPI Price Variation clauses, Mobilization Advances, DLP warranty retentions, and Pareto 80/20 bill of quantities cost drivers.
@@ -104,7 +104,7 @@ export const DeepRAGClauseSubTab: React.FC<DeepRAGClauseSubTabProps> = ({
           <div>
             <h4 className="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider flex items-center gap-1.5">
               <Scale className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
-              Contractual Clause Risk Matrix & Legal Obligations
+              [RAG] Contractual Clause Risk Matrix & Legal Obligations
             </h4>
             <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
               Extracted from General Conditions of Contract (GCC) & Special Conditions (SCC) under GFR 2017 & CVC guidelines.
@@ -190,7 +190,7 @@ export const DeepRAGClauseSubTab: React.FC<DeepRAGClauseSubTabProps> = ({
           <div>
             <h4 className="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider flex items-center gap-1.5">
               <FileSpreadsheet className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-              BOQ Pareto 80/20 Cost Drivers & Material Sensitivity
+              [RAG] BOQ Pareto 80/20 Cost Drivers & Material Sensitivity
             </h4>
             <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
               Identifies the key 20% of work packages driving 80% of project expenditure and raw material price volatility.
@@ -269,7 +269,7 @@ export const DeepRAGClauseSubTab: React.FC<DeepRAGClauseSubTabProps> = ({
       <div className="pt-2">
         <h4 className="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider mb-2.5 flex items-center gap-1.5">
           <FileCheck className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-          Statutory GFR 2017 & Eligibility Verification Checklist
+          [RAG] Statutory GFR 2017 & Eligibility Verification Checklist
         </h4>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
           {deepRAGReport.statutoryChecklist.map((chk) => (
@@ -300,7 +300,7 @@ export const DeepRAGClauseSubTab: React.FC<DeepRAGClauseSubTabProps> = ({
             className="px-3.5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold flex items-center gap-1.5 shadow-xs transition-all"
           >
             <BookOpen className="w-3.5 h-3.5" />
-            <span>Download Full SBD (PDF)</span>
+            <span>[RAG] Download Full SBD (PDF)</span>
           </a>
           <a
             href={boqUrl}
@@ -308,7 +308,7 @@ export const DeepRAGClauseSubTab: React.FC<DeepRAGClauseSubTabProps> = ({
             className="px-3.5 py-2 bg-slate-800 hover:bg-slate-900 text-white rounded-lg text-xs font-bold flex items-center gap-1.5 shadow-xs transition-all"
           >
             <FileSpreadsheet className="w-3.5 h-3.5 text-emerald-400" />
-            <span>Download BOQ Schedule (320 KB)</span>
+            <span>[RAG] Download BOQ Schedule (320 KB)</span>
           </a>
         </div>
       </div>

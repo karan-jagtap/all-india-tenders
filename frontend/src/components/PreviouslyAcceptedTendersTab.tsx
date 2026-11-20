@@ -11,7 +11,6 @@ import {
   FolderLock,
   Stamp,
   Users,
-  Search,
   TrendingDown,
   Layers,
   MapPin,
@@ -23,21 +22,24 @@ import {
   Truck,
   FileSpreadsheet,
   Tag,
-  X
+  ArrowUpDown
 } from 'lucide-react';
 import {
   FilterSearchBar,
   TopFilterActionBar,
   ActiveFilterChipsBar,
   TenderFilterDrawer,
-  FilterChipItem
+  FilterChipItem,
+  ToolbarSortDropdown,
+  ToolbarSortOption
 } from './common';
 import {
   AcceptedTender,
   listAcceptedTenders,
   getAcceptedTenderPdfUrl
 } from '../services/api';
-import { DetailModalTab, AcceptedTenderModalTab } from '../types';
+import { DetailModalTab, AcceptedTenderModalTab, AcceptedTenderSortOption } from '../types';
+import { formatDate } from '../utils';
 import { AllBidsEvaluationSubTab } from './AcceptedTenders/AllBidsEvaluationSubTab';
 import {
   ALL_CANONICAL_CATEGORIES,
@@ -261,6 +263,51 @@ interface EnrichedAcceptedTender extends AcceptedTender {
   _searchBlob: string;
 }
 
+export const ACCEPTED_TENDER_SORT_OPTIONS: ToolbarSortOption<AcceptedTenderSortOption>[] = [
+  {
+    value: 'AWARD_DATE_DESC',
+    label: '🏆 Award Date: Newest First',
+    shortLabel: 'Award (Newest)',
+    desc: 'Most recently awarded government contracts'
+  },
+  {
+    value: 'AWARD_DATE_ASC',
+    label: '📜 Award Date: Oldest First',
+    shortLabel: 'Award (Oldest)',
+    desc: 'Earliest awarded contracts in archive'
+  },
+  {
+    value: 'VALUE_DESC',
+    label: '💎 Contract Value: High to Low',
+    shortLabel: 'Value (High → Low)',
+    desc: 'Highest winning contract values first'
+  },
+  {
+    value: 'VALUE_ASC',
+    label: '🪙 Contract Value: Low to High',
+    shortLabel: 'Value (Low → High)',
+    desc: 'Smallest winning contract values first'
+  },
+  {
+    value: 'DISCOUNT_DESC',
+    label: '📉 Winning Discount %: High to Low',
+    shortLabel: 'Discount % (High → Low)',
+    desc: 'Contracts won with highest rebate/discount below estimate'
+  },
+  {
+    value: 'CONTRACTOR_ASC',
+    label: '🏢 Contractor Name (A → Z)',
+    shortLabel: 'Contractor (A → Z)',
+    desc: 'Alphabetical order by winning contractor'
+  },
+  {
+    value: 'TITLE_ASC',
+    label: '🔤 Work Title (A → Z)',
+    shortLabel: 'Title (A → Z)',
+    desc: 'Alphabetical order by tender title'
+  }
+];
+
 export const PreviouslyAcceptedTendersTab: React.FC = () => {
   const [tenders, setTenders] = useState<EnrichedAcceptedTender[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -269,12 +316,13 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
   const [selectedTenderId, setSelectedTenderId] = useState<string>('');
   const [activeSubTab, setActiveSubTab] = useState<DetailModalTab>(AcceptedTenderModalTab.COMPARISON);
   const [searchQuery, setSearchQuery] = useState<string>('');
-  const [selectedCategory, setSelectedCategory] = useState<string>('ALL');
-  const [selectedSource, setSelectedSource] = useState<string>('ALL');
-  const [selectedOrg, setSelectedOrg] = useState<string>('ALL');
-  const [selectedState, setSelectedState] = useState<string>('ALL');
-  const [selectedCity, setSelectedCity] = useState<string>('ALL');
+  const [selectedCategory, setSelectedCategory] = useState<string[]>(['ALL']);
+  const [selectedSource, setSelectedSource] = useState<string[]>(['ALL']);
+  const [selectedOrg, setSelectedOrg] = useState<string[]>(['ALL']);
+  const [selectedState, setSelectedState] = useState<string[]>(['ALL']);
+  const [selectedCity, setSelectedCity] = useState<string[]>(['ALL']);
   const [selectedYear, setSelectedYear] = useState<string>('ALL');
+  const [sortBy, setSortBy] = useState<AcceptedTenderSortOption>('AWARD_DATE_DESC');
   const [isVoiceSearching, setIsVoiceSearching] = useState<boolean>(false);
   const voiceSearchRef = useRef<any>(null);
   const dossierRef = useRef<HTMLDivElement>(null);
@@ -402,25 +450,26 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
   };
 
   const query = searchQuery.toLowerCase().trim();
+  const isAll = (arr: string[]) => !arr || arr.length === 0 || arr.includes('ALL');
 
   // Faceted matcher for historical accepted bids
   const matchesFilter = useCallback(
     (t: EnrichedAcceptedTender, excludeDimension?: string) => {
       if (query && !t._searchBlob.includes(query)) return false;
 
-      if (excludeDimension !== 'category' && selectedCategory !== 'ALL' && t._category !== selectedCategory) {
+      if (excludeDimension !== 'category' && !isAll(selectedCategory) && !selectedCategory.includes(t._category)) {
         return false;
       }
-      if (excludeDimension !== 'source' && selectedSource !== 'ALL' && t._source !== selectedSource) {
+      if (excludeDimension !== 'source' && !isAll(selectedSource) && !selectedSource.includes(t._source)) {
         return false;
       }
-      if (excludeDimension !== 'org' && selectedOrg !== 'ALL' && t._org !== selectedOrg) {
+      if (excludeDimension !== 'org' && !isAll(selectedOrg) && !selectedOrg.includes(t._org)) {
         return false;
       }
-      if (excludeDimension !== 'state' && selectedState !== 'ALL' && t._state !== selectedState) {
+      if (excludeDimension !== 'state' && !isAll(selectedState) && !selectedState.includes(t._state)) {
         return false;
       }
-      if (excludeDimension !== 'city' && selectedCity !== 'ALL' && t._city !== selectedCity) {
+      if (excludeDimension !== 'city' && !isAll(selectedCity) && !selectedCity.includes(t._city)) {
         return false;
       }
       if (excludeDimension !== 'year' && selectedYear !== 'ALL' && String(t.year) !== selectedYear) {
@@ -451,9 +500,9 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
     for (const t of tenders) {
       if (t._category) set.add(t._category);
     }
-    if (selectedCategory !== 'ALL') {
-      set.add(selectedCategory);
-    }
+    selectedCategory.forEach((cat) => {
+      if (cat !== 'ALL') set.add(cat);
+    });
     return Array.from(set).sort();
   }, [tenders, selectedCategory, filterConstantsTick]);
 
@@ -475,9 +524,9 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
     for (const t of tenders) {
       if (t._source) set.add(t._source);
     }
-    if (selectedSource !== 'ALL') {
-      set.add(selectedSource);
-    }
+    selectedSource.forEach((src) => {
+      if (src !== 'ALL') set.add(src);
+    });
     return Array.from(set).sort();
   }, [tenders, selectedSource, filterConstantsTick]);
 
@@ -496,11 +545,12 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
 
   const availableOrgs = useMemo(() => {
     const list = Array.from(orgCounts.keys()).sort();
-    if (selectedOrg !== 'ALL' && !list.includes(selectedOrg)) {
-      list.push(selectedOrg);
-      list.sort();
-    }
-    return list;
+    selectedOrg.forEach((org) => {
+      if (org !== 'ALL' && !list.includes(org)) {
+        list.push(org);
+      }
+    });
+    return list.sort();
   }, [orgCounts, selectedOrg]);
 
   // 3. Faceted context & counts for States
@@ -520,11 +570,12 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
 
   const availableStates = useMemo(() => {
     const list = Array.from(stateCounts.keys()).sort();
-    if (selectedState !== 'ALL' && !list.includes(selectedState)) {
-      list.push(selectedState);
-      list.sort();
-    }
-    return list;
+    selectedState.forEach((st) => {
+      if (st !== 'ALL' && !list.includes(st)) {
+        list.push(st);
+      }
+    });
+    return list.sort();
   }, [stateCounts, selectedState]);
 
   // 4. Faceted context & counts for Cities
@@ -544,11 +595,12 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
 
   const availableCities = useMemo(() => {
     const list = Array.from(cityCounts.keys()).sort();
-    if (selectedCity !== 'ALL' && !list.includes(selectedCity)) {
-      list.push(selectedCity);
-      list.sort();
-    }
-    return list;
+    selectedCity.forEach((ct) => {
+      if (ct !== 'ALL' && !list.includes(ct)) {
+        list.push(ct);
+      }
+    });
+    return list.sort();
   }, [cityCounts, selectedCity]);
 
   // 5. Faceted context & counts for Years
@@ -574,13 +626,52 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
     return list;
   }, [yearCounts, selectedYear]);
 
-  // Final filtered tenders intersection
+  // Final filtered tenders intersection & active sorting
   const filteredTenders = useMemo(() => {
-    return tenders.filter((t) => matchesFilter(t));
-  }, [tenders, matchesFilter]);
+    const list = tenders.filter((t) => matchesFilter(t));
+    return list.sort((a, b) => {
+      switch (sortBy) {
+        case 'AWARD_DATE_DESC': {
+          const bDate = b.award_date ? new Date(b.award_date).getTime() : (b.year ? b.year * 10000 : 0);
+          const aDate = a.award_date ? new Date(a.award_date).getTime() : (a.year ? a.year * 10000 : 0);
+          return bDate - aDate;
+        }
+        case 'AWARD_DATE_ASC': {
+          const aDate = a.award_date ? new Date(a.award_date).getTime() : (a.year ? a.year * 10000 : 0);
+          const bDate = b.award_date ? new Date(b.award_date).getTime() : (b.year ? b.year * 10000 : 0);
+          return aDate - bDate;
+        }
+        case 'VALUE_DESC': {
+          const bVal = b.bid_submission?.quoted_amount_inr || b.og_tender?.estimated_cost_inr || 0;
+          const aVal = a.bid_submission?.quoted_amount_inr || a.og_tender?.estimated_cost_inr || 0;
+          return bVal - aVal;
+        }
+        case 'VALUE_ASC': {
+          const aVal = a.bid_submission?.quoted_amount_inr || a.og_tender?.estimated_cost_inr || 0;
+          const bVal = b.bid_submission?.quoted_amount_inr || b.og_tender?.estimated_cost_inr || 0;
+          return aVal - bVal;
+        }
+        case 'DISCOUNT_DESC': {
+          const bDisc = b.bid_submission?.quoted_discount_pct || 0;
+          const aDisc = a.bid_submission?.quoted_discount_pct || 0;
+          return bDisc - aDisc;
+        }
+        case 'CONTRACTOR_ASC': {
+          const aName = a.winning_company?.name || '';
+          const bName = b.winning_company?.name || '';
+          return aName.localeCompare(bName);
+        }
+        case 'TITLE_ASC': {
+          return a.title.localeCompare(b.title);
+        }
+        default:
+          return 0;
+      }
+    });
+  }, [tenders, matchesFilter, sortBy]);
 
   // Whenever ANY filter is reset or changed, automatically select the first record in the refreshed list
-  const currentFilterKey = `${selectedCategory}|${selectedSource}|${selectedOrg}|${selectedState}|${selectedCity}|${selectedYear}|${searchQuery.trim()}`;
+  const currentFilterKey = `${selectedCategory.slice().sort().join(',')}|${selectedSource.slice().sort().join(',')}|${selectedOrg.slice().sort().join(',')}|${selectedState.slice().sort().join(',')}|${selectedCity.slice().sort().join(',')}|${selectedYear}|${sortBy}|${searchQuery.trim()}`;
   const [prevFilterKey, setPrevFilterKey] = useState<string>(currentFilterKey);
 
   if (prevFilterKey !== currentFilterKey) {
@@ -606,25 +697,27 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
   }, [selectedTender?.id]);
 
   const hasActiveFilters =
-    selectedCategory !== 'ALL' ||
-    selectedSource !== 'ALL' ||
-    selectedOrg !== 'ALL' ||
-    selectedState !== 'ALL' ||
-    selectedCity !== 'ALL' ||
+    !isAll(selectedCategory) ||
+    !isAll(selectedSource) ||
+    !isAll(selectedOrg) ||
+    !isAll(selectedState) ||
+    !isAll(selectedCity) ||
     selectedYear !== 'ALL' ||
+    sortBy !== 'AWARD_DATE_DESC' ||
     searchQuery.trim() !== '';
 
   const activeFiltersCount = useMemo(() => {
     let count = 0;
-    if (selectedCategory !== 'ALL') count++;
-    if (selectedSource !== 'ALL') count++;
-    if (selectedOrg !== 'ALL') count++;
-    if (selectedState !== 'ALL') count++;
-    if (selectedCity !== 'ALL') count++;
+    if (!isAll(selectedCategory)) count += selectedCategory.filter((c) => c !== 'ALL').length;
+    if (!isAll(selectedSource)) count += selectedSource.filter((s) => s !== 'ALL').length;
+    if (!isAll(selectedOrg)) count += selectedOrg.filter((o) => o !== 'ALL').length;
+    if (!isAll(selectedState)) count += selectedState.filter((st) => st !== 'ALL').length;
+    if (!isAll(selectedCity)) count += selectedCity.filter((ct) => ct !== 'ALL').length;
     if (selectedYear !== 'ALL') count++;
+    if (sortBy !== 'AWARD_DATE_DESC') count++;
     if (searchQuery.trim() !== '') count++;
     return count;
-  }, [selectedCategory, selectedSource, selectedOrg, selectedState, selectedCity, selectedYear, searchQuery]);
+  }, [selectedCategory, selectedSource, selectedOrg, selectedState, selectedCity, selectedYear, sortBy, searchQuery]);
 
   const selectFirstAcceptedTenderRecord = (tenderList: EnrichedAcceptedTender[]) => {
     const firstTender = tenderList[0];
@@ -633,12 +726,13 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
   };
 
   const resetFilterStateValues = () => {
-    setSelectedCategory('ALL');
-    setSelectedSource('ALL');
-    setSelectedOrg('ALL');
-    setSelectedState('ALL');
-    setSelectedCity('ALL');
+    setSelectedCategory(['ALL']);
+    setSelectedSource(['ALL']);
+    setSelectedOrg(['ALL']);
+    setSelectedState(['ALL']);
+    setSelectedCity(['ALL']);
     setSelectedYear('ALL');
+    setSortBy('AWARD_DATE_DESC');
     setSearchQuery('');
   };
 
@@ -674,25 +768,32 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
     }
   };
 
-  const handleRemoveCategoryChip = () => {
-    setSelectedCategory('ALL');
+  const handleRemoveCategory = (cat: string) => {
+    const next = selectedCategory.filter((c) => c !== cat && c !== 'ALL');
+    setSelectedCategory(next.length === 0 ? ['ALL'] : next);
   };
 
-  const handleRemoveSourceChip = () => {
-    setSelectedSource('ALL');
+  const handleRemoveSource = (src: string) => {
+    const next = selectedSource.filter((s) => s !== src && s !== 'ALL');
+    setSelectedSource(next.length === 0 ? ['ALL'] : next);
   };
 
-  const handleRemoveOrgChip = () => {
-    setSelectedOrg('ALL');
+  const handleRemoveOrg = (org: string) => {
+    const next = selectedOrg.filter((o) => o !== org && o !== 'ALL');
+    setSelectedOrg(next.length === 0 ? ['ALL'] : next);
   };
 
-  const handleRemoveStateChip = () => {
-    setSelectedState('ALL');
-    setSelectedCity('ALL');
+  const handleRemoveState = (st: string) => {
+    const next = selectedState.filter((s) => s !== st && s !== 'ALL');
+    setSelectedState(next.length === 0 ? ['ALL'] : next);
+    if (next.length === 0) {
+      setSelectedCity(['ALL']);
+    }
   };
 
-  const handleRemoveCityChip = () => {
-    setSelectedCity('ALL');
+  const handleRemoveCity = (ct: string) => {
+    const next = selectedCity.filter((c) => c !== ct && c !== 'ALL');
+    setSelectedCity(next.length === 0 ? ['ALL'] : next);
   };
 
   const handleRemoveYearChip = () => {
@@ -764,58 +865,68 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
   const activeChips: FilterChipItem[] = useMemo(() => {
     const list: FilterChipItem[] = [];
 
-    if (selectedCategory !== 'ALL') {
-      list.push({
-        id: 'category',
-        label: 'Category',
-        value: selectedCategory,
-        icon: <Tag className="w-3 h-3 text-emerald-600" />,
-        color: 'emerald',
-        onRemove: handleRemoveCategoryChip
+    if (!selectedCategory.includes('ALL')) {
+      selectedCategory.forEach((cat) => {
+        list.push({
+          id: `category-${cat}`,
+          label: 'Category',
+          value: cat,
+          icon: <Tag className="w-3 h-3 text-emerald-600" />,
+          color: 'emerald',
+          onRemove: () => handleRemoveCategory(cat)
+        });
       });
     }
 
-    if (selectedSource !== 'ALL') {
-      list.push({
-        id: 'source',
-        label: 'Source',
-        value: selectedSource,
-        icon: <Globe className="w-3 h-3 text-orange-600" />,
-        color: 'orange',
-        onRemove: handleRemoveSourceChip
+    if (!selectedSource.includes('ALL')) {
+      selectedSource.forEach((src) => {
+        list.push({
+          id: `source-${src}`,
+          label: 'Source',
+          value: src,
+          icon: <Globe className="w-3 h-3 text-orange-600" />,
+          color: 'orange',
+          onRemove: () => handleRemoveSource(src)
+        });
       });
     }
 
-    if (selectedOrg !== 'ALL') {
-      list.push({
-        id: 'org',
-        label: 'Org',
-        value: selectedOrg,
-        icon: <Building2 className="w-3 h-3 text-blue-600" />,
-        color: 'blue',
-        onRemove: handleRemoveOrgChip
+    if (!selectedOrg.includes('ALL')) {
+      selectedOrg.forEach((org) => {
+        list.push({
+          id: `org-${org}`,
+          label: 'Org',
+          value: org,
+          icon: <Building2 className="w-3 h-3 text-blue-600" />,
+          color: 'blue',
+          onRemove: () => handleRemoveOrg(org)
+        });
       });
     }
 
-    if (selectedState !== 'ALL') {
-      list.push({
-        id: 'state',
-        label: 'State',
-        value: selectedState,
-        icon: <MapPin className="w-3 h-3 text-rose-600" />,
-        color: 'rose',
-        onRemove: handleRemoveStateChip
+    if (!selectedState.includes('ALL')) {
+      selectedState.forEach((st) => {
+        list.push({
+          id: `state-${st}`,
+          label: 'State',
+          value: st,
+          icon: <MapPin className="w-3 h-3 text-rose-600" />,
+          color: 'rose',
+          onRemove: () => handleRemoveState(st)
+        });
       });
     }
 
-    if (selectedCity !== 'ALL') {
-      list.push({
-        id: 'city',
-        label: 'City',
-        value: selectedCity,
-        icon: <MapPin className="w-3 h-3 text-amber-600" />,
-        color: 'amber',
-        onRemove: handleRemoveCityChip
+    if (!selectedCity.includes('ALL')) {
+      selectedCity.forEach((ct) => {
+        list.push({
+          id: `city-${ct}`,
+          label: 'City',
+          value: ct,
+          icon: <MapPin className="w-3 h-3 text-amber-600" />,
+          color: 'amber',
+          onRemove: () => handleRemoveCity(ct)
+        });
       });
     }
 
@@ -827,6 +938,18 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
         icon: <Calendar className="w-3 h-3 text-amber-600" />,
         color: 'amber',
         onRemove: handleRemoveYearChip
+      });
+    }
+
+    if (sortBy !== 'AWARD_DATE_DESC') {
+      const activeOpt = ACCEPTED_TENDER_SORT_OPTIONS.find((o) => o.value === sortBy);
+      list.push({
+        id: 'sort',
+        label: 'Sort',
+        value: activeOpt?.shortLabel || activeOpt?.label || sortBy,
+        icon: <ArrowUpDown className="w-3 h-3 text-emerald-600" />,
+        color: 'emerald',
+        onRemove: () => setSortBy('AWARD_DATE_DESC')
       });
     }
 
@@ -848,6 +971,7 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
     selectedState,
     selectedCity,
     selectedYear,
+    sortBy,
     searchQuery
   ]);
 
@@ -902,6 +1026,15 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
             totalCount={tenders.length}
             reloadLabel="Reload"
             accentColor="emerald"
+            sortControl={
+              <ToolbarSortDropdown<AcceptedTenderSortOption>
+                value={sortBy}
+                onChange={setSortBy}
+                options={ACCEPTED_TENDER_SORT_OPTIONS}
+                defaultValue="AWARD_DATE_DESC"
+                accentColor="emerald"
+              />
+            }
           />
         </div>
 
@@ -976,33 +1109,6 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
                 ))}
               </select>
             </div>
-
-            {/* Keyword / Award ID Search */}
-            <div className="space-y-1.5">
-              <label className="text-xs font-bold text-slate-200 flex items-center gap-1.5">
-                <Search className="w-3.5 h-3.5 text-sky-400" />
-                <span>Keyword or Award ID</span>
-              </label>
-              <div className="relative">
-                <input
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Filter by contractor, NIT, authority..."
-                  className="w-full bg-slate-800 border border-slate-700 rounded-lg pl-3 pr-8 py-2 text-xs text-white placeholder-slate-400 focus:outline-none focus:border-emerald-500"
-                />
-                {searchQuery && (
-                  <button
-                    type="button"
-                    onClick={() => setSearchQuery('')}
-                    className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-slate-400 hover:text-white rounded transition-colors cursor-pointer"
-                    title="Clear keyword"
-                  >
-                    <X className="w-3.5 h-3.5" />
-                  </button>
-                )}
-              </div>
-            </div>
           </>
         }
       />
@@ -1035,9 +1141,9 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
                 <div
                   key={tender.id}
                   onClick={() => handleSelectTenderCard(tender)}
-                  className={`cursor-pointer rounded-xl p-4 border transition-all text-xs relative ${
+                  className={`cursor-pointer rounded-xl p-4 border transition-all text-xs relative hover:z-20 ${
                     isSelected
-                      ? 'bg-white dark:bg-[#131A2B] border-emerald-500 shadow-md ring-1 ring-emerald-500'
+                      ? 'bg-white dark:bg-[#131A2B] border-emerald-500 shadow-md ring-1 ring-emerald-500 z-10'
                       : 'bg-white dark:bg-[#0E1422] border-slate-200/90 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 hover:bg-slate-50/70 dark:hover:bg-slate-800/40 shadow-2xs'
                   }`}
                 >
@@ -1059,10 +1165,62 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
                         {sourceLabel}
                       </span>
                     </div>
-                    <span className="text-[11px] text-slate-400 dark:text-slate-500 font-mono flex items-center gap-1">
-                      <Calendar className="w-3 h-3" />
-                      {tender.award_date}
-                    </span>
+
+                    {/* Award Date with Explanatory Tooltip */}
+                    <div className="relative group/date shrink-0">
+                      <div
+                        className="text-[11px] text-slate-500 dark:text-slate-400 font-mono flex items-center gap-1 cursor-help hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors py-0.5 px-1 rounded hover:bg-emerald-50/70 dark:hover:bg-emerald-950/40"
+                      >
+                        <Calendar className="w-3 h-3 text-slate-400 dark:text-slate-500 group-hover/date:text-emerald-500" />
+                        <span className="border-b border-dotted border-slate-300 dark:border-slate-700 group-hover/date:border-emerald-500">
+                          {formatDate(tender.award_date)}
+                        </span>
+                      </div>
+
+                      {/* Floating Tooltip Card */}
+                      <div
+                        role="tooltip"
+                        className="absolute right-0 top-full mt-1.5 w-64 p-3 bg-slate-900/95 dark:bg-slate-950/95 text-slate-100 rounded-xl shadow-2xl border border-slate-700/90 backdrop-blur-md opacity-0 invisible group-hover/date:opacity-100 group-hover/date:visible transition-all duration-200 pointer-events-none z-50 text-[10px]"
+                      >
+                        {/* Header */}
+                        <div className="flex items-center gap-1.5 pb-1.5 mb-1.5 border-b border-slate-800">
+                          <Calendar className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                          <span className="font-bold text-xs text-white">
+                            Contract Award Date
+                          </span>
+                        </div>
+
+                        {/* Explanation of what the date is for */}
+                        <p className="text-slate-300 leading-relaxed">
+                          This date marks when the procuring authority officially accepted the L1 commercial proposal and issued the Letter of Acceptance (LOA).
+                        </p>
+
+                        {/* Key Timestamps / Info */}
+                        <div className="mt-2 pt-2 border-t border-slate-800 space-y-1 font-mono text-[10px]">
+                          <div className="flex items-center justify-between">
+                            <span className="text-slate-400">LOA Award Date:</span>
+                            <span className="text-emerald-300 font-bold">{formatDate(tender.award_date)}</span>
+                          </div>
+                          {tender.year && (
+                            <div className="flex items-center justify-between">
+                              <span className="text-slate-400">Fiscal Period:</span>
+                              <span className="text-slate-200 font-semibold">FY {tender.year}</span>
+                            </div>
+                          )}
+                          {tender.winning_company?.name && (
+                            <div className="flex items-center justify-between gap-2">
+                              <span className="text-slate-400 shrink-0">Awardee (L1):</span>
+                              <span className="text-slate-200 truncate font-semibold" title={tender.winning_company.name}>
+                                {tender.winning_company.name}
+                              </span>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Little top arrow */}
+                        <div className="absolute right-4 -top-1 w-2 h-2 bg-slate-900/95 dark:bg-slate-950/95 border-l border-t border-slate-700/90 transform rotate-45" />
+                      </div>
+                    </div>
                   </div>
 
                   <h3 className="font-bold text-slate-900 dark:text-white text-xs leading-snug break-words mb-1.5">
@@ -1192,7 +1350,7 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
                       title="Download Official In-Memory Generated PDF Dossier"
                     >
                       <Download className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
-                      <span>Download Dossier PDF</span>
+                      <span>[RAG] Download Dossier PDF</span>
                     </a>
                   </div>
                 </div>
@@ -1336,7 +1494,7 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
                     }`}
                   >
                     <FileText className="w-3.5 h-3.5 text-cyan-500" />
-                    <span>9. Official Dossier PDF</span>
+                    <span>[RAG] 9. Official Dossier PDF</span>
                   </button>
 
                   <button
@@ -2068,7 +2226,7 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
                         </div>
                         <div className="text-right">
                           <span className="text-[10px] text-slate-400 uppercase font-semibold">Date of Issuance</span>
-                          <div className="font-semibold text-slate-800 dark:text-slate-200">{selectedTender.acceptance_and_loa?.loa_date}</div>
+                          <div className="font-semibold text-slate-800 dark:text-slate-200">{formatDate(selectedTender.acceptance_and_loa?.loa_date)}</div>
                         </div>
                       </div>
 
@@ -2079,7 +2237,7 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
 
                       <div>
                         <span className="text-[10px] text-slate-400 uppercase font-semibold">Contract Agreement Execution</span>
-                        <div className="font-medium text-slate-800 dark:text-slate-200">{selectedTender.acceptance_and_loa?.contract_agreement_date}</div>
+                        <div className="font-medium text-slate-800 dark:text-slate-200">{formatDate(selectedTender.acceptance_and_loa?.contract_agreement_date)}</div>
                       </div>
 
                       <div className="bg-white dark:bg-[#141C2E] p-3.5 rounded-lg border border-slate-200 dark:border-slate-700/60 mt-2">
@@ -2102,7 +2260,7 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
                     <div>
                       <h4 className="text-xs font-bold text-slate-900 dark:text-slate-100 flex items-center gap-1.5">
                         <FileText className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-                        Official Generated Bid Dossier (PDF Document)
+                        [RAG] Official Generated Bid Dossier (PDF Document)
                       </h4>
                       <p className="text-[11px] text-slate-500 dark:text-slate-400">
                         Compiled dynamically via ReportLab in memory with zero local disk footprint.
@@ -2116,7 +2274,7 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
                         className="px-3 py-1.5 rounded-md text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 flex items-center gap-1"
                       >
                         <Download className="w-3.5 h-3.5" />
-                        <span>Download PDF</span>
+                        <span>[RAG] Download PDF</span>
                       </a>
                       <a
                         href={pdfUrl}
@@ -2134,7 +2292,7 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
                   <div className="w-full h-[620px] rounded-lg border border-slate-300 dark:border-slate-700 overflow-hidden bg-slate-100 dark:bg-slate-900 shadow-inner">
                     <iframe
                       src={pdfUrl}
-                      title="Accepted Tender Dossier PDF Preview"
+                      title="[RAG] Accepted Tender Dossier PDF Preview"
                       className="w-full h-full border-0"
                     />
                   </div>

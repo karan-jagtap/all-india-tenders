@@ -15,7 +15,7 @@ import {
 } from 'lucide-react';
 import { AcceptedTender } from '../../services/api';
 import { getContractorPool, subscribeContractorPools } from '../../constants';
-import { hashString } from '../../utils';
+import { hashString, formatDate } from '../../utils';
 import {
   AwardBidRank,
   EvaluationCover1Status,
@@ -467,19 +467,13 @@ export const AllBidsEvaluationSubTab: React.FC<AllBidsEvaluationSubTabProps> = (
                         </span>
                       </td>
 
-                      {/* Contractor Name & HQ */}
+                      {/* Contractor Name */}
                       <td className="py-3 px-3">
                         <div className="flex items-center gap-1.5 font-bold text-slate-900 dark:text-white">
                           {isWinner && <Award className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />}
                           <span className="break-words">
                             {bid.name}
                           </span>
-                        </div>
-                        <div className="text-[11px] text-slate-400 dark:text-slate-500 flex items-center gap-1 mt-0.5">
-                          <MapPin className="w-2.5 h-2.5" />
-                          <span>{bid.hq}</span>
-                          <span>•</span>
-                          <span>{bid.contractorClass}</span>
                         </div>
                       </td>
 
@@ -584,7 +578,14 @@ export const AllBidsEvaluationSubTab: React.FC<AllBidsEvaluationSubTabProps> = (
                     {/* Expandable Breakdown Drawer Row */}
                     {isSelected && (
                       <tr className="bg-slate-50/80 dark:bg-slate-900/60 border-b border-slate-200 dark:border-slate-800">
-                        <td colSpan={8} className="p-4">
+                        <td colSpan={8} className="p-4 space-y-3">
+                          <div className="text-[11px] text-slate-500 dark:text-slate-400 flex items-center gap-1.5 bg-white dark:bg-[#0E1422] px-2.5 py-1 rounded-md border border-slate-200 dark:border-slate-800 w-fit">
+                            <MapPin className="w-3 h-3 text-slate-400 dark:text-slate-500 shrink-0" />
+                            <span>{bid.hq}</span>
+                            <span>•</span>
+                            <span className="font-medium text-slate-700 dark:text-slate-300">{bid.contractorClass}</span>
+                          </div>
+
                           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
                             {/* Col 1: Evaluation Verdict */}
                             <div className="space-y-1.5 bg-white dark:bg-[#0E1422] p-3 rounded-lg border border-slate-200 dark:border-slate-800">
@@ -727,7 +728,7 @@ export const AllBidsEvaluationSubTab: React.FC<AllBidsEvaluationSubTabProps> = (
             </strong>
           </div>
           <div className="flex items-center gap-4">
-            <span>Agreement Date: <strong className="text-slate-200 font-semibold">{tender.acceptance_and_loa?.contract_agreement_date || 'Executed'}</strong></span>
+            <span>Agreement Date: <strong className="text-slate-200 font-semibold">{tender.acceptance_and_loa?.contract_agreement_date ? formatDate(tender.acceptance_and_loa.contract_agreement_date) : 'Executed'}</strong></span>
             <span className="text-emerald-400 font-bold flex items-center gap-1">
               <Check className="w-3.5 h-3.5" />
               Award Approved & Bound

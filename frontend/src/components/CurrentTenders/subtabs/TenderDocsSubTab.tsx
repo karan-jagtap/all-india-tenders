@@ -38,7 +38,7 @@ export const TenderDocsSubTab: React.FC<TenderDocsSubTabProps> = ({
         <div>
           <h4 className="text-xs font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
             <Layers className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
-            Official Sourced Tender Documents Package
+            [RAG] Official Sourced Tender Documents Package
           </h4>
           <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
             Complete statutory documents published on {selectedTender.source_portal} for NIT Reference{' '}
@@ -63,7 +63,7 @@ export const TenderDocsSubTab: React.FC<TenderDocsSubTabProps> = ({
             className="px-3 py-1.5 rounded-lg text-xs font-bold bg-emerald-600 text-white hover:bg-emerald-700 flex items-center gap-1.5 shadow-xs transition-all cursor-pointer"
           >
             <Download className="w-3.5 h-3.5" />
-            <span>Download {selectedDocType === 'sbd' ? 'Whole Doc' : 'Active Doc'}</span>
+            <span>[RAG] Download {selectedDocType === 'sbd' ? 'Whole Doc' : 'Active Doc'}</span>
           </a>
           <a
             href={activeDocUrl}
@@ -95,7 +95,7 @@ export const TenderDocsSubTab: React.FC<TenderDocsSubTabProps> = ({
             <span className="text-[10px] font-mono text-slate-500 dark:text-slate-400">4 Pages • Detailed SBD</span>
           </div>
           <h5 className="font-bold text-slate-900 dark:text-white text-xs mb-1">
-            Detailed Tender Document (SBD / RFP)
+            [RAG] Detailed Tender Document (SBD / RFP)
           </h5>
           <p className="text-[11px] text-slate-500 dark:text-slate-400 line-clamp-2">
             Includes Instructions to Bidders (ITB), General & Special Conditions of Contract (GCC/SCC), PQC Qualification, Technical Specs & Codes (IRC/MoRTH/CPWD/BIS), and Statutory Annexures.
@@ -131,7 +131,7 @@ export const TenderDocsSubTab: React.FC<TenderDocsSubTabProps> = ({
             <span className="text-[10px] font-mono text-slate-500 dark:text-slate-400">2 Pages • 480 KB</span>
           </div>
           <h5 className="font-bold text-slate-900 dark:text-white text-xs mb-1">
-            Notice Inviting Tender (NIT Summary)
+            [RAG] Notice Inviting Tender (NIT Summary)
           </h5>
           <p className="text-[11px] text-slate-500 dark:text-slate-400 line-clamp-2">
             Official advertisement summary notice published on portal specifying key dates, EMD amount, tender fee, and basic eligibility criteria.
@@ -167,7 +167,7 @@ export const TenderDocsSubTab: React.FC<TenderDocsSubTabProps> = ({
             <span className="text-[10px] font-mono text-slate-500 dark:text-slate-400">6 Pages • 320 KB</span>
           </div>
           <h5 className="font-bold text-slate-900 dark:text-white text-xs mb-1">
-            Bill of Quantities (BOQ / Rate Schedule)
+            [RAG] Bill of Quantities (BOQ / Rate Schedule)
           </h5>
           <p className="text-[11px] text-slate-500 dark:text-slate-400 line-clamp-2">
             Itemized financial schedule detailing item descriptions, quantities, and departmental estimate totaling {formatINR(selectedTender.estimated_cost_inr || 0)} for Cover-2 bidding.

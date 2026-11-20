@@ -468,11 +468,8 @@ export const App: React.FC = () => {
 
       {/* Footer */}
       <footer className="bg-white dark:bg-[#0A0E17] border-t border-slate-200/90 dark:border-slate-800 text-slate-600 dark:text-slate-400 text-xs py-4 px-4 sm:px-6 text-center transition-colors">
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-2 max-w-[1920px] mx-auto">
-          <span>All India Tenders • Sourcing across 28+ Real Government Portals (51 Monitored Endpoints)</span>
-          <span className="text-orange-600 dark:text-orange-400 font-mono text-[11px] font-medium">
-            Enterprise Hybrid Persistent Database Architecture • PostgreSQL 16 & SQLite
-          </span>
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-2 max-w-[1920px] mx-auto">
+          <span>All India Tenders • Statutory Public Procurement Intelligence Platform</span>
         </div>
       </footer>
     </div>

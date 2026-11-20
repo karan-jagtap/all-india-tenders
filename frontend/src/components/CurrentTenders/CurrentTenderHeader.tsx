@@ -19,7 +19,7 @@ import {
   Globe
 } from 'lucide-react';
 import { EnrichedCurrentTender, SubTabType, CurrentTenderSubTab } from '../../types';
-import { formatINR } from '../../utils';
+import { formatINR, formatDate } from '../../utils';
 
 export type { SubTabType };
 export { CurrentTenderSubTab };
@@ -148,7 +148,7 @@ export const CurrentTenderHeader: React.FC<CurrentTenderHeaderProps> = ({
             title="Open Whole 4-Page Standard Bidding Document in interactive viewer"
           >
             <Eye className="w-3.5 h-3.5" />
-            <span>View Whole Tender Doc</span>
+            <span>[RAG] View Whole Tender Doc</span>
             <span className="text-[9px] bg-indigo-900/80 px-1.5 py-0.2 rounded font-mono">
               Interactive
             </span>
@@ -162,7 +162,7 @@ export const CurrentTenderHeader: React.FC<CurrentTenderHeaderProps> = ({
             title="Download Complete 4-Page Standard Bidding Document (SBD / RFP PDF)"
           >
             <Download className="w-3.5 h-3.5" />
-            <span>Download Whole Doc</span>
+            <span>[RAG] Download Whole Doc</span>
             <span className="text-[9px] bg-emerald-900/80 px-1 py-0.2 rounded font-mono">PDF</span>
           </a>
         </div>
@@ -188,7 +188,7 @@ export const CurrentTenderHeader: React.FC<CurrentTenderHeaderProps> = ({
             title="Download Official Notice Inviting Tender (NIT Summary)"
           >
             <FileText className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" />
-            <span>NIT Notice</span>
+            <span>[RAG] NIT Notice</span>
           </a>
 
           {/* Tertiary Action: BOQ Rate Schedule */}
@@ -199,7 +199,7 @@ export const CurrentTenderHeader: React.FC<CurrentTenderHeaderProps> = ({
             title="Download Official Bill of Quantities (BOQ Rate Schedule)"
           >
             <FileSpreadsheet className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" />
-            <span>BOQ Schedule</span>
+            <span>[RAG] BOQ Schedule</span>
           </a>
         </div>
       </div>
@@ -211,7 +211,7 @@ export const CurrentTenderHeader: React.FC<CurrentTenderHeaderProps> = ({
           <span className="font-bold">Tender is actively in progress (Not Yet Filled / Unawarded):</span>
           <p className="text-[11px] text-emerald-900 dark:text-emerald-300 mt-0.5">
             The procuring authority ({selectedTender.organization}) is actively inviting competitive bids until{' '}
-            <strong>{selectedTender.closing_date} at {selectedTender.submission_deadline_time}</strong>. Zero contracts have been finalized.
+            <strong>{formatDate(selectedTender.closing_date)} at {selectedTender.submission_deadline_time}</strong>. Zero contracts have been finalized.
           </p>
         </div>
       </div>
@@ -223,12 +223,12 @@ export const CurrentTenderHeader: React.FC<CurrentTenderHeaderProps> = ({
           <div>
             <div className="font-bold text-orange-950 dark:text-orange-200 flex items-center gap-1.5">
               <span>Bid Submission Deadline:</span>
-              <span className="font-mono text-rose-700 dark:text-rose-400">{selectedTender.closing_date} at {selectedTender.submission_deadline_time}</span>
+              <span className="font-mono text-rose-700 dark:text-rose-400">{formatDate(selectedTender.closing_date)} at {selectedTender.submission_deadline_time}</span>
             </div>
             <div className="text-[11px] text-orange-800 dark:text-orange-300">
               {isClosed ? (
                 <span className="text-slate-600 dark:text-slate-400 font-semibold">
-                  🔒 Bid submission deadline elapsed on {selectedTender.closing_date} • Technical & financial evaluation in progress.
+                  🔒 Bid submission deadline elapsed on {formatDate(selectedTender.closing_date)} • Technical & financial evaluation in progress.
                 </span>
               ) : selectedTender.days_left > 0 ? (
                 <span>⚡ Exactly <strong>{selectedTender.days_left} calendar days left</strong> before submission window closes.</span>
@@ -326,7 +326,7 @@ export const CurrentTenderHeader: React.FC<CurrentTenderHeaderProps> = ({
           }`}
         >
           <BookOpen className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
-          <span>4. Official Tender Documents (NIT, SBD & BOQ)</span>
+          <span>[RAG] 4. Official Tender Documents (NIT, SBD & BOQ)</span>
           <span className="px-1.5 py-0.2 rounded-full text-[9px] font-bold bg-indigo-600 dark:bg-indigo-500 text-white">
             3 Docs
           </span>
@@ -353,7 +353,7 @@ export const CurrentTenderHeader: React.FC<CurrentTenderHeaderProps> = ({
           }`}
         >
           <Zap className={`w-3.5 h-3.5 ${activeSubTab === 'prediction' ? 'text-amber-200' : 'text-amber-600 dark:text-amber-400'} animate-pulse`} />
-          <span>6. ⚡ Competitor Bids & L1 Prediction (AI Simulator)</span>
+          <span>[RAG] 6. ⚡ Competitor Bids & L1 Prediction (AI Simulator)</span>
         </button>
 
         <button
@@ -365,7 +365,7 @@ export const CurrentTenderHeader: React.FC<CurrentTenderHeaderProps> = ({
           }`}
         >
           <Sparkles className={`w-3.5 h-3.5 ${activeSubTab === 'rag_analysis' ? 'text-indigo-200' : 'text-indigo-600 dark:text-indigo-400'} animate-pulse`} />
-          <span>7. 🔍 Deep RAG Clause Analysis & BOQ Cost Insights</span>
+          <span>[RAG] 7. 🔍 Deep Contract Clause Analysis & BOQ Cost Insights</span>
         </button>
       </div>
     </div>

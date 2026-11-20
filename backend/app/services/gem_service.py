@@ -170,7 +170,7 @@ def normalize_gem_doc(doc: Dict[str, Any]) -> Optional[Dict[str, Any]]:
     }
 
 
-def fetch_live_gem_bids(pages: int = 3, timeout_sec: int = 5) -> List[Dict[str, Any]]:
+def fetch_live_gem_bids(pages: int = 10, timeout_sec: int = 5) -> List[Dict[str, Any]]:
     """
     Connects to GeM BidPlus (bidplus.gem.gov.in) via session cookie handshake and JSON query.
     Extracts live active bids and returns normalized application records.
@@ -243,7 +243,7 @@ def get_gem_bids_catalog() -> List[Dict[str, Any]]:
     return fetch_live_gem_bids(pages=3)
 
 
-def refresh_gem_bids(pages: int = 3) -> List[Dict[str, Any]]:
+def refresh_gem_bids(pages: int = 10) -> List[Dict[str, Any]]:
     """
     Triggers a live scrape of GeM BidPlus, updates baseline JSON cache, and returns fresh bids.
     """

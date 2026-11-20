@@ -4,8 +4,10 @@
  */
 
 export * from './SearchableDropdown';
+export * from './MultiSelectDropdown';
 export * from './FilterSearchBar';
 export * from './TopFilterActionBar';
+export * from './ToolbarSortDropdown';
 export * from './ActiveFilterChipsBar';
 export * from './TenderFilterDrawer';
 export * from './SyncLiveButton';

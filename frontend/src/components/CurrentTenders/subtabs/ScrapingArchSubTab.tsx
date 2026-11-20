@@ -1,6 +1,7 @@
 import React from 'react';
 import { ServerOff, ExternalLink } from 'lucide-react';
 import { EnrichedCurrentTender } from '../../../types';
+import { formatDate } from '../../../utils';
 
 export interface ScrapingArchSubTabProps {
   selectedTender: EnrichedCurrentTender;
@@ -50,7 +51,7 @@ export const ScrapingArchSubTab: React.FC<ScrapingArchSubTabProps> = ({
         <div className="bg-slate-50 dark:bg-slate-800/60 p-3 rounded-lg border border-slate-200 dark:border-slate-700/60">
           <span className="text-[10px] text-slate-400 uppercase font-semibold block">Tender Bidding Status</span>
           <strong className="text-orange-700 dark:text-orange-400">IN PROGRESS (UNFILLED)</strong>
-          <span className="block text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Proposals actively invited until {selectedTender.closing_date}</span>
+          <span className="block text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Proposals actively invited until {formatDate(selectedTender.closing_date)}</span>
         </div>
 
         <div className="bg-slate-50 dark:bg-slate-800/60 p-3 rounded-lg border border-slate-200 dark:border-slate-700/60">

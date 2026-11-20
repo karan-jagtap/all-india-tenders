@@ -13,6 +13,7 @@ export interface TopFilterActionBarProps {
   reloadLabel?: string;
   accentColor?: FilterAccentColor;
   className?: string;
+  sortControl?: React.ReactNode;
 }
 
 export const TopFilterActionBar: React.FC<TopFilterActionBarProps> = ({
@@ -25,7 +26,8 @@ export const TopFilterActionBar: React.FC<TopFilterActionBarProps> = ({
   totalCount,
   reloadLabel = 'Reload',
   accentColor = 'orange',
-  className = ''
+  className = '',
+  sortControl
 }) => {
   const getFilterButtonActiveClasses = () => {
     switch (accentColor) {
@@ -89,6 +91,9 @@ export const TopFilterActionBar: React.FC<TopFilterActionBarProps> = ({
           <span className="text-[10px] text-slate-400 dark:text-slate-500 font-normal">(Sidebar)</span>
         )}
       </button>
+
+      {/* Sort Dropdown Slot */}
+      {sortControl}
 
       {/* Reset Filters Quick Button (if any active) */}
       {hasActiveFilters && (

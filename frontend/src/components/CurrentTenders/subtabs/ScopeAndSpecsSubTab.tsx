@@ -1,6 +1,7 @@
 import React from 'react';
 import { FileText } from 'lucide-react';
 import { EnrichedCurrentTender } from '../../../types';
+import { formatDate } from '../../../utils';
 
 export interface ScopeAndSpecsSubTabProps {
   selectedTender: EnrichedCurrentTender;
@@ -31,7 +32,7 @@ export const ScopeAndSpecsSubTab: React.FC<ScopeAndSpecsSubTabProps> = ({ select
           </div>
           <div>
             <span className="text-[10px] text-slate-400 uppercase font-semibold block">Published Date</span>
-            <span className="font-semibold text-slate-800 dark:text-slate-200">{selectedTender.published_date || 'Recent'}</span>
+            <span className="font-semibold text-slate-800 dark:text-slate-200">{formatDate(selectedTender.published_date) || 'Recent'}</span>
           </div>
           <div>
             <span className="text-[10px] text-slate-400 uppercase font-semibold block">State & Territory</span>

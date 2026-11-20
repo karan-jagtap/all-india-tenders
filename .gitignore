@@ -62,3 +62,10 @@ yarn-error.log*
 # Agent tooling
 .agents/
 
+# Large Persistent Databases & Catalogs
+*.db
+*.db-journal
+*.db-wal
+*current_catalog.json
+*cppp_live_tenders_cache.json
+

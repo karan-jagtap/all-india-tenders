@@ -12,36 +12,36 @@ export interface CurrentTenderFilterDrawerProps {
   totalFilteredCount: number;
 
   // Source
-  selectedSource: string;
-  setSelectedSource: (s: string) => void;
+  selectedSource: string[] | string;
+  setSelectedSource: (s: string[]) => void;
   availableSources: string[];
   sourceCounts: Map<string, number>;
   contextSourceCount: number;
 
   // Org
-  selectedOrg: string;
-  setSelectedOrg: (o: string) => void;
+  selectedOrg: string[] | string;
+  setSelectedOrg: (o: string[]) => void;
   availableOrgs: string[];
   orgCounts: Map<string, number>;
   contextOrgCount: number;
 
   // State
-  selectedState: string;
-  setSelectedState: (s: string) => void;
+  selectedState: string[] | string;
+  setSelectedState: (s: string[]) => void;
   availableStates: string[];
   stateCounts: Map<string, number>;
   contextStateCount: number;
 
   // City
-  selectedCity: string;
-  setSelectedCity: (c: string) => void;
+  selectedCity: string[] | string;
+  setSelectedCity: (c: string[]) => void;
   availableCities: string[];
   cityCounts: Map<string, number>;
   contextCityCount: number;
 
   // Category
-  selectedCategory: string;
-  setSelectedCategory: (c: string) => void;
+  selectedCategory: string[] | string;
+  setSelectedCategory: (c: string[]) => void;
   availableCategories: string[];
   categoryCounts: Map<string, number>;
   contextCategoryCount: number;

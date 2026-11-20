@@ -27,14 +27,14 @@ export const CompetitorPredictionSubTab: React.FC<CompetitorPredictionSubTabProp
             <div className="flex items-center gap-2 mb-1.5 flex-wrap">
               <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-wider uppercase bg-amber-400 text-slate-950 flex items-center gap-1.5 shadow-xs">
                 <Zap className="w-3 h-3 text-slate-950" />
-                PRE-BID AI SIMULATOR • GFR 173 BENCHMARK
+                [RAG] PRE-BID AI SIMULATOR • GFR 173 BENCHMARK
               </span>
               <span className="px-2 py-0.5 rounded text-[10px] bg-slate-800 text-slate-300 font-mono border border-slate-700">
                 Confidence: {preBidPrediction.confidenceScorePct}% ({preBidPrediction.matchingConfidenceLevel.split(' ')[0]})
               </span>
             </div>
             <h4 className="text-base font-bold text-white tracking-tight">
-              Pre-Bid Competitor Bids & L1 Winning Simulator
+              [RAG] Pre-Bid Competitor Bids & L1 Winning Simulator
             </h4>
             <p className="text-xs text-slate-300 mt-1 max-w-3xl leading-relaxed">
               Synthesized using Retrieval-Augmented Generation (RAG) against 2,600+ historical awarded tenders. Evaluates mandatory PQC turnover/solvency thresholds, authority Schedule of Rates (SOR) clearance margins, and regional contractor proximity to project likely competitor bids before you submit.
@@ -97,7 +97,7 @@ export const CompetitorPredictionSubTab: React.FC<CompetitorPredictionSubTabProp
         <div className="flex items-center gap-2">
           <Radio className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
           <span>
-            <strong>RAG Historical Authority Pattern:</strong> {preBidPrediction.authorityHistoricalClearancePattern}
+            <strong>[RAG] Historical Authority Pattern:</strong> {preBidPrediction.authorityHistoricalClearancePattern}
           </span>
         </div>
         <span className="text-[10px] font-mono font-semibold text-amber-800 dark:text-amber-400 shrink-0">
@@ -111,7 +111,7 @@ export const CompetitorPredictionSubTab: React.FC<CompetitorPredictionSubTabProp
           <div className="flex items-center gap-2">
             <Scale className="w-4 h-4 text-amber-400" />
             <h4 className="text-xs font-bold uppercase tracking-wider text-slate-100">
-              Clearing Probability Density Curve & Margin Distribution
+              [RAG] Clearing Probability Density Curve & Margin Distribution
             </h4>
           </div>
           <span className="text-[10px] text-slate-400 font-mono">
@@ -177,14 +177,14 @@ export const CompetitorPredictionSubTab: React.FC<CompetitorPredictionSubTabProp
           <div>
             <h4 className="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider flex items-center gap-1.5">
               <CheckCircle className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-              Simulated Financial Comparative Statement (Predicted CS Sheet)
+              [RAG] Simulated Financial Comparative Statement (Predicted CS Sheet)
             </h4>
             <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
               Projected financial opening based on PQC contractor balance sheets, regional equipment depots, and GFR 173 compliance.
             </p>
           </div>
           <span className="text-[11px] text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 px-2.5 py-1 rounded-lg border border-slate-200 dark:border-slate-700 font-mono">
-            RAG Matched: 5 Contenders
+            [RAG] Matched: 5 Contenders
           </span>
         </div>
 

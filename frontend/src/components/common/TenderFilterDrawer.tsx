@@ -11,7 +11,8 @@ import {
 } from 'lucide-react';
 import { QUICK_PORTAL_PILLS } from '../../constants';
 import { FilterAccentColor } from '../../types';
-import { SearchableDropdown, DropdownOption } from './SearchableDropdown';
+import { DropdownOption } from './SearchableDropdown';
+import { MultiSelectDropdown } from './MultiSelectDropdown';
 
 export interface TenderFilterDrawerProps {
   isOpen: boolean;
@@ -25,36 +26,36 @@ export interface TenderFilterDrawerProps {
   totalFilteredCount: number;
 
   // 1. Work Category / Sector
-  selectedCategory: string;
-  setSelectedCategory: (cat: string) => void;
+  selectedCategory: string | string[];
+  setSelectedCategory: (cat: string[]) => void;
   availableCategories: string[];
   categoryCounts: Map<string, number>;
   contextCategoryCount: number;
 
   // 2. Procurement Portal / Source
-  selectedSource: string;
-  setSelectedSource: (src: string) => void;
+  selectedSource: string | string[];
+  setSelectedSource: (src: string[]) => void;
   availableSources: string[];
   sourceCounts: Map<string, number>;
   contextSourceCount: number;
 
   // 3. Procuring Organization
-  selectedOrg: string;
-  setSelectedOrg: (org: string) => void;
+  selectedOrg: string | string[];
+  setSelectedOrg: (org: string[]) => void;
   availableOrgs: string[];
   orgCounts: Map<string, number>;
   contextOrgCount: number;
 
   // 4. State
-  selectedState: string;
-  setSelectedState: (st: string) => void;
+  selectedState: string | string[];
+  setSelectedState: (st: string[]) => void;
   availableStates: string[];
   stateCounts: Map<string, number>;
   contextStateCount: number;
 
   // 5. City
-  selectedCity: string;
-  setSelectedCity: (ct: string) => void;
+  selectedCity: string | string[];
+  setSelectedCity: (ct: string[]) => void;
   availableCities: string[];
   cityCounts: Map<string, number>;
   contextCityCount: number;
@@ -111,7 +112,52 @@ export const TenderFilterDrawer: React.FC<TenderFilterDrawerProps> = ({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isOpen, onClose]);
 
-  // Memoized options for SearchableDropdowns
+  const normCategories = useMemo(() => {
+    if (!selectedCategory) return ['ALL'];
+    return Array.isArray(selectedCategory)
+      ? selectedCategory.length === 0
+        ? ['ALL']
+        : selectedCategory
+      : [selectedCategory];
+  }, [selectedCategory]);
+
+  const normSources = useMemo(() => {
+    if (!selectedSource) return ['ALL'];
+    return Array.isArray(selectedSource)
+      ? selectedSource.length === 0
+        ? ['ALL']
+        : selectedSource
+      : [selectedSource];
+  }, [selectedSource]);
+
+  const normOrgs = useMemo(() => {
+    if (!selectedOrg) return ['ALL'];
+    return Array.isArray(selectedOrg)
+      ? selectedOrg.length === 0
+        ? ['ALL']
+        : selectedOrg
+      : [selectedOrg];
+  }, [selectedOrg]);
+
+  const normStates = useMemo(() => {
+    if (!selectedState) return ['ALL'];
+    return Array.isArray(selectedState)
+      ? selectedState.length === 0
+        ? ['ALL']
+        : selectedState
+      : [selectedState];
+  }, [selectedState]);
+
+  const normCities = useMemo(() => {
+    if (!selectedCity) return ['ALL'];
+    return Array.isArray(selectedCity)
+      ? selectedCity.length === 0
+        ? ['ALL']
+        : selectedCity
+      : [selectedCity];
+  }, [selectedCity]);
+
+  // Memoized options for SearchableDropdowns / MultiSelectDropdowns
   const categoryOptions: DropdownOption[] = useMemo(() => {
     return availableCategories.map((cat) => ({
       value: cat,
@@ -208,7 +254,13 @@ export const TenderFilterDrawer: React.FC<TenderFilterDrawerProps> = ({
   };
 
   const handleToggleSourcePill = (pillVal: string) => {
-    setSelectedSource(selectedSource === pillVal ? 'ALL' : pillVal);
+    if (normSources.includes(pillVal)) {
+      const next = normSources.filter((v) => v !== pillVal && v !== 'ALL');
+      setSelectedSource(next.length === 0 ? ['ALL'] : next);
+    } else {
+      const next = normSources.filter((v) => v !== 'ALL');
+      setSelectedSource([...next, pillVal]);
+    }
   };
 
   return (
@@ -275,8 +327,8 @@ export const TenderFilterDrawer: React.FC<TenderFilterDrawerProps> = ({
                   {availableCategories.length} Categories
                 </span>
               </div>
-              <SearchableDropdown
-                value={selectedCategory}
+              <MultiSelectDropdown
+                values={normCategories}
                 onChange={setSelectedCategory}
                 options={categoryOptions}
                 allOptionLabel="All Work Categories"
@@ -298,8 +350,8 @@ export const TenderFilterDrawer: React.FC<TenderFilterDrawerProps> = ({
                   {availableSources.length} Portals
                 </span>
               </div>
-              <SearchableDropdown
-                value={selectedSource}
+              <MultiSelectDropdown
+                values={normSources}
                 onChange={setSelectedSource}
                 options={sourceOptions}
                 allOptionLabel="All Procurement Portals"
@@ -311,20 +363,23 @@ export const TenderFilterDrawer: React.FC<TenderFilterDrawerProps> = ({
 
               {/* Quick Source Pill Shortcuts */}
               <div className="flex items-center gap-1.5 flex-wrap pt-1">
-                {QUICK_PORTAL_PILLS.map((pill) => (
-                  <button
-                    key={pill.val}
-                    type="button"
-                    onClick={() => handleToggleSourcePill(pill.val)}
-                    className={`px-2 py-1 rounded text-[10px] font-semibold flex items-center gap-1 transition-colors cursor-pointer ${
-                      selectedSource === pill.val
-                        ? pill.activeClass
-                        : 'bg-slate-800 text-slate-300 hover:bg-slate-700 border border-slate-700'
-                    }`}
-                  >
-                    {pill.label}
-                  </button>
-                ))}
+                {QUICK_PORTAL_PILLS.map((pill) => {
+                  const isActive = normSources.includes(pill.val);
+                  return (
+                    <button
+                      key={pill.val}
+                      type="button"
+                      onClick={() => handleToggleSourcePill(pill.val)}
+                      className={`px-2 py-1 rounded text-[10px] font-semibold flex items-center gap-1 transition-colors cursor-pointer ${
+                        isActive
+                          ? pill.activeClass
+                          : 'bg-slate-800 text-slate-300 hover:bg-slate-700 border border-slate-700'
+                      }`}
+                    >
+                      {pill.label}
+                    </button>
+                  );
+                })}
               </div>
             </div>
 
@@ -339,8 +394,8 @@ export const TenderFilterDrawer: React.FC<TenderFilterDrawerProps> = ({
                   {availableOrgs.length} Orgs
                 </span>
               </div>
-              <SearchableDropdown
-                value={selectedOrg}
+              <MultiSelectDropdown
+                values={normOrgs}
                 onChange={setSelectedOrg}
                 options={orgOptions}
                 allOptionLabel="All Organizations"
@@ -364,11 +419,11 @@ export const TenderFilterDrawer: React.FC<TenderFilterDrawerProps> = ({
                     {availableStates.length} States
                   </span>
                 </div>
-                <SearchableDropdown
-                  value={selectedState}
-                  onChange={(val) => {
-                    setSelectedState(val);
-                    setSelectedCity('ALL');
+                <MultiSelectDropdown
+                  values={normStates}
+                  onChange={(vals) => {
+                    setSelectedState(vals);
+                    setSelectedCity(['ALL']);
                   }}
                   options={stateOptions}
                   allOptionLabel="All States & UTs"
@@ -390,11 +445,17 @@ export const TenderFilterDrawer: React.FC<TenderFilterDrawerProps> = ({
                     {availableCities.length} Cities
                   </span>
                 </div>
-                <SearchableDropdown
-                  value={selectedCity}
+                <MultiSelectDropdown
+                  values={normCities}
                   onChange={setSelectedCity}
                   options={cityOptions}
-                  allOptionLabel={selectedState !== 'ALL' ? `All Cities in ${selectedState}` : 'All Cities'}
+                  allOptionLabel={
+                    normStates.length === 1 && normStates[0] !== 'ALL'
+                      ? `All Cities in ${normStates[0]}`
+                      : normStates.length > 1 && !normStates.includes('ALL')
+                      ? `All Cities in (${normStates.length} States)`
+                      : 'All Cities'
+                  }
                   allOptionCount={contextCityCount}
                   placeholder="Search city or district..."
                   icon={<MapPin className="w-3.5 h-3.5 text-slate-400" />}

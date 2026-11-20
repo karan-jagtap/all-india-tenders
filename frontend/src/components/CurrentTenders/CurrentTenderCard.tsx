@@ -1,7 +1,7 @@
 import React from 'react';
 import { Calendar, Building2, MapPin, Copy, Check, Download } from 'lucide-react';
 import { EnrichedCurrentTender } from '../../types';
-import { formatINR, getUrgencyBadge } from '../../utils';
+import { formatINR, getUrgencyBadge, formatDate } from '../../utils';
 
 export interface CurrentTenderCardProps {
   tender: EnrichedCurrentTender;
@@ -25,9 +25,9 @@ export const CurrentTenderCard: React.FC<CurrentTenderCardProps> = ({
   return (
     <div
       onClick={onSelect}
-      className={`cursor-pointer rounded-xl p-4 border transition-all text-xs relative ${
+      className={`cursor-pointer rounded-xl p-4 border transition-all text-xs relative hover:z-20 ${
         isSelected
-          ? 'bg-white dark:bg-[#131A2B] border-orange-500 dark:border-orange-500 shadow-md ring-1 ring-orange-500'
+          ? 'bg-white dark:bg-[#131A2B] border-orange-500 dark:border-orange-500 shadow-md ring-1 ring-orange-500 z-10'
           : isClosed
           ? 'bg-slate-50/60 dark:bg-[#0E1422]/60 border-slate-200/70 dark:border-slate-800/80 hover:border-slate-300 dark:hover:border-slate-700 hover:bg-slate-100/70 dark:hover:bg-[#131A2B]/60 shadow-[0_1px_3px_rgba(15,23,42,0.02)] opacity-90'
           : 'bg-white dark:bg-[#0E1422] border-slate-200/90 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 hover:bg-slate-50/70 dark:hover:bg-[#131A2B]/60 shadow-[0_1px_3px_rgba(15,23,42,0.03)]'
@@ -49,10 +49,68 @@ export const CurrentTenderCard: React.FC<CurrentTenderCardProps> = ({
           )}
           {getUrgencyBadge(tender.days_left, isClosed)}
         </div>
-        <span className="text-[11px] text-slate-500 dark:text-slate-400 font-mono flex items-center gap-1">
-          <Calendar className="w-3 h-3 text-slate-400 dark:text-slate-500" />
-          <span>{isClosed ? 'Closed:' : 'Closes:'} {tender.closing_date}</span>
-        </span>
+
+        {/* Date with Explanatory Tooltip */}
+        <div className="relative group/date shrink-0">
+          <div
+            className="text-[11px] text-slate-500 dark:text-slate-400 font-mono flex items-center gap-1 cursor-help hover:text-orange-600 dark:hover:text-orange-400 transition-colors py-0.5 px-1 rounded hover:bg-orange-50/70 dark:hover:bg-orange-950/40"
+          >
+            <Calendar className="w-3 h-3 text-slate-400 dark:text-slate-500 group-hover/date:text-orange-500" />
+            <span className="border-b border-dotted border-slate-300 dark:border-slate-700 group-hover/date:border-orange-500">
+              {isClosed ? 'Closed:' : 'Closes:'} {formatDate(tender.closing_date)}
+            </span>
+          </div>
+
+          {/* Floating Tooltip Card */}
+          <div
+            role="tooltip"
+            className="absolute right-0 top-full mt-1.5 w-64 p-3 bg-slate-900/95 dark:bg-slate-950/95 text-slate-100 rounded-xl shadow-2xl border border-slate-700/90 backdrop-blur-md opacity-0 invisible group-hover/date:opacity-100 group-hover/date:visible transition-all duration-200 pointer-events-none z-50 text-[10px]"
+          >
+            {/* Header */}
+            <div className="flex items-center gap-1.5 pb-1.5 mb-1.5 border-b border-slate-800">
+              <Calendar className="w-3.5 h-3.5 text-orange-400 shrink-0" />
+              <span className="font-bold text-xs text-white">
+                {isClosed ? 'Bid Submission Closed' : 'Bid Submission Deadline'}
+              </span>
+            </div>
+
+            {/* Explanation of what the date is for */}
+            <p className="text-slate-300 leading-relaxed">
+              {isClosed
+                ? 'This date is the official bid submission cutoff that has elapsed. The tender is now under technical evaluation.'
+                : 'This date is the final deadline to submit commercial and technical bids online before the official portal closes.'}
+            </p>
+
+            {/* Key Schedule Timestamps */}
+            <div className="mt-2 pt-2 border-t border-slate-800 space-y-1 font-mono text-[10px]">
+              <div className="flex items-center justify-between">
+                <span className="text-slate-400">Closing Date:</span>
+                <span className="text-amber-300 font-bold">{formatDate(tender.closing_date)}</span>
+              </div>
+              {tender.submission_deadline_time && (
+                <div className="flex items-center justify-between">
+                  <span className="text-slate-400">Cutoff Time:</span>
+                  <span className="text-slate-200 font-semibold">{tender.submission_deadline_time}</span>
+                </div>
+              )}
+              {tender.published_date && (
+                <div className="flex items-center justify-between">
+                  <span className="text-slate-400">Notice Published:</span>
+                  <span className="text-slate-300">{formatDate(tender.published_date)}</span>
+                </div>
+              )}
+              {tender.opening_date && (
+                <div className="flex items-center justify-between">
+                  <span className="text-slate-400">Bid Opening:</span>
+                  <span className="text-emerald-300">{formatDate(tender.opening_date)}</span>
+                </div>
+              )}
+            </div>
+
+            {/* Little top arrow */}
+            <div className="absolute right-4 -top-1 w-2 h-2 bg-slate-900/95 dark:bg-slate-950/95 border-l border-t border-slate-700/90 transform rotate-45" />
+          </div>
+        </div>
       </div>
 
       {/* 2. Line 2: Source portal badge */}
@@ -147,7 +205,7 @@ export const CurrentTenderCard: React.FC<CurrentTenderCardProps> = ({
             className="px-2 py-0.5 rounded text-[10px] font-bold bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 dark:hover:bg-indigo-900/80 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 flex items-center gap-1 transition-colors shadow-2xs"
           >
             <Download className="w-2.5 h-2.5" />
-            <span>Whole Doc</span>
+            <span>[RAG] Whole Doc</span>
           </a>
           <span className={isClosed ? "text-slate-500 dark:text-slate-400 font-medium" : "text-orange-700 dark:text-orange-400 font-medium"}>
             {isClosed ? "Bids Closed" : "Bids Open"}

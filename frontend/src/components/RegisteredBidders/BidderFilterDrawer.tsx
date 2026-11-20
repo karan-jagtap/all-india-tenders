@@ -7,7 +7,7 @@ import {
   TrendingUp,
   CheckCircle2
 } from 'lucide-react';
-import { SearchableDropdown, DropdownOption } from '../common';
+import { MultiSelectDropdown, DropdownOption } from '../common';
 
 export type BidderSortOption =
   | 'NAME_ASC'
@@ -25,15 +25,15 @@ export interface BidderFilterDrawerProps {
   totalFilteredCount: number;
 
   // 1. Work Specialization / Category
-  selectedCategory: string;
-  setSelectedCategory: (cat: string) => void;
+  selectedCategory: string[] | string;
+  setSelectedCategory: (cat: string[]) => void;
   allCategories: string[];
   categoryCounts?: Map<string, number>;
   totalBidders: number;
 
   // 2. State / Region
-  selectedState: string;
-  setSelectedState: (st: string) => void;
+  selectedState: string[] | string;
+  setSelectedState: (st: string[]) => void;
   allStates: string[];
   stateCounts?: Map<string, number>;
 
@@ -140,7 +140,25 @@ export const BidderFilterDrawer: React.FC<BidderFilterDrawerProps> = ({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isOpen, onClose]);
 
-  // Memoized options for SearchableDropdowns
+  const normCategories = useMemo(() => {
+    if (!selectedCategory) return ['ALL'];
+    return Array.isArray(selectedCategory)
+      ? selectedCategory.length === 0
+        ? ['ALL']
+        : selectedCategory
+      : [selectedCategory];
+  }, [selectedCategory]);
+
+  const normStates = useMemo(() => {
+    if (!selectedState) return ['ALL'];
+    return Array.isArray(selectedState)
+      ? selectedState.length === 0
+        ? ['ALL']
+        : selectedState
+      : [selectedState];
+  }, [selectedState]);
+
+  // Memoized options for Dropdowns
   const categoryOptions: DropdownOption[] = useMemo(() => {
     return allCategories.map((c) => ({
       value: c,
@@ -231,8 +249,8 @@ export const BidderFilterDrawer: React.FC<BidderFilterDrawerProps> = ({
                   {allCategories.length} Specializations
                 </span>
               </div>
-              <SearchableDropdown
-                value={selectedCategory}
+              <MultiSelectDropdown
+                values={normCategories}
                 onChange={setSelectedCategory}
                 options={categoryOptions}
                 allOptionLabel="All Specializations"
@@ -254,8 +272,8 @@ export const BidderFilterDrawer: React.FC<BidderFilterDrawerProps> = ({
                   {allStates.length} States
                 </span>
               </div>
-              <SearchableDropdown
-                value={selectedState}
+              <MultiSelectDropdown
+                values={normStates}
                 onChange={setSelectedState}
                 options={stateOptions}
                 allOptionLabel="All States"

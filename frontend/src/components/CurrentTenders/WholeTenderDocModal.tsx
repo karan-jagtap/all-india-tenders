@@ -10,7 +10,7 @@ import {
   Clock
 } from 'lucide-react';
 import { EnrichedCurrentTender } from '../../types';
-import { formatINR } from '../../utils';
+import { formatINR, formatDate } from '../../utils';
 
 export interface WholeTenderDocModalProps {
   isOpen: boolean;
@@ -51,7 +51,7 @@ export const WholeTenderDocModal: React.FC<WholeTenderDocModalProps> = ({
             <div>
               <div className="flex items-center gap-2 flex-wrap mb-1">
                 <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-500 text-slate-950">
-                  Whole Tender Document (SBD / RFP)
+                  [RAG] Whole Tender Document (SBD / RFP)
                 </span>
                 <span className="text-[10px] font-mono text-slate-300 bg-slate-800 px-2 py-0.5 rounded border border-slate-700">
                   Ref: {tender.nit_number}
@@ -77,7 +77,7 @@ export const WholeTenderDocModal: React.FC<WholeTenderDocModalProps> = ({
                 </span>
                 <span>•</span>
                 <span className="text-rose-400 flex items-center gap-1 font-mono">
-                  <Clock className="w-3 h-3" /> Closes: {tender.closing_date}
+                  <Clock className="w-3 h-3" /> Closes: {formatDate(tender.closing_date)}
                 </span>
               </div>
             </div>
@@ -93,7 +93,7 @@ export const WholeTenderDocModal: React.FC<WholeTenderDocModalProps> = ({
               title="Download Complete 4-Page Standard Bidding Document"
             >
               <Download className="w-4 h-4" />
-              <span>Download Whole Doc (PDF)</span>
+              <span>[RAG] Download Whole Doc (PDF)</span>
               <span className="text-[9px] bg-emerald-900/80 px-1.5 py-0.2 rounded font-mono">
                 PDF
               </span>
@@ -152,7 +152,7 @@ export const WholeTenderDocModal: React.FC<WholeTenderDocModalProps> = ({
         <div className="flex-1 w-full bg-slate-200 dark:bg-slate-900 relative overflow-hidden">
           <iframe
             src={sbdUrl}
-            title={`Whole Tender Document Preview - ${tender.nit_number}`}
+            title={`[RAG] Whole Tender Document Preview - ${tender.nit_number}`}
             className="w-full h-full border-0"
           />
         </div>
@@ -173,7 +173,7 @@ export const WholeTenderDocModal: React.FC<WholeTenderDocModalProps> = ({
               className="px-3 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer"
             >
               <Download className="w-3.5 h-3.5" />
-              <span>Download PDF</span>
+              <span>[RAG] Download PDF</span>
             </a>
             <button
               onClick={onClose}

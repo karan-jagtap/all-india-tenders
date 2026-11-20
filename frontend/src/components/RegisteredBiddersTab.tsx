@@ -19,8 +19,8 @@ export const RegisteredBiddersTab: React.FC = () => {
 
   const [selectedBidderId, setSelectedBidderId] = useState<string>('');
   const [searchQuery, setSearchQuery] = useState<string>('');
-  const [selectedCategory, setSelectedCategory] = useState<string>('ALL');
-  const [selectedState, setSelectedState] = useState<string>('ALL');
+  const [selectedCategory, setSelectedCategory] = useState<string[]>(['ALL']);
+  const [selectedState, setSelectedState] = useState<string[]>(['ALL']);
   // Default sorting: Alphabetical (A to Z) as requested
   const [sortBy, setSortBy] = useState<BidderSortOption>('NAME_ASC');
   const [copiedText, setCopiedText] = useState<string | null>(null);
@@ -180,11 +180,13 @@ export const RegisteredBiddersTab: React.FC = () => {
           }
         }
 
-        if (selectedCategory !== 'ALL' && !b.categories.includes(selectedCategory)) {
+        const isAll = (arr: string[]) => !arr || arr.length === 0 || arr.includes('ALL');
+
+        if (!isAll(selectedCategory) && !b.categories.some((c) => selectedCategory.includes(c))) {
           return false;
         }
 
-        if (selectedState !== 'ALL' && (!b.states || !b.states.includes(selectedState))) {
+        if (!isAll(selectedState) && (!b.states || !b.states.some((st) => selectedState.includes(st)))) {
           return false;
         }
 
@@ -207,7 +209,7 @@ export const RegisteredBiddersTab: React.FC = () => {
   }, [bidders, searchQuery, selectedCategory, selectedState, sortBy]);
 
   // Whenever ANY filter is reset or changed, automatically select the first record in the refreshed list
-  const currentFilterKey = `${selectedCategory}|${selectedState}|${sortBy}|${searchQuery.trim()}`;
+  const currentFilterKey = `${selectedCategory.slice().sort().join(',')}|${selectedState.slice().sort().join(',')}|${sortBy}|${searchQuery.trim()}`;
   const [prevFilterKey, setPrevFilterKey] = useState<string>(currentFilterKey);
 
   if (prevFilterKey !== currentFilterKey) {
@@ -275,8 +277,8 @@ export const RegisteredBiddersTab: React.FC = () => {
 
   const resetFilterStateValues = () => {
     setSearchQuery('');
-    setSelectedCategory('ALL');
-    setSelectedState('ALL');
+    setSelectedCategory(['ALL']);
+    setSelectedState(['ALL']);
     setSortBy('NAME_ASC');
   };
 
@@ -316,12 +318,14 @@ export const RegisteredBiddersTab: React.FC = () => {
     setIsFilterDrawerOpen(false);
   };
 
-  const handleRemoveCategoryChip = () => {
-    setSelectedCategory('ALL');
+  const handleRemoveCategory = (cat: string) => {
+    const next = selectedCategory.filter((c) => c !== cat && c !== 'ALL');
+    setSelectedCategory(next.length === 0 ? ['ALL'] : next);
   };
 
-  const handleRemoveStateChip = () => {
-    setSelectedState('ALL');
+  const handleRemoveState = (st: string) => {
+    const next = selectedState.filter((s) => s !== st && s !== 'ALL');
+    setSelectedState(next.length === 0 ? ['ALL'] : next);
   };
 
   const handleResetSortChip = () => {
@@ -332,28 +336,34 @@ export const RegisteredBiddersTab: React.FC = () => {
     setSearchQuery('');
   };
 
+  const isAll = (arr: string[]) => !arr || arr.length === 0 || arr.includes('ALL');
+
   const activeChips: FilterChipItem[] = useMemo(() => {
     const list: FilterChipItem[] = [];
 
-    if (selectedCategory !== 'ALL') {
-      list.push({
-        id: 'category',
-        label: 'Specialization',
-        value: selectedCategory,
-        color: 'blue',
-        icon: <Tag className="w-3 h-3 text-blue-500" />,
-        onRemove: handleRemoveCategoryChip
+    if (!selectedCategory.includes('ALL')) {
+      selectedCategory.forEach((cat) => {
+        list.push({
+          id: `category-${cat}`,
+          label: 'Specialization',
+          value: cat,
+          color: 'blue',
+          icon: <Tag className="w-3 h-3 text-blue-500" />,
+          onRemove: () => handleRemoveCategory(cat)
+        });
       });
     }
 
-    if (selectedState !== 'ALL') {
-      list.push({
-        id: 'state',
-        label: 'State',
-        value: selectedState,
-        color: 'rose',
-        icon: <MapPin className="w-3 h-3 text-rose-500" />,
-        onRemove: handleRemoveStateChip
+    if (!selectedState.includes('ALL')) {
+      selectedState.forEach((st) => {
+        list.push({
+          id: `state-${st}`,
+          label: 'State',
+          value: st,
+          color: 'rose',
+          icon: <MapPin className="w-3 h-3 text-rose-500" />,
+          onRemove: () => handleRemoveState(st)
+        });
       });
     }
 
@@ -390,8 +400,8 @@ export const RegisteredBiddersTab: React.FC = () => {
 
   const activeFiltersCount = useMemo(() => {
     let count = 0;
-    if (selectedCategory !== 'ALL') count++;
-    if (selectedState !== 'ALL') count++;
+    if (!isAll(selectedCategory)) count += selectedCategory.filter((c) => c !== 'ALL').length;
+    if (!isAll(selectedState)) count += selectedState.filter((s) => s !== 'ALL').length;
     if (sortBy !== 'NAME_ASC') count++;
     if (searchQuery.trim() !== '') count++;
     return count;

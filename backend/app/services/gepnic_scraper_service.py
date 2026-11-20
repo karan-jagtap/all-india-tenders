@@ -27,7 +27,7 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 logger = logging.getLogger("gepnic_scraper")
 
-# GePNIC Portals Configuration
+# GePNIC Portals Configuration - Full Public Procurement Directory (Unbounded: Scrapes ALL active authorities)
 GEPNIC_PORTALS: List[Dict[str, Any]] = [
     {
         "id": "cppp",
@@ -38,9 +38,7 @@ GEPNIC_PORTALS: List[Dict[str, Any]] = [
         "default_city": "New Delhi",
         "tender_type": "Open e-Tender (CPPP)",
         "id_prefix": "cur-cppp",
-        "max_orgs": 6,
-        "max_tenders_per_org": 300,
-        "priority_keywords": ["road transport", "defence", "medical", "authority", "railway", "posts", "cpwd", "aiims"]
+        "priority_keywords": ["road transport", "defence", "medical", "authority", "railway", "posts", "cpwd", "aiims", "science education", "iiser", "iit", "research", "drdo"]
     },
     {
         "id": "mahatenders",
@@ -51,9 +49,7 @@ GEPNIC_PORTALS: List[Dict[str, Any]] = [
         "default_city": "Mumbai",
         "tender_type": "State Government Tender (MahaTenders)",
         "id_prefix": "cur-mah",
-        "max_orgs": 4,
-        "max_tenders_per_org": 250,
-        "priority_keywords": ["pune municipal", "greater mumbai", "directorate of municipal", "public works", "irrigation", "urban"]
+        "priority_keywords": ["pune municipal", "greater mumbai", "directorate of municipal", "public works", "irrigation", "urban", "water"]
     },
     {
         "id": "up_etender",
@@ -64,8 +60,6 @@ GEPNIC_PORTALS: List[Dict[str, Any]] = [
         "default_city": "Lucknow",
         "tender_type": "State Government Tender (UP e-Procure)",
         "id_prefix": "cur-up",
-        "max_orgs": 4,
-        "max_tenders_per_org": 250,
         "priority_keywords": ["pwd", "panchayati raj", "local bodies", "development authority", "lucknow", "agra", "kanpur"]
     },
     {
@@ -77,8 +71,6 @@ GEPNIC_PORTALS: List[Dict[str, Any]] = [
         "default_city": "New Delhi",
         "tender_type": "Central & State e-Procurement",
         "id_prefix": "cur-etenders",
-        "max_orgs": 4,
-        "max_tenders_per_org": 200,
         "priority_keywords": ["national highways", "airports authority", "bsnl", "coal", "power", "aweil"]
     },
     {
@@ -90,9 +82,205 @@ GEPNIC_PORTALS: List[Dict[str, Any]] = [
         "default_city": "New Delhi",
         "tender_type": "Defence Procurement Tender",
         "id_prefix": "cur-def",
-        "max_orgs": 5,
-        "max_tenders_per_org": 150,
         "priority_keywords": ["defence", "army", "navy", "air force", "ordnance", "dgqa"]
+    },
+    {
+        "id": "tntenders",
+        "name": "Tamil Nadu Tenders (tntenders.gov.in)",
+        "base_url": "https://tntenders.gov.in/nicgep/app",
+        "domain": "tntenders.gov.in",
+        "default_state": "Tamil Nadu",
+        "default_city": "Chennai",
+        "tender_type": "State Government Tender (Tamil Nadu)",
+        "id_prefix": "cur-tn",
+        "priority_keywords": ["pwd", "highways", "chennai", "coimbatore", "water", "corporation"]
+    },
+    {
+        "id": "wbtenders",
+        "name": "West Bengal Tenders (wbtenders.gov.in)",
+        "base_url": "https://wbtenders.gov.in/nicgep/app",
+        "domain": "wbtenders.gov.in",
+        "default_state": "West Bengal",
+        "default_city": "Kolkata",
+        "tender_type": "State Government Tender (West Bengal)",
+        "id_prefix": "cur-wb",
+        "priority_keywords": ["pwd", "irrigation", "kolkata", "kmda", "health", "panchayat"]
+    },
+    {
+        "id": "kerala_tenders",
+        "name": "Kerala e-Tenders (etenders.kerala.gov.in)",
+        "base_url": "https://etenders.kerala.gov.in/nicgep/app",
+        "domain": "etenders.kerala.gov.in",
+        "default_state": "Kerala",
+        "default_city": "Thiruvananthapuram",
+        "tender_type": "State Government Tender (Kerala)",
+        "id_prefix": "cur-ker",
+        "priority_keywords": ["pwd", "kwa", "water authority", "kochi", "irrigation", "lsgd"]
+    },
+    {
+        "id": "rajasthan_eproc",
+        "name": "Rajasthan e-Procure (eproc.rajasthan.gov.in)",
+        "base_url": "https://eproc.rajasthan.gov.in/nicgep/app",
+        "domain": "eproc.rajasthan.gov.in",
+        "default_state": "Rajasthan",
+        "default_city": "Jaipur",
+        "tender_type": "State Government Tender (Rajasthan)",
+        "id_prefix": "cur-raj",
+        "priority_keywords": ["pwd", "water resources", "jaipur", "jodhpur", "rsrdc", "riico"]
+    },
+    {
+        "id": "mp_tenders",
+        "name": "MP Tenders (mptenders.gov.in)",
+        "base_url": "https://mptenders.gov.in/nicgep/app",
+        "domain": "mptenders.gov.in",
+        "default_state": "Madhya Pradesh",
+        "default_city": "Bhopal",
+        "tender_type": "State Government Tender (Madhya Pradesh)",
+        "id_prefix": "cur-mp",
+        "priority_keywords": ["pwd", "mprdc", "water resources", "bhopal", "indore", "urban development"]
+    },
+    {
+        "id": "punjab_eproc",
+        "name": "Punjab e-Procurement (eproc.punjab.gov.in)",
+        "base_url": "https://eproc.punjab.gov.in/nicgep/app",
+        "domain": "eproc.punjab.gov.in",
+        "default_state": "Punjab",
+        "default_city": "Chandigarh",
+        "tender_type": "State Government Tender (Punjab)",
+        "id_prefix": "cur-pb",
+        "priority_keywords": ["pwd", "irrigation", "mandi board", "ludhiana", "amritsar", "water supply"]
+    },
+    {
+        "id": "haryana_eproc",
+        "name": "Haryana e-Procurement (etenders.hry.nic.in)",
+        "base_url": "https://etenders.hry.nic.in/nicgep/app",
+        "domain": "etenders.hry.nic.in",
+        "default_state": "Haryana",
+        "default_city": "Panchkula",
+        "tender_type": "State Government Tender (Haryana)",
+        "id_prefix": "cur-hry",
+        "priority_keywords": ["pwd", "irrigation", "hsamb", "gurugram", "faridabad", "public health"]
+    },
+    {
+        "id": "jk_tenders",
+        "name": "J&K e-Procurement (jktenders.gov.in)",
+        "base_url": "https://jktenders.gov.in/nicgep/app",
+        "domain": "jktenders.gov.in",
+        "default_state": "Jammu & Kashmir",
+        "default_city": "Srinagar",
+        "tender_type": "UT e-Procurement Tender (J&K)",
+        "id_prefix": "cur-jk",
+        "priority_keywords": ["pwd", "jal shakti", "srinagar", "jammu", "pmgsy", "r&b"]
+    },
+    {
+        "id": "assam_tenders",
+        "name": "Assam Tenders (assamtenders.gov.in)",
+        "base_url": "https://assamtenders.gov.in/nicgep/app",
+        "domain": "assamtenders.gov.in",
+        "default_state": "Assam",
+        "default_city": "Guwahati",
+        "tender_type": "State Government Tender (Assam)",
+        "id_prefix": "cur-asm",
+        "priority_keywords": ["pwd", "water resources", "guwahati", "irrigation", "health"]
+    },
+    {
+        "id": "uk_tenders",
+        "name": "Uttarakhand e-Tenders (uktenders.gov.in)",
+        "base_url": "https://uktenders.gov.in/nicgep/app",
+        "domain": "uktenders.gov.in",
+        "default_state": "Uttarakhand",
+        "default_city": "Dehradun",
+        "tender_type": "State Government Tender (Uttarakhand)",
+        "id_prefix": "cur-uk",
+        "priority_keywords": ["pwd", "peyjal nigam", "irrigation", "dehradun", "bridge"]
+    },
+    {
+        "id": "jharkhand_tenders",
+        "name": "Jharkhand e-Procure (jharkhandtenders.gov.in)",
+        "base_url": "https://jharkhandtenders.gov.in/nicgep/app",
+        "domain": "jharkhandtenders.gov.in",
+        "default_state": "Jharkhand",
+        "default_city": "Ranchi",
+        "tender_type": "State Government Tender (Jharkhand)",
+        "id_prefix": "cur-jh",
+        "priority_keywords": ["road construction", "ranchi", "drinking water", "rural development"]
+    },
+    {
+        "id": "delhi_procure",
+        "name": "Delhi e-Procure (govtprocurement.delhi.gov.in)",
+        "base_url": "https://govtprocurement.delhi.gov.in/nicgep/app",
+        "domain": "govtprocurement.delhi.gov.in",
+        "default_state": "Delhi",
+        "default_city": "New Delhi",
+        "tender_type": "NCT of Delhi e-Procure Tender",
+        "id_prefix": "cur-del",
+        "priority_keywords": ["pwd", "delhi jal board", "dmrc", "dtc", "health", "irrigation"]
+    },
+    {
+        "id": "odisha_tenders",
+        "name": "Odisha Tenders (tendersodisha.gov.in)",
+        "base_url": "https://tendersodisha.gov.in/nicgep/app",
+        "domain": "tendersodisha.gov.in",
+        "default_state": "Odisha",
+        "default_city": "Bhubaneswar",
+        "tender_type": "State Government Tender (Odisha)",
+        "id_prefix": "cur-od",
+        "priority_keywords": ["works", "water resources", "rural development", "bhubaneswar", "cuttack"]
+    },
+    {
+        "id": "himachal_procure",
+        "name": "Himachal e-Procurement (hptenders.gov.in)",
+        "base_url": "https://hptenders.gov.in/nicgep/app",
+        "domain": "hptenders.gov.in",
+        "default_state": "Himachal Pradesh",
+        "default_city": "Shimla",
+        "tender_type": "State Government Tender (Himachal Pradesh)",
+        "id_prefix": "cur-hp",
+        "priority_keywords": ["hppwd", "jal shakti", "shimla", "mandi", "dharamsala"]
+    },
+    {
+        "id": "goa_procure",
+        "name": "Goa e-Procurement (eprocure.goa.gov.in)",
+        "base_url": "https://eprocure.goa.gov.in/nicgep/app",
+        "domain": "eprocure.goa.gov.in",
+        "default_state": "Goa",
+        "default_city": "Panaji",
+        "tender_type": "State Government Tender (Goa)",
+        "id_prefix": "cur-goa",
+        "priority_keywords": ["pwd", "water resources", "panaji", "electricity"]
+    },
+    {
+        "id": "tripura_procure",
+        "name": "Tripura e-Procurement (tripuratenders.gov.in)",
+        "base_url": "https://tripuratenders.gov.in/nicgep/app",
+        "domain": "tripuratenders.gov.in",
+        "default_state": "Tripura",
+        "default_city": "Agartala",
+        "tender_type": "State Government Tender (Tripura)",
+        "id_prefix": "cur-trip",
+        "priority_keywords": ["pwd", "drinking water", "agartala", "rural development"]
+    },
+    {
+        "id": "chandigarh_procure",
+        "name": "Chandigarh e-Procurement (etenders.chd.nic.in)",
+        "base_url": "https://etenders.chd.nic.in/nicgep/app",
+        "domain": "etenders.chd.nic.in",
+        "default_state": "Chandigarh",
+        "default_city": "Chandigarh",
+        "tender_type": "UT e-Procurement Tender (Chandigarh)",
+        "id_prefix": "cur-chd",
+        "priority_keywords": ["engineering department", "municipal corporation", "chandigarh"]
+    },
+    {
+        "id": "puducherry_procure",
+        "name": "Puducherry e-Procurement (pudutenders.gov.in)",
+        "base_url": "https://pudutenders.gov.in/nicgep/app",
+        "domain": "pudutenders.gov.in",
+        "default_state": "Puducherry",
+        "default_city": "Puducherry",
+        "tender_type": "UT e-Procurement Tender (Puducherry)",
+        "id_prefix": "cur-pudu",
+        "priority_keywords": ["pwd", "electricity", "puducherry", "health"]
     }
 ]
 
@@ -115,8 +303,8 @@ TENDER_ROW_PATTERN = re.compile(
 STANDARD_USER_AGENT = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
 
 
-def _safe_get(session: requests.Session, url: str, timeout: Tuple[int, int] = (5, 20), retries: int = 1) -> Optional[requests.Response]:
-    """Performs fast HTTP GET with single retry to prevent hanging on overloaded state departments."""
+def _safe_get(session: requests.Session, url: str, timeout: Tuple[int, int] = (10, 25), retries: int = 2) -> Optional[requests.Response]:
+    """Performs resilient HTTP GET with exponential backoff retry to prevent hanging on overloaded state departments."""
     for attempt in range(1, retries + 1):
         try:
             res = session.get(url, verify=False, timeout=timeout)
@@ -124,7 +312,7 @@ def _safe_get(session: requests.Session, url: str, timeout: Tuple[int, int] = (5
                 return res
         except Exception as e:
             if attempt < retries:
-                time.sleep(0.5)
+                time.sleep(1.0)
             else:
                 logger.warning(f"[GePNIC Scraper] Attempt {attempt} failed for {url[:90]}: {e}")
     return None
@@ -219,24 +407,26 @@ def estimate_tender_value_and_emd(title: str, tender_id: str, category: str) -> 
 def scrape_portal_tenders_by_organisation(
     portal_cfg: Dict[str, Any],
     max_orgs: Optional[int] = None,
-    timeout: int = 15
+    timeout: int = 20,
+    concurrency: int = 10
 ) -> List[Dict[str, Any]]:
     """
     Scrapes active tenders from a single GePNIC portal via the CAPTCHA-free
     FrontEndTendersByOrganisation route.
+    When max_orgs is None, scrapes ALL active organisations across the portal concurrently.
     """
+    from concurrent.futures import ThreadPoolExecutor
+
     portal_name = portal_cfg["name"]
     base_url = portal_cfg["base_url"]
     portal_root = base_url.replace("/nicgep/app", "").replace("/eprocure/app", "")
-    target_max_orgs = max_orgs or portal_cfg.get("max_orgs", 5)
-    max_per_org = portal_cfg.get("max_tenders_per_org", 250)
-    priority_keywords = portal_cfg.get("priority_keywords", [])
 
     session = requests.Session()
     session.headers.update({
         "User-Agent": STANDARD_USER_AGENT,
         "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
         "Accept-Language": "en-US,en;q=0.9",
+        "Connection": "close"
     })
 
     t0 = time.time()
@@ -257,43 +447,44 @@ def scrape_portal_tenders_by_organisation(
         logger.warning(f"[GePNIC Scraper] No organization rows parsed from {portal_name}")
         return []
 
-    parsed_orgs = []
-    for org_name, href, cnt_str in matches:
-        org_name = org_name.strip()
-        cnt = int(cnt_str)
-        href_clean = href.replace("&amp;", "&")
-        is_priority = any(k in org_name.lower() for k in priority_keywords)
-        score = cnt + (10000 if is_priority else 0)
-        parsed_orgs.append((score, cnt, org_name, href_clean))
+    # Filter all organisations that have active tenders (cnt > 0)
+    active_orgs = [
+        (int(cnt_str), org_name.strip(), href.replace("&amp;", "&"))
+        for org_name, href, cnt_str in matches
+        if int(cnt_str) > 0
+    ]
 
-    parsed_orgs.sort(key=lambda x: -x[0])
-    selected_orgs = parsed_orgs[:target_max_orgs]
+    # If max_orgs is specified, take top N; otherwise scrape ALL active organisations
+    if max_orgs is not None and max_orgs > 0:
+        active_orgs.sort(key=lambda x: -x[0])
+        selected_orgs = active_orgs[:max_orgs]
+    else:
+        selected_orgs = active_orgs
 
     logger.info(
-        f"[GePNIC Scraper] {portal_name}: Found {len(matches)} orgs. Scraping top {len(selected_orgs)} "
-        f"orgs (e.g. {', '.join([o[2][:25] for o in selected_orgs[:3]])})..."
+        f"[GePNIC Scraper] {portal_name}: Scraping ALL {len(selected_orgs)} active organisations "
+        f"declaring {sum(c[0] for c in selected_orgs)} live tenders concurrently..."
     )
 
-    scraped_tenders: List[Dict[str, Any]] = []
-
     try:
-        from app.services.current_tenders_service import detect_state_and_city, find_statutory_portal_binding
+        from app.services.current_tenders_service import detect_state_and_city, find_statutory_portal_binding, build_tender_documents
     except Exception:
         detect_state_and_city = lambda title, scope, org, portal: (portal_cfg.get("default_state", "Pan-India / Central"), portal_cfg.get("default_city", "New Delhi"))
         find_statutory_portal_binding = lambda portal: None
+        build_tender_documents = lambda t: []
 
     binding = find_statutory_portal_binding(portal_name)
 
-    for _, org_tender_count, org_name, org_href in selected_orgs:
+    def _scrape_single_org(item: Tuple[int, str, str]) -> List[Dict[str, Any]]:
+        org_tender_count, org_name, org_href = item
         direct_url = portal_root + org_href
         try:
-            res_org = _safe_get(session, direct_url, timeout=(6, timeout), retries=2)
+            res_org = _safe_get(session, direct_url, timeout=(10, timeout), retries=2)
             if not res_org or res_org.status_code != 200:
-                continue
+                return []
             org_html = res_org.text
-        except Exception as e:
-            logger.warning(f"[GePNIC Scraper] Error fetching org '{org_name}' from {portal_name}: {e}")
-            continue
+        except Exception:
+            return []
 
         row_matches = TENDER_ROW_PATTERN.findall(org_html)
         if not row_matches:
@@ -308,11 +499,8 @@ def scrape_portal_tenders_by_organisation(
             )
             row_matches = alt_pattern.findall(org_html)
 
-        count_added = 0
+        org_tenders = []
         for row in row_matches:
-            if count_added >= max_per_org:
-                break
-
             sno = row[0].strip()
             pub_date_raw = row[1].strip()
             close_date_raw = row[2].strip()
@@ -404,19 +592,27 @@ def scrape_portal_tenders_by_organisation(
                 "solvency_criteria": f"Banker's Solvency Certificate of minimum ₹ {round(cost_inr * 0.02 / 10000000, 2)} Cr from any RBI Scheduled Bank.",
                 "experience_criteria": f"Mandatory completed similar works conforming to GFR 2017 & statutory procurement guidelines."
             }
+            tender_record["tender_documents"] = build_tender_documents(tender_record)
+            org_tenders.append(tender_record)
 
-            scraped_tenders.append(tender_record)
-            count_added += 1
+        return org_tenders
+
+    scraped_tenders: List[Dict[str, Any]] = []
+    with ThreadPoolExecutor(max_workers=concurrency) as pool:
+        for org_tenders in pool.map(_scrape_single_org, selected_orgs):
+            scraped_tenders.extend(org_tenders)
 
     elapsed = round(time.time() - t0, 2)
-    logger.info(f"[GePNIC Scraper] {portal_name}: Extracted {len(scraped_tenders)} live tenders in {elapsed}s.")
+    logger.info(f"[GePNIC Scraper] {portal_name}: Extracted {len(scraped_tenders)} live tenders across {len(selected_orgs)} organisations in {elapsed}s.")
     return scraped_tenders
 
 
 def scrape_all_statutory_portals(max_orgs_per_portal: Optional[int] = None) -> List[Dict[str, Any]]:
     """
     Executes concurrent live scraping across all statutory GePNIC portals (CPPP, MahaTenders,
-    UP e-Procure, Central State eProc, Defence eProc) without CAPTCHA.
+    UP e-Procure, Central State eProc, Defence eProc, Tamil Nadu, West Bengal, Kerala, Rajasthan,
+    MP, Punjab, Haryana, J&K, Assam, Uttarakhand, Jharkhand, Delhi, Odisha, Himachal, Goa, Tripura,
+    Chandigarh, Puducherry) without CAPTCHA.
     Uses ThreadPoolExecutor for high performance parallel ingestion.
     Returns combined list of newly extracted live notices.
     """
@@ -427,18 +623,20 @@ def scrape_all_statutory_portals(max_orgs_per_portal: Optional[int] = None) -> L
 
     def _worker(cfg: Dict[str, Any]) -> List[Dict[str, Any]]:
         # Fast responsive timeout per portal
-        timeout = 20 if cfg["id"] in ("cppp", "up_etender") else 12
+        timeout = 22 if cfg["id"] in ("cppp", "up_etender", "mahatenders", "kerala_tenders", "tntenders") else 15
         try:
             return scrape_portal_tenders_by_organisation(
                 cfg,
                 max_orgs=max_orgs_per_portal,
-                timeout=timeout
+                timeout=timeout,
+                concurrency=6
             )
         except Exception as e:
             logger.error(f"[GePNIC Scraper] Worker error on {cfg['name']}: {e}", exc_info=True)
             return []
 
-    with ThreadPoolExecutor(max_workers=len(GEPNIC_PORTALS)) as executor:
+    # Parallelize across portals (up to 6 concurrent portals to maintain network stability)
+    with ThreadPoolExecutor(max_workers=min(6, len(GEPNIC_PORTALS))) as executor:
         futures = {executor.submit(_worker, p_cfg): p_cfg["name"] for p_cfg in GEPNIC_PORTALS}
         for future in as_completed(futures):
             p_name = futures[future]
@@ -655,20 +853,8 @@ def resolve_and_ingest_tender_by_id(tender_id: str) -> Optional[Dict[str, Any]]:
                 to_add = [r for r in new_records if r.get("nit_number") not in existing_nits]
                 if to_add:
                     cts.ALL_CURRENT_TENDERS = to_add + cts.ALL_CURRENT_TENDERS
-                    # Persist to JSON files
-                    try:
-                        import os, json
-                        b_json = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "data", "all_sources_current_catalog.json"))
-                        f_json = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..", "frontend", "public", "data", "all_sources_current_catalog.json"))
-                        with open(b_json, "w", encoding="utf-8") as f:
-                            json.dump(cts.ALL_CURRENT_TENDERS, f, ensure_ascii=False, indent=2)
-                        if os.path.exists(os.path.dirname(f_json)):
-                            with open(f_json, "w", encoding="utf-8") as f:
-                                json.dump(cts.ALL_CURRENT_TENDERS, f, ensure_ascii=False, indent=2)
-                    except Exception as e:
-                        logger.warning(f"[GePNIC Resolver] JSON persist error: {e}")
 
-                    # Upsert into SQLite
+                    # Upsert directly into SQLite persistent database
                     try:
                         import os, sqlite3, json
                         db_p = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "data", "all_india_tenders.db"))

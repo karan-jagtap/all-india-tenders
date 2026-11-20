@@ -27,12 +27,14 @@ async def get_current_tenders(
     search: Optional[str] = Query(None, description="Keyword search in title, authority, ref no, location"),
     min_cost: Optional[float] = Query(None, description="Minimum estimated cost in INR"),
     max_cost: Optional[float] = Query(None, description="Maximum estimated cost in INR"),
-    include_closed: bool = Query(True, description="Include closed / expired notices under technical evaluation")
+    include_closed: bool = Query(True, description="Include closed / expired notices under technical evaluation"),
+    limit: Optional[int] = Query(None, ge=1, le=5000, description="Max records to return for pagination"),
+    offset: int = Query(0, ge=0, description="Offset for pagination")
 ):
     """
-    Returns live, active tenders currently open for bid submission across Indian portals.
+    Returns live, active tenders directly from the indexed persistent database (SQLite / PostgreSQL).
     """
-    tenders = list_current_tenders(
+    tenders, total_count = list_current_tenders(
         source_portal=source_portal,
         organization=organization,
         state=state,
@@ -41,13 +43,17 @@ async def get_current_tenders(
         search=search,
         min_cost=min_cost,
         max_cost=max_cost,
-        include_closed=include_closed
+        include_closed=include_closed,
+        limit=limit,
+        offset=offset
     )
     return JSONResponse(
         content=tenders,
         headers={
             "Cache-Control": "no-cache, no-store, must-revalidate",
-            "Pragma": "no-cache"
+            "Pragma": "no-cache",
+            "X-Total-Count": str(total_count),
+            "Access-Control-Expose-Headers": "X-Total-Count, Content-Length"
         }
     )
 

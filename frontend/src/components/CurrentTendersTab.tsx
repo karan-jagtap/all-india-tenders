@@ -1,9 +1,11 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { Radio, RefreshCw } from 'lucide-react';
 import {
+  CurrentTender,
   EnrichedCurrentTender,
   PreBidSimulationReport,
-  DeepDocumentRAGReport
+  DeepDocumentRAGReport,
+  CurrentTenderSortOption
 } from '../types';
 import {
   listCurrentTenders,
@@ -44,20 +46,46 @@ import {
   subscribePortalSources
 } from '../constants';
 
+function enrichTenderList(rawList: CurrentTender[]): EnrichedCurrentTender[] {
+  const strictlyUnawarded = rawList.filter((t) => {
+    const isNotAwarded = t.is_awarded !== true;
+    const notAwardedStatus = !t.status?.toUpperCase().includes('AWARDED');
+    return isNotAwarded && notAwardedStatus;
+  });
+
+  return strictlyUnawarded.map((t) => {
+    const canonicalSource = canonicalizePortalSource(t.source_portal);
+    const canonicalSt = canonicalizeState(t.state, t.title, t.scope_summary, t.organization, canonicalSource);
+    const canonicalCt = canonicalizeCity(t.city, canonicalSt, t.title, t.scope_summary, t.organization, canonicalSource);
+    const canonicalCat = canonicalizeCategory(t.category, t.title, t.scope_summary);
+    return {
+      ...t,
+      source_portal: canonicalSource,
+      state: canonicalSt,
+      city: canonicalCt,
+      category: canonicalCat,
+      _sourceLabel: canonicalSource.split('(')[0].trim(),
+      _searchBlob: `${t.id} ${t.title} ${t.organization} ${t.nit_number} ${canonicalSt} ${canonicalCt} ${canonicalSource} ${canonicalCat} ${t.scope_summary || ''} ${t.ogd_resource_id || ''} ${t.departmental_channel || ''}`.toLowerCase()
+    };
+  });
+}
+
 export const CurrentTendersTab: React.FC = () => {
   const [tenders, setTenders] = useState<EnrichedCurrentTender[]>([]);
+  const [totalDbCount, setTotalDbCount] = useState<number>(69027);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
   const [selectedTenderId, setSelectedTenderId] = useState<string>('');
   const [activeSubTab, setActiveSubTab] = useState<SubTabType>('specs');
   const [searchQuery, setSearchQuery] = useState<string>('');
-  const [selectedSource, setSelectedSource] = useState<string>('ALL');
-  const [selectedOrg, setSelectedOrg] = useState<string>('ALL');
-  const [selectedState, setSelectedState] = useState<string>('ALL');
-  const [selectedCity, setSelectedCity] = useState<string>('ALL');
-  const [selectedCategory, setSelectedCategory] = useState<string>('ALL');
+  const [selectedSource, setSelectedSource] = useState<string[]>(['ALL']);
+  const [selectedOrg, setSelectedOrg] = useState<string[]>(['ALL']);
+  const [selectedState, setSelectedState] = useState<string[]>(['ALL']);
+  const [selectedCity, setSelectedCity] = useState<string[]>(['ALL']);
+  const [selectedCategory, setSelectedCategory] = useState<string[]>(['ALL']);
   const [selectedValueRange, setSelectedValueRange] = useState<string>('ALL');
+  const [sortBy, setSortBy] = useState<CurrentTenderSortOption>('CLOSING_SOONEST');
   const [includeClosed, setIncludeClosed] = useState<boolean>(false);
   const [isVoiceSearching, setIsVoiceSearching] = useState<boolean>(false);
   const voiceSearchRef = useRef<any>(null);
@@ -161,31 +189,17 @@ export const CurrentTendersTab: React.FC = () => {
     }
   };
 
-  const loadData = () => {
+  const loadData = (searchParam?: string) => {
     setLoading(true);
-    listCurrentTenders({ include_closed: true })
-      .then((data) => {
-        const strictlyUnawarded = data.filter((t) => {
-          const isNotAwarded = t.is_awarded !== true;
-          const notAwardedStatus = !t.status?.toUpperCase().includes('AWARDED');
-          return isNotAwarded && notAwardedStatus;
-        });
-
-        const enriched: EnrichedCurrentTender[] = strictlyUnawarded.map((t) => {
-          const canonicalSource = canonicalizePortalSource(t.source_portal);
-          const canonicalSt = canonicalizeState(t.state, t.title, t.scope_summary, t.organization, canonicalSource);
-          const canonicalCt = canonicalizeCity(t.city, canonicalSt, t.title, t.scope_summary, t.organization, canonicalSource);
-          const canonicalCat = canonicalizeCategory(t.category, t.title, t.scope_summary);
-          return {
-            ...t,
-            source_portal: canonicalSource,
-            state: canonicalSt,
-            city: canonicalCt,
-            category: canonicalCat,
-            _sourceLabel: canonicalSource.split('(')[0].trim(),
-            _searchBlob: `${t.id} ${t.title} ${t.organization} ${t.nit_number} ${canonicalSt} ${canonicalCt} ${canonicalSource} ${canonicalCat} ${t.scope_summary || ''} ${t.ogd_resource_id || ''} ${t.departmental_channel || ''}`.toLowerCase()
-          };
-        });
+    const q = searchParam !== undefined ? searchParam : (searchQuery.trim() || undefined);
+    listCurrentTenders({
+      include_closed: true,
+      search: q,
+      limit: q ? 300 : 1000
+    })
+      .then(({ tenders: data, totalCount }) => {
+        setTotalDbCount(totalCount);
+        const enriched = enrichTenderList(data);
         setTenders(enriched);
         if (enriched.length > 0 && (!selectedTenderId || !enriched.some(t => t.id === selectedTenderId))) {
           setSelectedTenderId(enriched[0].id);
@@ -205,7 +219,7 @@ export const CurrentTendersTab: React.FC = () => {
       loadData();
     } catch (err: any) {
       console.error('Live scraping failed:', err);
-      alert('Scraper execution encountered a network issue. Retrying with memory cache.');
+      alert('Scraper execution encountered a network issue. Retrying with database stream.');
       loadData();
     } finally {
       setIsScrapingLive(false);
@@ -216,8 +230,23 @@ export const CurrentTendersTab: React.FC = () => {
     loadData();
   }, []);
 
+  // Debounced server-side DB search for target tender IDs or keywords
+  useEffect(() => {
+    const q = searchQuery.trim();
+    if (q.length >= 3) {
+      const timer = setTimeout(() => {
+        loadData(q);
+      }, 400);
+      return () => clearTimeout(timer);
+    } else if (q.length === 0) {
+      loadData('');
+    }
+  }, [searchQuery]);
+
   const query = searchQuery.toLowerCase().trim();
   const todayStr = useMemo(() => new Date().toISOString().split('T')[0], []);
+
+  const isAll = (arr: string[]) => !arr || arr.length === 0 || arr.includes('ALL');
 
   // Faceted matcher: checks if tender satisfies all active filters except an excluded dimension
   const matchesFilter = useCallback(
@@ -230,19 +259,19 @@ export const CurrentTendersTab: React.FC = () => {
         if (isExpired) return false;
       }
 
-      if (excludeDimension !== 'source' && selectedSource !== 'ALL' && t.source_portal !== selectedSource) {
+      if (excludeDimension !== 'source' && !isAll(selectedSource) && !selectedSource.includes(t.source_portal)) {
         return false;
       }
-      if (excludeDimension !== 'org' && selectedOrg !== 'ALL' && t.organization !== selectedOrg) {
+      if (excludeDimension !== 'org' && !isAll(selectedOrg) && !selectedOrg.includes(t.organization)) {
         return false;
       }
-      if (excludeDimension !== 'state' && selectedState !== 'ALL' && t.state !== selectedState) {
+      if (excludeDimension !== 'state' && !isAll(selectedState) && !selectedState.includes(t.state)) {
         return false;
       }
-      if (excludeDimension !== 'city' && selectedCity !== 'ALL' && t.city !== selectedCity) {
+      if (excludeDimension !== 'city' && !isAll(selectedCity) && !selectedCity.includes(t.city)) {
         return false;
       }
-      if (excludeDimension !== 'category' && selectedCategory !== 'ALL' && t.category !== selectedCategory) {
+      if (excludeDimension !== 'category' && !isAll(selectedCategory) && !selectedCategory.includes(t.category)) {
         return false;
       }
       if (excludeDimension !== 'value' && selectedValueRange !== 'ALL') {
@@ -277,9 +306,9 @@ export const CurrentTendersTab: React.FC = () => {
     for (const t of tenders) {
       if (t.source_portal) set.add(t.source_portal);
     }
-    if (selectedSource !== 'ALL') {
-      set.add(selectedSource);
-    }
+    selectedSource.forEach((src) => {
+      if (src !== 'ALL') set.add(src);
+    });
     return Array.from(set).sort();
   }, [tenders, selectedSource, filterConstantsTick]);
 
@@ -297,9 +326,9 @@ export const CurrentTendersTab: React.FC = () => {
     for (const t of tenders) {
       if (t.organization) set.add(t.organization);
     }
-    if (selectedOrg !== 'ALL') {
-      set.add(selectedOrg);
-    }
+    selectedOrg.forEach((org) => {
+      if (org !== 'ALL') set.add(org);
+    });
     return Array.from(set).sort();
   }, [tenders, selectedOrg, filterConstantsTick]);
 
@@ -317,9 +346,9 @@ export const CurrentTendersTab: React.FC = () => {
     for (const t of tenders) {
       if (t.state) set.add(t.state);
     }
-    if (selectedState !== 'ALL') {
-      set.add(selectedState);
-    }
+    selectedState.forEach((st) => {
+      if (st !== 'ALL') set.add(st);
+    });
     return Array.from(set).sort();
   }, [tenders, selectedState, filterConstantsTick]);
 
@@ -337,9 +366,9 @@ export const CurrentTendersTab: React.FC = () => {
     for (const t of tenders) {
       if (t.city) set.add(t.city);
     }
-    if (selectedCity !== 'ALL') {
-      set.add(selectedCity);
-    }
+    selectedCity.forEach((ct) => {
+      if (ct !== 'ALL') set.add(ct);
+    });
     return Array.from(set).sort();
   }, [tenders, selectedCity, filterConstantsTick]);
 
@@ -357,17 +386,59 @@ export const CurrentTendersTab: React.FC = () => {
     for (const t of tenders) {
       if (t.category) set.add(t.category);
     }
-    if (selectedCategory !== 'ALL') {
-      set.add(selectedCategory);
-    }
+    selectedCategory.forEach((cat) => {
+      if (cat !== 'ALL') set.add(cat);
+    });
     return Array.from(set).sort();
   }, [tenders, selectedCategory, filterConstantsTick]);
 
-  // Final intersection of all active filters
-  const filteredTenders = useMemo(() => tenders.filter((t) => matchesFilter(t)), [tenders, matchesFilter]);
+  // Final intersection of all active filters & active sorting
+  const filteredTenders = useMemo(() => {
+    const list = tenders.filter((t) => matchesFilter(t));
+    return list.sort((a, b) => {
+      switch (sortBy) {
+        case 'CLOSING_SOONEST': {
+          const aDays = a.days_left !== undefined ? a.days_left : 999999;
+          const bDays = b.days_left !== undefined ? b.days_left : 999999;
+          if (aDays !== bDays) return aDays - bDays;
+          return (a.closing_date || '').localeCompare(b.closing_date || '');
+        }
+        case 'CLOSING_LATEST': {
+          const aDays = a.days_left !== undefined ? a.days_left : -1;
+          const bDays = b.days_left !== undefined ? b.days_left : -1;
+          if (aDays !== bDays) return bDays - aDays;
+          return (b.closing_date || '').localeCompare(a.closing_date || '');
+        }
+        case 'VALUE_DESC': {
+          return (b.estimated_cost_inr || 0) - (a.estimated_cost_inr || 0);
+        }
+        case 'VALUE_ASC': {
+          return (a.estimated_cost_inr || 0) - (b.estimated_cost_inr || 0);
+        }
+        case 'PUBLISHED_DESC': {
+          const bDate = b.published_date ? new Date(b.published_date).getTime() : 0;
+          const aDate = a.published_date ? new Date(a.published_date).getTime() : 0;
+          return bDate - aDate;
+        }
+        case 'PUBLISHED_ASC': {
+          const aDate = a.published_date ? new Date(a.published_date).getTime() : 0;
+          const bDate = b.published_date ? new Date(b.published_date).getTime() : 0;
+          return aDate - bDate;
+        }
+        case 'EMD_DESC': {
+          return (b.emd_amount_inr || 0) - (a.emd_amount_inr || 0);
+        }
+        case 'TITLE_ASC': {
+          return a.title.localeCompare(b.title);
+        }
+        default:
+          return 0;
+      }
+    });
+  }, [tenders, matchesFilter, sortBy]);
 
   // Whenever ANY filter is reset or changed, automatically select the first record in the refreshed list
-  const currentFilterKey = `${selectedSource}|${selectedOrg}|${selectedState}|${selectedCity}|${selectedCategory}|${selectedValueRange}|${searchQuery.trim()}`;
+  const currentFilterKey = `${selectedSource.slice().sort().join(',')}|${selectedOrg.slice().sort().join(',')}|${selectedState.slice().sort().join(',')}|${selectedCity.slice().sort().join(',')}|${selectedCategory.slice().sort().join(',')}|${selectedValueRange}|${sortBy}|${searchQuery.trim()}`;
   const [prevFilterKey, setPrevFilterKey] = useState<string>(currentFilterKey);
 
   if (prevFilterKey !== currentFilterKey) {
@@ -395,32 +466,35 @@ export const CurrentTendersTab: React.FC = () => {
     }
   }, [selectedTender?.id]);
 
-  const openCount = useMemo(() => {
-    return tenders.filter((t) => (t.days_left === undefined || t.days_left > 0) && (!t.closing_date || t.closing_date >= todayStr)).length;
-  }, [tenders, todayStr]);
-
   const hasActiveFilters =
-    selectedSource !== 'ALL' ||
-    selectedOrg !== 'ALL' ||
-    selectedState !== 'ALL' ||
-    selectedCity !== 'ALL' ||
-    selectedCategory !== 'ALL' ||
+    !isAll(selectedSource) ||
+    !isAll(selectedOrg) ||
+    !isAll(selectedState) ||
+    !isAll(selectedCity) ||
+    !isAll(selectedCategory) ||
     selectedValueRange !== 'ALL' ||
+    sortBy !== 'CLOSING_SOONEST' ||
     searchQuery.trim() !== '' ||
     includeClosed;
 
+  const openCount = useMemo(() => {
+    if (!hasActiveFilters && totalDbCount > 0) return totalDbCount;
+    return filteredTenders.filter((t) => (t.days_left === undefined || t.days_left > 0) && (!t.closing_date || t.closing_date >= todayStr)).length;
+  }, [filteredTenders, todayStr, hasActiveFilters, totalDbCount]);
+
   const activeFiltersCount = useMemo(() => {
     let count = 0;
-    if (selectedSource !== 'ALL') count++;
-    if (selectedOrg !== 'ALL') count++;
-    if (selectedState !== 'ALL') count++;
-    if (selectedCity !== 'ALL') count++;
-    if (selectedCategory !== 'ALL') count++;
+    if (!isAll(selectedSource)) count += selectedSource.filter((v) => v !== 'ALL').length;
+    if (!isAll(selectedOrg)) count += selectedOrg.filter((v) => v !== 'ALL').length;
+    if (!isAll(selectedState)) count += selectedState.filter((v) => v !== 'ALL').length;
+    if (!isAll(selectedCity)) count += selectedCity.filter((v) => v !== 'ALL').length;
+    if (!isAll(selectedCategory)) count += selectedCategory.filter((v) => v !== 'ALL').length;
     if (selectedValueRange !== 'ALL') count++;
+    if (sortBy !== 'CLOSING_SOONEST') count++;
     if (searchQuery.trim() !== '') count++;
     if (includeClosed) count++;
     return count;
-  }, [selectedSource, selectedOrg, selectedState, selectedCity, selectedCategory, selectedValueRange, searchQuery, includeClosed]);
+  }, [selectedSource, selectedOrg, selectedState, selectedCity, selectedCategory, selectedValueRange, sortBy, searchQuery, includeClosed]);
 
   const selectFirstTenderRecord = (tenderList: EnrichedCurrentTender[]) => {
     const firstTender = tenderList[0];
@@ -429,12 +503,13 @@ export const CurrentTendersTab: React.FC = () => {
   };
 
   const resetFilterStateValues = () => {
-    setSelectedSource('ALL');
-    setSelectedOrg('ALL');
-    setSelectedState('ALL');
-    setSelectedCity('ALL');
-    setSelectedCategory('ALL');
+    setSelectedSource(['ALL']);
+    setSelectedOrg(['ALL']);
+    setSelectedState(['ALL']);
+    setSelectedCity(['ALL']);
+    setSelectedCategory(['ALL']);
     setSelectedValueRange('ALL');
+    setSortBy('CLOSING_SOONEST');
     setSearchQuery('');
     setIncludeClosed(false);
   };
@@ -497,26 +572,55 @@ export const CurrentTendersTab: React.FC = () => {
   const PAGE_SIZE = 12;
   const [visibleCount, setVisibleCount] = useState<number>(PAGE_SIZE);
   const [isLoadingMore, setIsLoadingMore] = useState<boolean>(false);
+  const [isFetchingBatch, setIsFetchingBatch] = useState<boolean>(false);
   const listContainerRef = useRef<HTMLDivElement>(null);
   const sentinelRef = useRef<HTMLDivElement>(null);
 
   const visibleTenders = filteredTenders.slice(0, visibleCount);
 
+  const hasMoreToRender = visibleCount < filteredTenders.length;
+  const hasMoreInDb = !hasActiveFilters && tenders.length < totalDbCount;
+
   const loadMore = useCallback(() => {
-    if (isLoadingMore || visibleCount >= filteredTenders.length) return;
-    setIsLoadingMore(true);
-    setTimeout(() => {
-      setVisibleCount((prev) => Math.min(prev + PAGE_SIZE, filteredTenders.length));
-      setIsLoadingMore(false);
-    }, 200);
-  }, [isLoadingMore, visibleCount, filteredTenders.length]);
+    if (isLoadingMore || isFetchingBatch) return;
+
+    if (hasMoreToRender) {
+      setIsLoadingMore(true);
+      setTimeout(() => {
+        setVisibleCount((prev) => Math.min(prev + PAGE_SIZE, filteredTenders.length));
+        setIsLoadingMore(false);
+      }, 100);
+      return;
+    }
+
+    if (hasMoreInDb) {
+      setIsFetchingBatch(true);
+      listCurrentTenders({
+        include_closed: true,
+        limit: 1000,
+        offset: tenders.length
+      })
+        .then(({ tenders: nextBatch }) => {
+          if (nextBatch.length > 0) {
+            const enrichedBatch = enrichTenderList(nextBatch);
+            setTenders((prev) => [...prev, ...enrichedBatch]);
+            setVisibleCount((prev) => prev + PAGE_SIZE);
+          }
+          setIsFetchingBatch(false);
+        })
+        .catch((err) => {
+          console.error('Failed to stream next tenders batch:', err);
+          setIsFetchingBatch(false);
+        });
+    }
+  }, [isLoadingMore, isFetchingBatch, hasMoreToRender, hasMoreInDb, filteredTenders.length, tenders.length, totalDbCount]);
 
   useEffect(() => {
     setVisibleCount(PAGE_SIZE);
     if (listContainerRef.current) {
       listContainerRef.current.scrollTop = 0;
     }
-  }, [selectedSource, selectedOrg, selectedState, selectedCity, selectedCategory, selectedValueRange, searchQuery]);
+  }, [currentFilterKey]);
 
   useEffect(() => {
     const sentinel = sentinelRef.current;
@@ -546,8 +650,8 @@ export const CurrentTendersTab: React.FC = () => {
     return (
       <div className="flex flex-col items-center justify-center p-16 text-slate-500 space-y-3">
         <RefreshCw className="w-8 h-8 animate-spin text-orange-600" />
-        <p className="text-sm font-medium">Scraping in-progress notices directly from official portals...</p>
-        <span className="text-xs text-slate-400">100% In-Memory RAM • 0 Database Queries</span>
+        <p className="text-sm font-medium">Querying live procurement notices from indexed database...</p>
+        <span className="text-xs text-slate-400">Persistent SQLite Database • Instant Indexed Retrieval</span>
       </div>
     );
   }
@@ -587,13 +691,15 @@ export const CurrentTendersTab: React.FC = () => {
         setSelectedCity={setSelectedCity}
         selectedValueRange={selectedValueRange}
         setSelectedValueRange={setSelectedValueRange}
+        sortBy={sortBy}
+        setSortBy={setSortBy}
         activeFiltersCount={activeFiltersCount}
         hasActiveFilters={hasActiveFilters}
         resetAllFilters={resetAllFilters}
         onOpenFilterDrawer={handleOpenFilterDrawer}
         loadData={handleRunLiveScraper}
         loading={isScrapingLive}
-        totalTendersCount={includeClosed ? tenders.length : openCount}
+        totalTendersCount={hasActiveFilters ? filteredTenders.length : totalDbCount}
       />
 
       {/* Overlapping Filter Drawer (Slides from Right) */}
@@ -603,7 +709,7 @@ export const CurrentTendersTab: React.FC = () => {
         activeFiltersCount={activeFiltersCount}
         hasActiveFilters={hasActiveFilters}
         resetAllFilters={resetAllFilters}
-        totalFilteredCount={filteredTenders.length}
+        totalFilteredCount={hasActiveFilters ? filteredTenders.length : totalDbCount}
         selectedSource={selectedSource}
         setSelectedSource={setSelectedSource}
         availableSources={availableSources}
@@ -634,7 +740,7 @@ export const CurrentTendersTab: React.FC = () => {
         includeClosed={includeClosed}
         setIncludeClosed={setIncludeClosed}
         openCount={openCount}
-        totalAvailableCount={tenders.length}
+        totalAvailableCount={hasActiveFilters ? filteredTenders.length : totalDbCount}
       />
 
       {/* Main Grid: Left Tender List (35%) | Right Deep-Dive Dossier (65%) */}
@@ -645,12 +751,15 @@ export const CurrentTendersTab: React.FC = () => {
             <span className="flex items-center gap-1.5">
               <span>{includeClosed ? 'All Procurement Notices' : 'Open In-Progress Notices'}</span>
               <span className="text-[11px] font-mono font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
-                {visibleTenders.length < filteredTenders.length
-                  ? `${visibleTenders.length} of ${filteredTenders.length}`
-                  : `${filteredTenders.length}`}
+                {hasActiveFilters
+                  ? visibleTenders.length < filteredTenders.length
+                    ? `${visibleTenders.length} of ${filteredTenders.length.toLocaleString('en-IN')}`
+                    : `${filteredTenders.length.toLocaleString('en-IN')}`
+                  : visibleTenders.length < totalDbCount
+                    ? `${visibleTenders.length} of ${totalDbCount.toLocaleString('en-IN')}`
+                    : `${totalDbCount.toLocaleString('en-IN')}`}
               </span>
             </span>
-            <span className="text-[10px] text-slate-400 font-normal">Click notice to inspect specifications</span>
           </div>
 
           <div
@@ -673,21 +782,23 @@ export const CurrentTendersTab: React.FC = () => {
             })}
 
             {/* Infinite Scroll Sentinel */}
-            {visibleCount < filteredTenders.length && (
+            {(hasMoreToRender || hasMoreInDb) && (
               <div
                 ref={sentinelRef}
                 className="py-4 text-center text-xs text-slate-500 dark:text-slate-400 flex items-center justify-center gap-2 bg-slate-50/80 dark:bg-slate-900/60 rounded-xl border border-dashed border-slate-200 dark:border-slate-800"
               >
                 <RefreshCw className="w-3.5 h-3.5 animate-spin text-orange-600 dark:text-orange-400" />
                 <span>
-                  Loading {Math.min(PAGE_SIZE, filteredTenders.length - visibleCount)} more notices...
+                  {isFetchingBatch
+                    ? 'Loading next batch from indexed database...'
+                    : `Loading ${Math.min(PAGE_SIZE, hasMoreToRender ? filteredTenders.length - visibleCount : 12)} more notices...`}
                 </span>
               </div>
             )}
 
-            {visibleCount >= filteredTenders.length && filteredTenders.length > 0 && (
+            {!hasMoreToRender && !hasMoreInDb && (filteredTenders.length > 0 || totalDbCount > 0) && (
               <div className="py-2.5 text-center text-[11px] text-slate-400 dark:text-slate-500 font-medium">
-                ✓ Showing all {filteredTenders.length} {includeClosed ? 'notices (including closed / under evaluation)' : 'open in-progress notices'} (Purely Scraped)
+                ✓ Showing all {hasActiveFilters ? filteredTenders.length.toLocaleString('en-IN') : totalDbCount.toLocaleString('en-IN')} {includeClosed ? 'notices (including closed / under evaluation)' : 'open in-progress notices'}
               </div>
             )}
 

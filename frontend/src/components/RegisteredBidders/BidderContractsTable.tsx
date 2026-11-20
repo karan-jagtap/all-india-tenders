@@ -1,7 +1,7 @@
 import React from 'react';
 import { Award, Search } from 'lucide-react';
 import { BidderWonContract } from '../../types';
-import { formatCr, formatINR } from '../../utils';
+import { formatCr, formatINR, formatDate } from '../../utils';
 
 export interface BidderContractsTableProps {
   totalContractsCount: number;
@@ -78,7 +78,7 @@ export const BidderContractsTable: React.FC<BidderContractsTableProps> = ({
                   </td>
 
                   <td className="py-2.5 px-3 whitespace-nowrap text-slate-600 dark:text-slate-400 font-mono">
-                    <div className="font-semibold text-slate-800 dark:text-slate-200">{c.award_date}</div>
+                    <div className="font-semibold text-slate-800 dark:text-slate-200">{formatDate(c.award_date)}</div>
                     <span className="text-[10px] text-slate-400">FY {c.year}</span>
                   </td>
 

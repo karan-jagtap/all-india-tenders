@@ -29,6 +29,7 @@ export interface CurrentTender {
   pbg_pct: number;
   published_date: string;
   closing_date: string;
+  opening_date?: string;
   submission_deadline_time: string;
   days_left: number;
   state: string;
@@ -56,6 +57,25 @@ export interface EnrichedCurrentTender extends CurrentTender {
   _sourceLabel: string;
   _searchBlob: string;
 }
+
+export type CurrentTenderSortOption =
+  | 'CLOSING_SOONEST'
+  | 'CLOSING_LATEST'
+  | 'VALUE_DESC'
+  | 'VALUE_ASC'
+  | 'PUBLISHED_DESC'
+  | 'PUBLISHED_ASC'
+  | 'EMD_DESC'
+  | 'TITLE_ASC';
+
+export type AcceptedTenderSortOption =
+  | 'AWARD_DATE_DESC'
+  | 'AWARD_DATE_ASC'
+  | 'VALUE_DESC'
+  | 'VALUE_ASC'
+  | 'DISCOUNT_DESC'
+  | 'CONTRACTOR_ASC'
+  | 'TITLE_ASC';
 
 export interface AcceptedTender {
   id: string;

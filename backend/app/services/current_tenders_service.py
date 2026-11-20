@@ -986,22 +986,22 @@ def run_pure_scraping_sync() -> Dict[str, Any]:
     global ALL_CURRENT_TENDERS
     start_time = time.time()
 
-    # 1. Trigger live GeM scrape refresh across active BidPlus pages
+    # 1. Trigger live GeM scrape refresh across all active BidPlus pages
     new_gem_count = 0
     try:
         from app.services.gem_service import refresh_gem_bids, get_gem_bids_catalog
-        refresh_gem_bids(pages=3)
+        refresh_gem_bids(pages=10)
         gem_bids = get_gem_bids_catalog()
         new_gem_count = len(gem_bids) if gem_bids else 0
     except Exception as e:
         print(f"[Current Tenders] GeM live refresh notice: {e}")
 
-    # 2. Trigger live statutory GePNIC multi-portal scrape (CPPP, MahaTenders, UP, etc.)
+    # 2. Trigger live statutory GePNIC multi-portal scrape (ALL active organisations across CPPP, MahaTenders, UP, etc.)
     gepnic_scraped: List[Dict[str, Any]] = []
     try:
         from app.services.gepnic_scraper_service import scrape_all_statutory_portals
-        gepnic_scraped = scrape_all_statutory_portals(max_orgs_per_portal=4)
-        print(f"[Current Tenders] GePNIC scrape retrieved {len(gepnic_scraped)} live notices.")
+        gepnic_scraped = scrape_all_statutory_portals(max_orgs_per_portal=None)
+        print(f"[Current Tenders] GePNIC scrape retrieved {len(gepnic_scraped)} live notices across ALL organisations.")
     except Exception as e:
         print(f"[Current Tenders] GePNIC scrape error: {e}")
 
@@ -1045,19 +1045,35 @@ def run_pure_scraping_sync() -> Dict[str, Any]:
     merged_catalog = new_tenders + baseline
     ALL_CURRENT_TENDERS = merged_catalog
 
-    # 5. Persist merged catalog to JSON data files
-    try:
-        backend_json_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "data", "all_sources_current_catalog.json"))
-        frontend_json_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..", "frontend", "public", "data", "all_sources_current_catalog.json"))
-        
-        with open(backend_json_path, "w", encoding="utf-8") as f:
-            json.dump(merged_catalog, f, ensure_ascii=False, indent=2)
-            
-        if os.path.exists(os.path.dirname(frontend_json_path)):
-            with open(frontend_json_path, "w", encoding="utf-8") as f:
-                json.dump(merged_catalog, f, ensure_ascii=False, indent=2)
-    except Exception as save_err:
-        print(f"[Current Tenders] Error persisting JSON catalog: {save_err}")
+    # 5. Persist new tenders directly to SQLite persistent database (0 reliance on 300MB JSON)
+    if new_tenders:
+        try:
+            import sqlite3
+            db_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "data", "all_india_tenders.db"))
+            if os.path.exists(db_path):
+                now_str = datetime.now().isoformat()
+                conn = sqlite3.connect(db_path)
+                for item in new_tenders:
+                    conn.execute("""
+                        INSERT OR REPLACE INTO tenders (
+                            id, nit_number, title, source_portal, category,
+                            organisation, state, city, estimated_cost_inr,
+                            emd_amount_inr, publish_date, close_date, opening_date,
+                            days_left, status, document_url, scope_summary,
+                            raw_data, created_at, updated_at
+                        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    """, (
+                        item.get("id"), item.get("nit_number"), item.get("title", ""), item.get("source_portal", ""), item.get("category", ""),
+                        item.get("organization", item.get("organisation", "")), item.get("state", ""), item.get("city", ""),
+                        float(item.get("estimated_cost_inr", 0.0)), float(item.get("emd_amount_inr", 0.0)),
+                        str(item.get("published_date", "")), str(item.get("closing_date", "")), str(item.get("opening_date", "")),
+                        int(item.get("days_left", 0)), str(item.get("status", "OPEN")), str(item.get("document_url", "")),
+                        str(item.get("scope_summary", "")), json.dumps(item), now_str, now_str
+                    ))
+                conn.commit()
+                conn.close()
+        except Exception as save_err:
+            print(f"[Current Tenders] Direct DB persist notice: {save_err}")
 
     elapsed_ms = round((time.time() - start_time) * 1000, 2)
 
@@ -1096,10 +1112,156 @@ def list_current_tenders(
     search: Optional[str] = None,
     min_cost: Optional[float] = None,
     max_cost: Optional[float] = None,
-    include_closed: bool = True
-) -> List[Dict[str, Any]]:
-    """Filters current tenders by portal, organization, state, city, category, value, and search.
-    When include_closed=True, includes tenders whose submission deadline has elapsed (under technical evaluation)."""
+    include_closed: bool = True,
+    limit: Optional[int] = None,
+    offset: int = 0
+) -> Tuple[List[Dict[str, Any]], int]:
+    """Queries current tenders directly from the indexed persistent database (SQLite / PostgreSQL)
+    with B-tree indexes, FTS5 full-text search, and pagination support.
+    Returns (tenders, total_count)."""
+    db_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "data", "all_india_tenders.db"))
+    if os.path.exists(db_path):
+        try:
+            import sqlite3
+            conn = sqlite3.connect(db_path)
+            c = conn.cursor()
+
+            clauses = []
+            params = []
+
+            if not include_closed:
+                clauses.append("days_left > 0 AND status != 'AWARDED' AND status != 'CLOSED'")
+            else:
+                clauses.append("status != 'AWARDED'")
+
+            if source_portal and source_portal != "ALL":
+                portals = [p.strip() for p in source_portal.split(",") if p.strip() and p.strip() != "ALL"]
+                if len(portals) == 1:
+                    clauses.append("source_portal = ?")
+                    params.append(portals[0])
+                elif len(portals) > 1:
+                    placeholders = ",".join("?" for _ in portals)
+                    clauses.append(f"source_portal IN ({placeholders})")
+                    params.extend(portals)
+
+            if organization and organization != "ALL":
+                orgs = [o.strip() for o in organization.split(",") if o.strip() and o.strip() != "ALL"]
+                if len(orgs) == 1:
+                    clauses.append("organisation = ?")
+                    params.append(orgs[0])
+                elif len(orgs) > 1:
+                    placeholders = ",".join("?" for _ in orgs)
+                    clauses.append(f"organisation IN ({placeholders})")
+                    params.extend(orgs)
+
+            if state and state != "ALL":
+                states = [s.strip() for s in state.split(",") if s.strip() and s.strip() != "ALL"]
+                if len(states) == 1:
+                    clauses.append("state = ?")
+                    params.append(states[0])
+                elif len(states) > 1:
+                    placeholders = ",".join("?" for _ in states)
+                    clauses.append(f"state IN ({placeholders})")
+                    params.extend(states)
+
+            if city and city != "ALL":
+                cities = [ct.strip() for ct in city.split(",") if ct.strip() and ct.strip() != "ALL"]
+                if len(cities) == 1:
+                    clauses.append("city = ?")
+                    params.append(cities[0])
+                elif len(cities) > 1:
+                    placeholders = ",".join("?" for _ in cities)
+                    clauses.append(f"city IN ({placeholders})")
+                    params.extend(cities)
+
+            if category and category != "ALL":
+                cats = [c.strip() for c in category.split(",") if c.strip() and c.strip() != "ALL"]
+                if len(cats) == 1:
+                    clauses.append("category = ?")
+                    params.append(cats[0])
+                elif len(cats) > 1:
+                    placeholders = ",".join("?" for _ in cats)
+                    clauses.append(f"category IN ({placeholders})")
+                    params.extend(cats)
+
+            if min_cost is not None:
+                clauses.append("estimated_cost_inr >= ?")
+                params.append(min_cost)
+
+            if max_cost is not None:
+                clauses.append("estimated_cost_inr <= ?")
+                params.append(max_cost)
+
+            if search:
+                q_clean = search.strip()
+                # 1. Exact ID / NIT index lookup (< 1ms)
+                c.execute("SELECT raw_data FROM tenders WHERE id = ? OR nit_number = ? LIMIT 1", (q_clean, q_clean))
+                exact_row = c.fetchone()
+                if exact_row:
+                    t_item = json.loads(exact_row[0]) if isinstance(exact_row[0], str) else exact_row[0]
+                    if "tender_documents" not in t_item:
+                        t_item["tender_documents"] = build_tender_documents(t_item)
+                    conn.close()
+                    return [t_item], 1
+
+                # 2. Try FTS5 MATCH
+                fts_ids = []
+                try:
+                    fts_q = re.sub(r'[^a-zA-Z0-9_\s]', ' ', q_clean).strip()
+                    if fts_q:
+                        c.execute("SELECT id FROM tenders_fts WHERE tenders_fts MATCH ? LIMIT 300", (f'"{fts_q}"*',))
+                        fts_ids = [r[0] for r in c.fetchall()]
+                except Exception:
+                    pass
+
+                if fts_ids:
+                    placeholders = ','.join('?' for _ in fts_ids)
+                    clauses.append(f"id IN ({placeholders})")
+                    params.extend(fts_ids)
+                else:
+                    q_like = f"%{q_clean}%"
+                    clauses.append("(id LIKE ? OR nit_number LIKE ? OR title LIKE ? OR organisation LIKE ? OR state LIKE ? OR city LIKE ?)")
+                    params.extend([q_like, q_like, q_like, q_like, q_like, q_like])
+
+            where = "WHERE " + " AND ".join(clauses) if clauses else ""
+
+            # Instant COUNT(*) query from indexed database
+            count_sql = f"SELECT COUNT(*) FROM tenders {where}"
+            c.execute(count_sql, params)
+            total_count = c.fetchone()[0]
+
+            sql = f"""
+                SELECT raw_data FROM tenders
+                {where}
+                ORDER BY days_left ASC, estimated_cost_inr DESC
+            """
+            if limit is not None:
+                sql += f" LIMIT {int(limit)} OFFSET {int(offset)}"
+
+            c.execute(sql, params)
+            rows = c.fetchall()
+            tenders = []
+            for r in rows:
+                item = json.loads(r[0]) if isinstance(r[0], str) else r[0]
+                if "tender_documents" not in item:
+                    item["tender_documents"] = build_tender_documents(item)
+                tenders.append(item)
+            conn.close()
+
+            if not tenders and search and ("_" in search or "cur-" in search or "gem" in search or len(search) >= 6):
+                try:
+                    from app.services.gepnic_scraper_service import resolve_and_ingest_tender_by_id
+                    resolved = resolve_and_ingest_tender_by_id(search.strip())
+                    if resolved:
+                        tenders = [resolved]
+                        total_count = 1
+                except Exception as e:
+                    print(f"[Current Tenders] Dynamic live resolution error: {e}")
+
+            return tenders, total_count
+        except Exception as e:
+            print(f"[Current Tenders] Direct DB query fallback to memory: {e}")
+
     today_str = date.today().strftime("%Y-%m-%d")
     if include_closed:
         items = [
@@ -1165,10 +1327,31 @@ def list_current_tenders(
                 print(f"[Current Tenders] Dynamic live resolution error: {e}")
 
     # Sort: closing soon first, then highest value
-    return sorted(items, key=lambda x: (x.get("days_left", 999), -(x.get("estimated_cost_inr") or 0)))
+    sorted_items = sorted(items, key=lambda x: (x.get("days_left", 999), -(x.get("estimated_cost_inr") or 0)))
+    total_count = len(sorted_items)
+    if limit is not None:
+        return sorted_items[offset:offset + limit], total_count
+    return sorted_items, total_count
 
 
 def get_current_tender_by_id(tender_id: str) -> Optional[Dict[str, Any]]:
+    db_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "data", "all_india_tenders.db"))
+    if os.path.exists(db_path):
+        try:
+            import sqlite3
+            conn = sqlite3.connect(db_path)
+            c = conn.cursor()
+            c.execute("SELECT raw_data FROM tenders WHERE id = ? OR nit_number = ? LIMIT 1", (tender_id.strip(), tender_id.strip()))
+            row = c.fetchone()
+            conn.close()
+            if row:
+                t = json.loads(row[0]) if isinstance(row[0], str) else row[0]
+                if "tender_documents" not in t:
+                    t["tender_documents"] = build_tender_documents(t)
+                return t
+        except Exception as e:
+            print(f"[Current Tenders] Direct DB tender lookup error: {e}")
+
     for t in ALL_CURRENT_TENDERS:
         if t["id"] == tender_id or t["nit_number"] == tender_id:
             if "tender_documents" not in t:
@@ -1190,6 +1373,17 @@ def get_current_tender_by_id(tender_id: str) -> Optional[Dict[str, Any]]:
 # =============================================================================
 # IN-MEMORY REPORTLAB NIT PDF SUMMARY GENERATION (0 DISK FOOTPRINT)
 # =============================================================================
+def format_date_dmy(val: Any) -> str:
+    if not val:
+        return ""
+    val_str = str(val).strip()
+    m = re.match(r'^(\d{4})[-/](\d{1,2})[-/](\d{1,2})', val_str)
+    if m:
+        y, mo, d = m.groups()
+        return f"{int(d):02d}-{int(mo):02d}-{y}"
+    return val_str
+
+
 def generate_current_tender_nit_pdf(tender: Dict[str, Any]) -> bytes:
     """Generates an official Notice Inviting Tender (NIT) summary sheet PDF in memory."""
     buf = io.BytesIO()
@@ -1241,7 +1435,7 @@ def generate_current_tender_nit_pdf(tender: Dict[str, Any]) -> bytes:
 
     # Header Tricolor bar
     elements.append(Paragraph("<b>GOVERNMENT OF INDIA & STATE PROCUREMENT AUTHORITIES</b>", title_style))
-    elements.append(Paragraph(f"<b>NOTICE INVITING TENDER (NIT) — {tender['source_portal'].upper()}</b>", ParagraphStyle(
+    elements.append(Paragraph(f"<b>[RAG] NOTICE INVITING TENDER (NIT) — {tender['source_portal'].upper()}</b>", ParagraphStyle(
         'SubHeader', parent=title_style, fontSize=11, leading=14, textColor=colors.HexColor('#059669')
     )))
     elements.append(Spacer(1, 10))
@@ -1260,8 +1454,8 @@ def generate_current_tender_nit_pdf(tender: Dict[str, Any]) -> bytes:
         [Paragraph("<b>Estimated Project Cost:</b>", bold_style), Paragraph(f"₹ {est_val:,.2f}", bold_style)],
         [Paragraph("<b>Earnest Money Deposit (EMD):</b>", bold_style), Paragraph(f"₹ {emd_val:,.2f} (100% Exemption for MSEs under GFR 170)", body_style)],
         [Paragraph("<b>Tender Document Fee:</b>", bold_style), Paragraph(f"₹ {fee_val:,.2f}", body_style)],
-        [Paragraph("<b>Published Date:</b>", bold_style), Paragraph(str(tender.get('published_date', 'Recent')), body_style)],
-        [Paragraph("<b>Bid Submission Deadline:</b>", bold_style), Paragraph(f"{tender.get('closing_date', '')} at {tender.get('submission_deadline_time', '15:00 Hrs')}", bold_style)],
+        [Paragraph("<b>Published Date:</b>", bold_style), Paragraph(format_date_dmy(tender.get('published_date', 'Recent')) or 'Recent', body_style)],
+        [Paragraph("<b>Bid Submission Deadline:</b>", bold_style), Paragraph(f"{format_date_dmy(tender.get('closing_date', ''))} at {tender.get('submission_deadline_time', '15:00 Hrs')}", bold_style)],
         [Paragraph("<b>Bid Validity:</b>", bold_style), Paragraph("120 Calendar Days from bid opening", body_style)],
         [Paragraph("<b>Online Submission Link:</b>", bold_style), Paragraph(tender.get('portal_url', ''), body_style)]
     ]
@@ -1373,7 +1567,7 @@ def generate_detailed_tender_document_pdf(tender: Dict[str, Any]) -> bytes:
     elements.append(Paragraph("<b>GOVERNMENT OF INDIA & STATE PUBLIC PROCUREMENT</b>", ParagraphStyle('HeaderTop', parent=title_style, fontSize=11, textColor=colors.HexColor('#64748b'))))
     elements.append(Spacer(1, 4))
     elements.append(Paragraph(f"<b>{tender.get('organization', 'PUBLIC PROCURING AUTHORITY').upper()}</b>", title_style))
-    elements.append(Paragraph("<b>STANDARD BIDDING DOCUMENT (SBD) / REQUEST FOR PROPOSAL (RFP)</b>", ParagraphStyle('SubT', parent=title_style, fontSize=12, leading=16, textColor=colors.HexColor('#b45309'))))
+    elements.append(Paragraph("<b>[RAG] STANDARD BIDDING DOCUMENT (SBD) / REQUEST FOR PROPOSAL (RFP)</b>", ParagraphStyle('SubT', parent=title_style, fontSize=12, leading=16, textColor=colors.HexColor('#b45309'))))
     elements.append(Paragraph("<b>TWO-COVER ELECTRONIC BIDDING SYSTEM (COVER 1: TECHNICAL & ELIGIBILITY; COVER 2: FINANCIAL BOQ)</b>", ParagraphStyle('CoverType', parent=title_style, fontSize=8.5, textColor=colors.HexColor('#047857'))))
     elements.append(Spacer(1, 10))
 
@@ -1391,9 +1585,9 @@ def generate_detailed_tender_document_pdf(tender: Dict[str, Any]) -> bytes:
         [Paragraph("<b>Earnest Money Deposit (EMD):</b>", bold_style), Paragraph(f"₹ {emd_amt:,.2f} (100% Exemption for UDYAM MSEs per GFR Rule 170)", body_style)],
         [Paragraph("<b>Tender Document Cost / Fee:</b>", bold_style), Paragraph(f"₹ {fee_amt:,.2f} (Non-refundable)", body_style)],
         [Paragraph("<b>Performance Bank Guarantee (PBG):</b>", bold_style), Paragraph("5.0% of awarded contract value within 14 days of LOA", body_style)],
-        [Paragraph("<b>Bid Submission Start Date:</b>", bold_style), Paragraph(tender.get('published_date', 'Recent'), body_style)],
-        [Paragraph("<b>Bid Submission End Deadline:</b>", bold_style), Paragraph(f"{tender.get('closing_date', '')} at {tender.get('submission_deadline_time', '15:00 Hrs IST')}", bold_style)],
-        [Paragraph("<b>Technical Bid Opening Date:</b>", bold_style), Paragraph(f"{tender.get('closing_date', '')} at 15:30 Hrs IST", body_style)],
+        [Paragraph("<b>Bid Submission Start Date:</b>", bold_style), Paragraph(format_date_dmy(tender.get('published_date', 'Recent')) or 'Recent', body_style)],
+        [Paragraph("<b>Bid Submission End Deadline:</b>", bold_style), Paragraph(f"{format_date_dmy(tender.get('closing_date', ''))} at {tender.get('submission_deadline_time', '15:00 Hrs IST')}", bold_style)],
+        [Paragraph("<b>Technical Bid Opening Date:</b>", bold_style), Paragraph(f"{format_date_dmy(tender.get('opening_date') or tender.get('closing_date', ''))} at 15:30 Hrs IST", body_style)],
         [Paragraph("<b>Bid Validity Period:</b>", bold_style), Paragraph("120 Calendar Days from date of technical opening", body_style)],
         [Paragraph("<b>Official Portal Gateway:</b>", bold_style), Paragraph(tender.get('portal_url', ''), body_style)]
     ]
@@ -1601,7 +1795,7 @@ def generate_boq_schedule_pdf(tender: Dict[str, Any]) -> bytes:
 
     elements = []
     elements.append(Paragraph("<b>GOVERNMENT E-PROCUREMENT SYSTEM (GePNIC / GeM)</b>", ParagraphStyle('TopSub', parent=title_style, fontSize=10, textColor=colors.HexColor('#047857'))))
-    elements.append(Paragraph("<b>BILL OF QUANTITIES (BOQ) — SCHEDULE OF RATES & FINANCIAL BID</b>", title_style))
+    elements.append(Paragraph("<b>[RAG] BILL OF QUANTITIES (BOQ) — SCHEDULE OF RATES & FINANCIAL BID</b>", title_style))
     elements.append(Paragraph(f"<b>Tender Ref: {tender['nit_number']} • {tender['organization']}</b>", ParagraphStyle('OrgLine', parent=title_style, fontSize=9, textColor=colors.HexColor('#b45309'))))
     elements.append(Spacer(1, 8))
 
