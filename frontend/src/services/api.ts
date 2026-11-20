@@ -55,7 +55,8 @@ export async function listAcceptedTenders(filters?: AcceptedTenderFilters): Prom
         'Pragma': 'no-cache'
       }
     });
-    if (res.ok) {
+    const contentType = res.headers.get('content-type') || '';
+    if (res.ok && contentType.includes('application/json')) {
       const rawCountHeader = res.headers.get('X-Total-Count');
       const tenders: AcceptedTender[] = await res.json();
       const totalCount = rawCountHeader ? parseInt(rawCountHeader, 10) : tenders.length;
@@ -198,23 +199,161 @@ export async function listCurrentTenders(filters?: CurrentTenderFilters): Promis
   if (filters?.offset !== undefined) params.append('offset', String(filters.offset));
   params.append('_t', String(Date.now()));
 
-  const res = await fetch(`${API_BASE}/current-tenders?${params.toString()}`, {
-    cache: 'no-store',
-    headers: {
-      'Cache-Control': 'no-cache',
-      'Pragma': 'no-cache'
-    }
-  });
+  try {
+    const res = await fetch(`${API_BASE}/current-tenders?${params.toString()}`, {
+      cache: 'no-store',
+      headers: {
+        'Cache-Control': 'no-cache',
+        'Pragma': 'no-cache'
+      }
+    });
 
-  if (!res.ok) {
-    throw new Error(`Failed to query live tenders from database (${res.status} ${res.statusText})`);
+    const contentType = res.headers.get('content-type') || '';
+    if (res.ok && contentType.includes('application/json')) {
+      const rawCountHeader = res.headers.get('X-Total-Count');
+      const tenders: CurrentTender[] = await res.json();
+      const totalCount = rawCountHeader ? parseInt(rawCountHeader, 10) : tenders.length;
+      return { tenders, totalCount };
+    }
+  } catch {
+    // Backend API unreachable or static host (Netlify), falling back to static catalog
   }
 
-  const rawCountHeader = res.headers.get('X-Total-Count');
-  const tenders: CurrentTender[] = await res.json();
-  const totalCount = rawCountHeader ? parseInt(rawCountHeader, 10) : tenders.length;
+  // Fallback to static catalog for Netlify / serverless deployment
+  try {
+    const fallbackRes = await fetch(`/data/all_sources_current_catalog.json?_v=${Date.now()}`, {
+      cache: 'no-cache',
+      headers: { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' }
+    });
+    if (fallbackRes.ok) {
+      let catalog: CurrentTender[] = await fallbackRes.json();
+      const todayStr = new Date().toISOString().split('T')[0];
 
-  return { tenders, totalCount };
+      // Exclude closed unless requested
+      if (!filters?.include_closed) {
+        catalog = catalog.filter((t) => {
+          if (t.status === 'CLOSED' || t.status === 'AWARDED') return false;
+          if (t.days_left !== undefined && t.days_left !== null) {
+            return t.days_left > 0;
+          }
+          if (t.closing_date) {
+            return t.closing_date >= todayStr;
+          }
+          return true;
+        });
+      } else {
+        catalog = catalog.filter((t) => !t.status?.includes('AWARDED'));
+      }
+
+      // Filter by portal
+      if (filters?.source_portal && filters.source_portal !== 'ALL') {
+        const portals = filters.source_portal.split(',').map((p) => p.trim().toLowerCase());
+        catalog = catalog.filter((t) => {
+          const sp = (t.source_portal || '').toLowerCase();
+          return portals.some((p) => sp.includes(p) || p.includes(sp));
+        });
+      }
+
+      // Filter by org
+      if (filters?.organization && filters.organization !== 'ALL') {
+        const orgs = filters.organization.split(',').map((o) => o.trim().toLowerCase());
+        catalog = catalog.filter((t) => {
+          const org = (t.organization || '').toLowerCase();
+          return orgs.some((o) => org.includes(o) || o.includes(org));
+        });
+      }
+
+      // Filter by state
+      if (filters?.state && filters.state !== 'ALL') {
+        const states = filters.state.split(',').map((s) => s.trim().toLowerCase());
+        catalog = catalog.filter((t) => {
+          const st = (t.state || '').toLowerCase();
+          return states.some((s) => st.includes(s) || s.includes(st));
+        });
+      }
+
+      // Filter by city
+      if (filters?.city && filters.city !== 'ALL') {
+        const cities = filters.city.split(',').map((c) => c.trim().toLowerCase());
+        catalog = catalog.filter((t) => {
+          const ct = (t.city || '').toLowerCase();
+          return cities.some((c) => ct.includes(c) || c.includes(ct));
+        });
+      }
+
+      // Filter by category
+      if (filters?.category && filters.category !== 'ALL') {
+        const cats = filters.category.split(',').map((c) => c.trim().toLowerCase());
+        catalog = catalog.filter((t) => {
+          const cat = (t.category || '').toLowerCase();
+          return cats.some((c) => cat.includes(c) || c.includes(cat));
+        });
+      }
+
+      // Keyword search
+      if (filters?.search && filters.search.trim()) {
+        const q = filters.search.toLowerCase().trim();
+        catalog = catalog.filter((t) => {
+          const blob = `${t.id} ${t.nit_number} ${t.title} ${t.organization} ${t.source_portal} ${t.state} ${t.city} ${t.category} ${t.scope_summary || ''}`.toLowerCase();
+          return blob.includes(q);
+        });
+      }
+
+      // Min cost
+      if (filters?.min_cost) {
+        catalog = catalog.filter((t) => (t.estimated_cost_inr || 0) >= filters.min_cost!);
+      }
+
+      // Max cost
+      if (filters?.max_cost) {
+        catalog = catalog.filter((t) => (t.estimated_cost_inr || 0) <= filters.max_cost!);
+      }
+
+      // Sorting
+      if (filters?.sort_by) {
+        catalog.sort((a, b) => {
+          switch (filters.sort_by) {
+            case 'CLOSING_SOONEST': {
+              const aDays = a.days_left ?? 999;
+              const bDays = b.days_left ?? 999;
+              if (aDays !== bDays) return aDays - bDays;
+              return (a.closing_date || '').localeCompare(b.closing_date || '');
+            }
+            case 'CLOSING_LATEST': {
+              const aDays = a.days_left ?? 0;
+              const bDays = b.days_left ?? 0;
+              if (aDays !== bDays) return bDays - aDays;
+              return (b.closing_date || '').localeCompare(a.closing_date || '');
+            }
+            case 'VALUE_DESC':
+              return (b.estimated_cost_inr || 0) - (a.estimated_cost_inr || 0);
+            case 'VALUE_ASC':
+              return (a.estimated_cost_inr || 0) - (b.estimated_cost_inr || 0);
+            case 'PUBLISHED_DESC':
+              return (b.published_date || '').localeCompare(a.published_date || '');
+            case 'PUBLISHED_ASC':
+              return (a.published_date || '').localeCompare(b.published_date || '');
+            case 'EMD_DESC':
+              return (b.emd_amount_inr || 0) - (a.emd_amount_inr || 0);
+            case 'TITLE_ASC':
+              return (a.title || '').localeCompare(b.title || '');
+            default:
+              return 0;
+          }
+        });
+      }
+
+      const totalCount = catalog.length;
+      const offset = filters?.offset || 0;
+      const limit = filters?.limit !== undefined ? filters.limit : 12;
+      const paged = catalog.slice(offset, offset + limit);
+      return { tenders: paged, totalCount };
+    }
+  } catch {
+    // Fallback failed
+  }
+
+  throw new Error('Failed to load current tenders catalog');
 }
 
 export function getCurrentTenderPdfUrl(id: string): string {
