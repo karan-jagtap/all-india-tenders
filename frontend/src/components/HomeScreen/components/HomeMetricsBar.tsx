@@ -1,6 +1,7 @@
 import React from 'react';
-import { Radio, TrendingDown, Award, Users, Globe, ChevronRight } from 'lucide-react';
+import { Radio, TrendingDown, Award, Users, Globe, ChevronRight, Lock } from 'lucide-react';
 import { NavigableTab } from '../../../types';
+import { useAuthContext } from '../../../context/AuthContext';
 
 export interface HomeMetricsBarProps {
   activeTenders: number;
@@ -19,6 +20,7 @@ export const HomeMetricsBar: React.FC<HomeMetricsBarProps> = ({
   onNavigate,
   onScrollToSources
 }) => {
+  const { isSignedIn } = useAuthContext();
   return (
     <section className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
       {/* Metric 1: Live Notices */}
@@ -81,10 +83,12 @@ export const HomeMetricsBar: React.FC<HomeMetricsBarProps> = ({
       <div
         onClick={() => onNavigate('bidders')}
         className="bg-white dark:bg-[#0E1422] border border-slate-200/90 dark:border-slate-800 hover:border-blue-500 dark:hover:border-blue-500 rounded-xl p-4 shadow-[0_1px_3px_rgba(15,23,42,0.04)] dark:shadow-[0_2px_8px_rgba(0,0,0,0.3)] hover:shadow-md transition-all cursor-pointer group"
+        title={!isSignedIn ? 'Please log in to view Registered Contractors' : undefined}
       >
         <div className="flex items-center justify-between text-slate-400 mb-1">
-          <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-            Contractors
+          <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1">
+            <span>Contractors</span>
+            {!isSignedIn && <Lock className="w-3 h-3 text-amber-500 shrink-0" />}
           </span>
           <Users className="w-4 h-4 text-blue-600 dark:text-blue-400 group-hover:scale-110 transition-transform" />
         </div>
@@ -93,6 +97,7 @@ export const HomeMetricsBar: React.FC<HomeMetricsBarProps> = ({
         </div>
         <span className="text-[11px] text-blue-600 dark:text-blue-400 font-medium flex items-center gap-1 mt-0.5">
           <span>EPC & Infra Profiles</span>
+          {!isSignedIn && <span className="text-[9px] bg-amber-500/20 text-amber-600 dark:text-amber-400 px-1 py-0.2 rounded font-mono font-bold">Login</span>}
           <ChevronRight className="w-3 h-3" />
         </span>
       </div>

@@ -123,9 +123,10 @@ export enum NavigationTab {
   CURRENT = 'current',
   ACCEPTED = 'accepted',
   BIDDERS = 'bidders',
+  SIGN_IN = 'sign-in',
 }
 
-export type AppNavTarget = NavigationTab | 'home' | 'current' | 'accepted' | 'bidders';
+export type AppNavTarget = NavigationTab | 'home' | 'current' | 'accepted' | 'bidders' | 'sign-in';
 export type NavigableTab = NavigationTab.CURRENT | NavigationTab.ACCEPTED | NavigationTab.BIDDERS | 'current' | 'accepted' | 'bidders';
 
 export enum CurrentTenderSubTab {

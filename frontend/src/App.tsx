@@ -10,23 +10,27 @@ import {
   ChevronRight,
   Sun,
   Moon,
-  Database
+  LogIn,
+  Lock
 } from 'lucide-react';
 import { useTheme } from './context/ThemeContext';
+import { useAuthContext } from './context/AuthContext';
 import { HomeScreen } from './components/HomeScreen';
 import { PreviouslyAcceptedTendersTab } from './components/PreviouslyAcceptedTendersTab';
 import { CurrentTendersTab } from './components/CurrentTendersTab';
 import { RegisteredBiddersTab } from './components/RegisteredBiddersTab';
+import { AuthHeaderControls, SignInView, ClerkSetupModal, ProtectedRoute } from './components/auth';
 import { getPlatformStats, triggerLiveScrape, PlatformStats, ScrapeReport } from './services/api';
 import { NavigationTab } from './types';
 import { loadContractorPools } from './constants/contractors';
 import { loadPortalSources } from './constants/portalSources';
 import { loadMasterFilters } from './constants/masterFilters';
 import { loadUiFilters } from './constants/filters';
-import { SyncLiveButton, SyncHistoryModal } from './components/common';
+import { SyncLiveButton } from './components/common';
 
 export const App: React.FC = () => {
   const { toggleTheme, isDark } = useTheme();
+  const { isSignedIn, openSignIn, showSetupGuide, setShowSetupGuide } = useAuthContext();
   const [activeTab, setActiveTab] = useState<NavigationTab>(NavigationTab.HOME);
   const [stats, setStats] = useState<PlatformStats | null>(null);
   const [isSyncing, setIsSyncing] = useState<boolean>(false);
@@ -34,7 +38,22 @@ export const App: React.FC = () => {
   const [syncNotice, setSyncNotice] = useState<string | null>(null);
   const [syncKey, setSyncKey] = useState<number>(0);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState<boolean>(false);
-  const [isSyncHistoryOpen, setIsSyncHistoryOpen] = useState<boolean>(false);
+
+  // Sync route from URL hash or query if present (e.g. #sign-in)
+  useEffect(() => {
+    const hash = window.location.hash.toLowerCase();
+    const search = new URLSearchParams(window.location.search).get('tab');
+    if ((hash === '#sign-in' || hash === '#login' || search === 'sign-in' || search === 'login') && !isSignedIn) {
+      setActiveTab(NavigationTab.SIGN_IN);
+    }
+  }, [isSignedIn]);
+
+  // When user is signed in, ensure they are on Home/Overview instead of Sign In page
+  useEffect(() => {
+    if (isSignedIn && activeTab === NavigationTab.SIGN_IN) {
+      setActiveTab(NavigationTab.HOME);
+    }
+  }, [isSignedIn, activeTab]);
 
   const fetchStats = () => {
     getPlatformStats()
@@ -215,7 +234,7 @@ export const App: React.FC = () => {
             </div>
           </div>
 
-          {/* Top Actions: Theme Toggle + Sync Live + Hamburger Menu for smaller screens */}
+          {/* Top Actions: Theme Toggle + Sync Live + Auth Header Controls + Hamburger Menu */}
           <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
             {/* Theme Toggle Button (Light / Dark) */}
             <button
@@ -234,23 +253,18 @@ export const App: React.FC = () => {
               </span>
             </button>
 
-            {/* Sync Live Button with 5-minute Cooldown & Hover Tooltip */}
+            {/* Sync Live Button (Protected: Locked with tooltip when signed out) */}
             <SyncLiveButton
               onClick={handleSyncLive}
               isSyncing={isSyncing}
               cooldownRemaining={cooldownRemaining}
               variant="header"
+              isLocked={!isSignedIn}
+              onLockedClick={openSignIn}
             />
 
-            {/* Sync History / Audit Logs Button */}
-            <button
-              onClick={() => setIsSyncHistoryOpen(true)}
-              className="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700/80 text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer shadow-xs"
-              title="View Persistent Database Sync & Automated Cron Audit Logs (cron_sync_logs)"
-            >
-              <Database className="w-3.5 h-3.5 text-purple-400" />
-              <span className="hidden xl:inline">Sync History</span>
-            </button>
+            {/* Clerk Authentication Controls (Sign In Button or User Avatar Button) */}
+            <AuthHeaderControls onNavigateToSignIn={() => setActiveTab(NavigationTab.SIGN_IN)} />
 
             {/* Mobile Hamburger Button (< md) */}
             <button
@@ -277,34 +291,61 @@ export const App: React.FC = () => {
             {tabs.map((t) => {
               const Icon = t.icon;
               const isSelected = activeTab === t.id;
+              const isLocked = t.id === NavigationTab.BIDDERS && !isSignedIn;
               return (
-                <button
+                <div
                   key={t.id}
-                  onClick={() => setActiveTab(t.id)}
-                  className={`px-4 sm:px-5 py-2 rounded-lg text-xs font-bold flex items-center justify-center gap-2 transition-all cursor-pointer shrink-0 whitespace-nowrap ${
-                    isSelected
-                      ? t.activeClasses
-                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white dark:hover:bg-slate-800/70 hover:shadow-2xs'
-                  }`}
+                  className="relative group inline-flex"
+                  title={isLocked ? 'Please log in to view Registered Bidders' : undefined}
                 >
-                  <Icon
-                    className={`w-3.5 h-3.5 ${
+                  <button
+                    onClick={() => setActiveTab(t.id)}
+                    className={`px-4 sm:px-5 py-2 rounded-lg text-xs font-bold flex items-center justify-center gap-2 transition-all cursor-pointer shrink-0 whitespace-nowrap ${
                       isSelected
-                        ? 'text-white' + (t.id === 'current' ? ' animate-pulse' : '')
-                        : t.iconColor
+                        ? t.activeClasses
+                        : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white dark:hover:bg-slate-800/70 hover:shadow-2xs'
                     }`}
-                  />
-                  <span>{t.label}</span>
-                  {t.badge !== undefined && (
-                    <span
-                      className={`px-1.5 py-0.5 rounded-full text-[10px] font-mono font-semibold ${
-                        isSelected ? t.badgeColor : 'bg-slate-200/90 dark:bg-slate-800 text-slate-700 dark:text-slate-300'
+                  >
+                    <Icon
+                      className={`w-3.5 h-3.5 ${
+                        isSelected
+                          ? 'text-white' + (t.id === 'current' ? ' animate-pulse' : '')
+                          : t.iconColor
                       }`}
+                    />
+                    <span>{t.label}</span>
+                    {isLocked && (
+                      <Lock className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                    )}
+                    {t.badge !== undefined && (
+                      <span
+                        className={`px-1.5 py-0.5 rounded-full text-[10px] font-mono font-semibold ${
+                          isSelected ? t.badgeColor : 'bg-slate-200/90 dark:bg-slate-800 text-slate-700 dark:text-slate-300'
+                        }`}
+                      >
+                        {t.badge}
+                      </span>
+                    )}
+                  </button>
+
+                  {isLocked && (
+                    <div
+                      role="tooltip"
+                      className="absolute top-full left-1/2 -translate-x-1/2 mt-2.5 w-60 p-2.5 bg-slate-900/95 dark:bg-slate-950/95 text-slate-100 rounded-xl shadow-2xl border border-amber-500/40 backdrop-blur-md opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 pointer-events-none z-50 text-center"
                     >
-                      {t.badge}
-                    </span>
+                      <div className="flex items-center justify-center gap-1.5 text-amber-300 font-bold text-xs pb-1 border-b border-slate-800">
+                        <Lock className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                        <span>Please log in to access</span>
+                      </div>
+                      <p className="text-[11px] text-slate-300 mt-1 leading-snug">
+                        Contractor directories & solvency books are restricted to logged-in users.
+                      </p>
+                      <div className="mt-2 pt-1 border-t border-slate-800 text-[10px] text-amber-400 font-semibold">
+                        Click to view login requirements →
+                      </div>
+                    </div>
                   )}
-                </button>
+                </div>
               );
             })}
           </div>
@@ -362,6 +403,7 @@ export const App: React.FC = () => {
                 return (
                   <button
                     key={t.id}
+                    title={t.id === NavigationTab.BIDDERS && !isSignedIn ? 'Please log in to view Registered Bidders' : undefined}
                     onClick={() => {
                       setActiveTab(t.id);
                       setIsMobileMenuOpen(false);
@@ -386,6 +428,9 @@ export const App: React.FC = () => {
                           <span className="font-bold text-xs text-white break-words">
                             {t.label}
                           </span>
+                          {t.id === NavigationTab.BIDDERS && !isSignedIn && (
+                            <Lock className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                          )}
                           {t.badge !== undefined && (
                             <span
                               className={`px-1.5 py-0.2 rounded-full text-[10px] font-mono font-bold ${
@@ -411,8 +456,30 @@ export const App: React.FC = () => {
               })}
             </div>
 
-            {/* Drawer Footer with Quick Theme Toggle & Sync Live button */}
+            {/* Drawer Footer with Quick Theme Toggle, Auth, & Sync Live button */}
             <div className="p-4 border-t border-slate-800 bg-slate-950/60 space-y-2.5">
+              {/* Auth Account Action in Drawer */}
+              {!isSignedIn ? (
+                <button
+                  onClick={() => {
+                    setIsMobileMenuOpen(false);
+                    openSignIn();
+                  }}
+                  className="w-full py-2.5 px-3 bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-500 hover:to-amber-500 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-2 shadow-sm transition-all cursor-pointer"
+                >
+                  <LogIn className="w-4 h-4" />
+                  <span>Sign In / Create Account</span>
+                </button>
+              ) : (
+                <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-800/60 border border-slate-700/70 text-xs">
+                  <span className="font-semibold text-emerald-400 text-[11px] flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                    <span>Signed In</span>
+                  </span>
+                  <AuthHeaderControls />
+                </div>
+              )}
+
               <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-800/60 border border-slate-700/70 text-xs">
                 <span className="font-semibold text-slate-300 text-[11px]">Appearance Theme</span>
                 <button
@@ -441,18 +508,12 @@ export const App: React.FC = () => {
                 isSyncing={isSyncing}
                 cooldownRemaining={cooldownRemaining}
                 variant="drawer"
-              />
-
-              <button
-                onClick={() => {
-                  setIsSyncHistoryOpen(true);
+                isLocked={!isSignedIn}
+                onLockedClick={() => {
                   setIsMobileMenuOpen(false);
+                  openSignIn();
                 }}
-                className="w-full py-2 px-3 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700/80 text-xs font-semibold flex items-center justify-center gap-2 transition-all cursor-pointer"
-              >
-                <Database className="w-3.5 h-3.5 text-purple-400" />
-                <span>View Sync & Cron Audit Logs</span>
-              </button>
+              />
 
               <div className="text-[10px] text-slate-500 text-center">
                 Automated Cron: Daily @ 4:00 AM IST • Hybrid Persistent DB
@@ -484,8 +545,23 @@ export const App: React.FC = () => {
           <CurrentTendersTab key={`curr-${syncKey}`} />
         ) : activeTab === NavigationTab.ACCEPTED ? (
           <PreviouslyAcceptedTendersTab key={`acc-${syncKey}`} />
+        ) : activeTab === NavigationTab.BIDDERS ? (
+          <ProtectedRoute
+            title="Registered Bidders & Contractor Directory"
+            description="Access to contractor directories, 3-year audited financial turnovers, net worth calculations, and past awarded contract books is restricted to authenticated users. Please sign in to view registered bidders."
+          >
+            <RegisteredBiddersTab key={`bidders-${syncKey}`} />
+          </ProtectedRoute>
+        ) : activeTab === NavigationTab.SIGN_IN ? (
+          <SignInView onNavigateHome={() => setActiveTab(NavigationTab.HOME)} />
         ) : (
-          <RegisteredBiddersTab key={`bidders-${syncKey}`} />
+          <HomeScreen
+            stats={stats}
+            onNavigate={(tab) => setActiveTab(tab as NavigationTab)}
+            onTriggerSync={handleSyncLive}
+            isSyncing={isSyncing}
+            cooldownRemaining={cooldownRemaining}
+          />
         )}
       </main>
 
@@ -495,10 +571,10 @@ export const App: React.FC = () => {
           <span>All India Tenders • Statutory Public Procurement Intelligence Platform</span>
         </div>
       </footer>
-      {/* Sync History Audit Modal */}
-      <SyncHistoryModal
-        isOpen={isSyncHistoryOpen}
-        onClose={() => setIsSyncHistoryOpen(false)}
+      {/* Clerk Setup / Authentication Modal */}
+      <ClerkSetupModal
+        isOpen={showSetupGuide}
+        onClose={() => setShowSetupGuide(false)}
       />
     </div>
   );

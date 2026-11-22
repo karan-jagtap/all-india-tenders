@@ -11,6 +11,7 @@ import {
 import { NavigableTab } from '../../../types';
 import { PortalSourceCard } from './PortalSourceCard';
 import { FilterSearchBar, SyncLiveButton } from '../../common';
+import { useAuthContext } from '../../../context/AuthContext';
 
 export interface HomeSourcesDirectoryProps {
   onNavigate: (tab: NavigableTab) => void;
@@ -29,6 +30,8 @@ export const HomeSourcesDirectory: React.FC<HomeSourcesDirectoryProps> = ({
   const [selectedCategory, setSelectedCategory] = useState<'ALL' | PortalCategory>('ALL');
   const [selectedRegion, setSelectedRegion] = useState<'ALL' | PortalRegion>('ALL');
   const [tick, setTick] = useState<number>(0);
+
+  const { isSignedIn, openSignIn } = useAuthContext();
 
   useEffect(() => {
     return subscribePortalSources(() => setTick((t) => t + 1));
@@ -94,6 +97,8 @@ export const HomeSourcesDirectory: React.FC<HomeSourcesDirectoryProps> = ({
             isSyncing={isSyncing}
             cooldownRemaining={cooldownRemaining}
             variant="section"
+            isLocked={!isSignedIn}
+            onLockedClick={openSignIn}
           />
         </div>
       </div>

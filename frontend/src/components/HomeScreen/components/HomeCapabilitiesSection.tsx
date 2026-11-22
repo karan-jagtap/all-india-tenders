@@ -1,12 +1,14 @@
 import React from 'react';
-import { Radio, Award, Users, Sparkles, CheckCircle2, ChevronRight } from 'lucide-react';
+import { Radio, Award, Users, Sparkles, CheckCircle2, ChevronRight, Lock } from 'lucide-react';
 import { NavigableTab } from '../../../types';
+import { useAuthContext } from '../../../context/AuthContext';
 
 export interface HomeCapabilitiesSectionProps {
   onNavigate: (tab: NavigableTab) => void;
 }
 
 export const HomeCapabilitiesSection: React.FC<HomeCapabilitiesSectionProps> = ({ onNavigate }) => {
+  const { isSignedIn } = useAuthContext();
   return (
     <section className="space-y-4">
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-2 border-b border-slate-200 dark:border-slate-800 pb-3">
@@ -140,8 +142,10 @@ export const HomeCapabilitiesSection: React.FC<HomeCapabilitiesSectionProps> = (
           <button
             onClick={() => onNavigate('bidders')}
             className="w-full py-2.5 px-4 bg-blue-50 dark:bg-blue-950/40 hover:bg-blue-100 dark:hover:bg-blue-900/60 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800/60 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-colors cursor-pointer"
+            title={!isSignedIn ? 'Please log in to view Registered Contractors' : undefined}
           >
             <span>Inspect Registered Contractors</span>
+            {!isSignedIn && <Lock className="w-3.5 h-3.5 text-amber-500 shrink-0" />}
             <ChevronRight className="w-4 h-4" />
           </button>
         </div>
