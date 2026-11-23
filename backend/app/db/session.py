@@ -85,6 +85,30 @@ async def init_db():
 
         # Create all tables registered in Base metadata
         await conn.run_sync(Base.metadata.create_all)
+
+        # Ensure user columns exist on cron_sync_logs for user quota tracking
+        try:
+            if IS_POSTGRES:
+                await conn.execute(text("ALTER TABLE cron_sync_logs ADD COLUMN IF NOT EXISTS user_id VARCHAR(100)"))
+                await conn.execute(text("ALTER TABLE cron_sync_logs ADD COLUMN IF NOT EXISTS user_email VARCHAR(255)"))
+                await conn.execute(text("ALTER TABLE cron_sync_logs ADD COLUMN IF NOT EXISTS user_name VARCHAR(150)"))
+                await conn.execute(text("CREATE INDEX IF NOT EXISTS ix_cron_sync_logs_user_id ON cron_sync_logs (user_id)"))
+                await conn.execute(text("CREATE INDEX IF NOT EXISTS ix_cron_sync_logs_user_email ON cron_sync_logs (user_email)"))
+            else:
+                # SQLite column migration check
+                res = await conn.execute(text("PRAGMA table_info(cron_sync_logs)"))
+                existing_cols = {row[1] for row in res.fetchall()}
+                if "user_id" not in existing_cols:
+                    await conn.execute(text("ALTER TABLE cron_sync_logs ADD COLUMN user_id VARCHAR(100)"))
+                if "user_email" not in existing_cols:
+                    await conn.execute(text("ALTER TABLE cron_sync_logs ADD COLUMN user_email VARCHAR(255)"))
+                if "user_name" not in existing_cols:
+                    await conn.execute(text("ALTER TABLE cron_sync_logs ADD COLUMN user_name VARCHAR(150)"))
+                await conn.execute(text("CREATE INDEX IF NOT EXISTS ix_cron_sync_logs_user_id ON cron_sync_logs (user_id)"))
+                await conn.execute(text("CREATE INDEX IF NOT EXISTS ix_cron_sync_logs_user_email ON cron_sync_logs (user_email)"))
+        except Exception as col_err:
+            logger.warning(f"[Database] Notice ensuring cron_sync_logs user columns: {col_err}")
+
         logger.info(f"[Database] Schema initialized successfully on {'PostgreSQL' if IS_POSTGRES else 'SQLite'}.")
 
 async def get_db_session() -> AsyncGenerator[AsyncSession, None]:

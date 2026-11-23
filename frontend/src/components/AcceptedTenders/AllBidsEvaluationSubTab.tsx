@@ -1,4 +1,5 @@
 import React, { useMemo, useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Users,
   Award,
@@ -13,49 +14,26 @@ import {
   MapPin,
   Check
 } from 'lucide-react';
-import { AcceptedTender } from '../../services/api';
 import { getContractorPool, subscribeContractorPools } from '../../constants';
 import { hashString, formatDate } from '../../utils';
 import {
   AwardBidRank,
   EvaluationCover1Status,
   EvaluationCover2Status,
-  UiAccentColor
+  UiAccentColor,
+  EvaluatedBidder,
+  AllBidsEvaluationSubTabProps
 } from '../../types';
 
-export interface EvaluatedBidder {
-  rank: AwardBidRank;
-  isWinner: boolean;
-  name: string;
-  hq: string;
-  contractorClass: string;
-  quotedAmountInr: number;
-  quotedDiscountPct: number;
-  varianceVsEstimatePct: number;
-  marginOverL1Inr: number;
-  marginOverL1Pct: number;
-  techScore: number;
-  cover1Status: EvaluationCover1Status;
-  cover2Status: EvaluationCover2Status;
-  isDisqualified: boolean;
-  emdStatus: string;
-  statusBadge: string;
-  statusBadgeColor: UiAccentColor | 'emerald' | 'blue' | 'slate' | 'rose' | 'amber';
-  evaluationSummary: string;
-  equipmentDeclared: string;
-  turnoverCited: string;
-}
-
-interface AllBidsEvaluationSubTabProps {
-  tender: AcceptedTender;
-}
+export type { EvaluatedBidder, AllBidsEvaluationSubTabProps };
 
 export const AllBidsEvaluationSubTab: React.FC<AllBidsEvaluationSubTabProps> = ({ tender }) => {
+  const { t } = useTranslation();
   const [expandedBidderRank, setExpandedBidderRank] = useState<string | null>('L1');
   const [poolsTick, setPoolsTick] = useState(0);
 
   useEffect(() => {
-    return subscribeContractorPools(() => setPoolsTick((t) => t + 1));
+    return subscribeContractorPools(() => setPoolsTick((tick) => tick + 1));
   }, []);
 
   const formatINR = (val?: number) => {
@@ -158,7 +136,7 @@ export const AllBidsEvaluationSubTab: React.FC<AllBidsEvaluationSubTabProps> = (
         cover2Status: EvaluationCover2Status.QUALIFIED,
         isDisqualified: false,
         emdStatus: tender.bid_submission?.emd_mode || 'Bank Guarantee Verified',
-        statusBadge: 'AWARDED CONTRACT (L1)',
+        statusBadge: t('acceptedTenders.evalMatrix.statusAwardedContract'),
         statusBadgeColor: UiAccentColor.EMERALD,
         evaluationSummary:
           tender.acceptance_and_loa?.committee_verdict ||
@@ -186,7 +164,7 @@ export const AllBidsEvaluationSubTab: React.FC<AllBidsEvaluationSubTabProps> = (
         cover2Status: EvaluationCover2Status.QUALIFIED,
         isDisqualified: false,
         emdStatus: 'Bank Guarantee from Nationalized Bank',
-        statusBadge: 'RUNNER-UP (L2 STANDBY)',
+        statusBadge: t('acceptedTenders.evalMatrix.statusRunnerUp'),
         statusBadgeColor: UiAccentColor.BLUE,
         evaluationSummary: `Technically qualified in both Cover-1 and Cover-2 envelopes. Quoted +${deltaL2Pct}% over L1. Placed on statutory standby in accordance with CPWD Works Manual / GFR Rule 173.`,
         equipmentDeclared: 'Adequate deployment of road/structural equipment meeting all Schedule-C technical capacity criteria.',
@@ -210,7 +188,7 @@ export const AllBidsEvaluationSubTab: React.FC<AllBidsEvaluationSubTabProps> = (
         cover2Status: EvaluationCover2Status.QUALIFIED,
         isDisqualified: false,
         emdStatus: 'Online Gateway E-Payment Receipt',
-        statusBadge: 'RESPONSIVE (L3)',
+        statusBadge: t('acceptedTenders.evalMatrix.statusResponsive', { rank: 'L3' }),
         statusBadgeColor: UiAccentColor.SLATE,
         evaluationSummary: `Technically compliant. Higher rate quoted on sub-structure reinforced concrete and specialized electrical/MEP work lines (+${deltaL3Pct}% over L1).`,
         equipmentDeclared: 'Owned fabrication yard, cranes, and tipper fleets declared in Technical Cover-2.',
@@ -234,7 +212,7 @@ export const AllBidsEvaluationSubTab: React.FC<AllBidsEvaluationSubTabProps> = (
         cover2Status: EvaluationCover2Status.QUALIFIED,
         isDisqualified: false,
         emdStatus: 'Bank Guarantee from Scheduled Bank',
-        statusBadge: 'RESPONSIVE (L4)',
+        statusBadge: t('acceptedTenders.evalMatrix.statusResponsive', { rank: 'L4' }),
         statusBadgeColor: UiAccentColor.SLATE,
         evaluationSummary: `Technically qualified. Factored higher corporate mobilization contingencies and supply chain escalation risk buffer (+${deltaL4Pct}% over L1).`,
         equipmentDeclared: 'Standard equipment fleet satisfying minimum tender qualification requirements.',
@@ -258,7 +236,7 @@ export const AllBidsEvaluationSubTab: React.FC<AllBidsEvaluationSubTabProps> = (
         cover2Status: isL5Disqualified ? EvaluationCover2Status.DISQUALIFIED : EvaluationCover2Status.QUALIFIED,
         isDisqualified: isL5Disqualified,
         emdStatus: 'Online Gateway E-Payment',
-        statusBadge: isL5Disqualified ? 'COVER-2 DISQUALIFIED' : 'HIGH QUOTE (L5)',
+        statusBadge: isL5Disqualified ? t('acceptedTenders.evalMatrix.statusCover2Disqualified') : t('acceptedTenders.evalMatrix.statusHighQuote'),
         statusBadgeColor: isL5Disqualified ? UiAccentColor.ROSE : UiAccentColor.SLATE,
         evaluationSummary: isL5Disqualified
           ? 'Disqualified in Technical Evaluation: Banker Solvency certificate dated prior to mandatory 6-month validity window. Financial Cover-3 unopened in accordance with GFR Rule 173.'
@@ -269,7 +247,7 @@ export const AllBidsEvaluationSubTab: React.FC<AllBidsEvaluationSubTabProps> = (
     ];
 
     return list;
-  }, [tender, poolsTick]);
+  }, [tender, poolsTick, t]);
 
   const estimatedCost = tender.og_tender?.estimated_cost_inr || 150000000;
   const l1Bid = evaluatedBids[0];
@@ -319,23 +297,23 @@ export const AllBidsEvaluationSubTab: React.FC<AllBidsEvaluationSubTabProps> = (
           <div className="flex items-center gap-2 mb-1">
             <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-wider uppercase bg-amber-500 text-slate-950 flex items-center gap-1 shadow-2xs">
               <Users className="w-3.5 h-3.5" />
-              Comparative Bid Evaluation Matrix (All Competitors)
+              {t('acceptedTenders.evalMatrix.badge')}
             </span>
             <span className="text-[11px] font-mono text-slate-500 dark:text-slate-400">
-              Form 49 • NIC-GEP / CPPP Standards
+              {t('acceptedTenders.evalMatrix.standards')}
             </span>
           </div>
           <h3 className="text-base font-bold text-slate-900 dark:text-white tracking-tight">
-            Financial & Technical Bids Comparison: L1 Winner vs L2, L3, L4, L5 Competitors
+            {t('acceptedTenders.evalMatrix.title')}
           </h3>
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-            Comprehensive comparative statement of all participating contractors, evaluated quotes, price spreads, and committee resolution.
+            {t('acceptedTenders.evalMatrix.subtitle')}
           </p>
         </div>
 
         <div className="flex items-center gap-2 shrink-0">
           <div className="px-3 py-1.5 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/80 rounded-lg text-right">
-            <span className="text-[10px] uppercase font-bold text-emerald-700 dark:text-emerald-400 block">L1 Winning Bid</span>
+            <span className="text-[10px] uppercase font-bold text-emerald-700 dark:text-emerald-400 block">{t('acceptedTenders.evalMatrix.l1WinningBid')}</span>
             <span className="text-xs font-mono font-bold text-emerald-900 dark:text-emerald-200">
               {formatCr(l1Bid.quotedAmountInr)}
             </span>
@@ -348,7 +326,7 @@ export const AllBidsEvaluationSubTab: React.FC<AllBidsEvaluationSubTabProps> = (
         {/* Card 1: Winning L1 Bid */}
         <div className="bg-emerald-50/70 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-900/50 rounded-xl p-3.5 shadow-2xs">
           <div className="flex items-center justify-between text-emerald-800 dark:text-emerald-300 mb-1">
-            <span className="text-[11px] font-bold uppercase tracking-wider">L1 Awarded Bid</span>
+            <span className="text-[11px] font-bold uppercase tracking-wider">{t('acceptedTenders.evalMatrix.l1AwardedBid')}</span>
             <Award className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
           </div>
           <div className="text-lg font-black text-emerald-950 dark:text-emerald-200 font-mono">
@@ -358,8 +336,8 @@ export const AllBidsEvaluationSubTab: React.FC<AllBidsEvaluationSubTabProps> = (
             <TrendingDown className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
             <span>
               {l1Bid.quotedDiscountPct > 0
-                ? `${l1Bid.quotedDiscountPct}% below estimate`
-                : 'At department rate'}
+                ? t('acceptedTenders.evalMatrix.belowEstimate', { pct: l1Bid.quotedDiscountPct })
+                : t('acceptedTenders.evalMatrix.atDepartmentRate')}
             </span>
           </div>
         </div>
@@ -367,43 +345,45 @@ export const AllBidsEvaluationSubTab: React.FC<AllBidsEvaluationSubTabProps> = (
         {/* Card 2: L1 vs L2 Margin */}
         <div className="bg-blue-50/70 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-900/50 rounded-xl p-3.5 shadow-2xs">
           <div className="flex items-center justify-between text-blue-800 dark:text-blue-300 mb-1">
-            <span className="text-[11px] font-bold uppercase tracking-wider">L1 to L2 Spread</span>
+            <span className="text-[11px] font-bold uppercase tracking-wider">{t('acceptedTenders.evalMatrix.l1ToL2Spread')}</span>
             <Scale className="w-4 h-4 text-blue-600 dark:text-blue-400" />
           </div>
           <div className="text-lg font-black text-blue-950 dark:text-blue-200 font-mono">
             +{l1MarginOverL2Pct}%
           </div>
           <div className="text-[11px] text-blue-700 dark:text-blue-400 mt-1 font-mono">
-            L1 won by <strong>{formatCr(l1MarginOverL2Inr)}</strong> margin
+            {t('acceptedTenders.evalMatrix.l1WonByMargin', { amount: formatCr(l1MarginOverL2Inr) })}
           </div>
         </div>
 
         {/* Card 3: Public Exchequer Savings */}
         <div className="bg-amber-50/70 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900/50 rounded-xl p-3.5 shadow-2xs">
           <div className="flex items-center justify-between text-amber-800 dark:text-amber-300 mb-1">
-            <span className="text-[11px] font-bold uppercase tracking-wider">Public Savings</span>
+            <span className="text-[11px] font-bold uppercase tracking-wider">{t('acceptedTenders.evalMatrix.publicSavings')}</span>
             <TrendingDown className="w-4 h-4 text-amber-600 dark:text-amber-400" />
           </div>
           <div className="text-lg font-black text-amber-950 dark:text-amber-200 font-mono">
             {exchequerSavingsInr > 0 ? formatCr(exchequerSavingsInr) : '₹ 0.00 Cr'}
           </div>
           <div className="text-[11px] text-amber-700 dark:text-amber-400 mt-1 font-mono">
-            Saved below ₹ {formatCr(estimatedCost)} budget
+            {t('acceptedTenders.evalMatrix.savedBelowBudget', { budget: formatCr(estimatedCost) })}
           </div>
         </div>
 
         {/* Card 4: Total Bidders Evaluated */}
         <div className="bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/60 rounded-xl p-3.5 shadow-2xs">
           <div className="flex items-center justify-between text-slate-700 dark:text-slate-300 mb-1">
-            <span className="text-[11px] font-bold uppercase tracking-wider">Evaluated Bids</span>
+            <span className="text-[11px] font-bold uppercase tracking-wider">{t('acceptedTenders.evalMatrix.evaluatedBids')}</span>
             <Users className="w-4 h-4 text-slate-500 dark:text-slate-400" />
           </div>
           <div className="text-lg font-black text-slate-900 dark:text-white font-mono">
-            5 Bidders
+            {t('acceptedTenders.evalMatrix.biddersCount')}
           </div>
           <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">
-            {evaluatedBids.filter((b) => !b.isDisqualified).length} Responsive •{' '}
-            {evaluatedBids.filter((b) => b.isDisqualified).length} Rejected
+            {t('acceptedTenders.evalMatrix.responsiveCount', {
+              responsive: evaluatedBids.filter((b) => !b.isDisqualified).length,
+              rejected: evaluatedBids.filter((b) => b.isDisqualified).length
+            })}
           </div>
         </div>
       </div>
@@ -413,29 +393,29 @@ export const AllBidsEvaluationSubTab: React.FC<AllBidsEvaluationSubTabProps> = (
         <div className="flex items-center justify-between">
           <h4 className="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider flex items-center gap-1.5">
             <FileSpreadsheet className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-            <span>Master Comparative Bids Table (Rankings L1 – L5)</span>
+            <span>{t('acceptedTenders.evalMatrix.tableTitle')}</span>
           </h4>
           <span className="text-[11px] text-slate-400 dark:text-slate-500">
-            Click on any row to expand technical dossier and equipment breakdown
+            {t('acceptedTenders.evalMatrix.clickToExpand')}
           </span>
         </div>
 
         <div className="sm:hidden text-[11px] text-slate-500 dark:text-slate-400 font-medium px-1 flex items-center justify-between">
-          <span>← Swipe table horizontally to see all columns →</span>
+          <span>{t('acceptedTenders.evalMatrix.swipeNotice')}</span>
         </div>
 
         <div className="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-800 shadow-2xs">
           <table className="w-full text-left text-xs">
             <thead className="bg-slate-900 dark:bg-slate-950 text-white uppercase text-[10px] tracking-wider font-bold">
               <tr>
-                <th className="py-3 px-3">Rank</th>
-                <th className="py-3 px-3">Contractor / Firm Name</th>
-                <th className="py-3 px-3">Financial Bid Quoted</th>
-                <th className="py-3 px-3">Variance vs Est.</th>
-                <th className="py-3 px-3">Margin vs L1</th>
-                <th className="py-3 px-3">Tech Score</th>
-                <th className="py-3 px-3">PQC / Cover-2</th>
-                <th className="py-3 px-3">Tender Verdict</th>
+                <th className="py-3 px-3">{t('acceptedTenders.evalMatrix.colRank')}</th>
+                <th className="py-3 px-3">{t('acceptedTenders.evalMatrix.colContractor')}</th>
+                <th className="py-3 px-3">{t('acceptedTenders.evalMatrix.colFinancialBid')}</th>
+                <th className="py-3 px-3">{t('acceptedTenders.evalMatrix.colVariance')}</th>
+                <th className="py-3 px-3">{t('acceptedTenders.evalMatrix.colMargin')}</th>
+                <th className="py-3 px-3">{t('acceptedTenders.evalMatrix.colTechScore')}</th>
+                <th className="py-3 px-3">{t('acceptedTenders.evalMatrix.colPqc')}</th>
+                <th className="py-3 px-3">{t('acceptedTenders.evalMatrix.colVerdict')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 dark:divide-slate-800 bg-white dark:bg-[#0E1422]">
@@ -480,7 +460,7 @@ export const AllBidsEvaluationSubTab: React.FC<AllBidsEvaluationSubTabProps> = (
                       {/* Financial Bid */}
                       <td className="py-3 px-3 font-mono whitespace-nowrap">
                         {isDisq ? (
-                          <span className="text-slate-400 dark:text-slate-500 italic">Unopened (Deficient)</span>
+                          <span className="text-slate-400 dark:text-slate-500 italic">{t('acceptedTenders.evalMatrix.unopenedDeficient')}</span>
                         ) : (
                           <div>
                             <span className="font-bold text-slate-900 dark:text-white">
@@ -512,7 +492,7 @@ export const AllBidsEvaluationSubTab: React.FC<AllBidsEvaluationSubTabProps> = (
                       <td className="py-3 px-3 font-mono whitespace-nowrap">
                         {isWinner ? (
                           <span className="text-emerald-700 dark:text-emerald-400 font-bold text-[11px]">
-                            0.00% (Base Price)
+                            {t('acceptedTenders.evalMatrix.basePrice')}
                           </span>
                         ) : isDisq ? (
                           <span className="text-slate-400 dark:text-slate-500">—</span>
@@ -546,12 +526,12 @@ export const AllBidsEvaluationSubTab: React.FC<AllBidsEvaluationSubTabProps> = (
                         {isDisq ? (
                           <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-rose-700 dark:text-rose-400 bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/50 px-2 py-0.5 rounded">
                             <XCircle className="w-3 h-3 text-rose-600 dark:text-rose-400" />
-                            Disqualified
+                            {t('acceptedTenders.evalMatrix.disqualified')}
                           </span>
                         ) : (
                           <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-900/50 px-2 py-0.5 rounded">
                             <CheckCircle2 className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
-                            PQC Passed
+                            {t('acceptedTenders.evalMatrix.pqcPassed')}
                           </span>
                         )}
                       </td>
@@ -590,13 +570,13 @@ export const AllBidsEvaluationSubTab: React.FC<AllBidsEvaluationSubTabProps> = (
                             {/* Col 1: Evaluation Verdict */}
                             <div className="space-y-1.5 bg-white dark:bg-[#0E1422] p-3 rounded-lg border border-slate-200 dark:border-slate-800">
                               <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">
-                                Committee Evaluation Findings
+                                {t('acceptedTenders.evalMatrix.committeeFindings')}
                               </span>
                               <p className="text-slate-800 dark:text-slate-200 leading-relaxed text-[11px]">
                                 {bid.evaluationSummary}
                               </p>
                               <div className="pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-[11px]">
-                                <span className="text-slate-500 dark:text-slate-400">Security Mode:</span>
+                                <span className="text-slate-500 dark:text-slate-400">{t('acceptedTenders.evalMatrix.securityMode')}</span>
                                 <span className="font-semibold text-slate-800 dark:text-slate-200">{bid.emdStatus}</span>
                               </div>
                             </div>
@@ -604,13 +584,13 @@ export const AllBidsEvaluationSubTab: React.FC<AllBidsEvaluationSubTabProps> = (
                             {/* Col 2: Equipment & Machinery Fleet */}
                             <div className="space-y-1.5 bg-white dark:bg-[#0E1422] p-3 rounded-lg border border-slate-200 dark:border-slate-800">
                               <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">
-                                Committed Plant & Machinery
+                                {t('acceptedTenders.evalMatrix.plantMachinery')}
                               </span>
                               <p className="text-slate-700 dark:text-slate-300 leading-relaxed text-[11px]">
                                 {bid.equipmentDeclared}
                               </p>
                               <div className="pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-[11px]">
-                                <span className="text-slate-500 dark:text-slate-400">Technical Score:</span>
+                                <span className="text-slate-500 dark:text-slate-400">{t('acceptedTenders.evalMatrix.technicalScore')}</span>
                                 <span className="font-bold text-slate-900 dark:text-white font-mono">{bid.techScore} / 100</span>
                               </div>
                             </div>
@@ -618,18 +598,18 @@ export const AllBidsEvaluationSubTab: React.FC<AllBidsEvaluationSubTabProps> = (
                             {/* Col 3: Financial Capacity & Turnover */}
                             <div className="space-y-1.5 bg-white dark:bg-[#0E1422] p-3 rounded-lg border border-slate-200 dark:border-slate-800">
                               <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block">
-                                Verified Financial Standing
+                                {t('acceptedTenders.evalMatrix.financialStanding')}
                               </span>
                               <div className="flex items-center justify-between text-[11px]">
-                                <span className="text-slate-500 dark:text-slate-400">Audited Turnover:</span>
+                                <span className="text-slate-500 dark:text-slate-400">{t('acceptedTenders.evalMatrix.auditedTurnover')}</span>
                                 <span className="font-semibold text-slate-900 dark:text-white font-mono">{bid.turnoverCited}</span>
                               </div>
                               <div className="flex items-center justify-between text-[11px]">
-                                <span className="text-slate-500 dark:text-slate-400">Cover-1 Compliance:</span>
+                                <span className="text-slate-500 dark:text-slate-400">{t('acceptedTenders.evalMatrix.cover1Compliance')}</span>
                                 <span className="text-emerald-600 dark:text-emerald-400 font-semibold">{bid.cover1Status}</span>
                               </div>
                               <div className="flex items-center justify-between text-[11px]">
-                                <span className="text-slate-500 dark:text-slate-400">Cover-2 Technical:</span>
+                                <span className="text-slate-500 dark:text-slate-400">{t('acceptedTenders.evalMatrix.cover2Technical')}</span>
                                 <span className={bid.isDisqualified ? 'text-rose-600 dark:text-rose-400 font-semibold' : 'text-emerald-600 dark:text-emerald-400 font-semibold'}>
                                   {bid.cover2Status}
                                 </span>
@@ -652,10 +632,10 @@ export const AllBidsEvaluationSubTab: React.FC<AllBidsEvaluationSubTabProps> = (
         <div className="flex items-center justify-between">
           <span className="text-[11px] font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider flex items-center gap-1.5">
             <TrendingUp className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
-            Competitive Price Clustering (Visual Dispersion vs Department Estimate)
+            {t('acceptedTenders.evalMatrix.priceClustering')}
           </span>
           <span className="text-[11px] font-mono text-slate-500 dark:text-slate-400">
-            Estimate: {formatCr(estimatedCost)}
+            {t('acceptedTenders.evalMatrix.estimateLabel', { amount: formatCr(estimatedCost) })}
           </span>
         </div>
 
@@ -707,11 +687,11 @@ export const AllBidsEvaluationSubTab: React.FC<AllBidsEvaluationSubTabProps> = (
           <div className="flex items-center gap-2">
             <Award className="w-4 h-4 text-emerald-400" />
             <h5 className="text-xs font-bold text-white uppercase tracking-wider">
-              Tender Opening & Evaluation Committee Verdict (Official Record)
+              {t('acceptedTenders.evalMatrix.committeeVerdictTitle')}
             </h5>
           </div>
           <span className="text-[10px] text-slate-400 font-mono">
-            LOA Ref: {tender.acceptance_and_loa?.loa_number || 'LOA-CONFIRMED'}
+            {t('acceptedTenders.evalMatrix.loaRef', { ref: tender.acceptance_and_loa?.loa_number || 'LOA-CONFIRMED' })}
           </span>
         </div>
 
@@ -722,16 +702,16 @@ export const AllBidsEvaluationSubTab: React.FC<AllBidsEvaluationSubTabProps> = (
 
         <div className="pt-2 border-t border-slate-800/80 flex flex-wrap items-center justify-between gap-3 text-[11px] text-slate-400">
           <div>
-            Awarding Body:{' '}
+            {t('acceptedTenders.evalMatrix.awardingBody')}{' '}
             <strong className="text-slate-200 font-semibold">
               {tender.acceptance_and_loa?.awarding_authority || tender.og_tender?.authority || 'Competent Authority'}
             </strong>
           </div>
           <div className="flex items-center gap-4">
-            <span>Agreement Date: <strong className="text-slate-200 font-semibold">{tender.acceptance_and_loa?.contract_agreement_date ? formatDate(tender.acceptance_and_loa.contract_agreement_date) : 'Executed'}</strong></span>
+            <span>{t('acceptedTenders.evalMatrix.agreementDate')} <strong className="text-slate-200 font-semibold">{tender.acceptance_and_loa?.contract_agreement_date ? formatDate(tender.acceptance_and_loa.contract_agreement_date) : t('acceptedTenders.evalMatrix.executed')}</strong></span>
             <span className="text-emerald-400 font-bold flex items-center gap-1">
               <Check className="w-3.5 h-3.5" />
-              Award Approved & Bound
+              {t('acceptedTenders.evalMatrix.awardApproved')}
             </span>
           </div>
         </div>

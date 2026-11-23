@@ -344,6 +344,9 @@ class CronSyncLog(Base, TimestampMixin):
     db_upserted_count: Mapped[int] = mapped_column(Integer, default=0)
     execution_time_ms: Mapped[float] = mapped_column(Float, default=0.0)
     initiated_by: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
+    user_id: Mapped[Optional[str]] = mapped_column(String(100), nullable=True, index=True)
+    user_email: Mapped[Optional[str]] = mapped_column(String(255), nullable=True, index=True)
+    user_name: Mapped[Optional[str]] = mapped_column(String(150), nullable=True)
     details: Mapped[Optional[Dict[str, Any]]] = mapped_column(JSON, nullable=True)
     error_message: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
 

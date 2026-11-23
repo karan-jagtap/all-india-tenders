@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { SignIn } from '@clerk/react';
 import { dark } from '@clerk/themes';
 import { Shield, Key, ArrowLeft, Terminal, Copy, Check } from 'lucide-react';
@@ -10,6 +11,7 @@ export interface SignInViewProps {
 }
 
 export const SignInView: React.FC<SignInViewProps> = ({ onNavigateHome }) => {
+  const { t } = useTranslation();
   const { isConfigured, isSignedIn } = useAuthContext();
   const { isDark } = useTheme();
   const [copied, setCopied] = React.useState(false);
@@ -29,7 +31,7 @@ export const SignInView: React.FC<SignInViewProps> = ({ onNavigateHome }) => {
           className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white transition-colors cursor-pointer"
         >
           <ArrowLeft className="w-4 h-4" />
-          <span>Back to All India Tenders Overview</span>
+          <span>{t('auth.backToOverview')}</span>
         </button>
       </div>
 
@@ -38,28 +40,28 @@ export const SignInView: React.FC<SignInViewProps> = ({ onNavigateHome }) => {
           <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 text-emerald-500 flex items-center justify-center mx-auto border border-emerald-500/30">
             <Shield className="w-6 h-6" />
           </div>
-          <h2 className="text-xl font-bold text-slate-900 dark:text-white">You are Signed In</h2>
+          <h2 className="text-xl font-bold text-slate-900 dark:text-white">{t('auth.youAreSignedIn')}</h2>
           <p className="text-xs text-slate-500 dark:text-slate-400">
-            You now have full access to live scraper synchronization and all protected intelligence tools.
+            {t('auth.signedInFullAccess')}
           </p>
           <button
             onClick={onNavigateHome}
             className="px-5 py-2.5 bg-orange-600 hover:bg-orange-500 text-white font-bold text-xs rounded-xl shadow-md transition-all cursor-pointer"
           >
-            Explore Public Tenders Catalog
+            {t('auth.exploreCatalog')}
           </button>
         </div>
       ) : isConfigured ? (
         <div className="flex flex-col items-center justify-center">
           <div className="mb-6 text-center space-y-1">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-orange-500/10 border border-orange-500/30 text-[11px] font-semibold text-orange-600 dark:text-orange-400">
-              <span>🇮🇳 Statutory Procurement Auth</span>
+              <span>{t('auth.statutoryAuthBadge')}</span>
             </div>
             <h2 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">
-              Sign In to Your Account
+              {t('auth.signInToYourAccount')}
             </h2>
             <p className="text-xs text-slate-500 dark:text-slate-400">
-              Access real-time portal synchronization and restricted contractor intelligence
+              {t('auth.signInSubtitle')}
             </p>
           </div>
 
@@ -80,7 +82,7 @@ export const SignInView: React.FC<SignInViewProps> = ({ onNavigateHome }) => {
               <Key className="w-5 h-5" />
             </div>
             <div>
-              <h2 className="text-lg font-bold text-slate-900 dark:text-white">Clerk Authentication Setup</h2>
+              <h2 className="text-lg font-bold text-slate-900 dark:text-white">{t('auth.clerkSetupTitle')}</h2>
               <p className="text-xs text-slate-500 dark:text-slate-400">
                 Application: <code className="font-mono text-orange-600 dark:text-orange-400 font-bold">app_3MNQS7uCfXNbu5JrpHYdjnRRrzo</code>
               </p>

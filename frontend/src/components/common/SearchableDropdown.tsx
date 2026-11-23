@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Search, ChevronDown, Check, X } from 'lucide-react';
 import { FilterAccentColor } from '../../types';
 
@@ -28,12 +29,15 @@ export const SearchableDropdown: React.FC<SearchableDropdownProps> = ({
   options,
   allOptionLabel,
   allOptionCount,
-  placeholder = 'Search...',
+  placeholder,
   icon,
   accentColor = 'orange',
-  emptyMessage = 'No matching options found',
+  emptyMessage,
   className = ''
 }) => {
+  const { t } = useTranslation();
+  const effectivePlaceholder = placeholder ?? (t('common.search') + '...');
+  const effectiveEmptyMessage = emptyMessage ?? t('common.dropdown.noMatchingOptions');
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [openUpward, setOpenUpward] = useState<boolean>(false);
@@ -235,7 +239,7 @@ export const SearchableDropdown: React.FC<SearchableDropdownProps> = ({
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder={placeholder}
+              placeholder={effectivePlaceholder}
               className={`w-full bg-slate-800/90 border border-slate-700 rounded-lg pl-8 pr-7 py-1.5 text-xs text-white placeholder-slate-400 focus:outline-none transition-colors ${getAccentBorderClass()}`}
             />
             {searchQuery && (
@@ -243,7 +247,7 @@ export const SearchableDropdown: React.FC<SearchableDropdownProps> = ({
                 type="button"
                 onClick={handleClearSearch}
                 className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white p-0.5 rounded cursor-pointer"
-                title="Clear search"
+                title={t('common.searchBar.clearSearch')}
               >
                 <X className="w-3.5 h-3.5" />
               </button>
@@ -253,13 +257,13 @@ export const SearchableDropdown: React.FC<SearchableDropdownProps> = ({
           {/* Results Summary if Searching */}
           {query && (
             <div className="text-[10px] text-slate-400 px-2 pb-1.5 font-medium shrink-0 flex items-center justify-between">
-              <span>{filteredOptions.length} matching result{filteredOptions.length === 1 ? '' : 's'}</span>
+              <span>{filteredOptions.length === 1 ? t('common.dropdown.matchingResult', { count: 1 }) : t('common.dropdown.matchingResults', { count: filteredOptions.length })}</span>
               <button
                 type="button"
                 onClick={handleClearSearch}
                 className={`${getAccentTextClass()} hover:underline cursor-pointer`}
               >
-                Clear
+                {t('common.dropdown.clear')}
               </button>
             </div>
           )}
@@ -334,13 +338,13 @@ export const SearchableDropdown: React.FC<SearchableDropdownProps> = ({
             {/* Zero results */}
             {!matchesAll && filteredOptions.length === 0 && (
               <div className="p-3 text-center text-slate-400 text-xs">
-                <p>{emptyMessage} for "{searchQuery}"</p>
+                <p>{effectiveEmptyMessage} for "{searchQuery}"</p>
                 <button
                   type="button"
                   onClick={handleClearSearch}
                   className={`mt-1.5 text-xs ${getAccentTextClass()} hover:underline font-semibold cursor-pointer`}
                 >
-                  Clear search query
+                  {t('common.dropdown.clearSearchQuery')}
                 </button>
               </div>
             )}

@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Tag, Globe, Building2, MapPin, Clock, ArrowUpDown } from 'lucide-react';
 import {
   FilterSearchBar,
@@ -8,92 +9,11 @@ import {
   ToolbarSortDropdown,
   ToolbarSortOption
 } from '../common';
-import { CurrentTenderSortOption } from '../../types';
+import { CurrentTenderSortOption, CurrentTendersTopBarProps } from '../../types';
+import { CURRENT_TENDER_SORT_OPTIONS } from '../../constants';
 
-export const CURRENT_TENDER_SORT_OPTIONS: ToolbarSortOption<CurrentTenderSortOption>[] = [
-  {
-    value: 'CLOSING_SOONEST',
-    label: '⏰ Closing Soonest',
-    shortLabel: 'Closing Soonest',
-    desc: 'Notices with closest submission deadlines first'
-  },
-  {
-    value: 'CLOSING_LATEST',
-    label: '⏳ Closing Latest',
-    shortLabel: 'Closing Latest',
-    desc: 'Notices with longest submission windows remaining'
-  },
-  {
-    value: 'VALUE_DESC',
-    label: '💰 Value: High to Low',
-    shortLabel: 'Value (High → Low)',
-    desc: 'Largest estimated contract values first'
-  },
-  {
-    value: 'VALUE_ASC',
-    label: '🪙 Value: Low to High',
-    shortLabel: 'Value (Low → High)',
-    desc: 'Smallest / MSME-accessible estimated values first'
-  },
-  {
-    value: 'PUBLISHED_DESC',
-    label: '📅 Newest Published',
-    shortLabel: 'Newest Published',
-    desc: 'Most recently published procurement notices'
-  },
-  {
-    value: 'PUBLISHED_ASC',
-    label: '🗓️ Oldest Published',
-    shortLabel: 'Oldest Published',
-    desc: 'Oldest active notices first'
-  },
-  {
-    value: 'EMD_DESC',
-    label: '🛡️ EMD: High to Low',
-    shortLabel: 'EMD (High → Low)',
-    desc: 'Highest earnest money deposit first'
-  },
-  {
-    value: 'TITLE_ASC',
-    label: '🔤 Title (A → Z)',
-    shortLabel: 'Title (A → Z)',
-    desc: 'Alphabetical order by tender title'
-  }
-];
-
-export interface CurrentTendersTopBarProps {
-  searchQuery: string;
-  setSearchQuery: (q: string) => void;
-  isVoiceSearching: boolean;
-  toggleVoiceSearch: () => void;
-  selectedCategory: string[] | string;
-  setSelectedCategory: (c: string[]) => void;
-  availableCategories: string[];
-  categoryCounts: Map<string, number>;
-  contextCategoryCount: number;
-  selectedSource: string[] | string;
-  setSelectedSource: (s: string[]) => void;
-  availableSources: string[];
-  sourceCounts: Map<string, number>;
-  contextSourceCount: number;
-  selectedOrg: string[] | string;
-  setSelectedOrg: (o: string[]) => void;
-  selectedState: string[] | string;
-  setSelectedState: (s: string[]) => void;
-  selectedCity: string[] | string;
-  setSelectedCity: (c: string[]) => void;
-  selectedValueRange: string;
-  setSelectedValueRange: (v: string) => void;
-  sortBy: CurrentTenderSortOption;
-  setSortBy: (s: CurrentTenderSortOption) => void;
-  activeFiltersCount: number;
-  hasActiveFilters: boolean;
-  resetAllFilters: () => void;
-  onOpenFilterDrawer: () => void;
-  loadData: () => void;
-  loading: boolean;
-  totalTendersCount: number;
-}
+export { CURRENT_TENDER_SORT_OPTIONS };
+export type { CurrentTendersTopBarProps };
 
 export const CurrentTendersTopBar: React.FC<CurrentTendersTopBarProps> = ({
   searchQuery,
@@ -122,6 +42,58 @@ export const CurrentTendersTopBar: React.FC<CurrentTendersTopBarProps> = ({
   loading,
   totalTendersCount
 }) => {
+  const { t } = useTranslation();
+
+  const localizedSortOptions = useMemo<ToolbarSortOption<CurrentTenderSortOption>[]>(() => [
+    {
+      value: 'CLOSING_SOONEST',
+      label: t('currentTenders.sort.closingSoonest'),
+      shortLabel: t('currentTenders.sort.closingSoonestShort'),
+      desc: t('currentTenders.sort.closingSoonestDesc')
+    },
+    {
+      value: 'CLOSING_LATEST',
+      label: t('currentTenders.sort.closingLatest'),
+      shortLabel: t('currentTenders.sort.closingLatestShort'),
+      desc: t('currentTenders.sort.closingLatestDesc')
+    },
+    {
+      value: 'VALUE_DESC',
+      label: t('currentTenders.sort.valueDesc'),
+      shortLabel: t('currentTenders.sort.valueDescShort'),
+      desc: t('currentTenders.sort.valueDescDesc')
+    },
+    {
+      value: 'VALUE_ASC',
+      label: t('currentTenders.sort.valueAsc'),
+      shortLabel: t('currentTenders.sort.valueAscShort'),
+      desc: t('currentTenders.sort.valueAscDesc')
+    },
+    {
+      value: 'PUBLISHED_DESC',
+      label: t('currentTenders.sort.publishedDesc'),
+      shortLabel: t('currentTenders.sort.publishedDescShort'),
+      desc: t('currentTenders.sort.publishedDescDesc')
+    },
+    {
+      value: 'PUBLISHED_ASC',
+      label: t('currentTenders.sort.publishedAsc'),
+      shortLabel: t('currentTenders.sort.publishedAscShort'),
+      desc: t('currentTenders.sort.publishedAscDesc')
+    },
+    {
+      value: 'EMD_DESC',
+      label: t('currentTenders.sort.emdDesc'),
+      shortLabel: t('currentTenders.sort.emdDescShort'),
+      desc: t('currentTenders.sort.emdDescDesc')
+    },
+    {
+      value: 'TITLE_ASC',
+      label: t('currentTenders.sort.titleAsc'),
+      shortLabel: t('currentTenders.sort.titleAscShort'),
+      desc: t('currentTenders.sort.titleAscDesc')
+    }
+  ], [t]);
   const normCategories = useMemo(() => {
     if (!selectedCategory) return ['ALL'];
     return Array.isArray(selectedCategory)
@@ -211,7 +183,7 @@ export const CurrentTendersTopBar: React.FC<CurrentTendersTopBarProps> = ({
       normCategories.forEach((cat) => {
         list.push({
           id: `category-${cat}`,
-          label: 'Category',
+          label: t('common.category'),
           value: cat,
           icon: <Tag className="w-3 h-3 text-emerald-600" />,
           color: 'emerald',
@@ -224,7 +196,7 @@ export const CurrentTendersTopBar: React.FC<CurrentTendersTopBarProps> = ({
       normSources.forEach((src) => {
         list.push({
           id: `source-${src}`,
-          label: 'Source',
+          label: t('common.source'),
           value: src,
           icon: <Globe className="w-3 h-3 text-orange-600" />,
           color: 'orange',
@@ -237,7 +209,7 @@ export const CurrentTendersTopBar: React.FC<CurrentTendersTopBarProps> = ({
       normOrgs.forEach((org) => {
         list.push({
           id: `org-${org}`,
-          label: 'Org',
+          label: t('common.organization'),
           value: org,
           icon: <Building2 className="w-3 h-3 text-blue-600" />,
           color: 'blue',
@@ -250,7 +222,7 @@ export const CurrentTendersTopBar: React.FC<CurrentTendersTopBarProps> = ({
       normStates.forEach((st) => {
         list.push({
           id: `state-${st}`,
-          label: 'State',
+          label: t('common.state'),
           value: st,
           icon: <MapPin className="w-3 h-3 text-rose-600" />,
           color: 'rose',
@@ -263,7 +235,7 @@ export const CurrentTendersTopBar: React.FC<CurrentTendersTopBarProps> = ({
       normCities.forEach((ct) => {
         list.push({
           id: `city-${ct}`,
-          label: 'City',
+          label: t('common.city'),
           value: ct,
           icon: <MapPin className="w-3 h-3 text-amber-600" />,
           color: 'amber',
@@ -275,15 +247,15 @@ export const CurrentTendersTopBar: React.FC<CurrentTendersTopBarProps> = ({
     if (selectedValueRange !== 'ALL') {
       const labelVal =
         selectedValueRange === 'CLOSING_SOON'
-          ? '⚡ Closing Soon'
+          ? t('currentTenders.filter.closingSoon')
           : selectedValueRange === 'UNDER_10CR'
-          ? '< ₹ 10 Cr'
+          ? t('currentTenders.filter.under10Cr')
           : selectedValueRange === '10CR_50CR'
-          ? '₹ 10–50 Cr'
-          : '> ₹ 50 Cr';
+          ? t('currentTenders.filter.10to50Cr')
+          : t('currentTenders.filter.above50Cr');
       list.push({
         id: 'valueRange',
-        label: 'Range',
+        label: t('common.range'),
         value: labelVal,
         icon: <Clock className="w-3 h-3 text-amber-600" />,
         color: 'amber',
@@ -292,10 +264,10 @@ export const CurrentTendersTopBar: React.FC<CurrentTendersTopBarProps> = ({
     }
 
     if (sortBy !== 'CLOSING_SOONEST') {
-      const activeOpt = CURRENT_TENDER_SORT_OPTIONS.find((o) => o.value === sortBy);
+      const activeOpt = localizedSortOptions.find((o) => o.value === sortBy);
       list.push({
         id: 'sort',
-        label: 'Sort',
+        label: t('common.sort'),
         value: activeOpt?.shortLabel || activeOpt?.label || sortBy,
         icon: <ArrowUpDown className="w-3 h-3 text-orange-600" />,
         color: 'orange',
@@ -306,7 +278,7 @@ export const CurrentTendersTopBar: React.FC<CurrentTendersTopBarProps> = ({
     if (searchQuery.trim() !== '') {
       list.push({
         id: 'query',
-        label: 'Query',
+        label: t('common.query'),
         value: `"${searchQuery}"`,
         color: 'slate',
         onRemove: handleRemoveQueryChip
@@ -322,7 +294,9 @@ export const CurrentTendersTopBar: React.FC<CurrentTendersTopBarProps> = ({
     normCities,
     selectedValueRange,
     sortBy,
-    searchQuery
+    searchQuery,
+    localizedSortOptions,
+    t
   ]);
 
   return (
@@ -333,7 +307,7 @@ export const CurrentTendersTopBar: React.FC<CurrentTendersTopBarProps> = ({
         <FilterSearchBar
           searchQuery={searchQuery}
           setSearchQuery={setSearchQuery}
-          placeholder="Search live tenders, ref no, authority, city..."
+          placeholder={t('currentTenders.searchPlaceholder')}
           isVoiceSearching={isVoiceSearching}
           toggleVoiceSearch={toggleVoiceSearch}
           accentColor="orange"
@@ -349,13 +323,13 @@ export const CurrentTendersTopBar: React.FC<CurrentTendersTopBarProps> = ({
           onReload={loadData}
           isLoading={loading}
           totalCount={totalTendersCount}
-          reloadLabel="Reload"
+          reloadLabel={t('common.reload')}
           accentColor="orange"
           sortControl={
             <ToolbarSortDropdown<CurrentTenderSortOption>
               value={sortBy}
               onChange={setSortBy}
-              options={CURRENT_TENDER_SORT_OPTIONS}
+              options={localizedSortOptions}
               defaultValue="CLOSING_SOONEST"
               accentColor="orange"
             />

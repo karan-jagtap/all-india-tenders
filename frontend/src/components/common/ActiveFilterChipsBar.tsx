@@ -1,5 +1,6 @@
 import React from 'react';
 import { X, RotateCcw } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { FilterAccentColor } from '../../types';
 
 export interface FilterChipItem {
@@ -24,6 +25,7 @@ export const ActiveFilterChipsBar: React.FC<ActiveFilterChipsBarProps> = ({
   hasActiveFilters,
   className = ''
 }) => {
+  const { t } = useTranslation();
   const visible = hasActiveFilters !== undefined ? hasActiveFilters : chips.length > 0;
   if (!visible || chips.length === 0) return null;
 
@@ -51,7 +53,9 @@ export const ActiveFilterChipsBar: React.FC<ActiveFilterChipsBarProps> = ({
     <div
       className={`pt-2 border-t border-slate-100 dark:border-slate-800 flex flex-wrap items-center gap-1.5 text-xs animate-fadeIn ${className}`}
     >
-      <span className="text-[11px] text-slate-500 dark:text-slate-400 font-semibold mr-1">Applied:</span>
+      <span className="text-[11px] text-slate-500 dark:text-slate-400 font-semibold mr-1">
+        {t('common.applied')}
+      </span>
 
       {chips.map((chip) => (
         <span
@@ -79,10 +83,10 @@ export const ActiveFilterChipsBar: React.FC<ActiveFilterChipsBarProps> = ({
         type="button"
         onClick={onClearAll}
         className="text-[11px] text-slate-500 hover:text-slate-800 font-medium underline underline-offset-2 ml-1 cursor-pointer flex items-center gap-1 py-0.5 px-1 hover:bg-slate-100 rounded"
-        title="Clear all active filters"
+        title={t('common.clearAll')}
       >
         <RotateCcw className="w-2.5 h-2.5" />
-        <span>Clear all</span>
+        <span>{t('common.clearAll')}</span>
       </button>
     </div>
   );

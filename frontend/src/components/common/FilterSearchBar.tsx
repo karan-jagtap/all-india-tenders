@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Search, Mic, MicOff, X } from 'lucide-react';
 import { FilterAccentColor, ComponentVariant } from '../../types';
 
@@ -16,14 +17,16 @@ export interface FilterSearchBarProps {
 export const FilterSearchBar: React.FC<FilterSearchBarProps> = ({
   searchQuery,
   setSearchQuery,
-  placeholder = 'Search tenders, authority, ref no, city...',
+  placeholder,
   isVoiceSearching = false,
   toggleVoiceSearch,
   accentColor = 'orange',
   className = '',
   variant = 'light'
 }) => {
+  const { t } = useTranslation();
   const isDark = variant === 'dark';
+  const effectivePlaceholder = placeholder ?? t('common.searchBar.defaultPlaceholder');
 
   const getAccentClass = () => {
     switch (accentColor) {
@@ -50,7 +53,7 @@ export const FilterSearchBar: React.FC<FilterSearchBarProps> = ({
         type="text"
         value={searchQuery}
         onChange={(e) => setSearchQuery(e.target.value)}
-        placeholder={isVoiceSearching ? '🎙️ Listening to voice query...' : placeholder}
+        placeholder={isVoiceSearching ? t('common.searchBar.listening') : effectivePlaceholder}
         className={`w-full text-xs rounded-lg pl-9 ${
           toggleVoiceSearch || searchQuery ? 'pr-16' : 'pr-3'
         } py-2.5 transition-all focus:outline-none focus:ring-2 ${
@@ -74,7 +77,7 @@ export const FilterSearchBar: React.FC<FilterSearchBarProps> = ({
                 ? 'text-slate-400 hover:text-slate-200 hover:bg-slate-700'
                 : 'text-slate-400 hover:text-slate-600 hover:bg-slate-200/60'
             }`}
-            title="Clear search"
+            title={t('common.searchBar.clearSearch')}
           >
             <X className="w-3.5 h-3.5" />
           </button>
@@ -84,7 +87,7 @@ export const FilterSearchBar: React.FC<FilterSearchBarProps> = ({
           <button
             type="button"
             onClick={toggleVoiceSearch}
-            title={isVoiceSearching ? 'Listening... click to stop' : 'Click to speak search query'}
+            title={isVoiceSearching ? t('common.searchBar.listeningStop') : t('common.searchBar.clickToSpeak')}
             className={`p-1 rounded transition-colors cursor-pointer ${
               isVoiceSearching
                 ? 'text-red-600 animate-pulse bg-red-100'

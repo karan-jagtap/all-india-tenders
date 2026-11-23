@@ -1,5 +1,6 @@
 import React from 'react';
 import { ExternalLink, ChevronRight } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { PortalSourceInfo } from '../../../constants/portalSources';
 import { NavigableTab } from '../../../types';
 
@@ -9,6 +10,8 @@ export interface PortalSourceCardProps {
 }
 
 export const PortalSourceCard: React.FC<PortalSourceCardProps> = ({ portal, onNavigate }) => {
+  const { t } = useTranslation();
+
   return (
     <div className="bg-white dark:bg-[#0E1422] border border-slate-200/90 dark:border-slate-800 hover:border-cyan-300 dark:hover:border-cyan-700 rounded-xl p-4 shadow-2xs hover:shadow-md transition-all flex flex-col justify-between space-y-3 group">
       <div className="space-y-2">
@@ -25,7 +28,7 @@ export const PortalSourceCard: React.FC<PortalSourceCardProps> = ({ portal, onNa
 
           <span className="px-2 py-0.5 rounded text-[9px] font-bold tracking-wide uppercase bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/80 flex items-center gap-1 shrink-0">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse" />
-            LIVE
+            {t('home.sources.liveBadge')}
           </span>
         </div>
 
@@ -46,7 +49,7 @@ export const PortalSourceCard: React.FC<PortalSourceCardProps> = ({ portal, onNa
         {/* Key Authorities Covered */}
         <div>
           <span className="text-[10px] uppercase font-bold text-slate-400 block mb-1">
-            Procuring Authorities:
+            {t('home.sources.procuringAuthorities')}
           </span>
           <div className="flex flex-wrap gap-1">
             {portal.keyAuthorities.slice(0, 4).map((auth) => (
@@ -59,7 +62,7 @@ export const PortalSourceCard: React.FC<PortalSourceCardProps> = ({ portal, onNa
             ))}
             {portal.keyAuthorities.length > 4 && (
               <span className="px-1.5 py-0.5 rounded text-[10px] font-medium bg-slate-50 dark:bg-slate-900 text-slate-400">
-                +{portal.keyAuthorities.length - 4} more
+                {t('home.sources.plusMore',  { count: portal.keyAuthorities.length - 4 })}
               </span>
             )}
           </div>
@@ -78,18 +81,18 @@ export const PortalSourceCard: React.FC<PortalSourceCardProps> = ({ portal, onNa
           target="_blank"
           rel="noopener noreferrer"
           className="text-xs font-bold text-cyan-700 dark:text-cyan-400 hover:text-cyan-900 dark:hover:text-cyan-300 flex items-center gap-1 cursor-pointer"
-          title={`Open official portal ${portal.domain}`}
+          title={t('home.sources.openOfficialPortal',  { domain: portal.domain })}
         >
-          <span>Visit Portal</span>
+          <span>{t('home.sources.visitPortal')}</span>
           <ExternalLink className="w-3 h-3" />
         </a>
 
         <button
           onClick={() => onNavigate('current')}
           className="text-[11px] font-semibold text-orange-600 dark:text-orange-400 hover:text-orange-700 dark:hover:text-orange-300 flex items-center gap-0.5 cursor-pointer"
-          title="View tenders scraped from this portal"
+          title={t('home.sources.viewTendersFromPortal')}
         >
-          <span>View Tenders</span>
+          <span>{t('home.sources.viewTenders')}</span>
           <ChevronRight className="w-3 h-3" />
         </button>
       </div>

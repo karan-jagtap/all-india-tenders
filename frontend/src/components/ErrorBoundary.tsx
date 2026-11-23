@@ -1,22 +1,15 @@
-import { Component, ErrorInfo, ReactNode } from 'react';
+import { Component, ErrorInfo } from 'react';
 import { AlertTriangle, RefreshCw } from 'lucide-react';
+import i18n from '../i18n';
+import { ErrorBoundaryProps, ErrorBoundaryState } from '../types';
 
-interface Props {
-  children: ReactNode;
-}
-
-interface State {
-  hasError: boolean;
-  error: Error | null;
-}
-
-export class ErrorBoundary extends Component<Props, State> {
-  public state: State = {
+export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
+  public state: ErrorBoundaryState = {
     hasError: false,
-    error: null
+    error: undefined
   };
 
-  public static getDerivedStateFromError(error: Error): State {
+  public static getDerivedStateFromError(error: Error): ErrorBoundaryState {
     return { hasError: true, error };
   }
 
@@ -32,9 +25,9 @@ export class ErrorBoundary extends Component<Props, State> {
             <div className="w-12 h-12 rounded-full bg-red-500/20 text-red-400 flex items-center justify-center mx-auto mb-4">
               <AlertTriangle className="w-6 h-6" />
             </div>
-            <h2 className="text-lg font-bold text-white mb-2">Something went wrong</h2>
+            <h2 className="text-lg font-bold text-white mb-2">{i18n.t('errors.somethingWentWrong')}</h2>
             <p className="text-xs text-slate-400 mb-4 leading-relaxed">
-              The application encountered a runtime error. You can try refreshing or resetting the app state.
+              {i18n.t('errors.runtimeError')}
             </p>
             {this.state.error && (
               <pre className="text-left bg-slate-950 p-3 rounded-lg text-[11px] text-red-300 font-mono overflow-x-auto mb-4 border border-slate-800">
@@ -46,7 +39,7 @@ export class ErrorBoundary extends Component<Props, State> {
               className="px-4 py-2 bg-orange-600 hover:bg-orange-500 text-white font-bold text-xs rounded-xl inline-flex items-center gap-2 cursor-pointer shadow-md transition-all"
             >
               <RefreshCw className="w-4 h-4" />
-              <span>Reload Application</span>
+              <span>{i18n.t('errors.reloadApp')}</span>
             </button>
           </div>
         </div>

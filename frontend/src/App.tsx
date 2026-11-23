@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import {
   Home,
   Award,
@@ -20,17 +20,26 @@ import { PreviouslyAcceptedTendersTab } from './components/PreviouslyAcceptedTen
 import { CurrentTendersTab } from './components/CurrentTendersTab';
 import { RegisteredBiddersTab } from './components/RegisteredBiddersTab';
 import { AuthHeaderControls, SignInView, ClerkSetupModal, ProtectedRoute } from './components/auth';
-import { getPlatformStats, triggerLiveScrape, PlatformStats, ScrapeReport } from './services/api';
+import {
+  getPlatformStats,
+  triggerLiveScrape,
+  getUserSyncQuota,
+  PlatformStats,
+  ScrapeReport,
+  UserQuotaInfo
+} from './services/api';
 import { NavigationTab } from './types';
 import { loadContractorPools } from './constants/contractors';
 import { loadPortalSources } from './constants/portalSources';
 import { loadMasterFilters } from './constants/masterFilters';
 import { loadUiFilters } from './constants/filters';
-import { SyncLiveButton } from './components/common';
+import { SyncLiveButton, formatQuotaCountdown } from './components/common';
+import { useTranslation } from 'react-i18next';
 
 export const App: React.FC = () => {
+  const { t } = useTranslation();
   const { toggleTheme, isDark } = useTheme();
-  const { isSignedIn, openSignIn, showSetupGuide, setShowSetupGuide } = useAuthContext();
+  const { isSignedIn, userId, user, openSignIn, showSetupGuide, setShowSetupGuide } = useAuthContext();
   const [activeTab, setActiveTab] = useState<NavigationTab>(NavigationTab.HOME);
   const [stats, setStats] = useState<PlatformStats | null>(null);
   const [isSyncing, setIsSyncing] = useState<boolean>(false);
@@ -38,6 +47,71 @@ export const App: React.FC = () => {
   const [syncNotice, setSyncNotice] = useState<string | null>(null);
   const [syncKey, setSyncKey] = useState<number>(0);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState<boolean>(false);
+  const [userQuota, setUserQuota] = useState<UserQuotaInfo | null>(null);
+
+  // User details derived from Clerk session
+  const userEmail = useMemo(() => {
+    return (
+      user?.primaryEmailAddress?.emailAddress ||
+      user?.emailAddresses?.[0]?.emailAddress ||
+      null
+    );
+  }, [user]);
+
+  const userName = useMemo(() => {
+    return user?.fullName || user?.firstName || user?.username || null;
+  }, [user]);
+
+  // Fetch 24-hour sync quota for signed-in user
+  const fetchUserQuota = useCallback(async () => {
+    if (!userId) {
+      setUserQuota(null);
+      return;
+    }
+    try {
+      const quota = await getUserSyncQuota(userId);
+      setUserQuota(quota);
+    } catch (err) {
+      console.warn('Failed to load user sync quota', err);
+    }
+  }, [userId]);
+
+  useEffect(() => {
+    if (isSignedIn && userId) {
+      fetchUserQuota();
+    } else {
+      setUserQuota(null);
+    }
+  }, [isSignedIn, userId, fetchUserQuota]);
+
+  // Live 1-second interval for 24-hour quota unlock countdown
+  useEffect(() => {
+    if (!userQuota?.is_locked || (userQuota.next_sync_available_seconds ?? 0) <= 0) return;
+
+    const timer = setInterval(() => {
+      setUserQuota((prev) => {
+        if (!prev) return prev;
+        const current = prev.next_sync_available_seconds ?? 0;
+        if (current <= 1) {
+          clearInterval(timer);
+          fetchUserQuota();
+          return {
+            ...prev,
+            next_sync_available_seconds: 0,
+            is_locked: false,
+            syncs_remaining: 2,
+            syncs_used_24h: 0
+          };
+        }
+        return {
+          ...prev,
+          next_sync_available_seconds: current - 1
+        };
+      });
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [userQuota?.is_locked, userQuota?.next_sync_available_seconds, fetchUserQuota]);
 
   // Sync route from URL hash or query if present (e.g. #sign-in)
   useEffect(() => {
@@ -113,28 +187,52 @@ export const App: React.FC = () => {
   }, [isMobileMenuOpen]);
 
   const handleSyncLive = async () => {
+    if (!isSignedIn) {
+      openSignIn();
+      return;
+    }
+
+    if (userQuota?.is_locked) {
+      const remainingTime = formatQuotaCountdown(userQuota.next_sync_available_seconds);
+      setSyncNotice(
+        `Daily sync limit reached (2 of 2 syncs used within 24 hours). Next live sync available in ${remainingTime}.`
+      );
+      setTimeout(() => setSyncNotice(null), 5000);
+      return;
+    }
+
     if (isSyncing || cooldownRemaining > 0) return;
     setIsSyncing(true);
     setSyncNotice(null);
 
     try {
-      const report: ScrapeReport = await triggerLiveScrape();
+      const report: ScrapeReport = await triggerLiveScrape({
+        id: userId || undefined,
+        email: userEmail || undefined,
+        name: userName || undefined
+      });
       fetchStats();
       setSyncKey((prev) => prev + 1);
 
-      if (report.cooldown_remaining_seconds && report.cooldown_remaining_seconds > 0) {
-        setCooldownRemaining(report.cooldown_remaining_seconds);
-      } else if (report.status === 'success') {
-        setCooldownRemaining(300); // 5-minute safety cooldown
+      if (report.user_quota) {
+        setUserQuota(report.user_quota);
+      } else {
+        await fetchUserQuota();
       }
 
-      if (report.status === 'cooldown' || report.status === 'in_progress') {
+      if (report.status === 'quota_exceeded') {
+        setSyncNotice(report.message || 'Daily sync limit reached (2 of 2 syncs used within 24 hours).');
+      } else if (report.status === 'cooldown' || report.status === 'in_progress') {
         setSyncNotice(report.message || 'Synchronization is currently in cooldown to protect portals.');
+        if (report.cooldown_remaining_seconds) {
+          setCooldownRemaining(report.cooldown_remaining_seconds);
+        }
       } else {
         const portalCount = report.portals_scraped?.length || 28;
         const count = report.total_in_progress_tenders || 2718;
         const duration = report.execution_time_ms ? `${Math.round(report.execution_time_ms)}ms` : '2.3s';
-        setSyncNotice(`Synced ${count} live notices across ${portalCount} portals in ${duration} • Next scheduled cron: 4:00 AM IST`);
+        const quotaRemaining = report.user_quota?.syncs_remaining ?? (userQuota ? Math.max(0, userQuota.syncs_remaining - 1) : 1);
+        setSyncNotice(`Synced ${count} live notices across ${portalCount} portals in ${duration} • ${quotaRemaining} of 2 daily syncs remaining`);
       }
 
       setTimeout(() => {
@@ -152,8 +250,8 @@ export const App: React.FC = () => {
   const tabs = [
     {
       id: NavigationTab.HOME,
-      label: 'Home / Overview',
-      subtitle: 'Landing dashboard & platform telemetry',
+      label: t('nav.home'),
+      subtitle: t('nav.homeSubtitle'),
       icon: Home,
       iconColor: 'text-cyan-400',
       activeClasses: 'bg-slate-900 text-white shadow-sm',
@@ -162,19 +260,19 @@ export const App: React.FC = () => {
     },
     {
       id: NavigationTab.CURRENT,
-      label: 'InProgress Tenders',
-      subtitle: 'Live active notices & technical RFPs',
+      label: t('nav.current'),
+      subtitle: t('nav.currentSubtitle'),
       icon: Radio,
       iconColor: 'text-orange-500',
       activeClasses: 'bg-orange-600 text-white shadow-sm',
       mobileActiveBg: 'bg-gradient-to-r from-orange-950/80 to-slate-800 border-orange-500/50',
-      badge: stats?.active_tenders_count || 2688,
+      badge: stats?.active_tenders_count || 112261,
       badgeColor: 'bg-orange-700 text-white'
     },
     {
       id: NavigationTab.ACCEPTED,
-      label: 'Previously Accepted Tenders',
-      subtitle: 'L1 awarded contracts & BOQ prices',
+      label: t('nav.accepted'),
+      subtitle: t('nav.acceptedSubtitle'),
       icon: Award,
       iconColor: 'text-emerald-500',
       activeClasses: 'bg-emerald-600 text-white shadow-sm',
@@ -184,8 +282,8 @@ export const App: React.FC = () => {
     },
     {
       id: NavigationTab.BIDDERS,
-      label: 'Registered Bidders',
-      subtitle: 'Contractor directories & solvency books',
+      label: t('nav.bidders'),
+      subtitle: t('nav.biddersSubtitle'),
       icon: Users,
       iconColor: 'text-blue-500',
       activeClasses: 'bg-blue-600 text-white shadow-sm',
@@ -199,14 +297,7 @@ export const App: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#070A10] text-slate-900 dark:text-slate-100 flex flex-col font-sans transition-colors duration-200">
-      {/* Top National Tricolor Accent Strip */}
-      <div className="h-1.5 w-full flex shrink-0">
-        <div className="h-full w-1/3 bg-[#FF9933]" />
-        <div className="h-full w-1/3 bg-white" />
-        <div className="h-full w-1/3 bg-[#138808]" />
-      </div>
-
-      {/* 1. Clean Top Navbar (Logo, Title, Language Selector, Theme Toggle, Sync Live Button, and Mobile Hamburger Menu) */}
+      {/* 1. Clean Top Navbar (Logo, Title, Theme Toggle, Sync Live Button, and Mobile Hamburger Menu) */}
       <header className="bg-[#0A0E17] border-b border-slate-800 text-white sticky top-0 z-50 shadow-sm backdrop-blur-md">
         <div className="w-full px-3.5 sm:px-6 py-2.5 max-w-[1920px] mx-auto flex items-center justify-between gap-3">
           {/* Logo & Platform Name */}
@@ -223,13 +314,13 @@ export const App: React.FC = () => {
             </div>
             <div className="min-w-0">
               <h1 className="text-base sm:text-lg font-black tracking-tight text-white leading-tight truncate group-hover:text-orange-400 transition-colors">
-                ALL INDIA TENDERS
+                {t('brand.name')}
               </h1>
               <p className="text-[11px] text-slate-400 truncate flex items-center gap-1.5">
                 <span className="md:hidden font-semibold text-slate-200">
                   • {currentTabObj.label}
                 </span>
-                <span className="hidden md:inline">National Public Procurement Intelligence Platform</span>
+                <span className="hidden md:inline">{t('brand.tagline')}</span>
               </p>
             </div>
           </div>
@@ -240,8 +331,8 @@ export const App: React.FC = () => {
             <button
               onClick={toggleTheme}
               className="px-2.5 py-2 rounded-lg bg-slate-800/90 hover:bg-slate-700 active:bg-slate-600 text-slate-200 hover:text-white border border-slate-700/80 flex items-center gap-1.5 transition-all cursor-pointer shadow-xs group"
-              title={isDark ? 'Switch to Light theme' : 'Switch to Dark theme'}
-              aria-label={isDark ? 'Switch to Light theme' : 'Switch to Dark theme'}
+              title={isDark ? t('nav.switchToLight') : t('nav.switchToDark')}
+              aria-label={isDark ? t('nav.switchToLight') : t('nav.switchToDark')}
             >
               {isDark ? (
                 <Sun className="w-4 h-4 text-amber-400 group-hover:rotate-45 transition-transform duration-300" />
@@ -249,11 +340,11 @@ export const App: React.FC = () => {
                 <Moon className="w-4 h-4 text-amber-300 group-hover:-rotate-12 transition-transform duration-300" />
               )}
               <span className="text-[11px] font-semibold hidden sm:inline">
-                {isDark ? 'Light' : 'Dark'}
+                {isDark ? t('nav.light') : t('nav.dark')}
               </span>
             </button>
 
-            {/* Sync Live Button (Protected: Locked with tooltip when signed out) */}
+            {/* Sync Live Button (Protected: Locked with tooltip when signed out, Quota-limited to 2 syncs/24h when signed in) */}
             <SyncLiveButton
               onClick={handleSyncLive}
               isSyncing={isSyncing}
@@ -261,6 +352,9 @@ export const App: React.FC = () => {
               variant="header"
               isLocked={!isSignedIn}
               onLockedClick={openSignIn}
+              quotaInfo={userQuota}
+              userEmail={userEmail}
+              userName={userName}
             />
 
             {/* Clerk Authentication Controls (Sign In Button or User Avatar Button) */}
@@ -288,42 +382,42 @@ export const App: React.FC = () => {
         <div className="max-w-[1920px] mx-auto flex items-center justify-between gap-2.5">
           {/* Main Tenders Tabs */}
           <div className="flex items-center bg-slate-100/90 dark:bg-[#131A2B] p-1 rounded-xl border border-slate-200/90 dark:border-slate-800/80 shadow-inner gap-1 shrink-0">
-            {tabs.map((t) => {
-              const Icon = t.icon;
-              const isSelected = activeTab === t.id;
-              const isLocked = t.id === NavigationTab.BIDDERS && !isSignedIn;
+            {tabs.map((tabItem) => {
+              const Icon = tabItem.icon;
+              const isSelected = activeTab === tabItem.id;
+              const isLocked = tabItem.id === NavigationTab.BIDDERS && !isSignedIn;
               return (
                 <div
-                  key={t.id}
+                  key={tabItem.id}
                   className="relative group inline-flex"
-                  title={isLocked ? 'Please log in to view Registered Bidders' : undefined}
+                  title={isLocked ? t('nav.loginPromptBidders') : undefined}
                 >
                   <button
-                    onClick={() => setActiveTab(t.id)}
+                    onClick={() => setActiveTab(tabItem.id)}
                     className={`px-4 sm:px-5 py-2 rounded-lg text-xs font-bold flex items-center justify-center gap-2 transition-all cursor-pointer shrink-0 whitespace-nowrap ${
                       isSelected
-                        ? t.activeClasses
+                        ? tabItem.activeClasses
                         : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white dark:hover:bg-slate-800/70 hover:shadow-2xs'
                     }`}
                   >
                     <Icon
                       className={`w-3.5 h-3.5 ${
                         isSelected
-                          ? 'text-white' + (t.id === 'current' ? ' animate-pulse' : '')
-                          : t.iconColor
+                          ? 'text-white' + (tabItem.id === 'current' ? ' animate-pulse' : '')
+                          : tabItem.iconColor
                       }`}
                     />
-                    <span>{t.label}</span>
+                    <span>{tabItem.label}</span>
                     {isLocked && (
                       <Lock className="w-3.5 h-3.5 text-amber-400 shrink-0" />
                     )}
-                    {t.badge !== undefined && (
+                    {tabItem.badge !== undefined && (
                       <span
                         className={`px-1.5 py-0.5 rounded-full text-[10px] font-mono font-semibold ${
-                          isSelected ? t.badgeColor : 'bg-slate-200/90 dark:bg-slate-800 text-slate-700 dark:text-slate-300'
+                          isSelected ? tabItem.badgeColor : 'bg-slate-200/90 dark:bg-slate-800 text-slate-700 dark:text-slate-300'
                         }`}
                       >
-                        {t.badge}
+                        {tabItem.badge}
                       </span>
                     )}
                   </button>
@@ -335,13 +429,13 @@ export const App: React.FC = () => {
                     >
                       <div className="flex items-center justify-center gap-1.5 text-amber-300 font-bold text-xs pb-1 border-b border-slate-800">
                         <Lock className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-                        <span>Please log in to access</span>
+                        <span>{t('nav.loginPromptAccess')}</span>
                       </div>
                       <p className="text-[11px] text-slate-300 mt-1 leading-snug">
-                        Contractor directories & solvency books are restricted to logged-in users.
+                        {t('nav.loginPromptDesc')}
                       </p>
                       <div className="mt-2 pt-1 border-t border-slate-800 text-[10px] text-amber-400 font-semibold">
-                        Click to view login requirements →
+                        {t('nav.clickLoginRequirements')}
                       </div>
                     </div>
                   )}
@@ -397,52 +491,52 @@ export const App: React.FC = () => {
                 Platform Sections
               </div>
 
-              {tabs.map((t) => {
-                const Icon = t.icon;
-                const isSelected = activeTab === t.id;
+              {tabs.map((tabItem) => {
+                const Icon = tabItem.icon;
+                const isSelected = activeTab === tabItem.id;
                 return (
                   <button
-                    key={t.id}
-                    title={t.id === NavigationTab.BIDDERS && !isSignedIn ? 'Please log in to view Registered Bidders' : undefined}
+                    key={tabItem.id}
+                    title={tabItem.id === NavigationTab.BIDDERS && !isSignedIn ? t('nav.loginPromptBidders') : undefined}
                     onClick={() => {
-                      setActiveTab(t.id);
+                      setActiveTab(tabItem.id);
                       setIsMobileMenuOpen(false);
                       window.scrollTo({ top: 0, behavior: 'smooth' });
                     }}
                     className={`w-full p-3 rounded-xl flex items-center justify-between gap-3 text-left transition-all cursor-pointer border ${
                       isSelected
-                        ? `${t.mobileActiveBg} shadow-sm text-white`
+                        ? `${tabItem.mobileActiveBg} shadow-sm text-white`
                         : 'border-transparent hover:bg-slate-800/60 text-slate-300'
                     }`}
                   >
                     <div className="flex items-center gap-3 min-w-0">
                       <div
                         className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${
-                          isSelected ? 'bg-white/10 text-white' : 'bg-slate-800 ' + t.iconColor
+                          isSelected ? 'bg-white/10 text-white' : 'bg-slate-800 ' + tabItem.iconColor
                         }`}
                       >
-                        <Icon className={`w-4 h-4 ${isSelected && t.id === 'current' ? 'animate-pulse' : ''}`} />
+                        <Icon className={`w-4 h-4 ${isSelected && tabItem.id === 'current' ? 'animate-pulse' : ''}`} />
                       </div>
                       <div className="min-w-0">
                         <div className="flex items-center gap-2 flex-wrap">
                           <span className="font-bold text-xs text-white break-words">
-                            {t.label}
+                            {tabItem.label}
                           </span>
-                          {t.id === NavigationTab.BIDDERS && !isSignedIn && (
+                          {tabItem.id === NavigationTab.BIDDERS && !isSignedIn && (
                             <Lock className="w-3.5 h-3.5 text-amber-400 shrink-0" />
                           )}
-                          {t.badge !== undefined && (
+                          {tabItem.badge !== undefined && (
                             <span
                               className={`px-1.5 py-0.2 rounded-full text-[10px] font-mono font-bold ${
-                                isSelected ? t.badgeColor : 'bg-slate-800 text-slate-300 border border-slate-700'
+                                isSelected ? tabItem.badgeColor : 'bg-slate-800 text-slate-300 border border-slate-700'
                               }`}
                             >
-                              {t.badge}
+                              {tabItem.badge}
                             </span>
                           )}
                         </div>
                         <span className="text-[10px] text-slate-400 block truncate mt-0.5">
-                          {t.subtitle}
+                          {tabItem.subtitle}
                         </span>
                       </div>
                     </div>
@@ -481,7 +575,7 @@ export const App: React.FC = () => {
               )}
 
               <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-800/60 border border-slate-700/70 text-xs">
-                <span className="font-semibold text-slate-300 text-[11px]">Appearance Theme</span>
+                <span className="font-semibold text-slate-300 text-[11px]">{t('nav.appearanceTheme')}</span>
                 <button
                   onClick={toggleTheme}
                   className="px-2.5 py-1.5 rounded-lg bg-slate-700 hover:bg-slate-600 text-white font-bold flex items-center gap-1.5 transition-all cursor-pointer text-xs"
@@ -489,12 +583,12 @@ export const App: React.FC = () => {
                   {isDark ? (
                     <>
                       <Sun className="w-3.5 h-3.5 text-amber-400" />
-                      <span>Light Theme</span>
+                      <span>{t('nav.lightTheme')}</span>
                     </>
                   ) : (
                     <>
                       <Moon className="w-3.5 h-3.5 text-amber-300" />
-                      <span>Dark Theme</span>
+                      <span>{t('nav.darkTheme')}</span>
                     </>
                   )}
                 </button>
@@ -513,10 +607,13 @@ export const App: React.FC = () => {
                   setIsMobileMenuOpen(false);
                   openSignIn();
                 }}
+                quotaInfo={userQuota}
+                userEmail={userEmail}
+                userName={userName}
               />
 
               <div className="text-[10px] text-slate-500 text-center">
-                Automated Cron: Daily @ 4:00 AM IST • Hybrid Persistent DB
+                {t('nav.automatedCronFooter')}
               </div>
             </div>
           </div>
@@ -540,6 +637,9 @@ export const App: React.FC = () => {
             onTriggerSync={handleSyncLive}
             isSyncing={isSyncing}
             cooldownRemaining={cooldownRemaining}
+            quotaInfo={userQuota}
+            userEmail={userEmail}
+            userName={userName}
           />
         ) : activeTab === NavigationTab.CURRENT ? (
           <CurrentTendersTab key={`curr-${syncKey}`} />
@@ -561,6 +661,9 @@ export const App: React.FC = () => {
             onTriggerSync={handleSyncLive}
             isSyncing={isSyncing}
             cooldownRemaining={cooldownRemaining}
+            quotaInfo={userQuota}
+            userEmail={userEmail}
+            userName={userName}
           />
         )}
       </main>
@@ -568,7 +671,7 @@ export const App: React.FC = () => {
       {/* Footer */}
       <footer className="bg-white dark:bg-[#0A0E17] border-t border-slate-200/90 dark:border-slate-800 text-slate-600 dark:text-slate-400 text-xs py-4 px-4 sm:px-6 text-center transition-colors">
         <div className="flex flex-col sm:flex-row items-center justify-center gap-2 max-w-[1920px] mx-auto">
-          <span>All India Tenders • Statutory Public Procurement Intelligence Platform</span>
+          <span>{t('brand.footer')}</span>
         </div>
       </footer>
       {/* Clerk Setup / Authentication Modal */}

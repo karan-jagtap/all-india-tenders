@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Zap,
   Radio,
@@ -18,6 +19,8 @@ export interface CompetitorPredictionSubTabProps {
 export const CompetitorPredictionSubTab: React.FC<CompetitorPredictionSubTabProps> = ({
   preBidPrediction
 }) => {
+  const { t } = useTranslation();
+
   return (
     <div className="bg-white dark:bg-[#0E1422] rounded-xl border border-slate-200/90 dark:border-slate-800 p-5 shadow-xs space-y-5 animate-in fade-in duration-150 transition-colors">
       {/* Banner */}
@@ -27,26 +30,35 @@ export const CompetitorPredictionSubTab: React.FC<CompetitorPredictionSubTabProp
             <div className="flex items-center gap-2 mb-1.5 flex-wrap">
               <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-wider uppercase bg-amber-400 text-slate-950 flex items-center gap-1.5 shadow-xs">
                 <Zap className="w-3 h-3 text-slate-950" />
-                [RAG] PRE-BID AI SIMULATOR • GFR 173 BENCHMARK
+                {t('currentTenders.prediction.bannerBadge')}
               </span>
               <span className="px-2 py-0.5 rounded text-[10px] bg-slate-800 text-slate-300 font-mono border border-slate-700">
-                Confidence: {preBidPrediction.confidenceScorePct}% ({preBidPrediction.matchingConfidenceLevel.split(' ')[0]})
+                {t('currentTenders.prediction.confidence',  {
+                  score: preBidPrediction.confidenceScorePct,
+                  level: preBidPrediction.matchingConfidenceLevel.split(' ')[0]
+                })}
               </span>
             </div>
             <h4 className="text-base font-bold text-white tracking-tight">
-              [RAG] Pre-Bid Competitor Bids & L1 Winning Simulator
+              {t('currentTenders.prediction.title')}
             </h4>
             <p className="text-xs text-slate-300 mt-1 max-w-3xl leading-relaxed">
-              Synthesized using Retrieval-Augmented Generation (RAG) against 2,600+ historical awarded tenders. Evaluates mandatory PQC turnover/solvency thresholds, authority Schedule of Rates (SOR) clearance margins, and regional contractor proximity to project likely competitor bids before you submit.
+              {t(
+                'currentTenders.prediction.desc'
+              )}
             </p>
           </div>
 
           <div className="bg-slate-800/90 border border-amber-500/30 px-3.5 py-2 rounded-xl text-center shrink-0">
-            <span className="text-[10px] text-slate-400 uppercase font-semibold block">Predicted Turnout</span>
-            <span className="text-lg font-bold text-amber-400 font-mono">
-              {preBidPrediction.estimatedTurnoutCount} Bidders
+            <span className="text-[10px] text-slate-400 uppercase font-semibold block">
+              {t('currentTenders.prediction.predictedTurnout')}
             </span>
-            <span className="text-[9px] text-slate-400 block mt-0.5">Two-Cover Qualified</span>
+            <span className="text-lg font-bold text-amber-400 font-mono">
+              {t('currentTenders.prediction.biddersCount',  { count: preBidPrediction.estimatedTurnoutCount })}
+            </span>
+            <span className="text-[9px] text-slate-400 block mt-0.5">
+              {t('currentTenders.prediction.twoCoverQualified')}
+            </span>
           </div>
         </div>
       </div>
@@ -54,40 +66,50 @@ export const CompetitorPredictionSubTab: React.FC<CompetitorPredictionSubTabProp
       {/* 4 Core Intelligence Metric Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
         <div className="bg-slate-50 dark:bg-slate-800/60 p-3.5 rounded-xl border border-slate-200 dark:border-slate-700/60">
-          <span className="text-[10px] text-slate-400 uppercase font-semibold block">Official NIT Estimate</span>
+          <span className="text-[10px] text-slate-400 uppercase font-semibold block">
+            {t('currentTenders.prediction.officialNitEstimate')}
+          </span>
           <strong className="text-sm font-bold text-slate-900 dark:text-white block mt-0.5 font-mono">
             {formatINR(preBidPrediction.estimatedCostInr)}
           </strong>
-          <span className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 block">Baseline 100% Rate Book</span>
+          <span className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 block">
+            {t('currentTenders.prediction.baseline100')}
+          </span>
         </div>
 
         <div className="bg-emerald-50/70 dark:bg-emerald-950/30 p-3.5 rounded-xl border border-emerald-200 dark:border-emerald-900/50">
-          <span className="text-[10px] text-emerald-700 dark:text-emerald-400 uppercase font-semibold block">Predicted L1 Winner Cutoff</span>
+          <span className="text-[10px] text-emerald-700 dark:text-emerald-400 uppercase font-semibold block">
+            {t('currentTenders.prediction.predictedL1WinnerCutoff')}
+          </span>
           <strong className="text-sm font-bold text-emerald-900 dark:text-emerald-200 block mt-0.5 font-mono">
             {formatINR(preBidPrediction.predictedL1QuoteInr)}
           </strong>
           <span className="text-[11px] text-emerald-700 dark:text-emerald-400 font-semibold mt-1 block">
-            {preBidPrediction.predictedL1VariancePct}% below estimate
+            {t('currentTenders.prediction.belowEstimate',  { pct: preBidPrediction.predictedL1VariancePct })}
           </span>
         </div>
 
         <div className="bg-amber-50/70 dark:bg-amber-950/30 p-3.5 rounded-xl border border-amber-200 dark:border-amber-900/50">
-          <span className="text-[10px] text-amber-800 dark:text-amber-400 uppercase font-semibold block">Target Winning Sweet Spot</span>
+          <span className="text-[10px] text-amber-800 dark:text-amber-400 uppercase font-semibold block">
+            {t('currentTenders.prediction.targetWinningSweetSpot')}
+          </span>
           <strong className="text-xs font-bold text-amber-950 dark:text-amber-200 block mt-0.5 font-mono">
             {formatINR(preBidPrediction.winningSweetSpotMinInr)} – {formatINR(preBidPrediction.winningSweetSpotMaxInr)}
           </strong>
           <span className="text-[11px] text-amber-800 dark:text-amber-400 font-semibold mt-1 block">
-            {preBidPrediction.winningSweetSpotMinPct}% to {preBidPrediction.winningSweetSpotMaxPct}% (88% Win Rate)
+            {preBidPrediction.winningSweetSpotMinPct}% to {preBidPrediction.winningSweetSpotMaxPct}% ({t('currentTenders.prediction.winRate')})
           </span>
         </div>
 
         <div className="bg-rose-50/70 dark:bg-rose-950/30 p-3.5 rounded-xl border border-rose-200 dark:border-rose-900/50">
-          <span className="text-[10px] text-rose-700 dark:text-rose-400 uppercase font-semibold block">"Winner's Curse" Risk Zone</span>
+          <span className="text-[10px] text-rose-700 dark:text-rose-400 uppercase font-semibold block">
+            {t('currentTenders.prediction.winnersCurseRiskZone')}
+          </span>
           <strong className="text-sm font-bold text-rose-900 dark:text-rose-200 block mt-0.5 font-mono">
-            Below {formatINR(preBidPrediction.winnersCurseThresholdInr)}
+            {t('currentTenders.prediction.below')} {formatINR(preBidPrediction.winnersCurseThresholdInr)}
           </strong>
           <span className="text-[11px] text-rose-700 dark:text-rose-400 font-semibold mt-1 block">
-            Beyond {preBidPrediction.winnersCurseThresholdPct}% (Negative Margin)
+            {t('currentTenders.prediction.beyond')} {preBidPrediction.winnersCurseThresholdPct}% ({t('currentTenders.prediction.negativeMargin')})
           </span>
         </div>
       </div>
@@ -97,11 +119,11 @@ export const CompetitorPredictionSubTab: React.FC<CompetitorPredictionSubTabProp
         <div className="flex items-center gap-2">
           <Radio className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
           <span>
-            <strong>[RAG] Historical Authority Pattern:</strong> {preBidPrediction.authorityHistoricalClearancePattern}
+            <strong>{t('currentTenders.prediction.historicalAuthorityPattern')}</strong> {preBidPrediction.authorityHistoricalClearancePattern}
           </span>
         </div>
         <span className="text-[10px] font-mono font-semibold text-amber-800 dark:text-amber-400 shrink-0">
-          Sample Size: 2,600+ Awards
+          {t('currentTenders.prediction.sampleSize')}
         </span>
       </div>
 
@@ -111,11 +133,11 @@ export const CompetitorPredictionSubTab: React.FC<CompetitorPredictionSubTabProp
           <div className="flex items-center gap-2">
             <Scale className="w-4 h-4 text-amber-400" />
             <h4 className="text-xs font-bold uppercase tracking-wider text-slate-100">
-              [RAG] Clearing Probability Density Curve & Margin Distribution
+              {t('currentTenders.prediction.densityCurveTitle')}
             </h4>
           </div>
           <span className="text-[10px] text-slate-400 font-mono">
-            Monte Carlo DSR Calibration
+            {t('currentTenders.prediction.monteCarlo')}
           </span>
         </div>
 
@@ -133,7 +155,7 @@ export const CompetitorPredictionSubTab: React.FC<CompetitorPredictionSubTabProp
             >
               {band.isRecommended && (
                 <span className="absolute -top-2 right-2 px-1.5 py-0.2 bg-emerald-500 text-slate-950 font-bold text-[9px] rounded uppercase tracking-wider">
-                  Recommended Sweet Spot
+                  {t('currentTenders.prediction.recommendedSweetSpot')}
                 </span>
               )}
               <div className="text-[11px] font-bold text-slate-200 mb-1">
@@ -146,7 +168,7 @@ export const CompetitorPredictionSubTab: React.FC<CompetitorPredictionSubTabProp
                 {band.priceRangeInr}
               </div>
               <div className="mt-2 pt-2 border-t border-slate-700/60 flex items-center justify-between">
-                <span className="text-[10px] text-slate-400">Win Probability:</span>
+                <span className="text-[10px] text-slate-400">{t('currentTenders.prediction.winProbability')}</span>
                 <span className={`font-mono font-bold text-xs ${band.isRecommended ? 'text-emerald-400' : 'text-slate-200'}`}>
                   {band.clearanceProbabilityPct}%
                 </span>
@@ -177,14 +199,16 @@ export const CompetitorPredictionSubTab: React.FC<CompetitorPredictionSubTabProp
           <div>
             <h4 className="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider flex items-center gap-1.5">
               <CheckCircle className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-              [RAG] Simulated Financial Comparative Statement (Predicted CS Sheet)
+              {t('currentTenders.prediction.csSheetTitle')}
             </h4>
             <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
-              Projected financial opening based on PQC contractor balance sheets, regional equipment depots, and GFR 173 compliance.
+              {t(
+                'currentTenders.prediction.csSheetDesc'
+              )}
             </p>
           </div>
           <span className="text-[11px] text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 px-2.5 py-1 rounded-lg border border-slate-200 dark:border-slate-700 font-mono">
-            [RAG] Matched: 5 Contenders
+            {t('currentTenders.prediction.matchedContenders')}
           </span>
         </div>
 
@@ -192,15 +216,15 @@ export const CompetitorPredictionSubTab: React.FC<CompetitorPredictionSubTabProp
           <table className="w-full text-left text-xs">
             <thead className="bg-slate-900 dark:bg-slate-950 text-slate-200 text-[10px] uppercase font-bold tracking-wider">
               <tr>
-                <th className="py-2.5 px-3">Predicted Rank</th>
-                <th className="py-2.5 px-3">Qualified Competitor</th>
-                <th className="py-2.5 px-3">Sector Win Rate & Track</th>
-                <th className="py-2.5 px-3">Pricing Posture & Book</th>
-                <th className="py-2.5 px-3">Predicted Quote</th>
-                <th className="py-2.5 px-3">Variance vs NIT</th>
-                <th className="py-2.5 px-3">Delta vs L1</th>
-                <th className="py-2.5 px-3">Tech Score</th>
-                <th className="py-2.5 px-3">Bidding Behavior & Logistics Rationale</th>
+                <th className="py-2.5 px-3">{t('currentTenders.prediction.predictedRank')}</th>
+                <th className="py-2.5 px-3">{t('currentTenders.prediction.qualifiedCompetitor')}</th>
+                <th className="py-2.5 px-3">{t('currentTenders.prediction.sectorWinRateTrack')}</th>
+                <th className="py-2.5 px-3">{t('currentTenders.prediction.pricingPostureBook')}</th>
+                <th className="py-2.5 px-3">{t('currentTenders.prediction.predictedQuote')}</th>
+                <th className="py-2.5 px-3">{t('currentTenders.prediction.varianceVsNit')}</th>
+                <th className="py-2.5 px-3">{t('currentTenders.prediction.deltaVsL1')}</th>
+                <th className="py-2.5 px-3">{t('currentTenders.prediction.techScore')}</th>
+                <th className="py-2.5 px-3">{t('currentTenders.prediction.biddingBehavior')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-200 dark:divide-slate-800 bg-white dark:bg-[#0E1422]">
@@ -232,14 +256,16 @@ export const CompetitorPredictionSubTab: React.FC<CompetitorPredictionSubTabProp
                         <span>•</span>
                         <span className="font-semibold text-slate-700 dark:text-slate-300">{b.contractorClass}</span>
                         <span>•</span>
-                        <span className="text-emerald-700 dark:text-emerald-400 font-semibold">Turnover ₹ {b.annualTurnoverCr} Cr</span>
+                        <span className="text-emerald-700 dark:text-emerald-400 font-semibold">
+                          {t('currentTenders.prediction.turnoverCr',  { amount: b.annualTurnoverCr })}
+                        </span>
                       </div>
                     </td>
 
                     <td className="py-3 px-3 whitespace-nowrap">
                       <div className="font-bold text-slate-900 dark:text-white font-mono text-[11px] flex items-center gap-1">
                         <span className="text-emerald-700 dark:text-emerald-400">{b.sectorWinRatePct}%</span>
-                        <span className="text-slate-400 font-normal">Win Rate</span>
+                        <span className="text-slate-400 font-normal">{t('currentTenders.prediction.winRate')}</span>
                       </div>
                       <div className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5 truncate max-w-[160px]" title={b.headToHeadRecord}>
                         {b.headToHeadRecord}
@@ -273,7 +299,7 @@ export const CompetitorPredictionSubTab: React.FC<CompetitorPredictionSubTabProp
 
                     <td className="py-3 px-3 whitespace-nowrap font-mono text-[11px]">
                       {isL1 ? (
-                        <span className="text-emerald-700 dark:text-emerald-400 font-bold">0.0 (Baseline)</span>
+                        <span className="text-emerald-700 dark:text-emerald-400 font-bold">{t('currentTenders.prediction.baselineZero')}</span>
                       ) : (
                         <span className="text-slate-600 dark:text-slate-400">
                           +{formatINR(b.deltaL1Inr)} (+{b.deltaL1Pct}%)
@@ -304,7 +330,7 @@ export const CompetitorPredictionSubTab: React.FC<CompetitorPredictionSubTabProp
         <div className="p-4 bg-emerald-50/80 dark:bg-emerald-950/30 rounded-xl border border-emerald-200 dark:border-emerald-900/50 space-y-1.5">
           <div className="font-bold text-emerald-950 dark:text-emerald-200 flex items-center gap-1.5">
             <CheckCircle className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-            Winning Sweet-Spot Strategy
+            {t('currentTenders.prediction.sweetSpotStrategy')}
           </div>
           <p className="text-[11px] text-emerald-900 dark:text-emerald-300 leading-relaxed font-semibold">
             {preBidPrediction.strategicAdvice.recommendedPriceWindow}
@@ -317,10 +343,13 @@ export const CompetitorPredictionSubTab: React.FC<CompetitorPredictionSubTabProp
         <div className="p-4 bg-rose-50/80 dark:bg-rose-950/30 rounded-xl border border-rose-200 dark:border-rose-900/50 space-y-1.5">
           <div className="font-bold text-rose-950 dark:text-rose-200 flex items-center gap-1.5">
             <AlertCircle className="w-4 h-4 text-rose-600 dark:text-rose-400" />
-            "Winner's Curse" Risk Warning
+            {t('currentTenders.prediction.curseWarning')}
           </div>
           <p className="text-[11px] text-rose-900 dark:text-rose-300 leading-relaxed font-semibold">
-            Avoid Quoting Below {formatINR(preBidPrediction.winnersCurseThresholdInr)} ({preBidPrediction.winnersCurseThresholdPct}%)
+            {t('currentTenders.prediction.avoidQuotingBelow',  {
+              amount: formatINR(preBidPrediction.winnersCurseThresholdInr),
+              pct: preBidPrediction.winnersCurseThresholdPct
+            })}
           </p>
           <p className="text-[11px] text-rose-800 dark:text-rose-400 leading-relaxed">
             {preBidPrediction.strategicAdvice.riskAlert}
@@ -330,10 +359,10 @@ export const CompetitorPredictionSubTab: React.FC<CompetitorPredictionSubTabProp
         <div className="p-4 bg-blue-50/80 dark:bg-blue-950/30 rounded-xl border border-blue-200 dark:border-blue-900/50 space-y-1.5">
           <div className="font-bold text-blue-950 dark:text-blue-200 flex items-center gap-1.5">
             <ShieldAlert className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-            Cover-1 Technical Compliance Safeguard
+            {t('currentTenders.prediction.cover1Safeguard')}
           </div>
           <p className="text-[11px] text-blue-900 dark:text-blue-300 leading-relaxed font-semibold">
-            Strict Pre-Qualification Criteria (PQC) Adherence
+            {t('currentTenders.prediction.strictPqcAdherence')}
           </p>
           <p className="text-[11px] text-blue-800 dark:text-blue-400 leading-relaxed">
             {preBidPrediction.strategicAdvice.complianceKey}
@@ -343,3 +372,4 @@ export const CompetitorPredictionSubTab: React.FC<CompetitorPredictionSubTabProp
     </div>
   );
 };
+

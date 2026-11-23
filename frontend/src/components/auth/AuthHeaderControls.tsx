@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { LogIn, UserCheck } from 'lucide-react';
 import { UserButton, SignInButton } from '@clerk/react';
 import { dark } from '@clerk/themes';
@@ -10,6 +11,7 @@ export interface AuthHeaderControlsProps {
 }
 
 export const AuthHeaderControls: React.FC<AuthHeaderControlsProps> = ({ onNavigateToSignIn }) => {
+  const { t } = useTranslation();
   const { isSignedIn, isConfigured, openSignIn, user } = useAuthContext();
   const { isDark } = useTheme();
 
@@ -49,10 +51,10 @@ export const AuthHeaderControls: React.FC<AuthHeaderControlsProps> = ({ onNaviga
         <button
           type="button"
           className="px-3 py-1.5 rounded-lg bg-orange-600 hover:bg-orange-500 active:bg-orange-700 text-white font-bold text-xs flex items-center gap-1.5 shadow-sm transition-all cursor-pointer ring-1 ring-orange-400/30"
-          title="Sign in to your account"
+          title={t('nav.signIn')}
         >
           <LogIn className="w-3.5 h-3.5 shrink-0" />
-          <span>Sign In</span>
+          <span>{t('nav.signIn')}</span>
         </button>
       </SignInButton>
     );
@@ -64,10 +66,10 @@ export const AuthHeaderControls: React.FC<AuthHeaderControlsProps> = ({ onNaviga
       type="button"
       onClick={onNavigateToSignIn || openSignIn}
       className="px-3 py-1.5 rounded-lg bg-orange-600 hover:bg-orange-500 active:bg-orange-700 text-white font-bold text-xs flex items-center gap-1.5 shadow-sm transition-all cursor-pointer ring-1 ring-orange-400/30"
-      title="Sign in to your account"
+      title={t('nav.signIn')}
     >
       <LogIn className="w-3.5 h-3.5 shrink-0" />
-      <span>Sign In</span>
+      <span>{t('nav.signIn')}</span>
     </button>
   );
 };

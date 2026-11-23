@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Layers, Download, ExternalLink, Eye } from 'lucide-react';
 import { EnrichedCurrentTender, TenderDocType } from '../../../types';
 import { formatINR } from '../../../utils';
@@ -20,6 +21,7 @@ export const TenderDocsSubTab: React.FC<TenderDocsSubTabProps> = ({
   onOpenPortalBridge,
   onOpenWholeDoc
 }) => {
+  const { t } = useTranslation();
   const [selectedDocType, setSelectedDocType] = useState<TenderDocType>(TenderDocType.SBD);
 
   const activeDocUrl =
@@ -38,11 +40,13 @@ export const TenderDocsSubTab: React.FC<TenderDocsSubTabProps> = ({
         <div>
           <h4 className="text-xs font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
             <Layers className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
-            [RAG] Official Sourced Tender Documents Package
+            {t('currentTenders.docs.packageTitle')}
           </h4>
           <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
-            Complete statutory documents published on {selectedTender.source_portal} for NIT Reference{' '}
-            <code className="text-blue-700 dark:text-blue-400 font-bold font-mono">{selectedTender.nit_number}</code>.
+            {t(
+              'currentTenders.docs.packageDesc', 
+              { portal: selectedTender.source_portal, nit: selectedTender.nit_number }
+            )}
           </p>
         </div>
 
@@ -51,10 +55,10 @@ export const TenderDocsSubTab: React.FC<TenderDocsSubTabProps> = ({
             <button
               onClick={onOpenWholeDoc}
               className="px-3 py-1.5 rounded-lg text-xs font-bold bg-indigo-50 dark:bg-indigo-950/40 hover:bg-indigo-100 dark:hover:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-900/50 flex items-center gap-1.5 shadow-2xs transition-all cursor-pointer"
-              title="Expand whole tender document in dedicated reader modal"
+              title={t('currentTenders.docs.expandWholeDocTitle')}
             >
               <Eye className="w-3.5 h-3.5" />
-              <span>Full-Screen Viewer</span>
+              <span>{t('currentTenders.docs.fullScreenViewer')}</span>
             </button>
           )}
           <a
@@ -63,7 +67,11 @@ export const TenderDocsSubTab: React.FC<TenderDocsSubTabProps> = ({
             className="px-3 py-1.5 rounded-lg text-xs font-bold bg-emerald-600 text-white hover:bg-emerald-700 flex items-center gap-1.5 shadow-xs transition-all cursor-pointer"
           >
             <Download className="w-3.5 h-3.5" />
-            <span>[RAG] Download {selectedDocType === 'sbd' ? 'Whole Doc' : 'Active Doc'}</span>
+            <span>
+              {selectedDocType === 'sbd'
+                ? t('currentTenders.docs.downloadWholeDoc')
+                : t('currentTenders.docs.downloadActiveDoc')}
+            </span>
           </a>
           <a
             href={activeDocUrl}
@@ -72,7 +80,7 @@ export const TenderDocsSubTab: React.FC<TenderDocsSubTabProps> = ({
             className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-900 dark:bg-slate-800 text-white hover:bg-slate-800 dark:hover:bg-slate-700 flex items-center gap-1 transition-all"
           >
             <ExternalLink className="w-3.5 h-3.5" />
-            <span>New Tab</span>
+            <span>{t('common.newTab')}</span>
           </a>
         </div>
       </div>
@@ -90,19 +98,25 @@ export const TenderDocsSubTab: React.FC<TenderDocsSubTabProps> = ({
         >
           <div className="flex items-center justify-between gap-2 mb-1.5">
             <span className="px-2 py-0.5 rounded text-[9px] font-bold bg-indigo-100 dark:bg-indigo-900/60 text-indigo-800 dark:text-indigo-300 border border-indigo-300 dark:border-indigo-800">
-              Comprehensive SBD
+              {t('currentTenders.docs.sbdBadge')}
             </span>
-            <span className="text-[10px] font-mono text-slate-500 dark:text-slate-400">4 Pages • Detailed SBD</span>
+            <span className="text-[10px] font-mono text-slate-500 dark:text-slate-400">
+              {t('currentTenders.docs.sbdPages')}
+            </span>
           </div>
           <h5 className="font-bold text-slate-900 dark:text-white text-xs mb-1">
-            [RAG] Detailed Tender Document (SBD / RFP)
+            {t('currentTenders.docs.sbdTitle')}
           </h5>
           <p className="text-[11px] text-slate-500 dark:text-slate-400 line-clamp-2">
-            Includes Instructions to Bidders (ITB), General & Special Conditions of Contract (GCC/SCC), PQC Qualification, Technical Specs & Codes (IRC/MoRTH/CPWD/BIS), and Statutory Annexures.
+            {t(
+              'currentTenders.docs.sbdDesc'
+            )}
           </p>
           <div className="mt-2.5 pt-2 border-t border-slate-200/60 dark:border-slate-700/60 flex items-center justify-between text-[10px]">
             <span className="text-indigo-700 dark:text-indigo-400 font-semibold">
-              {selectedDocType === TenderDocType.SBD ? '● Active in Viewer' : 'Click to View'}
+              {selectedDocType === TenderDocType.SBD
+                ? t('currentTenders.docs.activeInViewer')
+                : t('currentTenders.docs.clickToView')}
             </span>
             <a
               href={sbdUrl}
@@ -110,7 +124,7 @@ export const TenderDocsSubTab: React.FC<TenderDocsSubTabProps> = ({
               onClick={(e) => e.stopPropagation()}
               className="text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 font-medium flex items-center gap-0.5"
             >
-              <Download className="w-3 h-3" /> Download
+              <Download className="w-3 h-3" /> {t('common.download')}
             </a>
           </div>
         </div>
@@ -126,19 +140,25 @@ export const TenderDocsSubTab: React.FC<TenderDocsSubTabProps> = ({
         >
           <div className="flex items-center justify-between gap-2 mb-1.5">
             <span className="px-2 py-0.5 rounded text-[9px] font-bold bg-orange-100 dark:bg-orange-900/60 text-orange-800 dark:text-orange-300 border border-orange-300 dark:border-orange-800">
-              NIT Notice
+              {t('currentTenders.docs.nitBadge')}
             </span>
-            <span className="text-[10px] font-mono text-slate-500 dark:text-slate-400">2 Pages • 480 KB</span>
+            <span className="text-[10px] font-mono text-slate-500 dark:text-slate-400">
+              {t('currentTenders.docs.nitPages')}
+            </span>
           </div>
           <h5 className="font-bold text-slate-900 dark:text-white text-xs mb-1">
-            [RAG] Notice Inviting Tender (NIT Summary)
+            {t('currentTenders.docs.nitTitle')}
           </h5>
           <p className="text-[11px] text-slate-500 dark:text-slate-400 line-clamp-2">
-            Official advertisement summary notice published on portal specifying key dates, EMD amount, tender fee, and basic eligibility criteria.
+            {t(
+              'currentTenders.docs.nitDesc'
+            )}
           </p>
           <div className="mt-2.5 pt-2 border-t border-slate-200/60 dark:border-slate-700/60 flex items-center justify-between text-[10px]">
             <span className="text-orange-700 dark:text-orange-400 font-semibold">
-              {selectedDocType === TenderDocType.NIT ? '● Active in Viewer' : 'Click to View'}
+              {selectedDocType === TenderDocType.NIT
+                ? t('currentTenders.docs.activeInViewer')
+                : t('currentTenders.docs.clickToView')}
             </span>
             <a
               href={pdfUrl}
@@ -146,7 +166,7 @@ export const TenderDocsSubTab: React.FC<TenderDocsSubTabProps> = ({
               onClick={(e) => e.stopPropagation()}
               className="text-slate-600 dark:text-slate-300 hover:text-orange-600 dark:hover:text-orange-400 font-medium flex items-center gap-0.5"
             >
-              <Download className="w-3 h-3" /> Download
+              <Download className="w-3 h-3" /> {t('common.download')}
             </a>
           </div>
         </div>
@@ -162,19 +182,26 @@ export const TenderDocsSubTab: React.FC<TenderDocsSubTabProps> = ({
         >
           <div className="flex items-center justify-between gap-2 mb-1.5">
             <span className="px-2 py-0.5 rounded text-[9px] font-bold bg-emerald-100 dark:bg-emerald-900/60 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800">
-              Price BOQ
+              {t('currentTenders.docs.boqBadge')}
             </span>
-            <span className="text-[10px] font-mono text-slate-500 dark:text-slate-400">6 Pages • 320 KB</span>
+            <span className="text-[10px] font-mono text-slate-500 dark:text-slate-400">
+              {t('currentTenders.docs.boqPages')}
+            </span>
           </div>
           <h5 className="font-bold text-slate-900 dark:text-white text-xs mb-1">
-            [RAG] Bill of Quantities (BOQ / Rate Schedule)
+            {t('currentTenders.docs.boqTitle')}
           </h5>
           <p className="text-[11px] text-slate-500 dark:text-slate-400 line-clamp-2">
-            Itemized financial schedule detailing item descriptions, quantities, and departmental estimate totaling {formatINR(selectedTender.estimated_cost_inr || 0)} for Cover-2 bidding.
+            {t(
+              'currentTenders.docs.boqDesc', 
+              { amount: formatINR(selectedTender.estimated_cost_inr || 0) }
+            )}
           </p>
           <div className="mt-2.5 pt-2 border-t border-slate-200/60 dark:border-slate-700/60 flex items-center justify-between text-[10px]">
             <span className="text-emerald-700 dark:text-emerald-400 font-semibold">
-              {selectedDocType === TenderDocType.BOQ ? '● Active in Viewer' : 'Click to View'}
+              {selectedDocType === TenderDocType.BOQ
+                ? t('currentTenders.docs.activeInViewer')
+                : t('currentTenders.docs.clickToView')}
             </span>
             <a
               href={boqUrl}
@@ -182,7 +209,7 @@ export const TenderDocsSubTab: React.FC<TenderDocsSubTabProps> = ({
               onClick={(e) => e.stopPropagation()}
               className="text-slate-600 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 font-medium flex items-center gap-0.5"
             >
-              <Download className="w-3 h-3" /> Download
+              <Download className="w-3 h-3" /> {t('common.download')}
             </a>
           </div>
         </div>
@@ -192,11 +219,13 @@ export const TenderDocsSubTab: React.FC<TenderDocsSubTabProps> = ({
       <div className="p-3 bg-slate-900 dark:bg-slate-950 text-white rounded-lg text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-2 border border-slate-800">
         <div className="flex items-center gap-2">
           <span className="px-2 py-0.5 bg-indigo-500/30 text-indigo-300 font-mono text-[10px] rounded font-bold uppercase">
-            Official Portal Sourcing
+            {t('currentTenders.docs.portalSourcing')}
           </span>
           <span className="text-slate-300 text-[11px]">
-            Sourced from: <strong className="text-white">{selectedTender.source_portal}</strong> • Section:{' '}
-            <em className="text-indigo-200">Work / Item Documents</em>
+            {t('currentTenders.docs.sourcedFrom')}{' '}
+            <strong className="text-white">{selectedTender.source_portal}</strong>
+            {t('currentTenders.docs.section')}{' '}
+            <em className="text-indigo-200">{t('currentTenders.docs.workDocuments')}</em>
           </span>
         </div>
 
@@ -205,7 +234,7 @@ export const TenderDocsSubTab: React.FC<TenderDocsSubTabProps> = ({
             onClick={(e) => onOpenPortalBridge(selectedTender, e)}
             className="text-blue-300 hover:text-white text-[11px] font-semibold flex items-center gap-1 cursor-pointer underline shrink-0"
           >
-            Verify Original Sourcing on Portal ↗
+            {t('currentTenders.docs.verifyPortal')}
           </button>
         )}
       </div>

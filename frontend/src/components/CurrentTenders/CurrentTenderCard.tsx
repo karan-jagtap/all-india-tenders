@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Calendar, Building2, MapPin, Copy, Check, Download } from 'lucide-react';
 import { EnrichedCurrentTender } from '../../types';
 import { formatINR, getUrgencyBadge, formatDate } from '../../utils';
@@ -18,6 +19,7 @@ export const CurrentTenderCard: React.FC<CurrentTenderCardProps> = ({
   onCopyNit,
   copiedNit
 }) => {
+  const { t } = useTranslation();
   const sourceLabel = tender._sourceLabel;
   const todayStr = new Date().toISOString().split('T')[0];
   const isClosed = (tender.days_left !== undefined && tender.days_left <= 0) || (Boolean(tender.closing_date) && tender.closing_date < todayStr);
@@ -39,12 +41,12 @@ export const CurrentTenderCard: React.FC<CurrentTenderCardProps> = ({
           {isClosed ? (
             <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 dark:bg-amber-950/60 text-amber-900 dark:text-amber-300 border border-amber-300 dark:border-amber-800 flex items-center gap-1">
               <span className="w-1.5 h-1.5 rounded-full bg-amber-600" />
-              UNDER EVALUATION
+              {t('currentTenders.underEvaluation')}
             </span>
           ) : (
             <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 dark:bg-emerald-950/60 text-emerald-900 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800 flex items-center gap-1">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse" />
-              IN PROGRESS (OPEN)
+              {t('currentTenders.inProgressOpen')}
             </span>
           )}
           {getUrgencyBadge(tender.days_left, isClosed)}
@@ -57,7 +59,7 @@ export const CurrentTenderCard: React.FC<CurrentTenderCardProps> = ({
           >
             <Calendar className="w-3 h-3 text-slate-400 dark:text-slate-500 group-hover/date:text-orange-500" />
             <span className="border-b border-dotted border-slate-300 dark:border-slate-700 group-hover/date:border-orange-500">
-              {isClosed ? 'Closed:' : 'Closes:'} {formatDate(tender.closing_date)}
+              {isClosed ? t('common.closed') : t('common.closes')} {formatDate(tender.closing_date)}
             </span>
           </div>
 
@@ -70,38 +72,44 @@ export const CurrentTenderCard: React.FC<CurrentTenderCardProps> = ({
             <div className="flex items-center gap-1.5 pb-1.5 mb-1.5 border-b border-slate-800">
               <Calendar className="w-3.5 h-3.5 text-orange-400 shrink-0" />
               <span className="font-bold text-xs text-white">
-                {isClosed ? 'Bid Submission Closed' : 'Bid Submission Deadline'}
+                {isClosed
+                  ? t('currentTenders.bidSubmissionClosed')
+                  : t('currentTenders.bidSubmissionDeadline')}
               </span>
             </div>
 
             {/* Explanation of what the date is for */}
             <p className="text-slate-300 leading-relaxed">
               {isClosed
-                ? 'This date is the official bid submission cutoff that has elapsed. The tender is now under technical evaluation.'
-                : 'This date is the final deadline to submit commercial and technical bids online before the official portal closes.'}
+                ? t(
+                    'currentTenders.bidSubmissionClosedDesc'
+                  )
+                : t(
+                    'currentTenders.bidSubmissionOpenDesc'
+                  )}
             </p>
 
             {/* Key Schedule Timestamps */}
             <div className="mt-2 pt-2 border-t border-slate-800 space-y-1 font-mono text-[10px]">
               <div className="flex items-center justify-between">
-                <span className="text-slate-400">Closing Date:</span>
+                <span className="text-slate-400">{t('currentTenders.closingDateLabel')}</span>
                 <span className="text-amber-300 font-bold">{formatDate(tender.closing_date)}</span>
               </div>
               {tender.submission_deadline_time && (
                 <div className="flex items-center justify-between">
-                  <span className="text-slate-400">Cutoff Time:</span>
+                  <span className="text-slate-400">{t('currentTenders.cutoffTimeLabel')}</span>
                   <span className="text-slate-200 font-semibold">{tender.submission_deadline_time}</span>
                 </div>
               )}
               {tender.published_date && (
                 <div className="flex items-center justify-between">
-                  <span className="text-slate-400">Notice Published:</span>
+                  <span className="text-slate-400">{t('currentTenders.noticePublishedLabel')}</span>
                   <span className="text-slate-300">{formatDate(tender.published_date)}</span>
                 </div>
               )}
               {tender.opening_date && (
                 <div className="flex items-center justify-between">
-                  <span className="text-slate-400">Bid Opening:</span>
+                  <span className="text-slate-400">{t('currentTenders.bidOpeningLabel')}</span>
                   <span className="text-emerald-300">{formatDate(tender.opening_date)}</span>
                 </div>
               )}
@@ -123,12 +131,12 @@ export const CurrentTenderCard: React.FC<CurrentTenderCardProps> = ({
         </span>
         {tender.source_portal.includes('gem.gov.in') && (
           <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-amber-100 dark:bg-amber-950/60 text-amber-900 dark:text-amber-300 border border-amber-300 dark:border-amber-800 flex items-center gap-1 shadow-2xs">
-            ⚡ GeM Portal
+            {t('currentTenders.gemPortalBadge')}
           </span>
         )}
         {(tender.is_ogd_open_data || tender.source_portal.includes('data.gov.in')) && (
           <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-cyan-100 dark:bg-cyan-950/60 text-cyan-900 dark:text-cyan-300 border border-cyan-300 dark:border-cyan-800 flex items-center gap-1 shadow-2xs">
-            🏛️ data.gov.in (OGD)
+            {t('currentTenders.ogdBadge')}
           </span>
         )}
       </div>
@@ -156,23 +164,27 @@ export const CurrentTenderCard: React.FC<CurrentTenderCardProps> = ({
           {tender.category}
         </span>
         <span className="inline-flex items-center gap-1 bg-indigo-50 dark:bg-indigo-950/40 border border-indigo-200 dark:border-indigo-900/60 px-1.5 py-0.5 rounded text-[9px] text-indigo-700 dark:text-indigo-300 font-semibold">
-          📑 SBD & NIT Docs
+          {t('currentTenders.sbdNitDocs')}
         </span>
       </div>
 
       {/* Financial Metrics Row */}
       <div className="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-slate-800 text-[11px]">
         <div>
-          <span className="text-slate-400 dark:text-slate-500 block text-[10px]">Estimated Cost</span>
+          <span className="text-slate-400 dark:text-slate-500 block text-[10px]">
+            {t('currentTenders.estimatedCost')}
+          </span>
           <strong className="text-slate-900 dark:text-white font-bold font-mono">
-            {tender.estimated_cost_inr ? formatINR(tender.estimated_cost_inr) : 'Refer to NIT'}
+            {tender.estimated_cost_inr ? formatINR(tender.estimated_cost_inr) : t('currentTenders.referToNit')}
           </strong>
         </div>
 
         <div className="text-right">
-          <span className="text-slate-400 dark:text-slate-500 block text-[10px]">EMD Amount</span>
+          <span className="text-slate-400 dark:text-slate-500 block text-[10px]">
+            {t('currentTenders.emdAmount')}
+          </span>
           <span className="text-purple-700 dark:text-purple-400 font-bold font-mono">
-            {tender.emd_amount_inr ? formatINR(tender.emd_amount_inr) : 'Exempt / Nil'}
+            {tender.emd_amount_inr ? formatINR(tender.emd_amount_inr) : t('currentTenders.exemptNil')}
           </span>
         </div>
       </div>
@@ -181,12 +193,12 @@ export const CurrentTenderCard: React.FC<CurrentTenderCardProps> = ({
       <div className="mt-2 pt-1.5 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-[10px] text-slate-500 dark:text-slate-400 gap-1.5 flex-wrap">
         <span
           onClick={(e) => onCopyNit(tender.nit_number, e)}
-          title="Click to copy NIT Reference Number"
+          title={t('currentTenders.clickToCopyNit')}
           className="font-mono text-slate-500 dark:text-slate-400 hover:text-blue-700 dark:hover:text-blue-400 flex items-center gap-1 cursor-pointer bg-slate-50 dark:bg-slate-800 hover:bg-blue-50 dark:hover:bg-blue-950/50 px-1.5 py-0.5 rounded border border-slate-200 dark:border-slate-700 transition-colors"
         >
           {copiedNit === tender.nit_number ? (
             <span className="text-emerald-700 dark:text-emerald-400 font-bold flex items-center gap-0.5">
-              <Check className="w-2.5 h-2.5" /> Copied!
+              <Check className="w-2.5 h-2.5" /> {t('common.copied')}
             </span>
           ) : (
             <>
@@ -201,14 +213,14 @@ export const CurrentTenderCard: React.FC<CurrentTenderCardProps> = ({
             href={`/api/current-tenders/${tender.id}/tender-document`}
             download={`${tender.id}_Whole_Tender_Document_SBD.pdf`}
             onClick={(e) => e.stopPropagation()}
-            title="Download Whole 4-Page Standard Bidding Document (PDF)"
+            title={t('wholeTenderDoc.downloadSbdTitle')}
             className="px-2 py-0.5 rounded text-[10px] font-bold bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 dark:hover:bg-indigo-900/80 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 flex items-center gap-1 transition-colors shadow-2xs"
           >
             <Download className="w-2.5 h-2.5" />
-            <span>[RAG] Whole Doc</span>
+            <span>{t('currentTenders.wholeDoc')}</span>
           </a>
           <span className={isClosed ? "text-slate-500 dark:text-slate-400 font-medium" : "text-orange-700 dark:text-orange-400 font-medium"}>
-            {isClosed ? "Bids Closed" : "Bids Open"}
+            {isClosed ? t('currentTenders.bidsClosed') : t('currentTenders.bidsOpen')}
           </span>
         </div>
       </div>

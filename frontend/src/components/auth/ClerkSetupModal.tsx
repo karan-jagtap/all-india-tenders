@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { X, Key, ShieldCheck, Terminal, Copy, Check, ExternalLink } from 'lucide-react';
 
 export interface ClerkSetupModalProps {
@@ -7,6 +8,7 @@ export interface ClerkSetupModalProps {
 }
 
 export const ClerkSetupModal: React.FC<ClerkSetupModalProps> = ({ isOpen, onClose }) => {
+  const { t } = useTranslation();
   const [copiedCmd, setCopiedCmd] = useState<string | null>(null);
   const [customKey, setCustomKey] = useState<string>('');
   const [savedSuccess, setSavedSuccess] = useState<boolean>(false);
@@ -51,10 +53,10 @@ export const ClerkSetupModal: React.FC<ClerkSetupModalProps> = ({ isOpen, onClos
             </div>
             <div>
               <h3 className="text-base font-bold text-slate-900 dark:text-white leading-snug">
-                Clerk Authentication Setup
+                {t('clerkSetup.title')}
               </h3>
               <p className="text-xs text-slate-500 dark:text-slate-400">
-                Application: <code className="text-orange-600 dark:text-orange-400 font-mono text-[11px]">app_3MNQS7uCfXNbu5JrpHYdjnRRrzo</code>
+                {t('clerkSetup.appId', { appId: 'app_3MNQS7uCfXNbu5JrpHYdjnRRrzo' })}
               </p>
             </div>
           </div>
@@ -71,10 +73,10 @@ export const ClerkSetupModal: React.FC<ClerkSetupModalProps> = ({ isOpen, onClos
           <div className="bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800/60 rounded-xl p-3 text-amber-900 dark:text-amber-200 leading-relaxed">
             <p className="font-semibold text-xs flex items-center gap-1.5 mb-1">
               <ShieldCheck className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
-              <span>Connect Clerk to Unlock Live Sync & Protected Features</span>
+              <span>{t('clerkSetup.noticeTitle')}</span>
             </p>
             <p className="text-[11px] text-amber-800/90 dark:text-amber-300/80">
-              Your Clerk application ID is configured. To authenticate in this environment, pull your API keys from Clerk into <code className="font-mono font-bold">.env.local</code>.
+              {t('clerkSetup.noticeDesc')}
             </p>
           </div>
 
@@ -83,23 +85,23 @@ export const ClerkSetupModal: React.FC<ClerkSetupModalProps> = ({ isOpen, onClos
             <div className="flex items-center justify-between">
               <span className="font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
                 <Terminal className="w-3.5 h-3.5 text-orange-500" />
-                <span>Option A: Run in your terminal</span>
+                <span>{t('clerkSetup.optionA')}</span>
               </span>
               <button
                 onClick={() => handleCopy('npx clerk auth login && npx clerk link --app app_3MNQS7uCfXNbu5JrpHYdjnRRrzo && npx clerk env pull', 'full')}
                 className="text-[11px] text-orange-600 dark:text-orange-400 hover:underline flex items-center gap-1 font-semibold cursor-pointer"
               >
                 {copiedCmd === 'full' ? <Check className="w-3 h-3 text-emerald-500" /> : <Copy className="w-3 h-3" />}
-                <span>{copiedCmd === 'full' ? 'Copied' : 'Copy All'}</span>
+                <span>{copiedCmd === 'full' ? t('common.copied') : t('clerkSetup.copyAll')}</span>
               </button>
             </div>
             <div className="bg-slate-900 text-slate-200 p-3 rounded-xl font-mono text-[11px] space-y-1.5 border border-slate-800">
               <div className="flex items-center justify-between text-slate-400">
-                <span># 1. Log in to Clerk CLI</span>
+                <span>{t('clerkSetup.logInCli')}</span>
               </div>
               <p className="text-emerald-400 select-all">npx clerk auth login</p>
               <div className="flex items-center justify-between text-slate-400 pt-1">
-                <span># 2. Link & pull development keys</span>
+                <span>{t('clerkSetup.linkApp')}</span>
               </div>
               <p className="text-emerald-400 select-all">npx clerk link --app app_3MNQS7uCfXNbu5JrpHYdjnRRrzo</p>
               <p className="text-emerald-400 select-all">npx clerk env pull</p>
@@ -109,10 +111,10 @@ export const ClerkSetupModal: React.FC<ClerkSetupModalProps> = ({ isOpen, onClos
           {/* Option B: Enter Publishable Key Directly */}
           <div className="space-y-2 pt-1 border-t border-slate-200 dark:border-slate-800">
             <label className="font-bold text-slate-700 dark:text-slate-300 block">
-              Option B: Paste Publishable Key directly
+              {t('clerkSetup.optionB')}
             </label>
             <p className="text-[11px] text-slate-500 dark:text-slate-400">
-              Find your key under <span className="font-semibold text-slate-700 dark:text-slate-300">API Keys</span> in the Clerk Dashboard:
+              {t('clerkSetup.whereFindKey')}
             </p>
             <div className="flex gap-2">
               <input
@@ -127,7 +129,7 @@ export const ClerkSetupModal: React.FC<ClerkSetupModalProps> = ({ isOpen, onClos
                 disabled={!customKey.trim()}
                 className="px-4 py-2 bg-orange-600 hover:bg-orange-500 disabled:opacity-50 text-white font-bold text-xs rounded-lg cursor-pointer transition-all shrink-0"
               >
-                {savedSuccess ? 'Saved!' : 'Save & Reload'}
+                {savedSuccess ? t('clerkSetup.keySaved') : t('clerkSetup.saveReload')}
               </button>
             </div>
           </div>
@@ -141,14 +143,14 @@ export const ClerkSetupModal: React.FC<ClerkSetupModalProps> = ({ isOpen, onClos
             rel="noopener noreferrer"
             className="text-[11px] text-slate-500 dark:text-slate-400 hover:text-orange-500 flex items-center gap-1 transition-colors"
           >
-            <span>Open Clerk Dashboard</span>
+            <span>{t('clerkSetup.openDashboard')}</span>
             <ExternalLink className="w-3 h-3" />
           </a>
           <button
             onClick={onClose}
             className="px-4 py-1.5 rounded-lg text-xs font-semibold bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-700 transition-colors cursor-pointer"
           >
-            Close
+            {t('common.close')}
           </button>
         </div>
       </div>

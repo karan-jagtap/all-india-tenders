@@ -18,6 +18,7 @@ import {
   MapPin,
   Globe
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { EnrichedCurrentTender, SubTabType, CurrentTenderSubTab } from '../../types';
 import { formatINR, formatDate } from '../../utils';
 
@@ -49,6 +50,7 @@ export const CurrentTenderHeader: React.FC<CurrentTenderHeaderProps> = ({
   nitPdfUrl,
   boqUrl
 }) => {
+  const { t } = useTranslation();
   const todayStr = new Date().toISOString().split('T')[0];
   const isClosed = (selectedTender.days_left !== undefined && selectedTender.days_left <= 0) || (Boolean(selectedTender.closing_date) && selectedTender.closing_date < todayStr);
 
@@ -60,27 +62,27 @@ export const CurrentTenderHeader: React.FC<CurrentTenderHeaderProps> = ({
         {isClosed ? (
           <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-bold bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 border border-amber-300 dark:border-amber-800/60 shadow-2xs shrink-0">
             <span className="w-2 h-2 rounded-full bg-amber-600 inline-block" />
-            <span>UNDER EVALUATION • BIDS CLOSED</span>
+            <span>{t('currentTenders.underEvaluationBidsClosed')}</span>
           </span>
         ) : (
           <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-bold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800/60 shadow-2xs shrink-0">
             <span className="w-2 h-2 rounded-full bg-emerald-600 animate-ping inline-block" />
-            <span>IN PROGRESS • UNFILLED (OPEN)</span>
+            <span>{t('currentTenders.inProgressUnfilledOpen')}</span>
           </span>
         )}
 
         {/* Reference ID Pill */}
         <div className="inline-flex items-center gap-1.5 bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 px-2.5 py-1 rounded-md text-xs font-mono text-slate-700 dark:text-slate-300 whitespace-nowrap shrink-0">
-          <span className="text-slate-400 font-sans text-[11px] font-medium">Ref:</span>
+          <span className="text-slate-400 font-sans text-[11px] font-medium">{t('currentTenders.ref')}</span>
           <span className="font-semibold text-slate-900 dark:text-white">{selectedTender.nit_number}</span>
           <button
             onClick={(e) => onCopyNit(selectedTender.nit_number, e)}
-            title="Copy Tender Reference ID"
+            title={t('currentTenders.copyRefId')}
             className="hover:text-blue-700 dark:hover:text-blue-400 transition-colors p-0.5 rounded hover:bg-slate-200 dark:hover:bg-slate-700 cursor-pointer ml-0.5"
           >
             {copiedNit === selectedTender.nit_number ? (
               <span className="text-[10px] text-emerald-700 dark:text-emerald-400 font-bold flex items-center gap-0.5 font-sans">
-                <Check className="w-3 h-3" /> Copied!
+                <Check className="w-3 h-3" /> {t('common.copied')}
               </span>
             ) : (
               <Copy className="w-3 h-3 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200" />
@@ -97,14 +99,14 @@ export const CurrentTenderHeader: React.FC<CurrentTenderHeaderProps> = ({
         {/* OGD / data.gov.in Badge */}
         {(selectedTender.is_ogd_open_data || selectedTender.source_portal?.includes('data.gov.in')) && (
           <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[11px] font-bold bg-cyan-50 dark:bg-cyan-950/40 text-cyan-900 dark:text-cyan-300 border border-cyan-200 dark:border-cyan-900/50 shadow-2xs whitespace-nowrap shrink-0">
-            <span>🏛️ data.gov.in Feed • GODL</span>
+            <span>{t('currentTenders.dataGovInBadge')}</span>
           </span>
         )}
 
         {/* GeM Badge */}
         {selectedTender.source_portal?.includes('gem.gov.in') && (
           <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-[11px] font-bold bg-amber-50 dark:bg-amber-950/40 text-amber-900 dark:text-amber-300 border border-amber-200 dark:border-amber-900/50 shadow-2xs whitespace-nowrap shrink-0">
-            <span>⚡ Government e-Marketplace (GeM)</span>
+            <span>{t('currentTenders.gemBadge')}</span>
           </span>
         )}
       </div>
@@ -145,10 +147,10 @@ export const CurrentTenderHeader: React.FC<CurrentTenderHeaderProps> = ({
           <button
             onClick={onOpenWholeDoc}
             className="px-3.5 py-2 bg-gradient-to-r from-indigo-700 via-indigo-600 to-blue-700 hover:from-indigo-600 hover:to-blue-600 text-white rounded-lg text-xs font-bold flex items-center gap-1.5 shadow-xs transition-all cursor-pointer ring-1 ring-indigo-400/30"
-            title="Open Whole 4-Page Standard Bidding Document in interactive viewer"
+            title={t('currentTenders.openInteractiveViewer')}
           >
             <Eye className="w-3.5 h-3.5" />
-            <span>[RAG] View Whole Tender Doc</span>
+            <span>{t('currentTenders.viewWholeTenderDoc')}</span>
             <span className="text-[9px] bg-indigo-900/80 px-1.5 py-0.2 rounded font-mono">
               Interactive
             </span>
@@ -159,10 +161,10 @@ export const CurrentTenderHeader: React.FC<CurrentTenderHeaderProps> = ({
             href={sbdUrl}
             download={`${selectedTender.id}_Whole_Tender_Document_SBD.pdf`}
             className="px-3.5 py-2 bg-emerald-700 hover:bg-emerald-600 text-white rounded-lg text-xs font-bold flex items-center gap-1.5 shadow-xs transition-all"
-            title="Download Complete 4-Page Standard Bidding Document (SBD / RFP PDF)"
+            title={t('currentTenders.downloadWholeDocPdf')}
           >
             <Download className="w-3.5 h-3.5" />
-            <span>[RAG] Download Whole Doc</span>
+            <span>{t('currentTenders.downloadWholeDoc')}</span>
             <span className="text-[9px] bg-emerald-900/80 px-1 py-0.2 rounded font-mono">PDF</span>
           </a>
         </div>
@@ -173,10 +175,10 @@ export const CurrentTenderHeader: React.FC<CurrentTenderHeaderProps> = ({
             <button
               onClick={(e) => onOpenPortalBridge(selectedTender, e)}
               className="px-3 py-2 bg-blue-50 dark:bg-blue-950/40 hover:bg-blue-100 dark:hover:bg-blue-900/40 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-900/50 rounded-lg text-xs font-semibold flex items-center gap-1.5 shadow-2xs transition-all cursor-pointer"
-              title="Navigate to Exact Tender on Official Portal"
+              title={t('currentTenders.navigateToPortal')}
             >
               <ExternalLink className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
-              <span>Portal Bridge ↗</span>
+              <span>{t('currentTenders.portalBridgeBtn')}</span>
             </button>
           )}
 
@@ -185,10 +187,10 @@ export const CurrentTenderHeader: React.FC<CurrentTenderHeaderProps> = ({
             href={nitPdfUrl}
             download={`${selectedTender.id}_NIT_Notice.pdf`}
             className="px-3 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-semibold flex items-center gap-1.5 shadow-2xs transition-all"
-            title="Download Official Notice Inviting Tender (NIT Summary)"
+            title={t('currentTenders.downloadNitNotice')}
           >
             <FileText className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" />
-            <span>[RAG] NIT Notice</span>
+            <span>{t('currentTenders.nitNotice')}</span>
           </a>
 
           {/* Tertiary Action: BOQ Rate Schedule */}
@@ -196,10 +198,10 @@ export const CurrentTenderHeader: React.FC<CurrentTenderHeaderProps> = ({
             href={boqUrl}
             download={`${selectedTender.id}_Bill_of_Quantities_BOQ.csv`}
             className="px-3 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 rounded-lg text-xs font-semibold flex items-center gap-1.5 shadow-2xs transition-all"
-            title="Download Official Bill of Quantities (BOQ Rate Schedule)"
+            title={t('currentTenders.downloadBoqSchedule')}
           >
             <FileSpreadsheet className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" />
-            <span>[RAG] BOQ Schedule</span>
+            <span>{t('currentTenders.boqSchedule')}</span>
           </a>
         </div>
       </div>
@@ -208,10 +210,13 @@ export const CurrentTenderHeader: React.FC<CurrentTenderHeaderProps> = ({
       <div className="mt-3 p-3 bg-gradient-to-r from-emerald-50 via-teal-50 to-emerald-100/60 dark:from-emerald-950/30 dark:via-teal-950/20 dark:to-emerald-900/20 rounded-lg border border-emerald-300 dark:border-emerald-800/60 text-xs text-emerald-950 dark:text-emerald-200 flex items-start gap-2.5">
         <CheckCircle className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
         <div>
-          <span className="font-bold">Tender is actively in progress (Not Yet Filled / Unawarded):</span>
+          <span className="font-bold">{t('currentTenders.activeUnfilledBanner')}</span>
           <p className="text-[11px] text-emerald-900 dark:text-emerald-300 mt-0.5">
-            The procuring authority ({selectedTender.organization}) is actively inviting competitive bids until{' '}
-            <strong>{formatDate(selectedTender.closing_date)} at {selectedTender.submission_deadline_time}</strong>. Zero contracts have been finalized.
+            {t('currentTenders.activeUnfilledDesc',  {
+              org: selectedTender.organization,
+              date: formatDate(selectedTender.closing_date),
+              time: selectedTender.submission_deadline_time
+            })}
           </p>
         </div>
       </div>
@@ -222,25 +227,27 @@ export const CurrentTenderHeader: React.FC<CurrentTenderHeaderProps> = ({
           <Clock className="w-5 h-5 text-orange-600 dark:text-orange-400 shrink-0" />
           <div>
             <div className="font-bold text-orange-950 dark:text-orange-200 flex items-center gap-1.5">
-              <span>Bid Submission Deadline:</span>
+              <span>{t('currentTenders.bidSubmissionDeadline')}</span>
               <span className="font-mono text-rose-700 dark:text-rose-400">{formatDate(selectedTender.closing_date)} at {selectedTender.submission_deadline_time}</span>
             </div>
             <div className="text-[11px] text-orange-800 dark:text-orange-300">
               {isClosed ? (
                 <span className="text-slate-600 dark:text-slate-400 font-semibold">
-                  🔒 Bid submission deadline elapsed on {formatDate(selectedTender.closing_date)} • Technical & financial evaluation in progress.
+                  {t('currentTenders.deadlineElapsed',  { date: formatDate(selectedTender.closing_date) })}
                 </span>
               ) : selectedTender.days_left > 0 ? (
-                <span>⚡ Exactly <strong>{selectedTender.days_left} calendar days left</strong> before submission window closes.</span>
+                <span>
+                  {t('currentTenders.daysLeftNotice',  { count: selectedTender.days_left })}
+                </span>
               ) : (
-                <span className="text-rose-700 dark:text-rose-400 font-bold">Closing today! Final hours.</span>
+                <span className="text-rose-700 dark:text-rose-400 font-bold">{t('currentTenders.closingTodayNotice')}</span>
               )}
             </div>
           </div>
         </div>
 
         <div className="text-right shrink-0">
-          <span className="text-[10px] text-orange-700 dark:text-orange-400 uppercase font-semibold block">Procuring Entity</span>
+          <span className="text-[10px] text-orange-700 dark:text-orange-400 uppercase font-semibold block">{t('currentTenders.procuringEntity')}</span>
           <span className="font-bold text-slate-900 dark:text-white text-xs truncate max-w-[260px] block" title={selectedTender.organization}>
             {selectedTender.organization}
           </span>
@@ -250,31 +257,31 @@ export const CurrentTenderHeader: React.FC<CurrentTenderHeaderProps> = ({
       {/* Quick Parameters Strip */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 mt-3 pt-1 text-xs">
         <div className="bg-slate-50 dark:bg-slate-800/60 p-2.5 rounded-lg border border-slate-100 dark:border-slate-700/60">
-          <span className="text-[10px] text-slate-400 uppercase font-semibold block">Estimated Project Cost</span>
+          <span className="text-[10px] text-slate-400 uppercase font-semibold block">{t('currentTenders.estimatedProjectCost')}</span>
           <span className="font-bold text-slate-900 dark:text-white block font-mono">
-            {selectedTender.estimated_cost_inr ? formatINR(selectedTender.estimated_cost_inr) : 'Refer to Notice'}
+            {selectedTender.estimated_cost_inr ? formatINR(selectedTender.estimated_cost_inr) : t('currentTenders.referToNotice')}
           </span>
         </div>
 
         <div className="bg-slate-50 dark:bg-slate-800/60 p-2.5 rounded-lg border border-slate-100 dark:border-slate-700/60">
-          <span className="text-[10px] text-slate-400 uppercase font-semibold block">EMD Required</span>
+          <span className="text-[10px] text-slate-400 uppercase font-semibold block">{t('currentTenders.emdRequired')}</span>
           <span className="font-bold text-purple-700 dark:text-purple-400 block font-mono">
-            {selectedTender.emd_amount_inr ? formatINR(selectedTender.emd_amount_inr) : 'Exempt / GFR 170'}
+            {selectedTender.emd_amount_inr ? formatINR(selectedTender.emd_amount_inr) : t('currentTenders.exemptGfr170')}
           </span>
-          <span className="text-[9px] text-emerald-700 dark:text-emerald-400 font-semibold block mt-0.5">MSEs 100% Exempt</span>
+          <span className="text-[9px] text-emerald-700 dark:text-emerald-400 font-semibold block mt-0.5">{t('currentTenders.msesExempt')}</span>
         </div>
 
         <div className="bg-slate-50 dark:bg-slate-800/60 p-2.5 rounded-lg border border-slate-100 dark:border-slate-700/60">
-          <span className="text-[10px] text-slate-400 uppercase font-semibold block">Tender Document Fee</span>
+          <span className="text-[10px] text-slate-400 uppercase font-semibold block">{t('currentTenders.tenderDocumentFee')}</span>
           <span className="font-bold text-slate-800 dark:text-slate-200 block font-mono">
-            {selectedTender.tender_fee_inr ? formatINR(selectedTender.tender_fee_inr) : '₹ 0 (Free)'}
+            {selectedTender.tender_fee_inr ? formatINR(selectedTender.tender_fee_inr) : t('currentTenders.freeFee')}
           </span>
         </div>
 
         <div className="bg-slate-50 dark:bg-slate-800/60 p-2.5 rounded-lg border border-slate-100 dark:border-slate-700/60">
-          <span className="text-[10px] text-slate-400 uppercase font-semibold block">Performance Guarantee</span>
+          <span className="text-[10px] text-slate-400 uppercase font-semibold block">{t('currentTenders.performanceGuarantee')}</span>
           <span className="font-bold text-blue-700 dark:text-blue-400 block font-mono">
-            {selectedTender.pbg_pct ? `${selectedTender.pbg_pct}% PBG` : '3-5% PBG'}
+            {selectedTender.pbg_pct ? t('currentTenders.pbgFormat',  { pct: selectedTender.pbg_pct }) : t('currentTenders.pbgDefault')}
           </span>
         </div>
       </div>
@@ -290,7 +297,7 @@ export const CurrentTenderHeader: React.FC<CurrentTenderHeaderProps> = ({
           }`}
         >
           <FileText className="w-3.5 h-3.5" />
-          <span>1. Scope of Work & NIT Specs</span>
+          <span>{t('currentTenders.subtabs.specs')}</span>
         </button>
 
         <button
@@ -302,7 +309,7 @@ export const CurrentTenderHeader: React.FC<CurrentTenderHeaderProps> = ({
           }`}
         >
           <CheckCircle className="w-3.5 h-3.5" />
-          <span>2. Pre-Qualification Criteria (PQC)</span>
+          <span>{t('currentTenders.subtabs.pqc')}</span>
         </button>
 
         <button
@@ -314,7 +321,7 @@ export const CurrentTenderHeader: React.FC<CurrentTenderHeaderProps> = ({
           }`}
         >
           <ShieldAlert className="w-3.5 h-3.5" />
-          <span>3. GFR Rule 170 MSME Exemptions</span>
+          <span>{t('currentTenders.subtabs.msme')}</span>
         </button>
 
         <button
@@ -326,7 +333,7 @@ export const CurrentTenderHeader: React.FC<CurrentTenderHeaderProps> = ({
           }`}
         >
           <BookOpen className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
-          <span>[RAG] 4. Official Tender Documents (NIT, SBD & BOQ)</span>
+          <span>{t('currentTenders.subtabs.docs')}</span>
           <span className="px-1.5 py-0.2 rounded-full text-[9px] font-bold bg-indigo-600 dark:bg-indigo-500 text-white">
             3 Docs
           </span>
@@ -341,7 +348,7 @@ export const CurrentTenderHeader: React.FC<CurrentTenderHeaderProps> = ({
           }`}
         >
           <ServerOff className="w-3.5 h-3.5 text-orange-400" />
-          <span>5. Scraping & 0-DB Architecture</span>
+          <span>{t('currentTenders.subtabs.scraping')}</span>
         </button>
 
         <button
@@ -353,7 +360,7 @@ export const CurrentTenderHeader: React.FC<CurrentTenderHeaderProps> = ({
           }`}
         >
           <Zap className={`w-3.5 h-3.5 ${activeSubTab === 'prediction' ? 'text-amber-200' : 'text-amber-600 dark:text-amber-400'} animate-pulse`} />
-          <span>[RAG] 6. ⚡ Competitor Bids & L1 Prediction (AI Simulator)</span>
+          <span>{t('currentTenders.subtabs.prediction')}</span>
         </button>
 
         <button
@@ -365,7 +372,7 @@ export const CurrentTenderHeader: React.FC<CurrentTenderHeaderProps> = ({
           }`}
         >
           <Sparkles className={`w-3.5 h-3.5 ${activeSubTab === 'rag_analysis' ? 'text-indigo-200' : 'text-indigo-600 dark:text-indigo-400'} animate-pulse`} />
-          <span>[RAG] 7. 🔍 Deep Contract Clause Analysis & BOQ Cost Insights</span>
+          <span>{t('currentTenders.subtabs.rag')}</span>
         </button>
       </div>
     </div>

@@ -1,5 +1,12 @@
 import React, { useMemo } from "react";
-import { RefreshCw, Clock, ShieldAlert, Lock } from "lucide-react";
+import { useTranslation } from "react-i18next";
+import { RefreshCw, Clock, ShieldAlert, Lock, Zap, CheckCircle2 } from "lucide-react";
+import { UserQuotaInfo } from "../../types";
+import {
+  formatCooldownTime,
+  formatQuotaCountdown,
+  formatSyncTimestamp
+} from "../../utils/syncTime";
 
 export interface SyncLiveButtonProps {
   onClick: () => void;
@@ -8,19 +15,12 @@ export interface SyncLiveButtonProps {
   variant?: "header" | "drawer" | "section";
   className?: string;
   tooltipPlacement?: "bottom-right" | "top" | "bottom-left";
-  isLocked?: boolean;
+  isLocked?: boolean; // Auth lock: true when user is signed out
   onLockedClick?: () => void;
+  quotaInfo?: UserQuotaInfo | null;
+  userEmail?: string | null;
+  userName?: string | null;
 }
-
-export const formatCooldownTime = (totalSeconds: number): string => {
-  if (totalSeconds <= 0) return "0s";
-  const mins = Math.floor(totalSeconds / 60);
-  const secs = totalSeconds % 60;
-  if (mins > 0) {
-    return `${mins}m ${secs.toString().padStart(2, "0")}s`;
-  }
-  return `${secs}s`;
-};
 
 export const SyncLiveButton: React.FC<SyncLiveButtonProps> = ({
   onClick,
@@ -31,32 +31,76 @@ export const SyncLiveButton: React.FC<SyncLiveButtonProps> = ({
   tooltipPlacement,
   isLocked = false,
   onLockedClick,
+  quotaInfo,
+  userEmail,
+  userName,
 }) => {
-  const isInCooldown = cooldownRemaining > 0;
-  const isDisabled = !isLocked && (isSyncing || isInCooldown);
+  const { t } = useTranslation();
+  const isQuotaLocked = !isLocked && !!quotaInfo?.is_locked;
+  const isAnyLocked = isLocked || isQuotaLocked;
+  const isInCooldown = !isQuotaLocked && cooldownRemaining > 0;
+  const isDisabled = !isLocked && (isSyncing || isInCooldown || isQuotaLocked);
+
+  const syncsRemaining = quotaInfo?.syncs_remaining ?? 2;
+  const syncsUsed = quotaInfo?.syncs_used_24h ?? 0;
+  const quotaSeconds = quotaInfo?.next_sync_available_seconds ?? 0;
 
   // Placement defaults based on variant
   const placement =
     tooltipPlacement || (variant === "drawer" ? "top" : "bottom-right");
 
-  const formattedTime = useMemo(
+  const formattedCooldown = useMemo(
     () => formatCooldownTime(cooldownRemaining),
     [cooldownRemaining],
   );
 
-  // Native title attribute for universal accessibility & mobile tap-hold
+  const formattedQuotaCountdownStr = useMemo(
+    () => formatQuotaCountdown(quotaSeconds),
+    [quotaSeconds],
+  );
+
+  const formattedLastSync = useMemo(
+    () => formatSyncTimestamp(quotaInfo?.last_sync_at),
+    [quotaInfo?.last_sync_at],
+  );
+
+  // Native title attribute for accessibility
   const nativeTitle = useMemo(() => {
     if (isLocked) {
-      return "Please log in to use this feature (Sync Live Tenders)";
+      return t('sync.nativeTitleLoggedOut');
+    }
+    if (isQuotaLocked) {
+      return t('sync.nativeTitleLimitReached', {
+        time: formattedQuotaCountdownStr,
+        defaultValue: `Daily sync limit reached (2/2 used within 24h). Next sync available in ${formattedQuotaCountdownStr}.`
+      });
     }
     if (isSyncing) {
-      return "Syncing live notices across 28+ government portals in progress (~2 seconds remaining).";
+      return t('sync.nativeTitleSyncing');
     }
     if (isInCooldown) {
-      return `Sync disabled: 5-minute safety cooldown active to protect statutory portals (GeM, CPPP, IREPS) from rapid requests. Available again in ${formattedTime}.`;
+      return t('sync.nativeTitleCooldown', {
+        time: formattedCooldown,
+        remaining: syncsRemaining,
+        total: 2,
+        defaultValue: `Sync disabled: 5-minute safety cooldown active. Available again in ${formattedCooldown}. (${syncsRemaining} of 2 syncs remaining)`
+      });
     }
-    return "Runs live scraper sync across all 28+ government portals (Automated daily at 4:00 AM IST)";
-  }, [isLocked, isSyncing, isInCooldown, formattedTime]);
+    return t('sync.nativeTitleReady', {
+      remaining: syncsRemaining,
+      total: 2,
+      defaultValue: `Runs live scraper sync across all 28+ government portals. Daily Quota: ${syncsRemaining} of 2 syncs remaining.`
+    });
+  }, [
+    isLocked,
+    isQuotaLocked,
+    isSyncing,
+    isInCooldown,
+    formattedCooldown,
+    formattedQuotaCountdownStr,
+    syncsRemaining,
+    t
+  ]);
 
   const tooltipPositionClass = useMemo(() => {
     switch (placement) {
@@ -82,6 +126,17 @@ export const SyncLiveButton: React.FC<SyncLiveButtonProps> = ({
     } else if (variant === "section") {
       buttonClasses =
         "px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-800 dark:bg-slate-800 text-slate-200 hover:text-white border border-amber-500/40 flex items-center gap-1.5 transition-all cursor-pointer shadow-2xs";
+    }
+  } else if (isQuotaLocked) {
+    if (variant === "header") {
+      buttonClasses =
+        "px-2.5 sm:px-3.5 py-2 bg-slate-800/95 text-amber-300 border border-amber-500/50 font-bold text-xs rounded-lg flex items-center gap-1.5 cursor-not-allowed shadow-xs opacity-90";
+    } else if (variant === "drawer") {
+      buttonClasses =
+        "w-full py-2.5 px-3 bg-slate-800/95 text-amber-300 border border-amber-500/50 font-bold text-xs rounded-xl flex items-center justify-center gap-2 cursor-not-allowed shadow-xs opacity-90";
+    } else if (variant === "section") {
+      buttonClasses =
+        "px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-800 text-amber-300 border border-amber-500/50 flex items-center gap-1.5 cursor-not-allowed shadow-2xs opacity-90";
     }
   } else if (variant === "header") {
     buttonClasses = isDisabled
@@ -121,66 +176,86 @@ export const SyncLiveButton: React.FC<SyncLiveButtonProps> = ({
       >
         {isSyncing ? (
           <RefreshCw className="w-3.5 h-3.5 animate-spin text-emerald-400 shrink-0" />
+        ) : isQuotaLocked ? (
+          <Clock className="w-3.5 h-3.5 text-amber-400 shrink-0" />
         ) : isInCooldown ? (
           <Clock className="w-3.5 h-3.5 text-amber-400 shrink-0" />
         ) : (
           <RefreshCw className="w-3.5 h-3.5 shrink-0" />
         )}
 
-        {/* Header Button Label with Lock Icon next to text */}
+        {/* Header Button Label */}
         {variant === "header" && (
           <div className="flex items-center gap-1.5">
             <span className="hidden xs:inline">
               {isSyncing
-                ? "Syncing..."
-                : isInCooldown
-                  ? `Sync (${formattedTime})`
-                  : "Sync Live"}
+                ? t('sync.syncing')
+                : isQuotaLocked
+                  ? t('sync.syncLimitReached')
+                  : isInCooldown
+                    ? `${t('sync.sync')} (${formattedCooldown})`
+                    : t('sync.syncLive')}
             </span>
             <span className="xs:hidden">
-              {isSyncing ? "..." : isInCooldown ? formattedTime : "Sync"}
+              {isSyncing
+                ? "..."
+                : isQuotaLocked
+                  ? t('sync.locked')
+                  : isInCooldown
+                    ? formattedCooldown
+                    : t('sync.sync')}
             </span>
-            {isLocked && (
+            {isAnyLocked && (
               <Lock className="w-3.5 h-3.5 text-amber-400 shrink-0" />
             )}
           </div>
         )}
 
-        {/* Drawer Button Label with Lock Icon next to text */}
+        {/* Drawer Button Label */}
         {variant === "drawer" && (
           <div className="flex items-center gap-2 justify-center">
             <span>
               {isSyncing
-                ? "Syncing Real Portals..."
-                : isInCooldown
-                  ? `Sync Available in ${formattedTime}`
-                  : "Sync Live Notices"}
+                ? t('sync.syncRealPortals')
+                : isQuotaLocked
+                  ? t('sync.dailyLimitReached')
+                  : isInCooldown
+                    ? t('sync.syncAvailableIn', { time: formattedCooldown, defaultValue: `Sync Available in ${formattedCooldown}` })
+                    : t('sync.syncLiveNotices')}
             </span>
-            {isLocked && <Lock className="w-4 h-4 text-amber-400 shrink-0" />}
+            {isAnyLocked && <Lock className="w-4 h-4 text-amber-400 shrink-0" />}
           </div>
         )}
 
-        {/* Section Button Label with Lock Icon next to text */}
+        {/* Section Button Label */}
         {variant === "section" && (
           <div className="flex items-center gap-1.5">
             <span className="hidden sm:inline">
               {isSyncing
-                ? "Scraping Live..."
-                : isInCooldown
-                  ? `Sync Cooldown (${formattedTime})`
-                  : "Sync Live Scraper"}
+                ? t('sync.scrapingLive')
+                : isQuotaLocked
+                  ? t('sync.syncLimitReached')
+                  : isInCooldown
+                    ? `${t('sync.sync')} (${formattedCooldown})`
+                    : t('sync.syncLiveScraper')}
             </span>
             <span className="sm:hidden">
-              {isSyncing ? "..." : isInCooldown ? formattedTime : "Sync"}
+              {isSyncing
+                ? "..."
+                : isQuotaLocked
+                  ? t('sync.locked')
+                  : isInCooldown
+                    ? formattedCooldown
+                    : t('sync.sync')}
             </span>
-            {isLocked && (
+            {isAnyLocked && (
               <Lock className="w-3.5 h-3.5 text-amber-400 shrink-0" />
             )}
           </div>
         )}
       </button>
 
-      {/* Floating Tooltip Hover Card: Explicitly tells the user to log in */}
+      {/* 1. Floating Tooltip Hover Card: Unauthenticated (Logged Out) */}
       {isLocked && (
         <div
           role="tooltip"
@@ -189,74 +264,193 @@ export const SyncLiveButton: React.FC<SyncLiveButtonProps> = ({
           <div className="flex items-center gap-2 mb-1.5 pb-1.5 border-b border-slate-800">
             <Lock className="w-4 h-4 text-amber-400 shrink-0" />
             <span className="font-bold text-xs text-amber-300">
-              Please log in to use this feature
+              {t('sync.loginPromptTitle')}
             </span>
           </div>
           <div className="space-y-1.5 text-[11px] leading-relaxed text-slate-300">
             <p>
-              Live synchronization across all 28+ government procurement portals
-              (GeM, CPPP, IREPS) requires user sign-in.
+              {t('sync.loginPromptDesc1')}
             </p>
             <p className="text-slate-400">
-              Please log in or create an account before you can trigger a live
-              synchronization.
+              {t('sync.loginPromptDesc2')}
             </p>
           </div>
           <div className="mt-2.5 pt-2 border-t border-slate-800 flex items-center justify-between text-[11px]">
             <span className="text-amber-400 font-semibold flex items-center gap-1">
-              Click to Log In →
+              {t('sync.clickToLogIn')}
             </span>
             <span className="font-mono text-[10px] text-slate-400 bg-slate-800 px-1.5 py-0.5 rounded">
-              Login Required
+              {t('sync.loginRequiredBadge')}
             </span>
           </div>
         </div>
       )}
 
-      {/* Floating Tooltip Hover Card: Explains WHY it's disabled and TILL HOW LONG (when not locked) */}
-      {!isLocked && isDisabled && (
+      {/* 2. Floating Tooltip Hover Card: Authenticated but Quota Limit Reached (2/2 in 24h) */}
+      {isQuotaLocked && (
         <div
           role="tooltip"
-          className={`absolute ${tooltipPositionClass} w-72 sm:w-80 p-3 bg-slate-900/95 dark:bg-slate-950/95 text-slate-100 rounded-xl shadow-2xl border border-slate-700/90 backdrop-blur-md opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 pointer-events-none z-50`}
+          className={`absolute ${tooltipPositionClass} w-80 sm:w-88 p-3.5 bg-slate-900/98 dark:bg-[#0c101a]/98 text-slate-100 rounded-xl shadow-2xl border border-amber-500/60 backdrop-blur-md opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 pointer-events-none z-50`}
         >
-          {/* Header with icon and status title */}
+          <div className="flex items-center justify-between gap-2 mb-2 pb-1.5 border-b border-slate-800">
+            <div className="flex items-center gap-1.5">
+              <Lock className="w-4 h-4 text-amber-400 shrink-0" />
+              <span className="font-bold text-xs text-amber-300">
+                {t('sync.limitReachedTitle')}
+              </span>
+            </div>
+            <span className="font-mono text-[10px] text-amber-300 bg-amber-950/80 border border-amber-800/80 px-1.5 py-0.5 rounded">
+              {t('sync.lockActiveBadge')}
+            </span>
+          </div>
+
+          {(userEmail || userName) && (
+            <div className="text-[10px] text-slate-300 bg-slate-800/60 rounded px-2 py-1 mb-2 border border-slate-700/50 flex items-center justify-between">
+              <span className="text-slate-400">{t('sync.accountLabel')}</span>
+              <span className="font-medium text-slate-200 truncate max-w-[190px]">
+                {userEmail || userName}
+              </span>
+            </div>
+          )}
+
+          <div className="space-y-1.5 text-[11px] leading-relaxed text-slate-300">
+            <p>
+              {t('sync.limitExplanation')}
+            </p>
+            <p className="text-slate-400">
+              {t('sync.lockDurationExplanation')}
+            </p>
+          </div>
+
+          <div className="mt-2.5 p-2 bg-amber-950/40 border border-amber-500/40 rounded-lg space-y-1.5">
+            <div className="flex items-center justify-between text-[11px]">
+              <span className="text-slate-300 flex items-center gap-1 font-medium">
+                <Clock className="w-3.5 h-3.5 text-amber-400 animate-pulse shrink-0" />
+                <span>{t('sync.nextSyncAvailableIn')}</span>
+              </span>
+              <span className="font-mono font-black text-amber-300 bg-slate-900 border border-amber-500/50 px-2 py-0.5 rounded text-[11px] tracking-wide">
+                {formattedQuotaCountdownStr}
+              </span>
+            </div>
+            {formattedLastSync && (
+              <div className="text-[10px] text-slate-400 flex items-center justify-between pt-1 border-t border-amber-900/40">
+                <span>{t('sync.lastSyncRecorded')}</span>
+                <span className="text-slate-300 font-mono">{formattedLastSync}</span>
+              </div>
+            )}
+          </div>
+
+          <div className="mt-2 pt-2 border-t border-slate-800/80 flex items-center justify-between text-[10px] text-slate-400">
+            <span>{t('nav.automatedCronFooter')}</span>
+            <span className="font-mono text-amber-400/90 font-semibold">
+              {t('sync.usedCount', { used: syncsUsed, total: quotaInfo?.sync_limit ?? 2, defaultValue: `${syncsUsed} of ${quotaInfo?.sync_limit ?? 2} used` })}
+            </span>
+          </div>
+        </div>
+      )}
+
+      {/* 3. Floating Tooltip Hover Card: In-Progress or 5-Min Cooldown */}
+      {!isAnyLocked && isDisabled && (
+        <div
+          role="tooltip"
+          className={`absolute ${tooltipPositionClass} w-76 sm:w-80 p-3 bg-slate-900/95 dark:bg-slate-950/95 text-slate-100 rounded-xl shadow-2xl border border-slate-700/90 backdrop-blur-md opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 pointer-events-none z-50`}
+        >
           <div className="flex items-center gap-2 mb-1.5 pb-1.5 border-b border-slate-800">
             {isSyncing ? (
               <>
                 <RefreshCw className="w-4 h-4 text-emerald-400 animate-spin shrink-0" />
                 <span className="font-bold text-xs text-emerald-300">
-                  Sync In Progress
+                  {t('sync.syncInProgressTitle')}
                 </span>
               </>
             ) : (
               <>
                 <ShieldAlert className="w-4 h-4 text-amber-400 shrink-0" />
                 <span className="font-bold text-xs text-amber-300">
-                  5-Minute Safety Cooldown
+                  {t('sync.cooldownTitle')}
                 </span>
               </>
             )}
           </div>
 
-          {/* Explanation: Why it is disabled */}
           <div className="space-y-1.5 text-[11px] leading-relaxed text-slate-300">
             <p>
-              <strong className="text-white">Why is this disabled?</strong>{" "}
+              <strong className="text-white">{t('sync.whyDisabled')}</strong>{" "}
               {isSyncing
-                ? "A live scrape is actively ingesting notices across 28+ statutory government portals (GeM, CPPP, IREPS)."
-                : "To prevent rapid scraping requests or IP blocks from official government portals (GeM, CPPP, IREPS). All users share the same updated database."}
+                ? t('sync.whyDisabledSyncing')
+                : t('sync.whyDisabledCooldown')}
             </p>
           </div>
 
-          {/* Countdown: Till how long */}
-          <div className="mt-2.5 pt-2 border-t border-slate-800 flex items-center justify-between text-[11px]">
-            <span className="text-slate-400 flex items-center gap-1 font-medium">
-              <Clock className="w-3.5 h-3.5 text-slate-400" />
-              <span>Available again:</span>
+          <div className="mt-2.5 pt-2 border-t border-slate-800 space-y-1 text-[11px]">
+            <div className="flex items-center justify-between">
+              <span className="text-slate-400 flex items-center gap-1 font-medium">
+                <Clock className="w-3.5 h-3.5 text-slate-400" />
+                <span>{t('sync.availableAgain')}</span>
+              </span>
+              <span className="font-mono font-bold text-amber-300 bg-amber-950/80 border border-amber-800/80 px-2 py-0.5 rounded text-[11px]">
+                {isSyncing ? t('sync.inTwoSeconds') : `In ${formattedCooldown}`}
+              </span>
+            </div>
+            <div className="flex items-center justify-between text-[10px] text-slate-400 pt-1">
+              <span>{t('sync.dailyQuotaLabel')}</span>
+              <span className="text-emerald-400 font-medium">
+                {t('sync.remainingWindow', { remaining: syncsRemaining, total: 2, defaultValue: `${syncsRemaining} of 2 syncs remaining (24h window)` })}
+              </span>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 4. Floating Tooltip Hover Card: Authenticated & Ready to Sync */}
+      {!isAnyLocked && !isDisabled && (
+        <div
+          role="tooltip"
+          className={`absolute ${tooltipPositionClass} w-76 sm:w-80 p-3 bg-slate-900/95 dark:bg-slate-950/95 text-slate-100 rounded-xl shadow-2xl border border-emerald-500/40 backdrop-blur-md opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 pointer-events-none z-50`}
+        >
+          <div className="flex items-center justify-between gap-2 mb-1.5 pb-1.5 border-b border-slate-800">
+            <div className="flex items-center gap-1.5">
+              <Zap className="w-4 h-4 text-emerald-400 shrink-0" />
+              <span className="font-bold text-xs text-emerald-300">
+                {t('sync.livePortalSyncTitle')}
+              </span>
+            </div>
+            <span className="font-mono text-[10px] text-emerald-300 bg-emerald-950/80 border border-emerald-800/80 px-1.5 py-0.5 rounded">
+              {t('sync.readyBadge')}
             </span>
-            <span className="font-mono font-bold text-amber-300 bg-amber-950/80 border border-amber-800/80 px-2 py-0.5 rounded text-[11px]">
-              {isSyncing ? "In ~2 seconds" : `In ${formattedTime}`}
-            </span>
+          </div>
+
+          {(userEmail || userName) && (
+            <div className="text-[10px] text-slate-300 bg-slate-800/60 rounded px-2 py-1 mb-2 border border-slate-700/50 flex items-center justify-between">
+              <span className="text-slate-400">{t('sync.signedInLabel')}</span>
+              <span className="font-medium text-slate-200 truncate max-w-[190px]">
+                {userEmail || userName}
+              </span>
+            </div>
+          )}
+
+          <div className="space-y-1.5 text-[11px] leading-relaxed text-slate-300">
+            <p>
+              {t('sync.whyDisabledSyncing')}
+            </p>
+          </div>
+
+          <div className="mt-2.5 pt-2 border-t border-slate-800 space-y-1 text-[11px]">
+            <div className="flex items-center justify-between">
+              <span className="text-slate-300 flex items-center gap-1 font-medium">
+                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                <span>{t('sync.dailyQuotaLabel')}</span>
+              </span>
+              <span className="font-mono font-bold text-emerald-300 bg-emerald-950/80 border border-emerald-800/80 px-2 py-0.5 rounded text-[11px]">
+                {t('sync.remainingCount', { remaining: syncsRemaining, total: 2, defaultValue: `${syncsRemaining} of 2 syncs remaining` })}
+              </span>
+            </div>
+            {formattedLastSync && (
+              <div className="text-[10px] text-slate-400 flex items-center justify-between pt-1">
+                <span>{t('sync.lastSyncLabel')}</span>
+                <span className="text-slate-300 font-mono">{formattedLastSync}</span>
+              </div>
+            )}
           </div>
         </div>
       )}

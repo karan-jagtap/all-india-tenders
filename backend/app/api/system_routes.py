@@ -14,7 +14,12 @@ from app.services.current_tenders_service import (
 from app.services.accepted_tenders_service import ACCEPTED_TENDERS_CATALOG
 from app.services.bidders_service import ALL_BIDDERS_CATALOG
 from app.services.db_sync_service import sync_scraped_data_to_db
-from app.services.cron_scheduler_service import run_statutory_sources_sync, get_cron_status, get_sync_logs
+from app.services.cron_scheduler_service import (
+    run_statutory_sources_sync,
+    get_cron_status,
+    get_sync_logs,
+    get_user_sync_quota
+)
 from app.db.session import IS_POSTGRES, DATABASE_URL
 
 router = APIRouter(tags=["System & Platform"])
@@ -42,6 +47,25 @@ async def health_check():
     }
 
 
+@router.get("/scraper/user-quota")
+@router.get("/system/user-sync-quota")
+async def get_user_quota_endpoint(
+    user_id: str = Query(..., description="Clerk User ID of signed-in user")
+):
+    """
+    Returns user sync quota status (limit: 2 syncs per 24 hours),
+    remaining syncs, lock status, and time until next sync is available.
+    """
+    quota_info = await get_user_sync_quota(user_id=user_id)
+    return JSONResponse(
+        content=quota_info,
+        headers={
+            "Cache-Control": "no-cache, no-store, must-revalidate",
+            "Pragma": "no-cache"
+        }
+    )
+
+
 @router.post("/scraper/scrape-live")
 @router.post("/cron/trigger")
 @router.post("/cron/sync")
@@ -49,10 +73,47 @@ async def trigger_live_scrape(request: Request = None):
     """
     Runs the official scraper synchronization job immediately (same job scheduled daily at 4:00 AM IST).
     Upserts scraped notices into persistent database and synchronizes the in-memory streaming catalog.
+    Enforces 2 syncs per 24 hours limit per signed-in user.
     """
     client_ip = request.client.host if (request and request.client) else "web"
-    report = await run_statutory_sources_sync(trigger_type="MANUAL_BUTTON", initiated_by=f"Manual UI ({client_ip})")
+    user_id = None
+    user_email = None
+    user_name = None
+
+    if request:
+        try:
+            body = await request.json()
+            if isinstance(body, dict):
+                user_id = body.get("user_id")
+                user_email = body.get("user_email")
+                user_name = body.get("user_name")
+        except Exception:
+            pass
+
+        if not user_id:
+            user_id = request.query_params.get("user_id")
+            user_email = request.query_params.get("user_email") or user_email
+            user_name = request.query_params.get("user_name") or user_name
+
+    initiated_by = (
+        f"{user_name} ({user_email})" if (user_name and user_email)
+        else (f"{user_email}" if user_email else (f"User {user_id}" if user_id else f"Manual UI ({client_ip})"))
+    )
+
+    report = await run_statutory_sources_sync(
+        trigger_type="MANUAL_BUTTON",
+        initiated_by=initiated_by,
+        user_id=user_id,
+        user_email=user_email,
+        user_name=user_name
+    )
+
+    status_code = 200
+    if report.get("status") == "quota_exceeded":
+        status_code = 429
+
     return JSONResponse(
+        status_code=status_code,
         content=report,
         headers={
             "Cache-Control": "no-cache, no-store, must-revalidate",
@@ -97,6 +158,21 @@ async def get_overview_stats():
     """
     Returns platform statistics across live and awarded procurement records.
     """
+    active_count = len(ALL_CURRENT_TENDERS)
+    try:
+        import os, sqlite3
+        db_p = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "data", "all_india_tenders.db"))
+        if os.path.exists(db_p):
+            conn = sqlite3.connect(db_p)
+            c = conn.cursor()
+            c.execute("SELECT COUNT(*) FROM tenders")
+            row = c.fetchone()
+            if row and row[0] > 0:
+                active_count = row[0]
+            conn.close()
+    except Exception:
+        pass
+
     portals = set()
     total_active_val = 0.0
     for t in ALL_CURRENT_TENDERS:
@@ -108,7 +184,7 @@ async def get_overview_stats():
 
     cron_info = get_cron_status()
     return {
-        "active_tenders_count": len(ALL_CURRENT_TENDERS),
+        "active_tenders_count": active_count,
         "accepted_tenders_count": len(ACCEPTED_TENDERS_CATALOG),
         "registered_bidders_count": len(ALL_BIDDERS_CATALOG),
         "database_engine": "PostgreSQL 16 (pgvector)" if IS_POSTGRES else "SQLite (aiosqlite)",

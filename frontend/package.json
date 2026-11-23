@@ -14,9 +14,11 @@
     "@clerk/react": "^6.19.3",
     "@clerk/themes": "^2.4.57",
     "clsx": "^2.1.1",
+    "i18next": "^27.2.4",
     "lucide-react": "^0.363.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-i18next": "^18.0.3",
     "tailwind-merge": "^2.2.2"
   },
   "devDependencies": {

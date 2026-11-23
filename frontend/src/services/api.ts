@@ -8,7 +8,8 @@ import {
   CurrentTender,
   PlatformStats,
   RegisteredBidder,
-  ScrapeReport
+  ScrapeReport,
+  UserQuotaInfo
 } from '../types';
 
 export * from '../types';
@@ -387,7 +388,7 @@ export async function getPlatformStats(): Promise<PlatformStats> {
   }
 
   return {
-    active_tenders_count: 3293,
+    active_tenders_count: 112261,
     accepted_tenders_count: 5224,
     registered_bidders_count: 103,
     database_required: true,
@@ -405,16 +406,176 @@ export async function getPlatformStats(): Promise<PlatformStats> {
   };
 }
 
-export async function triggerLiveScrape(): Promise<ScrapeReport> {
+function getClientSideUserQuota(userId: string): UserQuotaInfo {
+  const key = `ait_sync_timestamps_${userId}`;
+  let timestamps: number[] = [];
   try {
-    const res = await fetch(`${API_BASE}/scraper/scrape-live`, {
-      method: 'POST'
+    const raw = localStorage.getItem(key);
+    if (raw) timestamps = JSON.parse(raw);
+  } catch {
+    timestamps = [];
+  }
+
+  const now = Date.now();
+  const cutoff24h = now - 24 * 3600 * 1000;
+  timestamps = timestamps.filter((t) => typeof t === 'number' && t >= cutoff24h).sort((a, b) => a - b);
+  try {
+    localStorage.setItem(key, JSON.stringify(timestamps));
+  } catch {
+    // Ignore storage errors
+  }
+
+  const syncsUsed = timestamps.length;
+  const lastSyncTime = syncsUsed > 0 ? timestamps[timestamps.length - 1] : null;
+
+  if (syncsUsed >= 2 && lastSyncTime) {
+    const unlockTime = lastSyncTime + 24 * 3600 * 1000;
+    const remainingSeconds = Math.max(0, Math.ceil((unlockTime - now) / 1000));
+    const isLocked = remainingSeconds > 0;
+    const hrs = Math.floor(remainingSeconds / 3600);
+    const mins = Math.floor((remainingSeconds % 3600) / 60);
+    const secs = remainingSeconds % 60;
+    const timeFormatted = hrs > 0 ? `${hrs}h ${mins}m ${secs}s` : (mins > 0 ? `${mins}m ${secs}s` : `${secs}s`);
+
+    return {
+      user_id: userId,
+      sync_limit: 2,
+      syncs_used_24h: syncsUsed,
+      syncs_remaining: isLocked ? 0 : 2,
+      is_locked: isLocked,
+      next_sync_available_seconds: remainingSeconds,
+      next_sync_available_formatted: isLocked ? timeFormatted : 'Available now',
+      next_sync_available_at: new Date(unlockTime).toISOString(),
+      last_sync_at: new Date(lastSyncTime).toISOString()
+    };
+  }
+
+  return {
+    user_id: userId,
+    sync_limit: 2,
+    syncs_used_24h: syncsUsed,
+    syncs_remaining: Math.max(0, 2 - syncsUsed),
+    is_locked: false,
+    next_sync_available_seconds: 0,
+    next_sync_available_formatted: 'Available now',
+    next_sync_available_at: null,
+    last_sync_at: lastSyncTime ? new Date(lastSyncTime).toISOString() : null
+  };
+}
+
+export async function getUserSyncQuota(userId?: string | null): Promise<UserQuotaInfo> {
+  if (!userId) {
+    return {
+      user_id: null,
+      sync_limit: 2,
+      syncs_used_24h: 0,
+      syncs_remaining: 2,
+      is_locked: false,
+      next_sync_available_seconds: 0,
+      next_sync_available_formatted: 'Available now',
+      next_sync_available_at: null,
+      last_sync_at: null
+    };
+  }
+
+  try {
+    const res = await fetch(`${API_BASE}/scraper/user-quota?user_id=${encodeURIComponent(userId)}&_t=${Date.now()}`, {
+      cache: 'no-store',
+      headers: {
+        'Cache-Control': 'no-cache',
+        'Pragma': 'no-cache'
+      }
     });
     if (res.ok) {
-      return await res.json();
+      const data: UserQuotaInfo = await res.json();
+      return data;
+    }
+  } catch {
+    // Backend unreachable, fallback to client-side localStorage
+  }
+
+  return getClientSideUserQuota(userId);
+}
+
+export async function triggerLiveScrape(user?: { id?: string; email?: string; name?: string }): Promise<ScrapeReport> {
+  const payload = {
+    user_id: user?.id,
+    user_email: user?.email,
+    user_name: user?.name
+  };
+
+  try {
+    const res = await fetch(`${API_BASE}/scraper/scrape-live`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Cache-Control': 'no-cache'
+      },
+      body: JSON.stringify(payload)
+    });
+
+    const data = await res.json();
+    if (res.ok || res.status === 429) {
+      if (user?.id) {
+        // Also sync local storage for client fallback
+        if (data.status === 'success') {
+          const key = `ait_sync_timestamps_${user.id}`;
+          let timestamps: number[] = [];
+          try {
+            const raw = localStorage.getItem(key);
+            if (raw) timestamps = JSON.parse(raw);
+          } catch {}
+          timestamps.push(Date.now());
+          try {
+            localStorage.setItem(key, JSON.stringify(timestamps));
+          } catch {}
+        }
+      }
+      return data;
     }
   } catch {
     // Fallback response for serverless demo
+  }
+
+  // Client-side fallback if backend API is offline
+  if (user?.id) {
+    const quota = getClientSideUserQuota(user.id);
+    if (quota.is_locked) {
+      return {
+        status: 'quota_exceeded',
+        message: `Daily sync limit reached (2 of 2 syncs used within 24 hours). Next live sync available in ${quota.next_sync_available_formatted}.`,
+        total_in_progress_tenders: 2688,
+        execution_time_ms: 10,
+        portals_scraped: [],
+        timestamp: new Date().toISOString(),
+        user_quota: quota
+      };
+    }
+
+    // Record new sync timestamp
+    const key = `ait_sync_timestamps_${user.id}`;
+    let timestamps: number[] = [];
+    try {
+      const raw = localStorage.getItem(key);
+      if (raw) timestamps = JSON.parse(raw);
+    } catch {}
+    timestamps.push(Date.now());
+    try {
+      localStorage.setItem(key, JSON.stringify(timestamps));
+    } catch {}
+
+    const updatedQuota = getClientSideUserQuota(user.id);
+    return {
+      status: 'success',
+      message: 'Live scraper sync completed across all monitored portals.',
+      database_used: false,
+      database_note: 'Operating in pure memory streaming mode.',
+      total_in_progress_tenders: 2688,
+      execution_time_ms: 412,
+      portals_scraped: [],
+      timestamp: new Date().toISOString(),
+      user_quota: updatedQuota
+    };
   }
 
   return {

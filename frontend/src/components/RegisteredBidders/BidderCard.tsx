@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { MapPin } from 'lucide-react';
 import { RegisteredBidder } from '../../types';
 import { formatCr } from '../../utils';
@@ -14,6 +15,8 @@ export const BidderCard: React.FC<BidderCardProps> = ({
   isSelected,
   onSelect
 }) => {
+  const { t } = useTranslation();
+
   return (
     <div
       onClick={onSelect}
@@ -28,7 +31,7 @@ export const BidderCard: React.FC<BidderCardProps> = ({
           {bidder.pqc_clearance_rating || 'Super Class-I National'}
         </span>
         <span className="text-[11px] font-semibold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/50 px-2 py-0.5 rounded border border-emerald-200 dark:border-emerald-800">
-          {bidder.total_contracts_won} Won Contracts
+          {t('bidders.card.wonContracts', { count: bidder.total_contracts_won })}
         </span>
       </div>
 
@@ -44,13 +47,13 @@ export const BidderCard: React.FC<BidderCardProps> = ({
       {/* Financials Strip */}
       <div className="grid grid-cols-2 gap-2 pt-2.5 mt-2 border-t border-slate-100 dark:border-slate-800 text-xs">
         <div>
-          <span className="text-slate-400 dark:text-slate-500 block text-[10px]">Total Awarded</span>
+          <span className="text-slate-400 dark:text-slate-500 block text-[10px]">{t('bidders.card.totalAwarded')}</span>
           <strong className="text-slate-900 dark:text-white font-bold font-mono">
             {formatCr(bidder.total_awarded_value_inr)}
           </strong>
         </div>
         <div>
-          <span className="text-slate-400 dark:text-slate-500 block text-[10px]">Audited Turnover</span>
+          <span className="text-slate-400 dark:text-slate-500 block text-[10px]">{t('bidders.card.auditedTurnover')}</span>
           <strong className="text-purple-700 dark:text-purple-400 font-bold font-mono">
             {formatCr(bidder.audited_turnover_inr)}
           </strong>
@@ -60,13 +63,13 @@ export const BidderCard: React.FC<BidderCardProps> = ({
       {/* Financial Standing & Win Rate */}
       <div className="grid grid-cols-2 gap-2 pt-2 mt-1 border-t border-slate-100 dark:border-slate-800 text-[10px]">
         <div>
-          <span className="text-slate-400 dark:text-slate-500 block">Credit Rating</span>
+          <span className="text-slate-400 dark:text-slate-500 block">{t('bidders.card.creditRating')}</span>
           <span className="font-bold text-blue-700 dark:text-blue-400 truncate block" title={bidder.credit_rating}>
             {bidder.credit_rating?.split('(')[0]?.trim() || 'CRISIL AAA'}
           </span>
         </div>
         <div>
-          <span className="text-slate-400 dark:text-slate-500 block">Win Rate / Book</span>
+          <span className="text-slate-400 dark:text-slate-500 block">{t('bidders.card.winRateBook')}</span>
           <span className="font-bold text-emerald-700 dark:text-emerald-400 block font-mono">
             {bidder.win_rate_pct || 68}% • {formatCr(bidder.unexecuted_order_book_inr)}
           </span>
@@ -80,11 +83,11 @@ export const BidderCard: React.FC<BidderCardProps> = ({
         </span>
         {bidder.categories[1] && (
           <span className="text-[9px] bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 px-2 py-0.5 rounded">
-            +{bidder.categories.length - 1} more
+            {t('bidders.plusMore', { count: bidder.categories.length - 1 })}
           </span>
         )}
         <span className="text-[9px] bg-emerald-50 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 px-2 py-0.5 rounded border border-emerald-200 dark:border-emerald-800 font-medium ml-auto">
-          Make in India {bidder.local_content_pct}%
+          {t('bidders.card.makeInIndia', { pct: bidder.local_content_pct })}
         </span>
       </div>
     </div>

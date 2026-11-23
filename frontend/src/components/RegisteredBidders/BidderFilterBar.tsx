@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   FilterSearchBar,
   TopFilterActionBar,
@@ -35,6 +36,8 @@ export const BidderFilterBar: React.FC<BidderFilterBarProps> = ({
   totalBidders,
   chips
 }) => {
+  const { t } = useTranslation();
+
   return (
     <div className="bg-white dark:bg-[#0E1422] border border-slate-200/90 dark:border-slate-800 rounded-xl p-3 shadow-xs space-y-2.5 transition-colors">
       {/* Clean Single Row Toolbar: Search on LEFT, Filters & Reload on RIGHT */}
@@ -43,7 +46,7 @@ export const BidderFilterBar: React.FC<BidderFilterBarProps> = ({
         <FilterSearchBar
           searchQuery={searchQuery}
           setSearchQuery={setSearchQuery}
-          placeholder="Search registered contractors, CIN, GSTIN, PAN, city, authority..."
+          placeholder={t('bidders.searchPlaceholder')}
           isVoiceSearching={isVoiceSearching}
           toggleVoiceSearch={toggleVoiceSearch}
           accentColor="blue"
@@ -59,7 +62,7 @@ export const BidderFilterBar: React.FC<BidderFilterBarProps> = ({
           onReload={onReload}
           isLoading={isLoading}
           totalCount={totalBidders}
-          reloadLabel="Reload"
+          reloadLabel={t('common.reload')}
           accentColor="blue"
         />
       </div>

@@ -1,5 +1,5 @@
 import React from 'react';
-import { PlatformStats, NavigableTab } from '../../types';
+import { PlatformStats, NavigableTab, UserQuotaInfo } from '../../types';
 import {
   HomeHeroSection,
   HomeMetricsBar,
@@ -15,6 +15,9 @@ export interface HomeScreenProps {
   onTriggerSync: () => void;
   isSyncing: boolean;
   cooldownRemaining?: number;
+  quotaInfo?: UserQuotaInfo | null;
+  userEmail?: string | null;
+  userName?: string | null;
 }
 
 export const HomeScreen: React.FC<HomeScreenProps> = ({
@@ -22,9 +25,12 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
   onNavigate,
   onTriggerSync,
   isSyncing,
-  cooldownRemaining = 0
+  cooldownRemaining = 0,
+  quotaInfo,
+  userEmail,
+  userName
 }) => {
-  const activeTenders = stats?.active_tenders_count || 2718;
+  const activeTenders = stats?.active_tenders_count || 112261;
   const acceptedTenders = stats?.accepted_tenders_count || 4393;
   const biddersCount = stats?.registered_bidders_count || 87;
   const totalValueCr = stats?.total_active_procurement_value_inr
@@ -68,6 +74,9 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
         onTriggerSync={onTriggerSync}
         isSyncing={isSyncing}
         cooldownRemaining={cooldownRemaining}
+        quotaInfo={quotaInfo}
+        userEmail={userEmail}
+        userName={userName}
       />
 
       {/* 5. Bottom Call to Action Banner */}

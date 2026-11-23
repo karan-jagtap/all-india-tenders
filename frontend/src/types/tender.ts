@@ -152,6 +152,50 @@ export interface AcceptedTender {
   };
 }
 
+export interface EnrichedAcceptedTender extends AcceptedTender {
+  _source: string;
+  _sourceLabel: string;
+  _category: string;
+  _org: string;
+  _state: string;
+  _city: string;
+  _searchBlob: string;
+}
+
+export interface EvaluatedBidder {
+  rank: any;
+  isWinner: boolean;
+  name: string;
+  hq: string;
+  contractorClass: string;
+  quotedAmountInr: number;
+  quotedDiscountPct: number;
+  varianceVsEstimatePct: number;
+  marginOverL1Inr: number;
+  marginOverL1Pct: number;
+  techScore: number;
+  cover1Status: any;
+  cover2Status: any;
+  isDisqualified: boolean;
+  emdStatus: string;
+  statusBadge: string;
+  statusBadgeColor: any;
+  evaluationSummary: string;
+  equipmentDeclared: string;
+  turnoverCited: string;
+}
+
+export interface OrgItem {
+  name: string;
+  type: string;
+  state: string;
+  city: string;
+  portal: string;
+  activeCount: number;
+  acceptedCount: number;
+  totalEstimatedInr: number;
+}
+
 export interface BidderWonContract {
   tender_id: string;
   title: string;
@@ -211,6 +255,20 @@ export interface ScrapedPortalStatus {
   bidding_status: string;
 }
 
+export interface UserQuotaInfo {
+  user_id: string | null;
+  sync_limit: number;
+  syncs_used_24h: number;
+  syncs_remaining: number;
+  is_locked: boolean;
+  next_sync_available_seconds: number;
+  next_sync_available_formatted?: string;
+  next_sync_available_at?: string | null;
+  last_sync_at?: string | null;
+  last_user_name?: string | null;
+  last_user_email?: string | null;
+}
+
 export interface ScrapeReport {
   status: string;
   message?: string;
@@ -224,6 +282,7 @@ export interface ScrapeReport {
   trigger_type?: string;
   cooldown_remaining_seconds?: number;
   cooldown_total_seconds?: number;
+  user_quota?: UserQuotaInfo;
 }
 
 export interface PlatformStats {

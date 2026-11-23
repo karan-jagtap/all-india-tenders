@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   X,
   Building2,
@@ -14,23 +15,9 @@ import {
   Landmark
 } from 'lucide-react';
 import allOrgsData from '../data/all_organizations.json';
+import { OrgDirectoryItem as OrgItem, OrganizationsDirectoryModalProps as Props } from '../types';
 
-interface OrgItem {
-  authority: string;
-  portal: string;
-  category: string;
-  accepted_count: number;
-  current_count: number;
-  sector: string;
-  state: string;
-}
-
-interface Props {
-  isOpen: boolean;
-  onClose: () => void;
-  onSelectOrg?: (orgName: string) => void;
-  initialSector?: string;
-}
+export type { OrgItem, Props };
 
 export const OrganizationsDirectoryModal: React.FC<Props> = ({
   isOpen,
@@ -38,6 +25,7 @@ export const OrganizationsDirectoryModal: React.FC<Props> = ({
   onSelectOrg,
   initialSector = 'ALL'
 }) => {
+  const { t } = useTranslation();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedSector, setSelectedSector] = useState<string>(initialSector);
 
@@ -64,15 +52,15 @@ export const OrganizationsDirectoryModal: React.FC<Props> = ({
     return Array.from(map.values()).sort((a, b) => b.awardedTenders - a.awardedTenders);
   }, [orgs]);
 
-  const sectors = [
-    { id: 'ALL', label: 'All Organizations', count: orgs.length, icon: Landmark },
-    { id: 'Central Infra & Works', label: 'Central Infra & Works', count: orgs.filter((o) => o.sector === 'Central Infra & Works').length, icon: Building2 },
-    { id: 'Railways & Metros', label: 'Railways & Metros', count: orgs.filter((o) => o.sector === 'Railways & Metros').length, icon: Train },
-    { id: 'PSUs & Energy', label: 'PSUs & Energy', count: orgs.filter((o) => o.sector === 'PSUs & Energy').length, icon: Zap },
-    { id: 'Defense & Paramilitary', label: 'Defense & Security', count: orgs.filter((o) => o.sector === 'Defense & Paramilitary').length, icon: Shield },
-    { id: 'State Governments & Local Bodies', label: '19 States & Local Bodies', count: orgs.filter((o) => o.sector === 'State Governments & Local Bodies').length, icon: MapPin },
-    { id: 'PORTALS', label: '25 Statutory Portals', count: statutoryPortals.length, icon: Globe }
-  ];
+  const sectors = useMemo(() => [
+    { id: 'ALL', label: t('orgDirectory.allOrganizations'), count: orgs.length, icon: Landmark },
+    { id: 'Central Infra & Works', label: t('orgDirectory.sectorCentral'), count: orgs.filter((o) => o.sector === 'Central Infra & Works').length, icon: Building2 },
+    { id: 'Railways & Metros', label: t('orgDirectory.sectorRailways'), count: orgs.filter((o) => o.sector === 'Railways & Metros').length, icon: Train },
+    { id: 'PSUs & Energy', label: t('orgDirectory.sectorPsus'), count: orgs.filter((o) => o.sector === 'PSUs & Energy').length, icon: Zap },
+    { id: 'Defense & Paramilitary', label: t('orgDirectory.sectorDefense'), count: orgs.filter((o) => o.sector === 'Defense & Paramilitary').length, icon: Shield },
+    { id: 'State Governments & Local Bodies', label: t('orgDirectory.sectorStates'), count: orgs.filter((o) => o.sector === 'State Governments & Local Bodies').length, icon: MapPin },
+    { id: 'PORTALS', label: t('orgDirectory.statutoryPortals'), count: statutoryPortals.length, icon: Globe }
+  ], [orgs, statutoryPortals, t]);
 
   const filteredOrgs = useMemo(() => {
     const q = searchQuery.toLowerCase().trim();
@@ -110,19 +98,19 @@ export const OrganizationsDirectoryModal: React.FC<Props> = ({
             <div className="flex items-center gap-2 mb-1">
               <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-wider uppercase bg-orange-500 text-white flex items-center gap-1 shadow-xs">
                 <Globe className="w-3.5 h-3.5" />
-                Pan-India Sourcing Directory
+                {t('orgDirectory.badge')}
               </span>
-              <span className="text-xs text-slate-400 font-mono">100% Statutory Public Feeds</span>
+              <span className="text-xs text-slate-400 font-mono">{t('orgDirectory.statutoryFeeds')}</span>
             </div>
             <h2 className="text-base sm:text-lg font-bold text-white tracking-tight flex items-center gap-2">
-              All 123 Sourced Indian Authorities & 25 Statutory Portals
+              {t('orgDirectory.headerTitle')}
             </h2>
           </div>
 
           <button
             onClick={onClose}
             className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer"
-            aria-label="Close modal"
+            aria-label={t('common.close')}
           >
             <X className="w-5 h-5" />
           </button>
@@ -133,26 +121,26 @@ export const OrganizationsDirectoryModal: React.FC<Props> = ({
           <div className="flex items-center gap-4 flex-wrap">
             <div className="flex items-center gap-1.5 font-medium text-slate-700 dark:text-slate-300">
               <Building2 className="w-4 h-4 text-orange-600 dark:text-orange-400" />
-              <span><strong>123</strong> Government Organizations</span>
+              <span>{t('orgDirectory.govOrgs', { count: 123 })}</span>
             </div>
             <span className="text-slate-300 dark:text-slate-700">•</span>
             <div className="flex items-center gap-1.5 font-medium text-slate-700 dark:text-slate-300">
               <Globe className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-              <span><strong>25</strong> National & State Portals</span>
+              <span>{t('orgDirectory.nationalPortals', { count: 25 })}</span>
             </div>
             <span className="text-slate-300 dark:text-slate-700">•</span>
             <div className="flex items-center gap-1.5 font-medium text-slate-700 dark:text-slate-300">
               <Award className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-              <span><strong>4,350+</strong> Awarded Contracts</span>
+              <span>{t('orgDirectory.awardedContractsCount', { count: '4,350+' })}</span>
             </div>
             <span className="text-slate-300 dark:text-slate-700">•</span>
             <div className="flex items-center gap-1.5 font-medium text-slate-700 dark:text-slate-300">
               <Radio className="w-4 h-4 text-orange-500 dark:text-orange-400" />
-              <span><strong>2,718</strong> Live In-Progress Notices</span>
+              <span>{t('orgDirectory.liveNoticesCount', { count: '2,718' })}</span>
             </div>
           </div>
 
-          <span className="text-[11px] text-slate-500 dark:text-slate-400 font-mono">Enterprise Persistent DB • In-Memory Stream</span>
+          <span className="text-[11px] text-slate-500 dark:text-slate-400 font-mono">{t('orgDirectory.dbStreamBadge')}</span>
         </div>
 
         {/* Search & Sector Filters */}
@@ -163,7 +151,7 @@ export const OrganizationsDirectoryModal: React.FC<Props> = ({
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search by organization name (NHAI, CPWD, BHEL, DMRC, MahaPWD...), state, or portal..."
+              placeholder={t('orgDirectory.searchPlaceholder')}
               className="w-full pl-10 pr-4 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs sm:text-sm text-slate-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-orange-500 focus:bg-white dark:focus:bg-slate-900 transition-all shadow-inner"
             />
             {searchQuery && (
@@ -171,7 +159,7 @@ export const OrganizationsDirectoryModal: React.FC<Props> = ({
                 onClick={() => setSearchQuery('')}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 font-bold"
               >
-                Clear
+                {t('common.clear')}
               </button>
             )}
           </div>
@@ -223,7 +211,7 @@ export const OrganizationsDirectoryModal: React.FC<Props> = ({
                       <div className="flex items-center justify-between mb-2">
                         <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-50 dark:bg-blue-950/40 text-blue-800 dark:text-blue-300 border border-blue-200 dark:border-blue-900/50 flex items-center gap-1">
                           <Globe className="w-3 h-3 text-blue-600 dark:text-blue-400" />
-                          200 OK Active Feed
+                          {t('orgDirectory.activeFeed')}
                         </span>
                         <span className="text-[10px] text-slate-400 font-mono">#{idx + 1}</span>
                       </div>
@@ -234,14 +222,14 @@ export const OrganizationsDirectoryModal: React.FC<Props> = ({
 
                     <div className="pt-2.5 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs text-slate-600 dark:text-slate-400">
                       <div>
-                        <span className="text-[10px] text-slate-400 block font-medium">Executing Bodies</span>
-                        <strong className="text-slate-800 dark:text-slate-200">{p.orgsCount} Orgs</strong>
+                        <span className="text-[10px] text-slate-400 block font-medium">{t('orgDirectory.executingBodies')}</span>
+                        <strong className="text-slate-800 dark:text-slate-200">{t('orgDirectory.orgsCount', { count: p.orgsCount })}</strong>
                       </div>
                       <div className="text-right">
-                        <span className="text-[10px] text-slate-400 block font-medium">Tenders Catalog</span>
-                        <span className="text-emerald-700 dark:text-emerald-400 font-bold">{p.awardedTenders} Awarded</span>
+                        <span className="text-[10px] text-slate-400 block font-medium">{t('orgDirectory.tendersCatalog')}</span>
+                        <span className="text-emerald-700 dark:text-emerald-400 font-bold">{p.awardedTenders} {t('common.awarded')}</span>
                         <span className="text-slate-300 dark:text-slate-700 mx-1">•</span>
-                        <span className="text-orange-600 dark:text-orange-400 font-bold">{p.activeTenders} Live</span>
+                        <span className="text-orange-600 dark:text-orange-400 font-bold">{p.activeTenders} {t('common.active')}</span>
                       </div>
                     </div>
                   </div>
@@ -282,17 +270,17 @@ export const OrganizationsDirectoryModal: React.FC<Props> = ({
 
                     <div className="pt-2.5 border-t border-slate-100 dark:border-slate-800">
                       <div className="text-[10px] text-slate-500 dark:text-slate-400 mb-2 truncate" title={o.portal}>
-                        <span className="font-semibold text-slate-700 dark:text-slate-300">Source: </span>
+                        <span className="font-semibold text-slate-700 dark:text-slate-300">{t('orgDirectory.sourceLabel')} </span>
                         {portalShort}
                       </div>
 
                       <div className="flex items-center justify-between text-xs pt-1">
                         <div className="flex items-center gap-2">
                           <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
-                            {o.accepted_count} Awarded
+                            {o.accepted_count} {t('common.awarded')}
                           </span>
                           <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-orange-50 dark:bg-orange-950/40 text-orange-900 dark:text-orange-300 border border-orange-200 dark:border-orange-800">
-                            {o.current_count} Live
+                            {o.current_count} {t('common.active')}
                           </span>
                         </div>
 
@@ -304,7 +292,7 @@ export const OrganizationsDirectoryModal: React.FC<Props> = ({
                             }}
                             className="text-[11px] font-semibold text-orange-600 dark:text-orange-400 hover:text-orange-700 dark:hover:text-orange-300 hover:underline cursor-pointer"
                           >
-                            Filter Tenders →
+                            {t('orgDirectory.filterTenders')}
                           </button>
                         )}
                       </div>
@@ -318,7 +306,7 @@ export const OrganizationsDirectoryModal: React.FC<Props> = ({
           {filteredOrgs.length === 0 && selectedSector !== 'PORTALS' && (
             <div className="text-center py-12 text-slate-400 text-xs">
               <Building2 className="w-8 h-8 mx-auto mb-2 text-slate-300 dark:text-slate-600" />
-              <span>No organizations found matching "{searchQuery}"</span>
+              <span>{t('orgDirectory.noOrgsMatching', { query: searchQuery })}</span>
             </div>
           )}
         </div>
@@ -326,14 +314,14 @@ export const OrganizationsDirectoryModal: React.FC<Props> = ({
         {/* Footer */}
         <div className="bg-white dark:bg-[#0E1422] border-t border-slate-200 dark:border-slate-800 px-5 sm:px-7 py-3 flex items-center justify-between text-xs shrink-0">
           <span className="text-slate-500 dark:text-slate-400 text-[11px]">
-            National Public Procurement Catalog • Unified Portal Framework (CPPP, GeM, IREPS, MoD & 19 States)
+            {t('orgDirectory.footerNotice')}
           </span>
 
           <button
             onClick={onClose}
             className="px-4 py-1.5 bg-slate-900 dark:bg-slate-800 hover:bg-slate-800 dark:hover:bg-slate-700 text-white rounded-lg font-semibold text-xs transition-colors cursor-pointer"
           >
-            Close Directory
+            {t('orgDirectory.closeDirectory')}
           </button>
         </div>
       </div>

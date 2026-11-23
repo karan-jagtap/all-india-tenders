@@ -9,6 +9,7 @@ import {
   CheckCircle,
   ChevronRight
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { QUICK_PORTAL_PILLS } from '../../constants';
 import { FilterAccentColor } from '../../types';
 import { DropdownOption } from './SearchableDropdown';
@@ -67,8 +68,8 @@ export interface TenderFilterDrawerProps {
 export const TenderFilterDrawer: React.FC<TenderFilterDrawerProps> = ({
   isOpen,
   onClose,
-  title = 'Tender Filters',
-  subtitle = 'Refine procurement notices by authority, portal, sector, and location',
+  title,
+  subtitle,
   accentColor = 'orange',
   activeFiltersCount,
   hasActiveFilters,
@@ -101,6 +102,9 @@ export const TenderFilterDrawer: React.FC<TenderFilterDrawerProps> = ({
   contextCityCount,
   extraFilters
 }) => {
+  const { t } = useTranslation();
+  const effectiveTitle = title || t('common.filters');
+  const effectiveSubtitle = subtitle || t('currentTenders.filterDrawerSubtitle');
   // Close on Escape key
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -282,14 +286,14 @@ export const TenderFilterDrawer: React.FC<TenderFilterDrawerProps> = ({
               </div>
               <div>
                 <h3 className="text-sm font-bold text-white flex items-center gap-2">
-                  <span>{title}</span>
+                  <span>{effectiveTitle}</span>
                   {activeFiltersCount > 0 && (
                     <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${getHeaderBadgeClass()}`}>
-                      {activeFiltersCount} Active
+                      {activeFiltersCount} {t('common.active')}
                     </span>
                   )}
                 </h3>
-                <p className="text-[11px] text-slate-400">{subtitle}</p>
+                <p className="text-[11px] text-slate-400">{effectiveSubtitle}</p>
               </div>
             </div>
 
@@ -300,14 +304,14 @@ export const TenderFilterDrawer: React.FC<TenderFilterDrawerProps> = ({
                   onClick={resetAllFilters}
                   className={`text-xs font-semibold px-2 py-1 rounded hover:bg-slate-800 transition-colors cursor-pointer ${getResetBtnClass()}`}
                 >
-                  Reset All
+                  {t('common.resetAll')}
                 </button>
               )}
               <button
                 type="button"
                 onClick={onClose}
                 className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer"
-                title="Close filter drawer (Esc)"
+                title={t('common.closeFilterDrawer')}
               >
                 <X className="w-5 h-5" />
               </button>
@@ -321,19 +325,19 @@ export const TenderFilterDrawer: React.FC<TenderFilterDrawerProps> = ({
               <div className="flex items-center justify-between">
                 <label className="text-xs font-bold text-white flex items-center gap-1.5">
                   <Tag className="w-3.5 h-3.5 text-emerald-400" />
-                  <span>Work Category / Sector</span>
+                  <span>{t('common.workCategorySector')}</span>
                 </label>
                 <span className="text-[10px] text-emerald-400 font-mono bg-emerald-950/60 border border-emerald-800/60 px-1.5 py-0.5 rounded">
-                  {availableCategories.length} Categories
+                  {t('common.categoriesCount',  { count: availableCategories.length })}
                 </span>
               </div>
               <MultiSelectDropdown
                 values={normCategories}
                 onChange={setSelectedCategory}
                 options={categoryOptions}
-                allOptionLabel="All Work Categories"
+                allOptionLabel={t('common.allWorkCategories')}
                 allOptionCount={contextCategoryCount}
-                placeholder="Search category or sector..."
+                placeholder={t('common.searchCategory')}
                 icon={<Tag className="w-3.5 h-3.5 text-emerald-400" />}
                 accentColor="emerald"
               />
@@ -344,19 +348,19 @@ export const TenderFilterDrawer: React.FC<TenderFilterDrawerProps> = ({
               <div className="flex items-center justify-between">
                 <label className="text-xs font-bold text-white flex items-center gap-1.5">
                   <Globe className="w-3.5 h-3.5 text-orange-400" />
-                  <span>Procurement Portal (Source)</span>
+                  <span>{t('common.procurementPortalSource')}</span>
                 </label>
                 <span className="text-[10px] text-orange-400 font-mono bg-orange-950/60 border border-orange-800/60 px-1.5 py-0.5 rounded">
-                  {availableSources.length} Portals
+                  {t('common.portalsCount',  { count: availableSources.length })}
                 </span>
               </div>
               <MultiSelectDropdown
                 values={normSources}
                 onChange={setSelectedSource}
                 options={sourceOptions}
-                allOptionLabel="All Procurement Portals"
+                allOptionLabel={t('common.allProcurementPortals')}
                 allOptionCount={contextSourceCount}
-                placeholder="Search portal name or acronym..."
+                placeholder={t('common.searchPortal')}
                 icon={<Globe className="w-3.5 h-3.5 text-orange-400" />}
                 accentColor="orange"
               />
@@ -388,19 +392,19 @@ export const TenderFilterDrawer: React.FC<TenderFilterDrawerProps> = ({
               <div className="flex items-center justify-between">
                 <label className="text-xs font-bold text-slate-200 flex items-center gap-1.5">
                   <Building2 className="w-3.5 h-3.5 text-blue-400" />
-                  <span>Procuring Organisation / Ministry</span>
+                  <span>{t('common.procuringOrgMinistry')}</span>
                 </label>
                 <span className="text-[10px] text-blue-400 font-mono bg-blue-950/60 border border-blue-800/60 px-1.5 py-0.5 rounded">
-                  {availableOrgs.length} Orgs
+                  {t('common.orgsCount',  { count: availableOrgs.length })}
                 </span>
               </div>
               <MultiSelectDropdown
                 values={normOrgs}
                 onChange={setSelectedOrg}
                 options={orgOptions}
-                allOptionLabel="All Organizations"
+                allOptionLabel={t('common.allOrganizations')}
                 allOptionCount={contextOrgCount}
-                placeholder="Search authority, PSU, ministry, municipal body..."
+                placeholder={t('common.searchOrg')}
                 icon={<Building2 className="w-3.5 h-3.5 text-blue-400" />}
                 accentColor="blue"
               />
@@ -413,10 +417,10 @@ export const TenderFilterDrawer: React.FC<TenderFilterDrawerProps> = ({
                 <div className="flex items-center justify-between">
                   <label className="text-xs font-bold text-slate-200 flex items-center gap-1.5">
                     <MapPin className="w-3.5 h-3.5 text-rose-400" />
-                    <span>State / Union Territory</span>
+                    <span>{t('common.stateUnionTerritory')}</span>
                   </label>
                   <span className="text-[10px] text-rose-400 font-mono bg-rose-950/60 border border-rose-800/60 px-1.5 py-0.5 rounded">
-                    {availableStates.length} States
+                    {t('common.statesCount',  { count: availableStates.length })}
                   </span>
                 </div>
                 <MultiSelectDropdown
@@ -426,9 +430,9 @@ export const TenderFilterDrawer: React.FC<TenderFilterDrawerProps> = ({
                     setSelectedCity(['ALL']);
                   }}
                   options={stateOptions}
-                  allOptionLabel="All States & UTs"
+                  allOptionLabel={t('common.allStates')}
                   allOptionCount={contextStateCount}
-                  placeholder="Search Indian State or UT..."
+                  placeholder={t('common.searchState')}
                   icon={<MapPin className="w-3.5 h-3.5 text-rose-400" />}
                   accentColor="rose"
                 />
@@ -439,10 +443,10 @@ export const TenderFilterDrawer: React.FC<TenderFilterDrawerProps> = ({
                 <div className="flex items-center justify-between">
                   <label className="text-xs font-bold text-slate-300 flex items-center gap-1.5">
                     <MapPin className="w-3.5 h-3.5 text-slate-400" />
-                    <span>City / District</span>
+                    <span>{t('common.cityDistrict')}</span>
                   </label>
                   <span className="text-[10px] text-slate-400 font-mono bg-slate-800 px-1.5 py-0.5 rounded">
-                    {availableCities.length} Cities
+                    {t('common.citiesCount',  { count: availableCities.length })}
                   </span>
                 </div>
                 <MultiSelectDropdown
@@ -451,13 +455,13 @@ export const TenderFilterDrawer: React.FC<TenderFilterDrawerProps> = ({
                   options={cityOptions}
                   allOptionLabel={
                     normStates.length === 1 && normStates[0] !== 'ALL'
-                      ? `All Cities in ${normStates[0]}`
+                      ? t('common.allCitiesInState',  { state: normStates[0] })
                       : normStates.length > 1 && !normStates.includes('ALL')
-                      ? `All Cities in (${normStates.length} States)`
-                      : 'All Cities'
+                      ? t('common.allCitiesInStates',  { count: normStates.length })
+                      : t('common.allCities')
                   }
                   allOptionCount={contextCityCount}
-                  placeholder="Search city or district..."
+                  placeholder={t('common.searchCity')}
                   icon={<MapPin className="w-3.5 h-3.5 text-slate-400" />}
                   accentColor="amber"
                 />
@@ -471,8 +475,8 @@ export const TenderFilterDrawer: React.FC<TenderFilterDrawerProps> = ({
           {/* Drawer Footer */}
           <div className="p-4 sm:p-5 border-t border-slate-800 bg-slate-900/95 flex items-center justify-between gap-3 sticky bottom-0 z-20">
             <div className="text-xs text-slate-400">
-              Matching:{' '}
-              <span className="font-bold text-white font-mono">{totalFilteredCount}</span> notices
+              {t('common.matching')}{' '}
+              <span className="font-bold text-white font-mono">{totalFilteredCount}</span> {t('common.notices')}
             </div>
 
             <div className="flex items-center gap-2">
@@ -481,7 +485,7 @@ export const TenderFilterDrawer: React.FC<TenderFilterDrawerProps> = ({
                 onClick={onClose}
                 className="px-3 py-2 rounded-lg text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer"
               >
-                Close
+                {t('common.close')}
               </button>
               <button
                 type="button"
@@ -489,7 +493,7 @@ export const TenderFilterDrawer: React.FC<TenderFilterDrawerProps> = ({
                 className={`px-4 py-2 rounded-lg text-xs font-bold flex items-center gap-1.5 shadow-md transition-all cursor-pointer ${getApplyBtnClass()}`}
               >
                 <CheckCircle className="w-3.5 h-3.5" />
-                <span>View {totalFilteredCount} Notices</span>
+                <span>{t('common.viewCountNotices',  { count: totalFilteredCount })}</span>
                 <ChevronRight className="w-3.5 h-3.5" />
               </button>
             </div>

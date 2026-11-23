@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { ArrowUpDown, Check, ChevronDown } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { FilterAccentColor } from '../../types';
 
 export interface ToolbarSortOption<T extends string = string> {
@@ -26,6 +27,7 @@ export function ToolbarSortDropdown<T extends string = string>({
   accentColor = 'orange',
   className = ''
 }: ToolbarSortDropdownProps<T>) {
+  const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -108,10 +110,10 @@ export function ToolbarSortDropdown<T extends string = string>({
             ? getAccentActiveClass()
             : 'bg-white dark:bg-[#141C2E] hover:bg-slate-50 dark:hover:bg-[#18233A] text-slate-700 dark:text-slate-200 border border-slate-200/90 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600'
         } ${isOpen ? 'ring-1 ring-slate-400 dark:ring-slate-600' : ''}`}
-        title="Sort notices"
+        title={t('common.sortBy')}
       >
         <ArrowUpDown className={`w-3.5 h-3.5 shrink-0 ${isCustomSort ? getAccentCheckClass() : 'text-slate-400'}`} />
-        <span className="hidden sm:inline text-slate-400 font-normal">Sort:</span>
+        <span className="hidden sm:inline text-slate-400 font-normal">{t('common.sort')}</span>
         <span className="truncate max-w-[130px] sm:max-w-[160px]">
           {selectedOption?.shortLabel || selectedOption?.label}
         </span>
@@ -129,9 +131,9 @@ export function ToolbarSortDropdown<T extends string = string>({
           style={{ maxHeight: '360px' }}
         >
           <div className="px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-400 border-b border-slate-800 mb-1 flex items-center justify-between">
-            <span>Sort Order</span>
+            <span>{t('common.sortOrder')}</span>
             {isCustomSort && (
-              <span className={`text-[9px] font-semibold ${getAccentCheckClass()}`}>Custom</span>
+              <span className={`text-[9px] font-semibold ${getAccentCheckClass()}`}>{t('common.custom')}</span>
             )}
           </div>
 

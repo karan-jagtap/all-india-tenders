@@ -1,5 +1,6 @@
 import React from 'react';
 import { SlidersHorizontal, RotateCcw, RefreshCw } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { FilterAccentColor } from '../../types';
 
 export interface TopFilterActionBarProps {
@@ -24,11 +25,14 @@ export const TopFilterActionBar: React.FC<TopFilterActionBarProps> = ({
   onReload,
   isLoading = false,
   totalCount,
-  reloadLabel = 'Reload',
+  reloadLabel,
   accentColor = 'orange',
   className = '',
   sortControl
 }) => {
+  const { t } = useTranslation();
+  const effectiveReloadLabel = reloadLabel || t('common.reload');
+
   const getFilterButtonActiveClasses = () => {
     switch (accentColor) {
       case 'emerald':
@@ -75,12 +79,12 @@ export const TopFilterActionBar: React.FC<TopFilterActionBarProps> = ({
             ? getFilterButtonActiveClasses()
             : 'bg-white dark:bg-[#141C2E] hover:bg-slate-50 dark:hover:bg-[#18233A] text-slate-700 dark:text-slate-200 border border-slate-200/90 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600'
         }`}
-        title="Open comprehensive filters in right sidebar drawer"
+        title={t('common.filters')}
       >
         <SlidersHorizontal
           className={`w-3.5 h-3.5 ${activeFiltersCount > 0 ? 'text-white' : getIconColor()}`}
         />
-        <span>Filters</span>
+        <span>{t('common.filters')}</span>
         {activeFiltersCount > 0 ? (
           <span
             className={`px-1.5 py-0.5 rounded-full text-[10px] font-mono bg-white font-black shadow-2xs ${getFilterBadgeColor()}`}
@@ -88,7 +92,9 @@ export const TopFilterActionBar: React.FC<TopFilterActionBarProps> = ({
             {activeFiltersCount}
           </span>
         ) : (
-          <span className="text-[10px] text-slate-400 dark:text-slate-500 font-normal">(Sidebar)</span>
+          <span className="text-[10px] text-slate-400 dark:text-slate-500 font-normal">
+            {t('common.sidebar')}
+          </span>
         )}
       </button>
 
@@ -100,10 +106,10 @@ export const TopFilterActionBar: React.FC<TopFilterActionBarProps> = ({
         <button
           onClick={onResetFilters}
           className="px-2.5 py-2 rounded-lg text-xs font-medium text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 flex items-center gap-1 transition-all cursor-pointer"
-          title="Reset all filters"
+          title={t('common.resetAll')}
         >
           <RotateCcw className="w-3 h-3 text-slate-500 dark:text-slate-400" />
-          <span className="hidden sm:inline">Reset</span>
+          <span className="hidden sm:inline">{t('common.reset')}</span>
         </button>
       )}
 
@@ -113,7 +119,7 @@ export const TopFilterActionBar: React.FC<TopFilterActionBarProps> = ({
           onClick={onReload}
           disabled={isLoading}
           className="px-3 py-2 rounded-lg text-xs font-medium text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white bg-white dark:bg-[#141C2E] hover:bg-slate-50 dark:hover:bg-[#18233A] border border-slate-200/90 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 flex items-center gap-1.5 transition-all cursor-pointer shadow-2xs disabled:opacity-50"
-          title="Reload notices"
+          title={t('common.reload')}
         >
           <RefreshCw
             className={`w-3.5 h-3.5 ${
@@ -125,7 +131,7 @@ export const TopFilterActionBar: React.FC<TopFilterActionBarProps> = ({
             } ${isLoading ? 'animate-spin' : ''}`}
           />
           <span>
-            {reloadLabel}
+            {effectiveReloadLabel}
             {totalCount !== undefined ? ` (${totalCount.toLocaleString()})` : ''}
           </span>
         </button>

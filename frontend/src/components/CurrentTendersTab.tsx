@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { Radio, RefreshCw } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import {
   CurrentTender,
   EnrichedCurrentTender,
@@ -72,8 +73,9 @@ function enrichTenderList(rawList: CurrentTender[]): EnrichedCurrentTender[] {
 }
 
 export const CurrentTendersTab: React.FC = () => {
+  const { t } = useTranslation();
   const [tenders, setTenders] = useState<EnrichedCurrentTender[]>([]);
-  const [totalDbCount, setTotalDbCount] = useState<number>(69027);
+  const [totalDbCount, setTotalDbCount] = useState<number>(112261);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -652,8 +654,12 @@ export const CurrentTendersTab: React.FC = () => {
     return (
       <div className="flex flex-col items-center justify-center p-16 text-slate-500 space-y-3">
         <RefreshCw className="w-8 h-8 animate-spin text-orange-600" />
-        <p className="text-sm font-medium">Querying live procurement notices from indexed database...</p>
-        <span className="text-xs text-slate-400">Persistent SQLite Database • Instant Indexed Retrieval</span>
+        <p className="text-sm font-medium">
+          {t('currentTenders.queryingDatabase')}
+        </p>
+        <span className="text-xs text-slate-400">
+          {t('currentTenders.databaseBadge')}
+        </span>
       </div>
     );
   }
@@ -661,7 +667,9 @@ export const CurrentTendersTab: React.FC = () => {
   if (error) {
     return (
       <div className="p-6 bg-red-50 border border-red-200 rounded-xl text-red-700 text-sm">
-        <strong className="block font-bold mb-1">Failed to connect to official procurement portals</strong>
+        <strong className="block font-bold mb-1">
+          {t('currentTenders.failedToConnect')}
+        </strong>
         {error}
       </div>
     );
@@ -751,10 +759,14 @@ export const CurrentTendersTab: React.FC = () => {
         <div className="space-y-3">
           <div className="text-xs font-bold text-slate-500 uppercase tracking-wider px-1 flex items-center justify-between">
             <span className="flex items-center gap-1.5">
-              <span>{includeClosed ? 'All Procurement Notices' : 'Open In-Progress Notices'}</span>
+              <span>
+                {includeClosed
+                  ? t('currentTenders.allProcurementNotices')
+                  : t('currentTenders.openInProgressNotices')}
+              </span>
               <span className="text-[11px] font-mono font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
                 {visibleTenders.length < totalDbCount
-                  ? `${visibleTenders.length} of ${totalDbCount.toLocaleString('en-IN')}`
+                  ? `${visibleTenders.length} ${t('common.of')} ${totalDbCount.toLocaleString('en-IN')}`
                   : `${totalDbCount.toLocaleString('en-IN')}`}
               </span>
             </span>
@@ -793,25 +805,32 @@ export const CurrentTendersTab: React.FC = () => {
                 className="py-3 text-center text-xs text-slate-500 dark:text-slate-400 flex items-center justify-center gap-2 bg-slate-50/80 dark:bg-slate-900/60 rounded-xl border border-dashed border-slate-200 dark:border-slate-800"
               >
                 <RefreshCw className="w-3.5 h-3.5 animate-spin text-orange-600 dark:text-orange-400" />
-                <span>Loading next 12 notices from indexed database...</span>
+                <span>{t('currentTenders.loadingNext12')}</span>
               </div>
             )}
 
             {!hasMore && (visibleTenders.length > 0 || totalDbCount > 0) && (
               <div className="py-2.5 text-center text-[11px] text-slate-400 dark:text-slate-500 font-medium">
-                ✓ Showing all {totalDbCount.toLocaleString('en-IN')} {includeClosed ? 'notices (including closed / under evaluation)' : 'open in-progress notices'}
+                {t('currentTenders.showingAllNotices',  {
+                  count: totalDbCount,
+                  statusDesc: includeClosed
+                    ? t('currentTenders.allNoticesIncludingClosed')
+                    : t('currentTenders.openNoticesDesc')
+                })}
               </div>
             )}
 
             {visibleTenders.length === 0 && !loading && (
               <div className="text-center py-12 px-4 bg-white dark:bg-[#0E1422] rounded-xl border border-slate-200/90 dark:border-slate-800 text-xs text-slate-500 dark:text-slate-400 space-y-2">
                 <Radio className="w-8 h-8 text-slate-300 dark:text-slate-600 mx-auto" />
-                <p className="font-semibold text-slate-800 dark:text-slate-200">No in-progress tenders matched the active filters.</p>
+                <p className="font-semibold text-slate-800 dark:text-slate-200">
+                  {t('currentTenders.noMatchingActiveFilters')}
+                </p>
                 <button
                   onClick={resetAllFilters}
                   className="px-3 py-1.5 bg-orange-600 hover:bg-orange-700 text-white rounded text-xs font-semibold cursor-pointer"
                 >
-                  Clear all filters
+                  {t('common.clearAll')}
                 </button>
               </div>
             )}
@@ -819,12 +838,14 @@ export const CurrentTendersTab: React.FC = () => {
             {filteredTenders.length === 0 && (
               <div className="text-center py-12 px-4 bg-white dark:bg-[#0E1422] rounded-xl border border-slate-200/90 dark:border-slate-800 text-xs text-slate-500 dark:text-slate-400 space-y-2">
                 <Radio className="w-8 h-8 text-slate-300 dark:text-slate-600 mx-auto" />
-                <p className="font-semibold text-slate-800 dark:text-slate-200">No in-progress tenders matched the active filters.</p>
+                <p className="font-semibold text-slate-800 dark:text-slate-200">
+                  {t('currentTenders.noMatchingActiveFilters')}
+                </p>
                 <button
                   onClick={resetAllFilters}
                   className="px-3 py-1.5 bg-orange-600 hover:bg-orange-700 text-white rounded text-xs font-semibold cursor-pointer"
                 >
-                  Clear all filters
+                  {t('common.clearAll')}
                 </button>
               </div>
             )}
@@ -836,15 +857,17 @@ export const CurrentTendersTab: React.FC = () => {
           {!selectedTender || filteredTenders.length === 0 ? (
             <div className="bg-white dark:bg-[#0E1422] rounded-xl border border-slate-200/90 dark:border-slate-800 p-12 text-center shadow-xs">
               <Radio className="w-10 h-10 text-slate-300 dark:text-slate-600 mx-auto mb-3" />
-              <h3 className="text-sm font-bold text-slate-800 dark:text-slate-100">No matching in-progress tenders found</h3>
+              <h3 className="text-sm font-bold text-slate-800 dark:text-slate-100">
+                {t('currentTenders.noMatchingTitle')}
+              </h3>
               <p className="text-xs text-slate-400 dark:text-slate-500 mt-1 mb-4">
-                No active tenders match your selected filter combination. Try resetting your filters.
+                {t('currentTenders.noMatchingDesc')}
               </p>
               <button
                 onClick={resetAllFilters}
                 className="px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white font-semibold text-xs rounded-lg shadow-xs transition-colors cursor-pointer"
               >
-                Reset All Filters
+                {t('common.resetAll')}
               </button>
             </div>
           ) : (

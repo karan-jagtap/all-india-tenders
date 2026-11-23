@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Award, Search } from 'lucide-react';
 import { BidderWonContract } from '../../types';
 import { formatCr, formatINR, formatDate } from '../../utils';
@@ -16,16 +17,18 @@ export const BidderContractsTable: React.FC<BidderContractsTableProps> = ({
   setContractSearchQuery,
   filteredContracts
 }) => {
+  const { t } = useTranslation();
+
   return (
     <div className="bg-white dark:bg-[#0E1422] rounded-xl border border-slate-200/90 dark:border-slate-800 p-5 shadow-xs space-y-3 transition-colors">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <h3 className="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider flex items-center gap-1.5">
             <Award className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-            Verified Statutory Public Contracts Awarded Till Date ({totalContractsCount})
+            {t('bidders.verifiedStatutoryContracts', { count: totalContractsCount })}
           </h3>
           <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
-            Official government contract awards aggregated from CPPP, GeM, MahaTenders, IREPS, and state portals under GFR 173 transparency norms.
+            {t('bidders.contractsTransparencyNotice')}
           </p>
         </div>
 
@@ -34,7 +37,7 @@ export const BidderContractsTable: React.FC<BidderContractsTableProps> = ({
           <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
           <input
             type="text"
-            placeholder="Filter contractor's projects..."
+            placeholder={t('bidders.filterProjectsPlaceholder')}
             value={contractSearchQuery}
             onChange={(e) => setContractSearchQuery(e.target.value)}
             className="w-full bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 focus:border-blue-500 dark:focus:border-blue-400 rounded-lg pl-8 pr-3 py-1 text-xs text-slate-800 dark:text-white placeholder-slate-400 focus:outline-none"
@@ -47,19 +50,19 @@ export const BidderContractsTable: React.FC<BidderContractsTableProps> = ({
         <table className="w-full text-left text-xs">
           <thead className="bg-slate-900 dark:bg-slate-950 text-slate-200 text-[10px] uppercase font-bold tracking-wider sticky top-0 z-10">
             <tr>
-              <th className="py-2.5 px-3">Project Title & Scope</th>
-              <th className="py-2.5 px-3">Procuring Authority</th>
-              <th className="py-2.5 px-3">Award Date & Year</th>
-              <th className="py-2.5 px-3">Contract Value</th>
-              <th className="py-2.5 px-3">Winning Quote Delta</th>
-              <th className="py-2.5 px-3">LOA Reference</th>
+              <th className="py-2.5 px-3">{t('bidders.table.titleScope')}</th>
+              <th className="py-2.5 px-3">{t('bidders.table.authority')}</th>
+              <th className="py-2.5 px-3">{t('bidders.table.awardDate')}</th>
+              <th className="py-2.5 px-3">{t('bidders.table.contractValue')}</th>
+              <th className="py-2.5 px-3">{t('bidders.table.winningDelta')}</th>
+              <th className="py-2.5 px-3">{t('bidders.table.loaRef')}</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-200 dark:divide-slate-800 bg-white dark:bg-[#0E1422]">
             {filteredContracts.length === 0 ? (
               <tr>
                 <td colSpan={6} className="py-8 text-center text-slate-400 dark:text-slate-500">
-                  No matching projects found for this query.
+                  {t('bidders.table.noProjectsFound')}
                 </td>
               </tr>
             ) : (

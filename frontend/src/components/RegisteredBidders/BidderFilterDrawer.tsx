@@ -1,4 +1,5 @@
 import React, { useMemo, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   SlidersHorizontal,
   X,
@@ -8,73 +9,19 @@ import {
   CheckCircle2
 } from 'lucide-react';
 import { MultiSelectDropdown, DropdownOption } from '../common';
+import {
+  BidderSortOption,
+  BidderFilterDrawerProps,
+  BidderSortOptionItem,
+  BidderSortOptionCardProps
+} from '../../types';
 
-export type BidderSortOption =
-  | 'NAME_ASC'
-  | 'NAME_DESC'
-  | 'CONTRACTS_DESC'
-  | 'VALUE_DESC'
-  | 'TURNOVER_DESC';
-
-export interface BidderFilterDrawerProps {
-  isOpen: boolean;
-  onClose: () => void;
-  activeFiltersCount: number;
-  hasActiveFilters: boolean;
-  resetAllFilters: () => void;
-  totalFilteredCount: number;
-
-  // 1. Work Specialization / Category
-  selectedCategory: string[] | string;
-  setSelectedCategory: (cat: string[]) => void;
-  allCategories: string[];
-  categoryCounts?: Map<string, number>;
-  totalBidders: number;
-
-  // 2. State / Region
-  selectedState: string[] | string;
-  setSelectedState: (st: string[]) => void;
-  allStates: string[];
-  stateCounts?: Map<string, number>;
-
-  // 3. Ranking & Sorting
-  sortBy: BidderSortOption;
-  setSortBy: (s: BidderSortOption) => void;
-}
-
-export const SORT_OPTIONS: { value: BidderSortOption; label: string; desc: string }[] = [
-  {
-    value: 'NAME_ASC',
-    label: 'Alphabetical (A → Z)',
-    desc: 'Contractors sorted by corporate name from A to Z'
-  },
-  {
-    value: 'NAME_DESC',
-    label: 'Alphabetical (Z → A)',
-    desc: 'Contractors sorted by corporate name from Z to A'
-  },
-  {
-    value: 'CONTRACTS_DESC',
-    label: 'Most Contracts Won',
-    desc: 'Ranked by total public procurement contracts won till date'
-  },
-  {
-    value: 'VALUE_DESC',
-    label: 'Highest Total Value Awarded',
-    desc: 'Ranked by cumulative rupee value of won government tenders'
-  },
-  {
-    value: 'TURNOVER_DESC',
-    label: 'Highest Audited Turnover',
-    desc: 'Ranked by statutory audited annual turnover from balance sheets'
-  }
-];
-
-interface BidderSortOptionCardProps {
-  option: (typeof SORT_OPTIONS)[number];
-  isSelected: boolean;
-  onSelect: (val: BidderSortOption) => void;
-}
+export type {
+  BidderSortOption,
+  BidderFilterDrawerProps,
+  BidderSortOptionItem,
+  BidderSortOptionCardProps
+};
 
 const BidderSortOptionCard: React.FC<BidderSortOptionCardProps> = ({
   option,
@@ -129,6 +76,36 @@ export const BidderFilterDrawer: React.FC<BidderFilterDrawerProps> = ({
   sortBy,
   setSortBy
 }) => {
+  const { t } = useTranslation();
+
+  const sortOptions: BidderSortOptionItem[] = useMemo(() => [
+    {
+      value: 'NAME_ASC',
+      label: t('bidders.sort.nameAsc'),
+      desc: t('bidders.sort.nameAscDesc')
+    },
+    {
+      value: 'NAME_DESC',
+      label: t('bidders.sort.nameDesc'),
+      desc: t('bidders.sort.nameDescDesc')
+    },
+    {
+      value: 'CONTRACTS_DESC',
+      label: t('bidders.sort.contractsDesc'),
+      desc: t('bidders.sort.contractsDescDesc')
+    },
+    {
+      value: 'VALUE_DESC',
+      label: t('bidders.sort.valueDesc'),
+      desc: t('bidders.sort.valueDescDesc')
+    },
+    {
+      value: 'TURNOVER_DESC',
+      label: t('bidders.sort.turnoverDesc'),
+      desc: t('bidders.sort.turnoverDescDesc')
+    }
+  ], [t]);
+
   // Listen for Escape key
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -164,18 +141,18 @@ export const BidderFilterDrawer: React.FC<BidderFilterDrawerProps> = ({
       value: c,
       label: c,
       count: categoryCounts?.get(c) ?? 0,
-      countSuffix: 'bidders'
+      countSuffix: t('common.contractors')
     }));
-  }, [allCategories, categoryCounts]);
+  }, [allCategories, categoryCounts, t]);
 
   const stateOptions: DropdownOption[] = useMemo(() => {
     return allStates.map((s) => ({
       value: s,
       label: s,
       count: stateCounts?.get(s) ?? 0,
-      countSuffix: 'bidders'
+      countSuffix: t('common.contractors')
     }));
-  }, [allStates, stateCounts]);
+  }, [allStates, stateCounts, t]);
 
   const handleSelectSort = (optionVal: BidderSortOption) => {
     setSortBy(optionVal);
@@ -202,15 +179,15 @@ export const BidderFilterDrawer: React.FC<BidderFilterDrawerProps> = ({
               </div>
               <div>
                 <h3 className="text-sm font-bold text-white flex items-center gap-2">
-                  <span>Contractor Directory Filters</span>
+                  <span>{t('bidders.filterDrawer.title')}</span>
                   {activeFiltersCount > 0 && (
                     <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-500 text-white shadow-xs">
-                      {activeFiltersCount} Active
+                      {t('bidders.filterDrawer.activeCount', { count: activeFiltersCount })}
                     </span>
                   )}
                 </h3>
                 <p className="text-[11px] text-slate-400">
-                  Refine registered contractors by specialization, state, and ranking
+                  {t('bidders.filterDrawer.subtitle')}
                 </p>
               </div>
             </div>
@@ -222,14 +199,14 @@ export const BidderFilterDrawer: React.FC<BidderFilterDrawerProps> = ({
                   onClick={resetAllFilters}
                   className="text-xs font-semibold px-2 py-1 rounded hover:bg-slate-800 text-blue-400 hover:text-blue-300 transition-colors cursor-pointer"
                 >
-                  Reset All
+                  {t('common.resetAll')}
                 </button>
               )}
               <button
                 type="button"
                 onClick={onClose}
                 className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer"
-                title="Close filter drawer (Esc)"
+                title={t('common.close')}
               >
                 <X className="w-5 h-5" />
               </button>
@@ -243,19 +220,19 @@ export const BidderFilterDrawer: React.FC<BidderFilterDrawerProps> = ({
               <div className="flex items-center justify-between">
                 <label className="text-xs font-bold text-white flex items-center gap-1.5">
                   <Tag className="w-3.5 h-3.5 text-blue-400" />
-                  <span>Work Specialization / Sector</span>
+                  <span>{t('bidders.filterDrawer.workSpecialization')}</span>
                 </label>
                 <span className="text-[10px] text-blue-400 font-mono bg-blue-950/60 border border-blue-800/60 px-1.5 py-0.5 rounded">
-                  {allCategories.length} Specializations
+                  {t('bidders.filterDrawer.specializationsCount', { count: allCategories.length })}
                 </span>
               </div>
               <MultiSelectDropdown
                 values={normCategories}
                 onChange={setSelectedCategory}
                 options={categoryOptions}
-                allOptionLabel="All Specializations"
+                allOptionLabel={t('bidders.filterDrawer.allSpecializations')}
                 allOptionCount={totalBidders}
-                placeholder="Search specialization or sector..."
+                placeholder={t('bidders.filterDrawer.searchSpecialization')}
                 icon={<Tag className="w-3.5 h-3.5 text-blue-400" />}
                 accentColor="blue"
               />
@@ -266,19 +243,19 @@ export const BidderFilterDrawer: React.FC<BidderFilterDrawerProps> = ({
               <div className="flex items-center justify-between">
                 <label className="text-xs font-bold text-white flex items-center gap-1.5">
                   <MapPin className="w-3.5 h-3.5 text-rose-400" />
-                  <span>State / Operational Region</span>
+                  <span>{t('bidders.filterDrawer.stateHeadquarters')}</span>
                 </label>
                 <span className="text-[10px] text-rose-400 font-mono bg-rose-950/60 border border-rose-800/60 px-1.5 py-0.5 rounded">
-                  {allStates.length} States
+                  {t('bidders.filterDrawer.statesCount', { count: allStates.length })}
                 </span>
               </div>
               <MultiSelectDropdown
                 values={normStates}
                 onChange={setSelectedState}
                 options={stateOptions}
-                allOptionLabel="All States"
+                allOptionLabel={t('bidders.filterDrawer.allStates')}
                 allOptionCount={totalBidders}
-                placeholder="Search state..."
+                placeholder={t('bidders.filterDrawer.searchState')}
                 icon={<MapPin className="w-3.5 h-3.5 text-rose-400" />}
                 accentColor="rose"
               />
@@ -288,10 +265,10 @@ export const BidderFilterDrawer: React.FC<BidderFilterDrawerProps> = ({
             <div className="space-y-2 bg-slate-800/40 p-3 rounded-xl border border-slate-800">
               <label className="text-xs font-bold text-white flex items-center gap-1.5">
                 <TrendingUp className="w-3.5 h-3.5 text-emerald-400" />
-                <span>Contractor Ranking & Sorting</span>
+                <span>{t('bidders.filterDrawer.rankingSorting')}</span>
               </label>
               <div className="space-y-1.5">
-                {SORT_OPTIONS.map((opt) => (
+                {sortOptions.map((opt) => (
                   <BidderSortOptionCard
                     key={opt.value}
                     option={opt}
@@ -311,14 +288,14 @@ export const BidderFilterDrawer: React.FC<BidderFilterDrawerProps> = ({
               disabled={!hasActiveFilters}
               className="px-4 py-2.5 rounded-xl border border-slate-700 hover:bg-slate-800 text-slate-300 hover:text-white font-semibold text-xs transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
             >
-              Reset All
+              {t('common.resetAll')}
             </button>
             <button
               type="button"
               onClick={onClose}
               className="flex-1 py-2.5 px-4 rounded-xl font-bold text-xs shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white"
             >
-              <span>Apply & Show {totalFilteredCount} Contractors</span>
+              <span>{t('bidders.filterDrawer.viewCountContractors', { count: totalFilteredCount })}</span>
             </button>
           </div>
         </div>

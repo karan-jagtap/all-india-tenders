@@ -114,6 +114,13 @@ export enum EvaluationCover2Status {
   DISQUALIFIED = 'Disqualified (Criteria Shortfall)',
 }
 
+export type BidderSortOption =
+  | 'NAME_ASC'
+  | 'NAME_DESC'
+  | 'CONTRACTS_DESC'
+  | 'VALUE_DESC'
+  | 'TURNOVER_DESC';
+
 // ============================================================================
 // 5. APPLICATION NAVIGATION & TAB ROUTING ENUMS
 // ============================================================================

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Award,
   FileText,
@@ -39,7 +40,7 @@ import {
   getAcceptedTenderPdfUrl,
   AcceptedTenderFilters
 } from '../services/api';
-import { DetailModalTab, AcceptedTenderModalTab, AcceptedTenderSortOption } from '../types';
+import { DetailModalTab, AcceptedTenderModalTab, AcceptedTenderSortOption, EnrichedAcceptedTender } from '../types';
 import { formatDate } from '../utils';
 import { AllBidsEvaluationSubTab } from './AcceptedTenders/AllBidsEvaluationSubTab';
 import {
@@ -51,8 +52,11 @@ import {
   canonicalizeCategory,
   canonicalizePortalSource,
   subscribeMasterFilters,
-  subscribePortalSources
+  subscribePortalSources,
+  ACCEPTED_TENDER_SORT_OPTIONS
 } from '../constants';
+
+export { ACCEPTED_TENDER_SORT_OPTIONS };
 
 const getTenderSource = (tender: AcceptedTender): string => {
   return canonicalizePortalSource(tender.og_tender?.portal);
@@ -257,62 +261,8 @@ const getTenderCity = (tender: AcceptedTender): string => {
   return 'Pan-India';
 };
 
-interface EnrichedAcceptedTender extends AcceptedTender {
-  _source: string;
-  _sourceLabel: string;
-  _category: string;
-  _org: string;
-  _state: string;
-  _city: string;
-  _searchBlob: string;
-}
-
-export const ACCEPTED_TENDER_SORT_OPTIONS: ToolbarSortOption<AcceptedTenderSortOption>[] = [
-  {
-    value: 'AWARD_DATE_DESC',
-    label: '🏆 Award Date: Newest First',
-    shortLabel: 'Award (Newest)',
-    desc: 'Most recently awarded government contracts'
-  },
-  {
-    value: 'AWARD_DATE_ASC',
-    label: '📜 Award Date: Oldest First',
-    shortLabel: 'Award (Oldest)',
-    desc: 'Earliest awarded contracts in archive'
-  },
-  {
-    value: 'VALUE_DESC',
-    label: '💎 Contract Value: High to Low',
-    shortLabel: 'Value (High → Low)',
-    desc: 'Highest winning contract values first'
-  },
-  {
-    value: 'VALUE_ASC',
-    label: '🪙 Contract Value: Low to High',
-    shortLabel: 'Value (Low → High)',
-    desc: 'Smallest winning contract values first'
-  },
-  {
-    value: 'DISCOUNT_DESC',
-    label: '📉 Winning Discount %: High to Low',
-    shortLabel: 'Discount % (High → Low)',
-    desc: 'Contracts won with highest rebate/discount below estimate'
-  },
-  {
-    value: 'CONTRACTOR_ASC',
-    label: '🏢 Contractor Name (A → Z)',
-    shortLabel: 'Contractor (A → Z)',
-    desc: 'Alphabetical order by winning contractor'
-  },
-  {
-    value: 'TITLE_ASC',
-    label: '🔤 Work Title (A → Z)',
-    shortLabel: 'Title (A → Z)',
-    desc: 'Alphabetical order by tender title'
-  }
-];
-
 export const PreviouslyAcceptedTendersTab: React.FC = () => {
+  const { t } = useTranslation();
   const [tenders, setTenders] = useState<EnrichedAcceptedTender[]>([]);
   const [totalDbCount, setTotalDbCount] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(true);
@@ -337,8 +287,8 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
   const [filterConstantsTick, setFilterConstantsTick] = useState<number>(0);
 
   useEffect(() => {
-    const unsub1 = subscribeMasterFilters(() => setFilterConstantsTick((t) => t + 1));
-    const unsub2 = subscribePortalSources(() => setFilterConstantsTick((t) => t + 1));
+    const unsub1 = subscribeMasterFilters(() => setFilterConstantsTick((tick) => tick + 1));
+    const unsub2 = subscribePortalSources(() => setFilterConstantsTick((tick) => tick + 1));
     return () => {
       unsub1();
       unsub2();
@@ -935,6 +885,51 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
     }
   };
 
+  const localizedSortOptions = useMemo<ToolbarSortOption<AcceptedTenderSortOption>[]>(() => [
+    {
+      value: 'AWARD_DATE_DESC',
+      label: t('acceptedTenders.sort.awardDateDesc'),
+      shortLabel: t('acceptedTenders.sort.awardDateDescShort'),
+      desc: t('acceptedTenders.sort.awardDateDescDescription')
+    },
+    {
+      value: 'AWARD_DATE_ASC',
+      label: t('acceptedTenders.sort.awardDateAsc'),
+      shortLabel: t('acceptedTenders.sort.awardDateAscShort'),
+      desc: t('acceptedTenders.sort.awardDateAscDescription')
+    },
+    {
+      value: 'VALUE_DESC',
+      label: t('acceptedTenders.sort.valueDesc'),
+      shortLabel: t('acceptedTenders.sort.valueDescShort'),
+      desc: t('acceptedTenders.sort.valueDescDescription')
+    },
+    {
+      value: 'VALUE_ASC',
+      label: t('acceptedTenders.sort.valueAsc'),
+      shortLabel: t('acceptedTenders.sort.valueAscShort'),
+      desc: t('acceptedTenders.sort.valueAscDescription')
+    },
+    {
+      value: 'DISCOUNT_DESC',
+      label: t('acceptedTenders.sort.discountDesc'),
+      shortLabel: t('acceptedTenders.sort.discountDescShort'),
+      desc: t('acceptedTenders.sort.discountDescDescription')
+    },
+    {
+      value: 'CONTRACTOR_ASC',
+      label: t('acceptedTenders.sort.contractorAsc'),
+      shortLabel: t('acceptedTenders.sort.contractorAscShort'),
+      desc: t('acceptedTenders.sort.contractorAscDescription')
+    },
+    {
+      value: 'TITLE_ASC',
+      label: t('acceptedTenders.sort.titleAsc'),
+      shortLabel: t('acceptedTenders.sort.titleAscShort'),
+      desc: t('acceptedTenders.sort.titleAscDescription')
+    }
+  ], [t]);
+
   // Memoized chips for ActiveFilterChipsBar (MUST be before any early return)
   const activeChips: FilterChipItem[] = useMemo(() => {
     const list: FilterChipItem[] = [];
@@ -943,7 +938,7 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
       selectedCategory.forEach((cat) => {
         list.push({
           id: `category-${cat}`,
-          label: 'Category',
+          label: t('common.category'),
           value: cat,
           icon: <Tag className="w-3 h-3 text-emerald-600" />,
           color: 'emerald',
@@ -956,7 +951,7 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
       selectedSource.forEach((src) => {
         list.push({
           id: `source-${src}`,
-          label: 'Source',
+          label: t('common.source'),
           value: src,
           icon: <Globe className="w-3 h-3 text-orange-600" />,
           color: 'orange',
@@ -969,7 +964,7 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
       selectedOrg.forEach((org) => {
         list.push({
           id: `org-${org}`,
-          label: 'Org',
+          label: t('common.organization'),
           value: org,
           icon: <Building2 className="w-3 h-3 text-blue-600" />,
           color: 'blue',
@@ -982,7 +977,7 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
       selectedState.forEach((st) => {
         list.push({
           id: `state-${st}`,
-          label: 'State',
+          label: t('common.state'),
           value: st,
           icon: <MapPin className="w-3 h-3 text-rose-600" />,
           color: 'rose',
@@ -995,7 +990,7 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
       selectedCity.forEach((ct) => {
         list.push({
           id: `city-${ct}`,
-          label: 'City',
+          label: t('common.city'),
           value: ct,
           icon: <MapPin className="w-3 h-3 text-amber-600" />,
           color: 'amber',
@@ -1007,7 +1002,7 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
     if (selectedYear !== 'ALL') {
       list.push({
         id: 'year',
-        label: 'Year',
+        label: t('common.year'),
         value: `FY ${selectedYear}`,
         icon: <Calendar className="w-3 h-3 text-amber-600" />,
         color: 'amber',
@@ -1016,10 +1011,10 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
     }
 
     if (sortBy !== 'AWARD_DATE_DESC') {
-      const activeOpt = ACCEPTED_TENDER_SORT_OPTIONS.find((o) => o.value === sortBy);
+      const activeOpt = localizedSortOptions.find((o) => o.value === sortBy);
       list.push({
         id: 'sort',
-        label: 'Sort',
+        label: t('common.sort'),
         value: activeOpt?.shortLabel || activeOpt?.label || sortBy,
         icon: <ArrowUpDown className="w-3 h-3 text-emerald-600" />,
         color: 'emerald',
@@ -1030,7 +1025,7 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
     if (searchQuery.trim() !== '') {
       list.push({
         id: 'query',
-        label: 'Query',
+        label: t('common.query'),
         value: `"${searchQuery}"`,
         color: 'slate',
         onRemove: handleRemoveQueryChip
@@ -1046,30 +1041,32 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
     selectedCity,
     selectedYear,
     sortBy,
-    searchQuery
+    searchQuery,
+    localizedSortOptions,
+    t
   ]);
 
   if (loading && tenders.length === 0) {
     return (
       <div className="bg-white dark:bg-[#0E1422] rounded-xl border border-slate-200/90 dark:border-slate-800 p-12 text-center text-slate-500 dark:text-slate-400 shadow-xs flex flex-col items-center justify-center">
         <div className="w-8 h-8 border-3 border-emerald-500 border-t-transparent rounded-full animate-spin mb-3" />
-        <span className="text-sm font-semibold text-slate-800">Loading Historical Accepted Bids Archive...</span>
-        <span className="text-xs text-slate-400 mt-1">Retrieving awarded Indian public procurement tenders, submissions & LOA orders</span>
+        <span className="text-sm font-semibold text-slate-800 dark:text-slate-200">{t('acceptedTenders.loadingArchive')}</span>
+        <span className="text-xs text-slate-400 mt-1">{t('acceptedTenders.retrievingAwarded')}</span>
       </div>
     );
   }
 
   if (error && tenders.length === 0) {
     return (
-      <div className="bg-white rounded-xl border border-red-200 p-8 text-center text-red-600 shadow-xs">
+      <div className="bg-white dark:bg-[#0E1422] rounded-xl border border-red-200 dark:border-red-900/60 p-8 text-center text-red-600 dark:text-red-400 shadow-xs">
         <Award className="w-8 h-8 mx-auto mb-2 text-red-500" />
-        <h3 className="text-sm font-bold">Could not load accepted tenders archive</h3>
-        <p className="text-xs text-slate-500 mt-1">{error}</p>
+        <h3 className="text-sm font-bold">{t('acceptedTenders.couldNotLoad')}</h3>
+        <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">{error}</p>
         <button
           onClick={() => loadData()}
-          className="mt-3 px-3 py-1.5 bg-red-600 text-white rounded-lg text-xs font-semibold"
+          className="mt-3 px-3 py-1.5 bg-red-600 text-white rounded-lg text-xs font-semibold cursor-pointer"
         >
-          Retry
+          {t('acceptedTenders.retry')}
         </button>
       </div>
     );
@@ -1083,7 +1080,7 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
           <FilterSearchBar
             searchQuery={searchQuery}
             setSearchQuery={setSearchQuery}
-            placeholder="Search awarded tenders, contractor, authority, city..."
+            placeholder={t('acceptedTenders.searchPlaceholder')}
             isVoiceSearching={isVoiceSearching}
             toggleVoiceSearch={toggleVoiceSearch}
             accentColor="emerald"
@@ -1098,13 +1095,13 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
             onReload={handleReload}
             isLoading={loading}
             totalCount={totalDbCount || tenders.length}
-            reloadLabel="Reload"
+            reloadLabel={t('common.reload')}
             accentColor="emerald"
             sortControl={
               <ToolbarSortDropdown<AcceptedTenderSortOption>
                 value={sortBy}
                 onChange={setSortBy}
-                options={ACCEPTED_TENDER_SORT_OPTIONS}
+                options={localizedSortOptions}
                 defaultValue="AWARD_DATE_DESC"
                 accentColor="emerald"
               />
@@ -1123,8 +1120,8 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
       <TenderFilterDrawer
         isOpen={isFilterSidebarOpen}
         onClose={handleCloseFilterDrawer}
-        title="Awarded Tender Filters"
-        subtitle="Refine historical government awarded contracts"
+        title={t('acceptedTenders.filterDrawerTitle')}
+        subtitle={t('acceptedTenders.filterDrawerSubtitle')}
         accentColor="emerald"
         activeFiltersCount={activeFiltersCount}
         hasActiveFilters={hasActiveFilters}
@@ -1162,10 +1159,10 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
               <div className="flex items-center justify-between">
                 <label className="text-xs font-bold text-slate-200 flex items-center gap-1.5">
                   <Calendar className="w-3.5 h-3.5 text-orange-400" />
-                  <span>Award Year (Fiscal Period)</span>
+                  <span>{t('acceptedTenders.awardYearFiscal')}</span>
                 </label>
                 <span className="text-[10px] text-slate-400 font-mono">
-                  {availableYears.length} Years
+                  {t('common.yearsCount', { count: availableYears.length })}
                 </span>
               </div>
               <select
@@ -1174,11 +1171,11 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
                 className="w-full bg-slate-800 border border-slate-700 hover:border-slate-600 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-emerald-500 cursor-pointer"
               >
                 <option value="ALL" className="bg-slate-900 text-white font-medium">
-                  All Award Years ({contextForYear.length})
+                  {t('acceptedTenders.allAwardYears', { count: contextForYear.length })}
                 </option>
                 {availableYears.map((yr) => (
                   <option key={yr} value={yr} className="bg-slate-900 text-white">
-                    Financial Year {yr} ({yearCounts.get(yr) || 0} awards)
+                    {t('acceptedTenders.financialYearFormat', { year: yr, count: yearCounts.get(yr) || 0 })}
                   </option>
                 ))}
               </select>
@@ -1193,10 +1190,10 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
         <div className="space-y-3">
           <div className="text-xs font-bold text-slate-500 uppercase tracking-wider px-1 flex items-center justify-between">
             <span className="flex items-center gap-1.5">
-              <span>Awarded Contracts</span>
+              <span>{t('acceptedTenders.awardedContracts')}</span>
               <span className="text-[11px] font-mono font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
                 {visibleTenders.length < totalDbCount
-                  ? `${visibleTenders.length} of ${totalDbCount.toLocaleString('en-IN')}`
+                  ? `${visibleTenders.length} ${t('common.of')} ${totalDbCount.toLocaleString('en-IN')}`
                   : `${(totalDbCount || visibleTenders.length).toLocaleString('en-IN')}`}
               </span>
             </span>
@@ -1229,7 +1226,7 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
                     <div className="flex items-center gap-1.5 flex-wrap">
                       <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 flex items-center gap-1">
                         <Award className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
-                        AWARDED (L1)
+                        {t('acceptedTenders.awardedL1')}
                       </span>
                       {tender.year && (
                         <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-orange-100 dark:bg-orange-950/60 text-orange-900 dark:text-orange-300 border border-orange-200 dark:border-orange-800">
@@ -1264,30 +1261,30 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
                         <div className="flex items-center gap-1.5 pb-1.5 mb-1.5 border-b border-slate-800">
                           <Calendar className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
                           <span className="font-bold text-xs text-white">
-                            Contract Award Date
+                            {t('acceptedTenders.contractAwardDate')}
                           </span>
                         </div>
 
                         {/* Explanation of what the date is for */}
                         <p className="text-slate-300 leading-relaxed">
-                          This date marks when the procuring authority officially accepted the L1 commercial proposal and issued the Letter of Acceptance (LOA).
+                          {t('acceptedTenders.contractAwardDateDesc')}
                         </p>
 
                         {/* Key Timestamps / Info */}
                         <div className="mt-2 pt-2 border-t border-slate-800 space-y-1 font-mono text-[10px]">
                           <div className="flex items-center justify-between">
-                            <span className="text-slate-400">LOA Award Date:</span>
+                            <span className="text-slate-400">{t('acceptedTenders.loaAwardDate')}</span>
                             <span className="text-emerald-300 font-bold">{formatDate(tender.award_date)}</span>
                           </div>
                           {tender.year && (
                             <div className="flex items-center justify-between">
-                              <span className="text-slate-400">Fiscal Period:</span>
+                              <span className="text-slate-400">{t('acceptedTenders.fiscalPeriod')}</span>
                               <span className="text-slate-200 font-semibold">FY {tender.year}</span>
                             </div>
                           )}
                           {tender.winning_company?.name && (
                             <div className="flex items-center justify-between gap-2">
-                              <span className="text-slate-400 shrink-0">Awardee (L1):</span>
+                              <span className="text-slate-400 shrink-0">{t('acceptedTenders.awardeeL1')}</span>
                               <span className="text-slate-200 truncate font-semibold" title={tender.winning_company.name}>
                                 {tender.winning_company.name}
                               </span>
@@ -1322,7 +1319,7 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
 
                   {/* Winning Bidder Pill */}
                   <div className="bg-slate-50 dark:bg-slate-800/60 rounded-lg p-2 border border-slate-100 dark:border-slate-700/60 mb-2.5">
-                    <div className="text-[10px] uppercase font-semibold text-slate-400">Winning Contractor</div>
+                    <div className="text-[10px] uppercase font-semibold text-slate-400">{t('acceptedTenders.winningContractor')}</div>
                     <div className="font-bold text-slate-800 dark:text-slate-100 break-words text-[11px]">
                       {tender.winning_company?.name}
                     </div>
@@ -1331,14 +1328,14 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
                   {/* Financial Metrics Row */}
                   <div className="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-slate-800 text-[11px]">
                     <div>
-                      <span className="text-slate-400 block text-[10px]">Award Value</span>
+                      <span className="text-slate-400 block text-[10px]">{t('acceptedTenders.awardValue')}</span>
                       <strong className="text-emerald-700 dark:text-emerald-400 font-bold font-mono">
                         {formatINR(tender.bid_submission?.quoted_amount_inr)}
                       </strong>
                     </div>
 
                     <div className="text-right">
-                      <span className="text-slate-400 block text-[10px]">Estimated</span>
+                      <span className="text-slate-400 block text-[10px]">{t('acceptedTenders.estimated')}</span>
                       <span className="text-slate-600 dark:text-slate-400 line-through font-mono">
                         {formatINR(tender.og_tender?.estimated_cost_inr)}
                       </span>
@@ -1358,25 +1355,25 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
               >
                 <div className="w-4 h-4 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin" />
                 <span className="text-[11px] font-medium text-slate-500 dark:text-slate-400">
-                  Loading next 12 awarded contracts...
+                  {t('acceptedTenders.loadingNext12')}
                 </span>
               </div>
             )}
 
             {!hasMoreToRender && filteredTenders.length > 0 && (
               <div className="py-2.5 text-center text-[11px] text-slate-400 dark:text-slate-500 font-medium border-t border-slate-100 dark:border-slate-800">
-                ✓ Showing all {filteredTenders.length.toLocaleString('en-IN')} contracts
+                {t('acceptedTenders.showingAllContracts', { count: filteredTenders.length.toLocaleString('en-IN') })}
               </div>
             )}
 
             {filteredTenders.length === 0 && (
               <div className="bg-white dark:bg-[#0E1422] rounded-xl border border-slate-200/90 dark:border-slate-800 p-8 text-center text-slate-500 dark:text-slate-400 text-xs space-y-2">
-                <p>No accepted tenders matching your selected criteria.</p>
+                <p>{t('acceptedTenders.noAcceptedTendersMatching')}</p>
                 <button
                   onClick={resetAllFilters}
                   className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 hover:bg-emerald-100 dark:hover:bg-emerald-900/40 transition-colors cursor-pointer"
                 >
-                  Reset All Filters
+                  {t('common.resetAll')}
                 </button>
               </div>
             )}
@@ -1388,15 +1385,15 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
           {!selectedTender || filteredTenders.length === 0 ? (
             <div className="bg-white dark:bg-[#0E1422] rounded-xl border border-slate-200/90 dark:border-slate-800 p-12 text-center text-slate-500 dark:text-slate-400 shadow-xs">
               <Award className="w-10 h-10 text-slate-300 dark:text-slate-600 mx-auto mb-3" />
-              <h3 className="text-sm font-bold text-slate-800 dark:text-slate-100">No matching accepted tenders found</h3>
+              <h3 className="text-sm font-bold text-slate-800 dark:text-slate-100">{t('acceptedTenders.noMatchingAcceptedFound')}</h3>
               <p className="text-xs text-slate-400 dark:text-slate-500 mt-1 mb-4">
-                No tenders match your current filter combination. Try adjusting the Source, Organisation, State, City, or Year filters.
+                {t('acceptedTenders.noMatchingAcceptedDesc')}
               </p>
               <button
                 onClick={resetAllFilters}
                 className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs rounded-lg shadow-xs transition-colors cursor-pointer"
               >
-                Reset All Filters
+                {t('common.resetAll')}
               </button>
             </div>
           ) : (
@@ -1407,10 +1404,10 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
                   <div>
                     <div className="flex items-center gap-2 mb-1">
                       <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
-                        🏆 L1 WINNING PROPOSAL
+                        {t('acceptedTenders.l1WinningProposal')}
                       </span>
                       <span className="text-xs text-slate-400 dark:text-slate-500 font-mono">
-                        LOA: {selectedTender.acceptance_and_loa?.loa_number}
+                        {t('acceptedTenders.loa')} {selectedTender.acceptance_and_loa?.loa_number}
                       </span>
                     </div>
                     <h3 className="text-sm font-bold text-slate-900 dark:text-white leading-snug">
@@ -1427,7 +1424,7 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
                       title="Download Official In-Memory Generated PDF Dossier"
                     >
                       <Download className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
-                      <span>[RAG] Download Dossier PDF</span>
+                      <span>{t('acceptedTenders.downloadDossierPdf')}</span>
                     </a>
                   </div>
                 </div>
@@ -1435,29 +1432,29 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
                 {/* Quick Summary Strip */}
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 mt-3 pt-1 text-xs">
                   <div className="bg-slate-50 dark:bg-slate-800/60 p-2.5 rounded-lg border border-slate-100 dark:border-slate-700/60">
-                    <span className="text-[10px] text-slate-400 uppercase font-semibold block">Awarded To</span>
+                    <span className="text-[10px] text-slate-400 uppercase font-semibold block">{t('acceptedTenders.awardedTo')}</span>
                     <span className="font-bold text-slate-800 dark:text-slate-100 break-words block" title={selectedTender.winning_company?.name}>
                       {selectedTender.winning_company?.name}
                     </span>
                   </div>
 
                   <div className="bg-slate-50 dark:bg-slate-800/60 p-2.5 rounded-lg border border-slate-100 dark:border-slate-700/60">
-                    <span className="text-[10px] text-slate-400 uppercase font-semibold block">Quoted L1 Bid</span>
+                    <span className="text-[10px] text-slate-400 uppercase font-semibold block">{t('acceptedTenders.quotedL1Bid')}</span>
                     <span className="font-bold text-emerald-700 dark:text-emerald-400 block font-mono">
                       {formatINR(selectedTender.bid_submission?.quoted_amount_inr)}
                     </span>
                   </div>
 
                   <div className="bg-slate-50 dark:bg-slate-800/60 p-2.5 rounded-lg border border-slate-100 dark:border-slate-700/60">
-                    <span className="text-[10px] text-slate-400 uppercase font-semibold block">L1 Discount</span>
+                    <span className="text-[10px] text-slate-400 uppercase font-semibold block">{t('acceptedTenders.l1Discount')}</span>
                     <span className="font-bold text-emerald-600 dark:text-emerald-400 block flex items-center gap-1 font-mono">
                       <TrendingDown className="w-3.5 h-3.5" />
-                      {selectedTender.bid_submission?.quoted_discount_pct}% below estimate
+                      {t('acceptedTenders.belowEstimate', { pct: selectedTender.bid_submission?.quoted_discount_pct })}
                     </span>
                   </div>
 
                   <div className="bg-slate-50 dark:bg-slate-800/60 p-2.5 rounded-lg border border-slate-100 dark:border-slate-700/60">
-                    <span className="text-[10px] text-slate-400 uppercase font-semibold block">EMD Instrument</span>
+                    <span className="text-[10px] text-slate-400 uppercase font-semibold block">{t('acceptedTenders.emdInstrument')}</span>
                     <span className="font-bold text-purple-700 dark:text-purple-400 block break-words" title={selectedTender.bid_submission?.emd_mode}>
                       {selectedTender.bid_submission?.emd_mode}
                     </span>
@@ -1475,7 +1472,7 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
                     }`}
                   >
                     <Layers className="w-3.5 h-3.5" />
-                    <span>1. OG Tender vs Winning Bid</span>
+                    <span>{t('acceptedTenders.subtabs.tab1')}</span>
                   </button>
 
                   <button
@@ -1487,7 +1484,7 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
                     }`}
                   >
                     <Building2 className="w-3.5 h-3.5" />
-                    <span>2. Contractor Profile</span>
+                    <span>{t('acceptedTenders.subtabs.tab2')}</span>
                   </button>
 
                   <button
@@ -1499,7 +1496,7 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
                     }`}
                   >
                     <FolderLock className="w-3.5 h-3.5" />
-                    <span>3. Filled 3-Cover Exhibits</span>
+                    <span>{t('acceptedTenders.subtabs.tab3')}</span>
                   </button>
 
                   <button
@@ -1511,7 +1508,7 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
                     }`}
                   >
                     <Wrench className="w-3.5 h-3.5 text-amber-500" />
-                    <span>4. Technical PQC & Machinery</span>
+                    <span>{t('acceptedTenders.subtabs.tab4')}</span>
                   </button>
 
                   <button
@@ -1523,7 +1520,7 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
                     }`}
                   >
                     <FileSpreadsheet className="w-3.5 h-3.5 text-emerald-500" />
-                    <span>5. Financial BOQ Analysis</span>
+                    <span>{t('acceptedTenders.subtabs.tab5')}</span>
                   </button>
 
                   <button
@@ -1535,7 +1532,7 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
                     }`}
                   >
                     <Scale className="w-3.5 h-3.5 text-blue-500" />
-                    <span>6. Make in India & Legal</span>
+                    <span>{t('acceptedTenders.subtabs.tab6')}</span>
                   </button>
 
                   <button
@@ -1547,7 +1544,7 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
                     }`}
                   >
                     <Clock className="w-3.5 h-3.5 text-purple-500" />
-                    <span>7. Milestones & Payment Terms</span>
+                    <span>{t('acceptedTenders.subtabs.tab7')}</span>
                   </button>
 
                   <button
@@ -1559,7 +1556,7 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
                     }`}
                   >
                     <Stamp className="w-3.5 h-3.5 text-rose-500" />
-                    <span>8. Letter of Acceptance (LOA)</span>
+                    <span>{t('acceptedTenders.subtabs.tab8')}</span>
                   </button>
 
                   <button
@@ -1571,7 +1568,7 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
                     }`}
                   >
                     <FileText className="w-3.5 h-3.5 text-cyan-500" />
-                    <span>[RAG] 9. Official Dossier PDF</span>
+                    <span>{t('acceptedTenders.subtabs.tab9')}</span>
                   </button>
 
                   <button
@@ -1583,7 +1580,7 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
                     }`}
                   >
                     <Users className="w-3.5 h-3.5 text-amber-500" />
-                    <span>10. All Evaluated Bids (L1, L2, L3...)</span>
+                    <span>{t('acceptedTenders.subtabs.tab10')}</span>
                   </button>
                 </div>
               </div>
@@ -1594,10 +1591,10 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
                   <div>
                     <h4 className="text-xs font-bold text-slate-900 dark:text-slate-100 uppercase tracking-wider flex items-center gap-1.5">
                       <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-                      Comparative Audit: Tender Requirement vs Contractor Submission
+                      {t('acceptedTenders.dossier.comparativeAuditTitle')}
                     </h4>
                     <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                      Side-by-side compliance mapping showing how this bidder satisfied every qualification threshold.
+                      {t('acceptedTenders.dossier.comparativeAuditDesc')}
                     </p>
                   </div>
 
@@ -1605,30 +1602,30 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
                     <table className="w-full text-left text-xs">
                       <thead className="bg-slate-50 dark:bg-[#131A2B] text-slate-600 dark:text-slate-300 font-semibold border-b border-slate-200 dark:border-slate-800">
                         <tr>
-                          <th className="py-2.5 px-3">Evaluation Parameter</th>
-                          <th className="py-2.5 px-3 w-1/3">Original Tender (NIT) Condition</th>
-                          <th className="py-2.5 px-3 w-1/3">Submitted by Winning Contractor</th>
-                          <th className="py-2.5 px-3 text-center">Verdict</th>
+                          <th className="py-2.5 px-3">{t('acceptedTenders.dossier.evalParam')}</th>
+                          <th className="py-2.5 px-3 w-1/3">{t('acceptedTenders.dossier.nitCondition')}</th>
+                          <th className="py-2.5 px-3 w-1/3">{t('acceptedTenders.dossier.submittedByWinner')}</th>
+                          <th className="py-2.5 px-3 text-center">{t('acceptedTenders.dossier.verdict')}</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-slate-100 dark:divide-slate-800 text-slate-700 dark:text-slate-300">
                         <tr>
-                          <td className="py-2.5 px-3 font-semibold text-slate-900 dark:text-slate-100">Total Price / Financial Bid</td>
+                          <td className="py-2.5 px-3 font-semibold text-slate-900 dark:text-slate-100">{t('acceptedTenders.dossier.totalPrice')}</td>
                           <td className="py-2.5 px-3 font-mono text-slate-700 dark:text-slate-300">
-                            Estimated: {formatINR(selectedTender.og_tender?.estimated_cost_inr)}
+                            {t('acceptedTenders.estimated')}: {formatINR(selectedTender.og_tender?.estimated_cost_inr)}
                           </td>
                           <td className="py-2.5 px-3 font-mono font-bold text-emerald-700 dark:text-emerald-400">
                             {formatINR(selectedTender.bid_submission?.quoted_amount_inr)} (-{selectedTender.bid_submission?.quoted_discount_pct}%)
                           </td>
                           <td className="py-2.5 px-3 text-center">
                             <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-transparent dark:border-emerald-800/60">
-                              L1 LOWEST
+                              {t('acceptedTenders.dossier.l1Lowest')}
                             </span>
                           </td>
                         </tr>
 
                         <tr>
-                          <td className="py-2.5 px-3 font-semibold text-slate-900 dark:text-slate-100">Earnest Money Deposit (EMD)</td>
+                          <td className="py-2.5 px-3 font-semibold text-slate-900 dark:text-slate-100">{t('acceptedTenders.dossier.emd')}</td>
                           <td className="py-2.5 px-3 font-mono text-slate-700 dark:text-slate-300">
                             ₹ {(selectedTender.og_tender?.emd_amount_inr || 0).toLocaleString('en-IN')}
                           </td>
@@ -1638,13 +1635,13 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
                           </td>
                           <td className="py-2.5 px-3 text-center">
                             <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-transparent dark:border-emerald-800/60">
-                              ACCEPTED
+                              {t('acceptedTenders.dossier.accepted')}
                             </span>
                           </td>
                         </tr>
 
                         <tr>
-                          <td className="py-2.5 px-3 font-semibold text-slate-900 dark:text-slate-100">Annual Financial Turnover</td>
+                          <td className="py-2.5 px-3 font-semibold text-slate-900 dark:text-slate-100">{t('acceptedTenders.dossier.annualTurnover')}</td>
                           <td className="py-2.5 px-3 font-mono text-slate-700 dark:text-slate-300">
                             Min 40%: {formatINR(selectedTender.og_tender?.min_turnover_inr)}
                           </td>
@@ -1658,13 +1655,13 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
                           </td>
                           <td className="py-2.5 px-3 text-center">
                             <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-transparent dark:border-emerald-800/60">
-                              SURPASSES
+                              {t('acceptedTenders.dossier.surpasses')}
                             </span>
                           </td>
                         </tr>
 
                         <tr>
-                          <td className="py-2.5 px-3 font-semibold text-slate-900 dark:text-slate-100">Bank Solvency Certificate</td>
+                          <td className="py-2.5 px-3 font-semibold text-slate-900 dark:text-slate-100">{t('acceptedTenders.dossier.bankSolvency')}</td>
                           <td className="py-2.5 px-3 font-mono text-slate-700 dark:text-slate-300">
                             Min 40%: {formatINR(selectedTender.og_tender?.min_solvency_inr)}
                           </td>
@@ -1678,28 +1675,28 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
                           </td>
                           <td className="py-2.5 px-3 text-center">
                             <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-transparent dark:border-emerald-800/60">
-                              QUALIFIED
+                              {t('acceptedTenders.dossier.qualified')}
                             </span>
                           </td>
                         </tr>
 
                         <tr>
-                          <td className="py-2.5 px-3 font-semibold text-slate-900 dark:text-slate-100">Similar Work 3-2-1 Experience</td>
+                          <td className="py-2.5 px-3 font-semibold text-slate-900 dark:text-slate-100">{t('acceptedTenders.dossier.similarWork')}</td>
                           <td className="py-2.5 px-3 text-[11px] text-slate-700 dark:text-slate-300">
                             {selectedTender.og_tender?.similar_work_criteria}
                           </td>
                           <td className="py-2.5 px-3 text-[11px] text-slate-700 dark:text-slate-300">
-                            Satisfied via completed central/state PSU projects with verified completion certificates.
+                            {t('acceptedTenders.dossier.similarWorkDesc')}
                           </td>
                           <td className="py-2.5 px-3 text-center">
                             <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-transparent dark:border-emerald-800/60">
-                              VERIFIED
+                              {t('acceptedTenders.dossier.verified')}
                             </span>
                           </td>
                         </tr>
 
                         <tr>
-                          <td className="py-2.5 px-3 font-semibold text-slate-900 dark:text-slate-100">Make in India Local Content</td>
+                          <td className="py-2.5 px-3 font-semibold text-slate-900 dark:text-slate-100">{t('acceptedTenders.dossier.makeInIndiaLocal')}</td>
                           <td className="py-2.5 px-3 text-[11px] text-slate-700 dark:text-slate-300">
                             Class-I Local Supplier (Minimum 50% Domestic Value Addition)
                           </td>
@@ -1709,7 +1706,7 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
                           </td>
                           <td className="py-2.5 px-3 text-center">
                             <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-transparent dark:border-emerald-800/60">
-                              COMPLIANT
+                              {t('acceptedTenders.dossier.compliant')}
                             </span>
                           </td>
                         </tr>
@@ -1725,43 +1722,43 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
                   <div>
                     <h4 className="text-xs font-bold text-slate-900 dark:text-slate-100 uppercase tracking-wider flex items-center gap-1.5">
                       <Building2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-                      Corporate Credentials of the Awarded Contractor
+                      {t('acceptedTenders.dossier.companyProfileTitle')}
                     </h4>
                     <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                      Official incorporation, tax filings, statutory licenses, and key management personnel.
+                      {t('acceptedTenders.dossier.companyProfileDesc')}
                     </p>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
                     <div className="bg-slate-50 dark:bg-slate-800/60 p-3 rounded-lg border border-slate-200 dark:border-slate-700/60">
-                      <span className="text-[10px] text-slate-400 font-semibold uppercase block">Company Legal Name</span>
+                      <span className="text-[10px] text-slate-400 font-semibold uppercase block">{t('acceptedTenders.dossier.legalName')}</span>
                       <strong className="text-slate-900 dark:text-slate-100 text-xs">{selectedTender.winning_company?.name}</strong>
                       <span className="block text-[11px] text-slate-500 dark:text-slate-400 mt-1">{selectedTender.winning_company?.business_type}</span>
                     </div>
 
                     <div className="bg-slate-50 dark:bg-slate-800/60 p-3 rounded-lg border border-slate-200 dark:border-slate-700/60">
-                      <span className="text-[10px] text-slate-400 font-semibold uppercase block">Corporate Identification (CIN)</span>
+                      <span className="text-[10px] text-slate-400 font-semibold uppercase block">{t('acceptedTenders.dossier.cin')}</span>
                       <span className="font-mono text-slate-800 dark:text-slate-200 font-bold">{selectedTender.winning_company?.cin}</span>
                     </div>
 
                     <div className="bg-slate-50 dark:bg-slate-800/60 p-3 rounded-lg border border-slate-200 dark:border-slate-700/60 md:col-span-2">
-                      <span className="text-[10px] text-slate-400 font-semibold uppercase block">Registered Corporate Office</span>
+                      <span className="text-[10px] text-slate-400 font-semibold uppercase block">{t('acceptedTenders.dossier.registeredOffice')}</span>
                       <span className="text-slate-700 dark:text-slate-300">{selectedTender.winning_company?.registered_office}</span>
                     </div>
 
                     <div className="bg-slate-50 dark:bg-slate-800/60 p-3 rounded-lg border border-slate-200 dark:border-slate-700/60">
-                      <span className="text-[10px] text-slate-400 font-semibold uppercase block">Tax Identifiers</span>
+                      <span className="text-[10px] text-slate-400 font-semibold uppercase block">{t('acceptedTenders.dossier.taxIdentifiers')}</span>
                       <div className="font-mono text-slate-800 dark:text-slate-200">GSTIN: {selectedTender.winning_company?.gstin}</div>
                       <div className="font-mono text-slate-800 dark:text-slate-200">PAN: {selectedTender.winning_company?.pan}</div>
                     </div>
 
                     <div className="bg-slate-50 dark:bg-slate-800/60 p-3 rounded-lg border border-slate-200 dark:border-slate-700/60">
-                      <span className="text-[10px] text-slate-400 font-semibold uppercase block">MSME & Enterprise Category</span>
+                      <span className="text-[10px] text-slate-400 font-semibold uppercase block">{t('acceptedTenders.dossier.msmeCategory')}</span>
                       <span className="font-semibold text-slate-800 dark:text-slate-200">{selectedTender.winning_company?.msme_status}</span>
                     </div>
 
                     <div className="bg-slate-50 dark:bg-slate-800/60 p-3 rounded-lg border border-slate-200 dark:border-slate-700/60">
-                      <span className="text-[10px] text-slate-400 font-semibold uppercase block">Audited 3-Year Turnover</span>
+                      <span className="text-[10px] text-slate-400 font-semibold uppercase block">{t('acceptedTenders.dossier.threeYrTurnover')}</span>
                       <div className="font-mono font-bold text-emerald-700 dark:text-emerald-400 text-xs">
                         {formatINR(selectedTender.winning_company?.audited_turnover_inr)}
                       </div>
@@ -1769,7 +1766,7 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
                     </div>
 
                     <div className="bg-slate-50 dark:bg-slate-800/60 p-3 rounded-lg border border-slate-200 dark:border-slate-700/60">
-                      <span className="text-[10px] text-slate-400 font-semibold uppercase block">Bank Solvency Backing</span>
+                      <span className="text-[10px] text-slate-400 font-semibold uppercase block">{t('acceptedTenders.dossier.solvencyBacking')}</span>
                       <div className="font-mono font-bold text-slate-800 dark:text-slate-200 text-xs">
                         {formatINR(selectedTender.winning_company?.solvency_certificate_inr)}
                       </div>
@@ -1777,7 +1774,7 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
                     </div>
 
                     <div className="bg-slate-50 dark:bg-slate-800/60 p-3 rounded-lg border border-slate-200 dark:border-slate-700/60 md:col-span-2">
-                      <span className="text-[10px] text-slate-400 font-semibold uppercase block">Key Project In-Charge</span>
+                      <span className="text-[10px] text-slate-400 font-semibold uppercase block">{t('acceptedTenders.dossier.keyProjectLead')}</span>
                       <div className="text-slate-800 dark:text-slate-200 font-medium flex items-center gap-1.5 mt-0.5">
                         <Users className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" />
                         <span>{selectedTender.winning_company?.project_lead}</span>
@@ -1793,10 +1790,10 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
                   <div className="bg-white dark:bg-[#0E1422] rounded-xl border border-slate-200/90 dark:border-slate-800 p-5 shadow-xs transition-colors">
                     <h4 className="text-xs font-bold text-slate-900 dark:text-slate-100 uppercase tracking-wider flex items-center gap-1.5 mb-1">
                       <FolderLock className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-                      What the Winning Bidder Submitted in the 3 Packets
+                      {t('acceptedTenders.dossier.coversTitle')}
                     </h4>
                     <p className="text-xs text-slate-500 dark:text-slate-400 mb-4">
-                      Inspection of actual exhibits, certificates, affidavits, and price BOQ schedule filed on the portal.
+                      {t('acceptedTenders.dossier.coversDesc')}
                     </p>
 
                     <div className="space-y-3.5">
@@ -1804,7 +1801,7 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
                       <div className="bg-amber-50/50 dark:bg-amber-950/20 rounded-xl border border-amber-200 dark:border-amber-900/40 overflow-hidden">
                         <div className="bg-amber-100/80 dark:bg-amber-950/50 px-4 py-2 text-xs font-bold text-amber-900 dark:text-amber-200 flex items-center justify-between">
                           <span>{selectedTender.bid_submission?.cover_1?.name}</span>
-                          <span className="text-[10px] uppercase font-mono px-2 py-0.5 rounded bg-white/80 dark:bg-slate-800 text-slate-800 dark:text-slate-200">Fee & EMD</span>
+                          <span className="text-[10px] uppercase font-mono px-2 py-0.5 rounded bg-white/80 dark:bg-slate-800 text-slate-800 dark:text-slate-200">{t('acceptedTenders.dossier.feeEmd')}</span>
                         </div>
                         <div className="p-3.5">
                           <ul className="space-y-1.5 text-xs text-slate-700 dark:text-slate-300">
@@ -1822,7 +1819,7 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
                       <div className="bg-blue-50/50 dark:bg-blue-950/20 rounded-xl border border-blue-200 dark:border-blue-900/40 overflow-hidden">
                         <div className="bg-blue-100/80 dark:bg-blue-950/50 px-4 py-2 text-xs font-bold text-blue-900 dark:text-blue-200 flex items-center justify-between">
                           <span>{selectedTender.bid_submission?.cover_2?.name}</span>
-                          <span className="text-[10px] uppercase font-mono px-2 py-0.5 rounded bg-white/80 dark:bg-slate-800 text-slate-800 dark:text-slate-200">Technical & PQ</span>
+                          <span className="text-[10px] uppercase font-mono px-2 py-0.5 rounded bg-white/80 dark:bg-slate-800 text-slate-800 dark:text-slate-200">{t('acceptedTenders.dossier.techPq')}</span>
                         </div>
                         <div className="p-3.5">
                           <ul className="space-y-1.5 text-xs text-slate-700 dark:text-slate-300">
@@ -1840,7 +1837,7 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
                       <div className="bg-emerald-50/50 dark:bg-emerald-950/20 rounded-xl border border-emerald-200 dark:border-emerald-900/40 overflow-hidden">
                         <div className="bg-emerald-100/80 dark:bg-emerald-950/50 px-4 py-2 text-xs font-bold text-emerald-900 dark:text-emerald-200 flex items-center justify-between">
                           <span>{selectedTender.bid_submission?.cover_3?.name}</span>
-                          <span className="text-[10px] uppercase font-mono px-2 py-0.5 rounded bg-white/80 dark:bg-slate-800 text-slate-800 dark:text-slate-200">Financial BOQ</span>
+                          <span className="text-[10px] uppercase font-mono px-2 py-0.5 rounded bg-white/80 dark:bg-slate-800 text-slate-800 dark:text-slate-200">{t('acceptedTenders.dossier.finBoq')}</span>
                         </div>
                         <div className="p-3.5">
                           <ul className="space-y-1.5 text-xs text-slate-700 dark:text-slate-300">
@@ -1864,49 +1861,49 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
                   <div>
                     <h4 className="text-xs font-bold text-slate-900 dark:text-slate-100 uppercase tracking-wider flex items-center gap-1.5">
                       <Wrench className="w-4 h-4 text-amber-600 dark:text-amber-400" />
-                      Technical Pre-Qualification Criteria (PQC) & Machinery Deployment
+                      {t('acceptedTenders.dossier.pqcTitle')}
                     </h4>
                     <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                      Verification of GFR Rule 173 technical experience thresholds, specialized plant deployment, and certified engineering manpower.
+                      {t('acceptedTenders.dossier.pqcDesc')}
                     </p>
                   </div>
 
                   {/* 3-2-1 Experience Formula Grid */}
                   <div className="bg-amber-50/60 dark:bg-amber-950/20 rounded-xl border border-amber-200 dark:border-amber-900/40 p-4">
                     <span className="text-[11px] font-bold text-amber-900 dark:text-amber-200 uppercase tracking-wider block mb-2">
-                      GFR Rule 173 Similar Work Formula Verification
+                      {t('acceptedTenders.dossier.formulaVerification')}
                     </span>
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
                       <div className="bg-white dark:bg-[#141C2E] p-3 rounded-lg border border-amber-200/80 dark:border-amber-900/40 shadow-2xs">
-                        <span className="text-[10px] text-amber-700 dark:text-amber-400 font-bold uppercase block">Condition A (3 Works)</span>
+                        <span className="text-[10px] text-amber-700 dark:text-amber-400 font-bold uppercase block">{t('acceptedTenders.dossier.conditionA')}</span>
                         <div className="font-mono font-bold text-slate-900 dark:text-slate-100 text-xs mt-0.5">
                           ≥ {formatINR((selectedTender.og_tender?.estimated_cost_inr || 0) * 0.4)}
                         </div>
-                        <span className="text-[10px] text-slate-500 dark:text-slate-400 block mt-1">3 completed similar works of 40% cost in last 7 years</span>
+                        <span className="text-[10px] text-slate-500 dark:text-slate-400 block mt-1">{t('acceptedTenders.dossier.conditionADesc')}</span>
                         <span className="inline-block mt-2 px-2 py-0.5 bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 text-[9px] font-bold rounded">
-                          ✓ VERIFIED & APPROVED
+                          {t('acceptedTenders.dossier.verifiedApproved')}
                         </span>
                       </div>
 
                       <div className="bg-white dark:bg-[#141C2E] p-3 rounded-lg border border-amber-200/80 dark:border-amber-900/40 shadow-2xs">
-                        <span className="text-[10px] text-amber-700 dark:text-amber-400 font-bold uppercase block">Condition B (2 Works)</span>
+                        <span className="text-[10px] text-amber-700 dark:text-amber-400 font-bold uppercase block">{t('acceptedTenders.dossier.conditionB')}</span>
                         <div className="font-mono font-bold text-slate-900 dark:text-slate-100 text-xs mt-0.5">
                           ≥ {formatINR((selectedTender.og_tender?.estimated_cost_inr || 0) * 0.5)}
                         </div>
-                        <span className="text-[10px] text-slate-500 dark:text-slate-400 block mt-1">2 completed similar works of 50% cost in last 7 years</span>
+                        <span className="text-[10px] text-slate-500 dark:text-slate-400 block mt-1">{t('acceptedTenders.dossier.conditionBDesc')}</span>
                         <span className="inline-block mt-2 px-2 py-0.5 bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 text-[9px] font-bold rounded">
-                          ✓ VERIFIED & APPROVED
+                          {t('acceptedTenders.dossier.verifiedApproved')}
                         </span>
                       </div>
 
                       <div className="bg-white dark:bg-[#141C2E] p-3 rounded-lg border border-amber-200/80 dark:border-amber-900/40 shadow-2xs">
-                        <span className="text-[10px] text-amber-700 dark:text-amber-400 font-bold uppercase block">Condition C (1 Work)</span>
+                        <span className="text-[10px] text-amber-700 dark:text-amber-400 font-bold uppercase block">{t('acceptedTenders.dossier.conditionC')}</span>
                         <div className="font-mono font-bold text-slate-900 dark:text-slate-100 text-xs mt-0.5">
                           ≥ {formatINR((selectedTender.og_tender?.estimated_cost_inr || 0) * 0.8)}
                         </div>
-                        <span className="text-[10px] text-slate-500 dark:text-slate-400 block mt-1">1 single completed mega work of 80% contract value</span>
+                        <span className="text-[10px] text-slate-500 dark:text-slate-400 block mt-1">{t('acceptedTenders.dossier.conditionCDesc')}</span>
                         <span className="inline-block mt-2 px-2 py-0.5 bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 text-[9px] font-bold rounded">
-                          ✓ EXCEEDS CRITERIA
+                          {t('acceptedTenders.dossier.exceedsCriteria')}
                         </span>
                       </div>
                     </div>
@@ -1916,7 +1913,7 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
                   <div>
                     <h5 className="text-xs font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider mb-2 flex items-center gap-1.5">
                       <Truck className="w-3.5 h-3.5 text-slate-600 dark:text-slate-400" />
-                      Mandatory Heavy Plant & Equipment Mobilized on Site
+                      {t('acceptedTenders.dossier.machineryTitle')}
                     </h5>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
                       {[
@@ -1944,7 +1941,7 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
                   <div className="bg-slate-50 dark:bg-slate-800/60 rounded-xl p-4 border border-slate-200 dark:border-slate-700/60">
                     <h5 className="text-xs font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider mb-2 flex items-center gap-1.5">
                       <Users className="w-3.5 h-3.5 text-slate-600 dark:text-slate-400" />
-                      Statutory Key Engineering Manpower Committed by Bidder
+                      {t('acceptedTenders.dossier.manpowerTitle')}
                     </h5>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
                       <div className="bg-white dark:bg-[#141C2E] p-2.5 rounded-lg border border-slate-200 dark:border-slate-700/60">
@@ -1978,39 +1975,39 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
                   <div>
                     <h4 className="text-xs font-bold text-slate-900 dark:text-slate-100 uppercase tracking-wider flex items-center gap-1.5">
                       <FileSpreadsheet className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-                      Itemized Bill of Quantities (BOQ) & Quoted Financial Schedule
+                      {t('acceptedTenders.dossier.boqTitle')}
                     </h4>
                     <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                      Financial rate schedule showing bill line items, component percentages, and competitive tender evaluation against L2 and L3 bids.
+                      {t('acceptedTenders.dossier.boqDesc')}
                     </p>
                   </div>
 
                   {/* Summary Comparison vs Estimate */}
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
                     <div className="bg-slate-50 dark:bg-slate-800/60 p-3 rounded-lg border border-slate-200 dark:border-slate-700/60">
-                      <span className="text-[10px] uppercase font-semibold text-slate-400">Department Estimate</span>
+                      <span className="text-[10px] uppercase font-semibold text-slate-400">{t('acceptedTenders.dossier.deptEstimate')}</span>
                       <div className="font-mono font-bold text-slate-900 dark:text-slate-100 text-sm mt-0.5">
                         {formatINR(selectedTender.og_tender?.estimated_cost_inr)}
                       </div>
-                      <span className="text-[10px] text-slate-500 dark:text-slate-400">Based on Official DSR Rates</span>
+                      <span className="text-[10px] text-slate-500 dark:text-slate-400">{t('acceptedTenders.dossier.basedOnDsr')}</span>
                     </div>
 
                     <div className="bg-emerald-50 dark:bg-emerald-950/30 p-3 rounded-lg border border-emerald-200 dark:border-emerald-800/50">
-                      <span className="text-[10px] uppercase font-semibold text-emerald-700 dark:text-emerald-300">Contractor Quoted L1 Bid</span>
+                      <span className="text-[10px] uppercase font-semibold text-emerald-700 dark:text-emerald-300">{t('acceptedTenders.dossier.contractorL1Bid')}</span>
                       <div className="font-mono font-bold text-emerald-800 dark:text-emerald-200 text-sm mt-0.5">
                         {formatINR(selectedTender.bid_submission?.quoted_amount_inr)}
                       </div>
                       <span className="text-[10px] text-emerald-700 dark:text-emerald-400 font-bold">
-                        -{selectedTender.bid_submission?.quoted_discount_pct}% Below Department Estimate
+                        {t('acceptedTenders.dossier.belowDeptEstimate', { pct: selectedTender.bid_submission?.quoted_discount_pct })}
                       </span>
                     </div>
 
                     <div className="bg-blue-50 dark:bg-blue-950/30 p-3 rounded-lg border border-blue-200 dark:border-blue-800/50">
-                      <span className="text-[10px] uppercase font-semibold text-blue-700 dark:text-blue-300">Net Exchequer Savings</span>
+                      <span className="text-[10px] uppercase font-semibold text-blue-700 dark:text-blue-300">{t('acceptedTenders.dossier.netSavings')}</span>
                       <div className="font-mono font-bold text-blue-900 dark:text-blue-200 text-sm mt-0.5">
                         {formatINR((selectedTender.og_tender?.estimated_cost_inr || 0) - (selectedTender.bid_submission?.quoted_amount_inr || 0))}
                       </div>
-                      <span className="text-[10px] text-blue-600 dark:text-blue-400">Saved to Government Treasury</span>
+                      <span className="text-[10px] text-blue-600 dark:text-blue-400">{t('acceptedTenders.dossier.savedToTreasury')}</span>
                     </div>
                   </div>
 
@@ -2019,11 +2016,11 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
                     <table className="w-full text-left text-xs">
                       <thead className="bg-slate-50 dark:bg-[#131A2B] text-slate-600 dark:text-slate-300 font-semibold border-b border-slate-200 dark:border-slate-800">
                         <tr>
-                          <th className="py-2.5 px-3">Item #</th>
-                          <th className="py-2.5 px-3">BOQ Component Description</th>
-                          <th className="py-2.5 px-3 text-right">Est. Share (%)</th>
-                          <th className="py-2.5 px-3 text-right">Contractor Quoted Share</th>
-                          <th className="py-2.5 px-3 text-center">Pricing Strategy</th>
+                          <th className="py-2.5 px-3">{t('acceptedTenders.dossier.itemNo')}</th>
+                          <th className="py-2.5 px-3">{t('acceptedTenders.dossier.itemDesc')}</th>
+                          <th className="py-2.5 px-3 text-right">{t('acceptedTenders.dossier.estShare')}</th>
+                          <th className="py-2.5 px-3 text-right">{t('acceptedTenders.dossier.quotedShare')}</th>
+                          <th className="py-2.5 px-3 text-center">{t('acceptedTenders.dossier.pricingStrategy')}</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-slate-100 dark:divide-slate-800 text-slate-700 dark:text-slate-300">
@@ -2054,12 +2051,12 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
                   {/* Competitive Bid Matrix (L1 vs L2 vs L3) */}
                   <div className="bg-slate-50 dark:bg-slate-800/60 p-4 rounded-xl border border-slate-200 dark:border-slate-700/60">
                     <span className="text-[11px] font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider block mb-2">
-                      Competitive Price Comparison Matrix (Tender Evaluation Committee)
+                      {t('acceptedTenders.dossier.competitiveMatrix')}
                     </span>
                     <div className="space-y-2 text-xs">
                       <div className="bg-emerald-50/80 dark:bg-emerald-950/40 p-2.5 rounded-lg border border-emerald-300 dark:border-emerald-800/60 flex items-center justify-between">
                         <div className="flex items-center gap-2">
-                          <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-600 text-white">L1 WINNER</span>
+                          <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-600 text-white">{t('acceptedTenders.dossier.l1Winner')}</span>
                           <span className="font-bold text-slate-900 dark:text-slate-100">{selectedTender.winning_company?.name}</span>
                         </div>
                         <div className="text-right">
@@ -2074,23 +2071,23 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
 
                       <div className="bg-white dark:bg-[#141C2E] p-2.5 rounded-lg border border-slate-200 dark:border-slate-700/60 flex items-center justify-between text-slate-600 dark:text-slate-300">
                         <div className="flex items-center gap-2">
-                          <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200">L2 BIDDER</span>
+                          <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200">{t('acceptedTenders.dossier.l2Bidder')}</span>
                           <span>Afcons Infrastructure / Larsen & Toubro Consortium</span>
                         </div>
                         <div className="text-right font-mono">
                           <span>{formatINR((selectedTender.bid_submission?.quoted_amount_inr || 0) * 1.026)}</span>
-                          <span className="text-[10px] text-slate-500 dark:text-slate-400 ml-1.5">(+2.6% over L1)</span>
+                          <span className="text-[10px] text-slate-500 dark:text-slate-400 ml-1.5">{t('acceptedTenders.dossier.overL1', { pct: 2.6 })}</span>
                         </div>
                       </div>
 
                       <div className="bg-white dark:bg-[#141C2E] p-2.5 rounded-lg border border-slate-200 dark:border-slate-700/60 flex items-center justify-between text-slate-600 dark:text-slate-300">
                         <div className="flex items-center gap-2">
-                          <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200">L3 BIDDER</span>
+                          <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200">{t('acceptedTenders.dossier.l3Bidder')}</span>
                           <span>NCC Limited / Dilip Buildcon JV</span>
                         </div>
                         <div className="text-right font-mono">
                           <span>{formatINR((selectedTender.bid_submission?.quoted_amount_inr || 0) * 1.054)}</span>
-                          <span className="text-[10px] text-slate-500 dark:text-slate-400 ml-1.5">(+5.4% over L1)</span>
+                          <span className="text-[10px] text-slate-500 dark:text-slate-400 ml-1.5">{t('acceptedTenders.dossier.overL1', { pct: 5.4 })}</span>
                         </div>
                       </div>
                     </div>
@@ -2104,10 +2101,10 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
                   <div>
                     <h4 className="text-xs font-bold text-slate-900 dark:text-slate-100 uppercase tracking-wider flex items-center gap-1.5">
                       <Scale className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-                      Statutory, Tax & Make in India Order (DPIIT) Legal Exhibits
+                      {t('acceptedTenders.dossier.legalTitle')}
                     </h4>
                     <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                      Mandatory government public procurement regulatory filings, anti-corruption integrity accords, and tax standing certificates.
+                      {t('acceptedTenders.dossier.legalDesc')}
                     </p>
                   </div>
 
@@ -2183,10 +2180,10 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
                   <div>
                     <h4 className="text-xs font-bold text-slate-900 dark:text-slate-100 uppercase tracking-wider flex items-center gap-1.5">
                       <Clock className="w-4 h-4 text-purple-600 dark:text-purple-400" />
-                      Contract Execution Milestones & Running Account (RA) Billing Schedule
+                      {t('acceptedTenders.dossier.milestonesTitle')}
                     </h4>
                     <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                      Detailed stage-by-stage construction timeline, milestone financial triggers, defect liability period, and liquidated damages provisions.
+                      {t('acceptedTenders.dossier.milestonesDesc')}
                     </p>
                   </div>
 
@@ -2253,19 +2250,19 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
                   {/* Contract Protection & Security Clauses */}
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
                     <div className="bg-slate-50 dark:bg-slate-800/60 p-3 rounded-lg border border-slate-200 dark:border-slate-700/60">
-                      <span className="text-[10px] uppercase font-semibold text-slate-400">Performance Bank Guarantee</span>
+                      <span className="text-[10px] uppercase font-semibold text-slate-400">{t('acceptedTenders.dossier.pbg')}</span>
                       <strong className="text-slate-900 dark:text-slate-100 block mt-0.5">5% of Contract Value</strong>
                       <span className="text-[10px] text-slate-500 dark:text-slate-400 block mt-1">Submitted within 14 days of LOA, valid up to DLP completion + 60 days.</span>
                     </div>
 
                     <div className="bg-slate-50 dark:bg-slate-800/60 p-3 rounded-lg border border-slate-200 dark:border-slate-700/60">
-                      <span className="text-[10px] uppercase font-semibold text-slate-400">Defect Liability Period (DLP)</span>
+                      <span className="text-[10px] uppercase font-semibold text-slate-400">{t('acceptedTenders.dossier.dlp')}</span>
                       <strong className="text-slate-900 dark:text-slate-100 block mt-0.5">36 to 60 Months Guarantee</strong>
                       <span className="text-[10px] text-slate-500 dark:text-slate-400 block mt-1">Free maintenance of riding quality, culvert settlement, and road safety furniture.</span>
                     </div>
 
                     <div className="bg-slate-50 dark:bg-slate-800/60 p-3 rounded-lg border border-slate-200 dark:border-slate-700/60">
-                      <span className="text-[10px] uppercase font-semibold text-slate-400">Liquidated Damages (LD)</span>
+                      <span className="text-[10px] uppercase font-semibold text-slate-400">{t('acceptedTenders.dossier.ld')}</span>
                       <strong className="text-slate-900 dark:text-slate-100 block mt-0.5">0.5% per Week (Max 10%)</strong>
                       <span className="text-[10px] text-slate-500 dark:text-slate-400 block mt-1">Statutory delay compensation levied for unauthorized extension of time.</span>
                     </div>
@@ -2279,10 +2276,10 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
                   <div>
                     <h4 className="text-xs font-bold text-slate-900 dark:text-slate-100 uppercase tracking-wider flex items-center gap-1.5">
                       <Stamp className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-                      Official Letter of Acceptance (LOA) & Tender Committee Minutes
+                      {t('acceptedTenders.dossier.loaMinutesTitle')}
                     </h4>
                     <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                      Official endorsement and justification for selecting this contractor as the lowest responsive L1 bidder.
+                      {t('acceptedTenders.dossier.loaMinutesDesc')}
                     </p>
                   </div>
 
@@ -2290,36 +2287,36 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
                   <div className="bg-slate-50 dark:bg-[#080C14] border-2 border-slate-300 dark:border-slate-700 rounded-xl p-5 relative">
                     {/* Official Stamp Watermark */}
                     <div className="absolute right-6 top-6 border-2 border-emerald-600 text-emerald-700 dark:text-emerald-400 font-bold px-3 py-1 rounded text-xs uppercase tracking-widest rotate-6 bg-white/90 dark:bg-slate-900/90 shadow-2xs">
-                      AWARDED & ACCEPTED
+                      {t('acceptedTenders.dossier.awardedAccepted')}
                     </div>
 
                     <div className="space-y-3 text-xs">
                       <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-2.5">
                         <div>
-                          <span className="text-[10px] text-slate-400 uppercase font-semibold">Letter of Acceptance (LOA) Number</span>
+                          <span className="text-[10px] text-slate-400 uppercase font-semibold">{t('acceptedTenders.dossier.loaNumber')}</span>
                           <div className="font-mono font-bold text-slate-900 dark:text-slate-100 text-xs">
                             {selectedTender.acceptance_and_loa?.loa_number}
                           </div>
                         </div>
                         <div className="text-right">
-                          <span className="text-[10px] text-slate-400 uppercase font-semibold">Date of Issuance</span>
+                          <span className="text-[10px] text-slate-400 uppercase font-semibold">{t('acceptedTenders.dossier.issuanceDate')}</span>
                           <div className="font-semibold text-slate-800 dark:text-slate-200">{formatDate(selectedTender.acceptance_and_loa?.loa_date)}</div>
                         </div>
                       </div>
 
                       <div>
-                        <span className="text-[10px] text-slate-400 uppercase font-semibold">Awarding Authority</span>
+                        <span className="text-[10px] text-slate-400 uppercase font-semibold">{t('acceptedTenders.dossier.awardingAuthority')}</span>
                         <div className="font-medium text-slate-800 dark:text-slate-200">{selectedTender.acceptance_and_loa?.awarding_authority}</div>
                       </div>
 
                       <div>
-                        <span className="text-[10px] text-slate-400 uppercase font-semibold">Contract Agreement Execution</span>
+                        <span className="text-[10px] text-slate-400 uppercase font-semibold">{t('acceptedTenders.dossier.contractAgreementExecution')}</span>
                         <div className="font-medium text-slate-800 dark:text-slate-200">{formatDate(selectedTender.acceptance_and_loa?.contract_agreement_date)}</div>
                       </div>
 
                       <div className="bg-white dark:bg-[#141C2E] p-3.5 rounded-lg border border-slate-200 dark:border-slate-700/60 mt-2">
                         <span className="text-[10px] text-slate-400 uppercase font-semibold block mb-1">
-                          Tender Evaluation Committee Findings & Recommendation
+                          {t('acceptedTenders.dossier.committeeFindingsRec')}
                         </span>
                         <p className="text-slate-700 dark:text-slate-300 leading-relaxed text-xs">
                           "{selectedTender.acceptance_and_loa?.committee_verdict}"
@@ -2337,10 +2334,10 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
                     <div>
                       <h4 className="text-xs font-bold text-slate-900 dark:text-slate-100 flex items-center gap-1.5">
                         <FileText className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-                        [RAG] Official Generated Bid Dossier (PDF Document)
+                        {t('acceptedTenders.dossier.officialPdfTitle')}
                       </h4>
                       <p className="text-[11px] text-slate-500 dark:text-slate-400">
-                        Compiled dynamically via ReportLab in memory with zero local disk footprint.
+                        {t('acceptedTenders.dossier.officialPdfDesc')}
                       </p>
                     </div>
 
@@ -2351,7 +2348,7 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
                         className="px-3 py-1.5 rounded-md text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 flex items-center gap-1"
                       >
                         <Download className="w-3.5 h-3.5" />
-                        <span>[RAG] Download PDF</span>
+                        <span>{t('acceptedTenders.dossier.downloadPdf')}</span>
                       </a>
                       <a
                         href={pdfUrl}
@@ -2360,7 +2357,7 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
                         className="px-3 py-1.5 rounded-md text-xs font-semibold bg-slate-900 dark:bg-slate-700 text-white hover:bg-slate-800 dark:hover:bg-slate-600 flex items-center gap-1"
                       >
                         <ExternalLink className="w-3.5 h-3.5" />
-                        <span>Open in New Window</span>
+                        <span>{t('acceptedTenders.dossier.openNewWindow')}</span>
                       </a>
                     </div>
                   </div>

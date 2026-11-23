@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { Mail, Send, MessageSquare, User, Phone, CheckCircle2, AlertCircle, Clock, Sparkles } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { FeedbackSubject } from '../../../types';
 
 export const HomeFeedbackContactSection: React.FC = () => {
+  const { t } = useTranslation();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
@@ -17,7 +19,7 @@ export const HomeFeedbackContactSection: React.FC = () => {
     setErrorMessage(null);
 
     if (!name.trim() || !email.trim() || !message.trim()) {
-      setErrorMessage('Please fill in all required fields (Name, Email, and Message).');
+      setErrorMessage(t('home.feedback.errorMessage'));
       return;
     }
 
@@ -50,7 +52,7 @@ export const HomeFeedbackContactSection: React.FC = () => {
         throw new Error(errorMsg);
       }
 
-      setSuccessMessage(data.message || 'Thank you! Your submission has been received successfully.');
+      setSuccessMessage(data.message || t('home.feedback.successMessage'));
       setName('');
       setEmail('');
       setPhone('');
@@ -72,13 +74,13 @@ export const HomeFeedbackContactSection: React.FC = () => {
           <div className="space-y-2.5">
             <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold bg-orange-100 dark:bg-orange-950/60 text-orange-900 dark:text-orange-300 border border-orange-300 dark:border-orange-800">
               <Sparkles className="w-3.5 h-3.5 text-orange-600 dark:text-orange-400" />
-              <span>Feedback & Contact Us</span>
+              <span>{t('home.feedback.badge')}</span>
             </span>
             <h2 className="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight">
-              Get in Touch with Our Procurement Team
+              {t('home.feedback.title')}
             </h2>
             <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
-              Have questions about Indian public tenders, GeM portal sourcing, or want to suggest a new platform capability? We review every submission.
+              {t('home.feedback.subtitle')}
             </p>
           </div>
 
@@ -90,13 +92,13 @@ export const HomeFeedbackContactSection: React.FC = () => {
               </div>
               <div className="space-y-0.5 min-w-0">
                 <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block">
-                  Direct Response
+                  {t('home.feedback.directResponse')}
                 </span>
                 <span className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white block">
-                  Immediate Notification
+                  {t('home.feedback.immediateNotification')}
                 </span>
                 <span className="text-[11px] text-slate-500 dark:text-slate-400 block">
-                  Automated notification sent to our team immediately upon submission.
+                  {t('home.feedback.notificationDesc')}
                 </span>
               </div>
             </div>
@@ -108,13 +110,13 @@ export const HomeFeedbackContactSection: React.FC = () => {
               </div>
               <div className="space-y-0.5">
                 <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block">
-                  Response SLA
+                  {t('home.feedback.responseSla')}
                 </span>
                 <span className="text-xs font-semibold text-slate-800 dark:text-slate-200 block">
-                  Usually replies within 24 hours
+                  {t('home.feedback.usuallyReplies')}
                 </span>
                 <span className="text-[11px] text-slate-500 dark:text-slate-400 block">
-                  Technical support for bidding documents and API integrations.
+                  {t('home.feedback.techSupport')}
                 </span>
               </div>
             </div>
@@ -130,13 +132,13 @@ export const HomeFeedbackContactSection: React.FC = () => {
               </div>
               <div className="space-y-1.5 max-w-md mx-auto">
                 <h3 className="text-lg font-bold text-slate-900 dark:text-white">
-                  Submission Successfully Received!
+                  {t('home.feedback.submissionReceived')}
                 </h3>
                 <p className="text-xs text-slate-600 dark:text-slate-300">
                   {successMessage}
                 </p>
                 <p className="text-[11px] text-slate-500 dark:text-slate-400 pt-1">
-                  Our team has been notified and will review your message shortly.
+                  {t('home.feedback.notificationDesc')}
                 </p>
               </div>
               <button
@@ -144,7 +146,7 @@ export const HomeFeedbackContactSection: React.FC = () => {
                 onClick={() => setSuccessMessage(null)}
                 className="mt-4 px-4 py-2 rounded-lg bg-slate-200 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 text-xs font-semibold transition-all cursor-pointer"
               >
-                Send Another Message
+                {t('home.feedback.sendAnother')}
               </button>
             </div>
           ) : (
@@ -161,7 +163,7 @@ export const HomeFeedbackContactSection: React.FC = () => {
                 <div className="space-y-1.5">
                   <label htmlFor="feedback-name" className="text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1">
                     <User className="w-3.5 h-3.5 text-slate-400" />
-                    <span>Your Full Name <span className="text-orange-500">*</span></span>
+                    <span>{t('home.feedback.yourFullName')} <span className="text-orange-500">*</span></span>
                   </label>
                   <input
                     id="feedback-name"
@@ -169,7 +171,7 @@ export const HomeFeedbackContactSection: React.FC = () => {
                     required
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    placeholder="e.g. Ramesh Sharma"
+                    placeholder={t('home.feedback.fullNamePlaceholder')}
                     className="w-full px-3.5 py-2 text-xs rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-[#0E1422] text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-orange-500"
                   />
                 </div>
@@ -177,7 +179,7 @@ export const HomeFeedbackContactSection: React.FC = () => {
                 <div className="space-y-1.5">
                   <label htmlFor="feedback-email" className="text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1">
                     <Mail className="w-3.5 h-3.5 text-slate-400" />
-                    <span>Email Address <span className="text-orange-500">*</span></span>
+                    <span>{t('home.feedback.emailAddress')} <span className="text-orange-500">*</span></span>
                   </label>
                   <input
                     id="feedback-email"
@@ -185,7 +187,7 @@ export const HomeFeedbackContactSection: React.FC = () => {
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="you@company.com"
+                    placeholder={t('home.feedback.emailPlaceholder')}
                     className="w-full px-3.5 py-2 text-xs rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-[#0E1422] text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-orange-500"
                   />
                 </div>
@@ -196,21 +198,21 @@ export const HomeFeedbackContactSection: React.FC = () => {
                 <div className="space-y-1.5">
                   <label htmlFor="feedback-phone" className="text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1">
                     <Phone className="w-3.5 h-3.5 text-slate-400" />
-                    <span>Mobile / WhatsApp Number</span>
+                    <span>{t('home.feedback.mobileWhatsApp')}</span>
                   </label>
                   <input
                     id="feedback-phone"
                     type="tel"
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
-                    placeholder="+91 98765 43210 (optional)"
+                    placeholder={t('home.feedback.phoneOptional')}
                     className="w-full px-3.5 py-2 text-xs rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-[#0E1422] text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-orange-500"
                   />
                 </div>
 
                 <div className="space-y-1.5">
                   <label htmlFor="feedback-subject" className="text-xs font-bold text-slate-700 dark:text-slate-300">
-                    Feedback / Contact Us
+                    {t('home.feedback.feedbackSubject')}
                   </label>
                   <select
                     id="feedback-subject"
@@ -229,10 +231,10 @@ export const HomeFeedbackContactSection: React.FC = () => {
                 <label htmlFor="feedback-message" className="text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center justify-between">
                   <span className="flex items-center gap-1">
                     <MessageSquare className="w-3.5 h-3.5 text-slate-400" />
-                    <span>Message / Details <span className="text-orange-500">*</span></span>
+                    <span>{t('home.feedback.messageDetails')} <span className="text-orange-500">*</span></span>
                   </span>
                   <span className="text-[10px] text-slate-400 font-normal">
-                    {message.length} / 5,000 characters
+                    {t('home.feedback.charactersCount',  { count: message.length })}
                   </span>
                 </label>
                 <textarea
@@ -244,8 +246,8 @@ export const HomeFeedbackContactSection: React.FC = () => {
                   onChange={(e) => setMessage(e.target.value)}
                   placeholder={
                     subject === 'Contact Us'
-                      ? 'Please describe your query, procurement requirement, or question in detail...'
-                      : 'Please share your suggestions, ideas, or feedback to help us improve...'
+                      ? t('home.feedback.contactUsPlaceholder')
+                      : t('home.feedback.feedbackPlaceholder')
                   }
                   className="w-full px-3.5 py-2.5 text-xs rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-[#0E1422] text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-orange-500 resize-y"
                 />
@@ -261,12 +263,16 @@ export const HomeFeedbackContactSection: React.FC = () => {
                   {isSubmitting ? (
                     <>
                       <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                      <span>Submitting...</span>
+                      <span>{t('home.feedback.submitting')}</span>
                     </>
                   ) : (
                     <>
                       <Send className="w-3.5 h-3.5" />
-                      <span>{subject === 'Contact Us' ? 'Submit Contact Request' : 'Submit Feedback'}</span>
+                      <span>
+                        {subject === 'Contact Us'
+                          ? t('home.feedback.submitContactRequest')
+                          : t('home.feedback.submitFeedback')}
+                      </span>
                     </>
                   )}
                 </button>

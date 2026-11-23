@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Sparkles,
   Scale,
@@ -22,6 +23,8 @@ export const DeepRAGClauseSubTab: React.FC<DeepRAGClauseSubTabProps> = ({
   sbdUrl,
   boqUrl
 }) => {
+  const { t } = useTranslation();
+
   return (
     <div className="bg-white dark:bg-[#0E1422] rounded-xl border border-slate-200/90 dark:border-slate-800 p-5 shadow-xs space-y-4 transition-colors">
       {/* Top Executive Dossier Banner */}
@@ -31,25 +34,29 @@ export const DeepRAGClauseSubTab: React.FC<DeepRAGClauseSubTabProps> = ({
             <div className="flex items-center gap-2 mb-1.5 flex-wrap">
               <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-wider uppercase bg-indigo-500 text-slate-950 flex items-center gap-1 shadow-xs">
                 <Sparkles className="w-3.5 h-3.5" />
-                [RAG] CONTRACT DOCUMENT INTELLIGENCE
+                {t('currentTenders.deepRag.contractDocIntel')}
               </span>
               <span className="px-2 py-0.5 rounded text-[10px] bg-slate-800 text-slate-300 font-mono border border-slate-700">
-                SBD & BOQ Schedule Synthesis
+                {t('currentTenders.deepRag.sbdBoqSynthesis')}
               </span>
               <span className="px-2 py-0.5 rounded text-[10px] bg-emerald-950 text-emerald-300 font-bold border border-emerald-700/60">
                 {deepRAGReport.riskVerdict}
               </span>
             </div>
             <h4 className="text-base font-bold text-white tracking-tight">
-              [RAG] SBD Contract Clause Breakdown & BOQ Cost Drivers
+              {t('currentTenders.deepRag.title')}
             </h4>
             <p className="text-xs text-slate-300 mt-1 max-w-3xl leading-relaxed">
-              AI Retrieval-Augmented Generation extracts and risk-scores critical contractual liabilities: Liquidated Damages formulas, RBI/MoSPI Price Variation clauses, Mobilization Advances, DLP warranty retentions, and Pareto 80/20 bill of quantities cost drivers.
+              {t(
+                'currentTenders.deepRag.desc'
+              )}
             </p>
           </div>
 
           <div className="bg-slate-800/90 border border-indigo-500/40 px-4 py-2.5 rounded-xl text-center shrink-0">
-            <span className="text-[10px] text-slate-400 uppercase font-semibold block">Bankability Score</span>
+            <span className="text-[10px] text-slate-400 uppercase font-semibold block">
+              {t('currentTenders.deepRag.bankabilityScore')}
+            </span>
             <div className="flex items-center justify-center gap-1">
               <span className="text-2xl font-bold text-indigo-400 font-mono">
                 {deepRAGReport.overallRiskScore}
@@ -57,7 +64,7 @@ export const DeepRAGClauseSubTab: React.FC<DeepRAGClauseSubTabProps> = ({
               <span className="text-xs text-slate-400 font-mono">/ 100</span>
             </div>
             <span className="text-[9px] text-emerald-400 font-bold block mt-0.5">
-              High Bankability Tier
+              {t('currentTenders.deepRag.highBankabilityTier')}
             </span>
           </div>
         </div>
@@ -66,35 +73,51 @@ export const DeepRAGClauseSubTab: React.FC<DeepRAGClauseSubTabProps> = ({
       {/* 4 Contractual Foundation Metric Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
         <div className="bg-slate-50 dark:bg-slate-800/60 p-3 rounded-xl border border-slate-200 dark:border-slate-700/60">
-          <span className="text-[10px] text-slate-400 uppercase font-semibold block">Liquidated Damages (LD)</span>
+          <span className="text-[10px] text-slate-400 uppercase font-semibold block">
+            {t('currentTenders.deepRag.ld')}
+          </span>
           <strong className="text-sm font-bold text-rose-700 dark:text-rose-400 block mt-0.5 font-mono">
             0.5% / Wk (Cap {deepRAGReport.ldCapPct}%)
           </strong>
-          <span className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5 block">Milestone Linked</span>
+          <span className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5 block">
+            {t('currentTenders.deepRag.milestoneLinked')}
+          </span>
         </div>
 
         <div className="bg-slate-50 dark:bg-slate-800/60 p-3 rounded-xl border border-slate-200 dark:border-slate-700/60">
-          <span className="text-[10px] text-slate-400 uppercase font-semibold block">Price Variation (PVC)</span>
+          <span className="text-[10px] text-slate-400 uppercase font-semibold block">
+            {t('currentTenders.deepRag.pvc')}
+          </span>
           <strong className="text-sm font-bold text-emerald-700 dark:text-emerald-400 block mt-0.5 font-mono">
-            MoSPI WPI Active
+            {t('currentTenders.deepRag.mospiWpiActive')}
           </strong>
-          <span className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5 block">Steel, Cement, Labour, Fuel</span>
+          <span className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5 block">
+            {t('currentTenders.deepRag.pvcComponents')}
+          </span>
         </div>
 
         <div className="bg-slate-50 dark:bg-slate-800/60 p-3 rounded-xl border border-slate-200 dark:border-slate-700/60">
-          <span className="text-[10px] text-slate-400 uppercase font-semibold block">Mobilization Advance</span>
+          <span className="text-[10px] text-slate-400 uppercase font-semibold block">
+            {t('currentTenders.deepRag.mobilizationAdvance')}
+          </span>
           <strong className="text-sm font-bold text-blue-700 dark:text-blue-400 block mt-0.5 font-mono">
             10.0% @ 8% p.a.
           </strong>
-          <span className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5 block">Against Bank Guarantee</span>
+          <span className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5 block">
+            {t('currentTenders.deepRag.againstBg')}
+          </span>
         </div>
 
         <div className="bg-slate-50 dark:bg-slate-800/60 p-3 rounded-xl border border-slate-200 dark:border-slate-700/60">
-          <span className="text-[10px] text-slate-400 uppercase font-semibold block">Defect Liability (DLP)</span>
+          <span className="text-[10px] text-slate-400 uppercase font-semibold block">
+            {t('currentTenders.deepRag.dlp')}
+          </span>
           <strong className="text-sm font-bold text-purple-700 dark:text-purple-400 block mt-0.5 font-mono">
             {deepRAGReport.dlpMonths} Months
           </strong>
-          <span className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5 block">{deepRAGReport.pbgPct}% PBG Retention</span>
+          <span className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5 block">
+            {deepRAGReport.pbgPct}% {t('currentTenders.deepRag.secDepositRetention')}
+          </span>
         </div>
       </div>
 
@@ -104,7 +127,7 @@ export const DeepRAGClauseSubTab: React.FC<DeepRAGClauseSubTabProps> = ({
           <div>
             <h4 className="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider flex items-center gap-1.5">
               <Scale className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
-              [RAG] Contractual Clause Risk Matrix & Legal Obligations
+              {t('currentTenders.deepRag.clausesTitle')}
             </h4>
             <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
               Extracted from General Conditions of Contract (GCC) & Special Conditions (SCC) under GFR 2017 & CVC guidelines.
@@ -190,7 +213,7 @@ export const DeepRAGClauseSubTab: React.FC<DeepRAGClauseSubTabProps> = ({
           <div>
             <h4 className="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider flex items-center gap-1.5">
               <FileSpreadsheet className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-              [RAG] BOQ Pareto 80/20 Cost Drivers & Material Sensitivity
+              {t('currentTenders.deepRag.boqTitle')}
             </h4>
             <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
               Identifies the key 20% of work packages driving 80% of project expenditure and raw material price volatility.
@@ -205,14 +228,14 @@ export const DeepRAGClauseSubTab: React.FC<DeepRAGClauseSubTabProps> = ({
           <table className="w-full text-left text-xs">
             <thead className="bg-slate-900 dark:bg-slate-950 text-slate-200 text-[10px] uppercase font-bold tracking-wider">
               <tr>
-                <th className="py-2.5 px-3">Item No</th>
-                <th className="py-2.5 px-3">Work Package & Description</th>
-                <th className="py-2.5 px-3">Unit</th>
-                <th className="py-2.5 px-3">Qty</th>
-                <th className="py-2.5 px-3">Est. Amount</th>
-                <th className="py-2.5 px-3">Cost Share</th>
-                <th className="py-2.5 px-3">Cumulative</th>
-                <th className="py-2.5 px-3">Material Sensitivity & Hedging</th>
+                <th className="py-2.5 px-3">{t('currentTenders.deepRag.itemNo')}</th>
+                <th className="py-2.5 px-3">{t('currentTenders.deepRag.descWorks')}</th>
+                <th className="py-2.5 px-3">{t('currentTenders.deepRag.unit')}</th>
+                <th className="py-2.5 px-3">{t('currentTenders.deepRag.estQty')}</th>
+                <th className="py-2.5 px-3">{t('currentTenders.deepRag.amountInr')}</th>
+                <th className="py-2.5 px-3">{t('currentTenders.deepRag.costPct')}</th>
+                <th className="py-2.5 px-3">{t('currentTenders.deepRag.cumPct')}</th>
+                <th className="py-2.5 px-3">{t('currentTenders.deepRag.hedgingAdvice')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-200 dark:divide-slate-800 bg-white dark:bg-[#0E1422]">
@@ -229,7 +252,7 @@ export const DeepRAGClauseSubTab: React.FC<DeepRAGClauseSubTabProps> = ({
                     <div className="font-bold text-slate-900 dark:text-white leading-snug">{p.description}</div>
                     {p.isParetoDriver80_20 && (
                       <span className="inline-block mt-1 px-1.5 py-0.2 rounded text-[9px] font-bold bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 border border-amber-300 dark:border-amber-800">
-                        ★ Top 80% Pareto Driver
+                        {t('currentTenders.deepRag.topParetoDriver')}
                       </span>
                     )}
                   </td>
@@ -269,7 +292,7 @@ export const DeepRAGClauseSubTab: React.FC<DeepRAGClauseSubTabProps> = ({
       <div className="pt-2">
         <h4 className="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider mb-2.5 flex items-center gap-1.5">
           <FileCheck className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-          [RAG] Statutory GFR 2017 & Eligibility Verification Checklist
+          {t('currentTenders.deepRag.checklistTitle')}
         </h4>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
           {deepRAGReport.statutoryChecklist.map((chk) => (
@@ -291,7 +314,7 @@ export const DeepRAGClauseSubTab: React.FC<DeepRAGClauseSubTabProps> = ({
       {/* Actions Bar: Direct Document Access */}
       <div className="pt-4 border-t border-slate-200 dark:border-slate-800 flex flex-wrap items-center justify-between gap-3">
         <div className="text-xs text-slate-500 dark:text-slate-400">
-          Standard Bidding Document (SBD) and BOQ generated in memory via ReportLab with zero disk overhead.
+          {t('currentTenders.deepRag.footerNote')}
         </div>
         <div className="flex items-center gap-2 flex-wrap">
           <a
@@ -300,7 +323,7 @@ export const DeepRAGClauseSubTab: React.FC<DeepRAGClauseSubTabProps> = ({
             className="px-3.5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold flex items-center gap-1.5 shadow-xs transition-all"
           >
             <BookOpen className="w-3.5 h-3.5" />
-            <span>[RAG] Download Full SBD (PDF)</span>
+            <span>{t('currentTenders.deepRag.downloadSbdPdf')}</span>
           </a>
           <a
             href={boqUrl}
@@ -308,10 +331,11 @@ export const DeepRAGClauseSubTab: React.FC<DeepRAGClauseSubTabProps> = ({
             className="px-3.5 py-2 bg-slate-800 hover:bg-slate-900 text-white rounded-lg text-xs font-bold flex items-center gap-1.5 shadow-xs transition-all"
           >
             <FileSpreadsheet className="w-3.5 h-3.5 text-emerald-400" />
-            <span>[RAG] Download BOQ Schedule (320 KB)</span>
+            <span>{t('currentTenders.deepRag.downloadBoqSchedule')}</span>
           </a>
         </div>
       </div>
     </div>
   );
 };
+

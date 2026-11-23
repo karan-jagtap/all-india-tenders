@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Building2, AlertCircle, Tag, MapPin, TrendingUp } from 'lucide-react';
 import { RegisteredBidder, BidderWonContract } from '../types';
 import { listRegisteredBidders } from '../services/api';
@@ -13,6 +14,7 @@ import {
 } from './RegisteredBidders';
 
 export const RegisteredBiddersTab: React.FC = () => {
+  const { t } = useTranslation();
   const [bidders, setBidders] = useState<RegisteredBidder[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -38,7 +40,7 @@ export const RegisteredBiddersTab: React.FC = () => {
       (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
 
     if (!SpeechRecognition) {
-      alert('Voice search is not supported in this browser. Please use Chrome, Edge, or Safari.');
+      alert(t('common.searchBar.voiceNotSupported'));
       return;
     }
 
@@ -345,7 +347,7 @@ export const RegisteredBiddersTab: React.FC = () => {
       selectedCategory.forEach((cat) => {
         list.push({
           id: `category-${cat}`,
-          label: 'Specialization',
+          label: t('bidders.filterDrawer.workSpecialization'),
           value: cat,
           color: 'blue',
           icon: <Tag className="w-3 h-3 text-blue-500" />,
@@ -358,7 +360,7 @@ export const RegisteredBiddersTab: React.FC = () => {
       selectedState.forEach((st) => {
         list.push({
           id: `state-${st}`,
-          label: 'State',
+          label: t('common.state'),
           value: st,
           color: 'rose',
           icon: <MapPin className="w-3 h-3 text-rose-500" />,
@@ -369,15 +371,15 @@ export const RegisteredBiddersTab: React.FC = () => {
 
     if (sortBy !== 'NAME_ASC') {
       const sortLabelMap: Record<BidderSortOption, string> = {
-        NAME_ASC: 'Alphabetical (A → Z)',
-        NAME_DESC: 'Alphabetical (Z → A)',
-        CONTRACTS_DESC: 'Most Contracts',
-        VALUE_DESC: 'Highest Value',
-        TURNOVER_DESC: 'Highest Turnover'
+        NAME_ASC: t('bidders.sort.nameAsc'),
+        NAME_DESC: t('bidders.sort.nameDesc'),
+        CONTRACTS_DESC: t('bidders.sort.contractsDesc'),
+        VALUE_DESC: t('bidders.sort.valueDesc'),
+        TURNOVER_DESC: t('bidders.sort.turnoverDesc')
       };
       list.push({
         id: 'sort',
-        label: 'Sort',
+        label: t('common.sort'),
         value: sortLabelMap[sortBy],
         color: 'emerald',
         icon: <TrendingUp className="w-3 h-3 text-emerald-500" />,
@@ -388,7 +390,7 @@ export const RegisteredBiddersTab: React.FC = () => {
     if (searchQuery.trim() !== '') {
       list.push({
         id: 'query',
-        label: 'Query',
+        label: t('common.search'),
         value: `"${searchQuery.trim()}"`,
         color: 'slate',
         onRemove: handleRemoveSearchChip
@@ -396,7 +398,7 @@ export const RegisteredBiddersTab: React.FC = () => {
     }
 
     return list;
-  }, [selectedCategory, selectedState, sortBy, searchQuery]);
+  }, [selectedCategory, selectedState, sortBy, searchQuery, t]);
 
   const activeFiltersCount = useMemo(() => {
     let count = 0;
@@ -468,24 +470,24 @@ export const RegisteredBiddersTab: React.FC = () => {
           }}
         >
           <div className="text-xs text-slate-500 dark:text-slate-400 font-semibold px-1 flex items-center justify-between">
-            <span>Registered Contractors ({filteredBidders.length})</span>
+            <span>{t('bidders.registeredContractorsCount', { count: filteredBidders.length })}</span>
           </div>
 
           {loading ? (
             <div className="p-8 text-center bg-white dark:bg-[#0E1422] rounded-xl border border-slate-200/90 dark:border-slate-800">
               <div className="inline-block animate-spin w-6 h-6 border-2 border-blue-600 border-t-transparent rounded-full mb-2" />
-              <p className="text-xs text-slate-500 dark:text-slate-400">Loading contractor directory in RAM...</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400">{t('bidders.loadingInRam')}</p>
             </div>
           ) : filteredBidders.length === 0 ? (
             <div className="p-8 text-center bg-white dark:bg-[#0E1422] rounded-xl border border-slate-200/90 dark:border-slate-800">
               <Building2 className="w-8 h-8 text-slate-300 dark:text-slate-600 mx-auto mb-2" />
-              <h3 className="text-sm font-bold text-slate-700 dark:text-slate-200">No Contractors Found</h3>
-              <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">Try broadening your search or resetting filters.</p>
+              <h3 className="text-sm font-bold text-slate-700 dark:text-slate-200">{t('bidders.noContractorsFound')}</h3>
+              <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">{t('bidders.noContractorsDesc')}</p>
               <button
                 onClick={resetFilters}
                 className="mt-3 px-3 py-1.5 bg-blue-600 text-white text-xs rounded-lg hover:bg-blue-700 font-semibold cursor-pointer"
               >
-                Reset All Filters
+                {t('common.resetAll')}
               </button>
             </div>
           ) : (
@@ -524,7 +526,7 @@ export const RegisteredBiddersTab: React.FC = () => {
             </div>
           ) : (
             <div className="bg-white dark:bg-[#0E1422] rounded-xl border border-slate-200/90 dark:border-slate-800 p-8 text-center text-slate-400 dark:text-slate-500">
-              Select a contractor to view complete profile dossier.
+              {t('bidders.selectContractorPrompt')}
             </div>
           )}
         </div>

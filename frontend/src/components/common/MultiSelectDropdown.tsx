@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Search, ChevronDown, Check, X, RotateCcw } from 'lucide-react';
 import { FilterAccentColor } from '../../types';
 import { DropdownOption } from './SearchableDropdown';
@@ -23,13 +24,16 @@ export const MultiSelectDropdown: React.FC<MultiSelectDropdownProps> = ({
   options,
   allOptionLabel,
   allOptionCount,
-  placeholder = 'Search...',
+  placeholder,
   icon,
   accentColor = 'orange',
-  emptyMessage = 'No matching options found',
+  emptyMessage,
   className = '',
   maxPreviewCount = 2
 }) => {
+  const { t } = useTranslation();
+  const effectivePlaceholder = placeholder ?? (t('common.search') + '...');
+  const effectiveEmptyMessage = emptyMessage ?? t('common.dropdown.noMatchingOptions');
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [openUpward, setOpenUpward] = useState<boolean>(false);
@@ -271,7 +275,7 @@ export const MultiSelectDropdown: React.FC<MultiSelectDropdownProps> = ({
               <span
                 className={`font-bold px-1.5 py-0.5 rounded text-[10px] shrink-0 border ${getAccentBadgeClass()}`}
               >
-                {selectedValuesList.length} Selected
+                {t('common.dropdown.selected', { count: selectedValuesList.length })}
               </span>
               <span className="font-medium text-slate-200 truncate text-[11px]">
                 {selectedOptions
@@ -279,7 +283,7 @@ export const MultiSelectDropdown: React.FC<MultiSelectDropdownProps> = ({
                   .map((o) => o.label)
                   .join(', ')}
                 {selectedValuesList.length > maxPreviewCount &&
-                  ` +${selectedValuesList.length - maxPreviewCount} more`}
+                  ` ${t('bidders.plusMore', { count: selectedValuesList.length - maxPreviewCount })}`}
               </span>
             </div>
           )}
@@ -291,7 +295,7 @@ export const MultiSelectDropdown: React.FC<MultiSelectDropdownProps> = ({
               type="button"
               onClick={handleClearAll}
               className="p-1 rounded hover:bg-slate-700 text-slate-400 hover:text-white transition-colors"
-              title="Clear selection (reset to All)"
+              title={t('common.dropdown.clearSelection')}
             >
               <X className="w-3.5 h-3.5" />
             </button>
@@ -321,7 +325,7 @@ export const MultiSelectDropdown: React.FC<MultiSelectDropdownProps> = ({
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder={placeholder}
+              placeholder={effectivePlaceholder}
               className={`w-full bg-slate-800/90 border border-slate-700 rounded-lg pl-8 pr-7 py-1.5 text-xs text-white placeholder-slate-400 focus:outline-none transition-colors ${getAccentBorderClass()}`}
             />
             {searchQuery && (
@@ -329,7 +333,7 @@ export const MultiSelectDropdown: React.FC<MultiSelectDropdownProps> = ({
                 type="button"
                 onClick={handleClearSearch}
                 className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white p-0.5 rounded cursor-pointer"
-                title="Clear search"
+                title={t('common.searchBar.clearSearch')}
               >
                 <X className="w-3.5 h-3.5" />
               </button>
@@ -340,13 +344,10 @@ export const MultiSelectDropdown: React.FC<MultiSelectDropdownProps> = ({
           <div className="flex items-center justify-between px-1 pb-2 pt-0.5 text-[11px] shrink-0 border-b border-slate-800 mb-1.5">
             <div className="flex items-center gap-1.5">
               {isAllSelected ? (
-                <span className="text-slate-400 font-medium">All options selected</span>
+                <span className="text-slate-400 font-medium">{t('common.dropdown.allOptionsSelected')}</span>
               ) : (
                 <span className="font-semibold text-white">
-                  <span className={`${getAccentTextClass()} font-mono font-bold`}>
-                    {selectedValuesList.length}
-                  </span>{' '}
-                  of {options.length} selected
+                  {t('common.dropdown.selectedCount', { count: selectedValuesList.length, total: options.length })}
                 </span>
               )}
             </div>
@@ -358,7 +359,7 @@ export const MultiSelectDropdown: React.FC<MultiSelectDropdownProps> = ({
                   onClick={handleSelectFilteredAll}
                   className={`${getAccentTextClass()} hover:underline font-semibold cursor-pointer text-[10px]`}
                 >
-                  Select all matches ({filteredOptions.length})
+                  {t('common.dropdown.selectAllMatches', { count: filteredOptions.length })}
                 </button>
               )}
               {!isAllSelected && (
@@ -368,7 +369,7 @@ export const MultiSelectDropdown: React.FC<MultiSelectDropdownProps> = ({
                   className="text-slate-400 hover:text-white flex items-center gap-1 cursor-pointer text-[10px]"
                 >
                   <RotateCcw className="w-2.5 h-2.5" />
-                  <span>Reset to All</span>
+                  <span>{t('common.dropdown.resetToAll')}</span>
                 </button>
               )}
             </div>
@@ -406,7 +407,7 @@ export const MultiSelectDropdown: React.FC<MultiSelectDropdownProps> = ({
                 </div>
                 {isAllSelected && (
                   <span className={`text-[10px] font-semibold ${getAccentTextClass()}`}>
-                    Active
+                    {t('common.dropdown.active')}
                   </span>
                 )}
               </button>
@@ -468,14 +469,14 @@ export const MultiSelectDropdown: React.FC<MultiSelectDropdownProps> = ({
             {!matchesAll && filteredOptions.length === 0 && (
               <div className="p-3 text-center text-slate-400 text-xs">
                 <p>
-                  {emptyMessage} for "{searchQuery}"
+                  {effectiveEmptyMessage} for "{searchQuery}"
                 </p>
                 <button
                   type="button"
                   onClick={handleClearSearch}
                   className={`mt-1.5 text-xs ${getAccentTextClass()} hover:underline font-semibold cursor-pointer`}
                 >
-                  Clear search query
+                  {t('common.dropdown.clearSearchQuery')}
                 </button>
               </div>
             )}
@@ -484,14 +485,18 @@ export const MultiSelectDropdown: React.FC<MultiSelectDropdownProps> = ({
           {/* Footer Bar: Apply / Done Button */}
           <div className="pt-2 mt-1.5 border-t border-slate-800 flex items-center justify-between shrink-0">
             <span className="text-[10px] text-slate-400">
-              {isAllSelected ? 'Showing all' : `${selectedValuesList.length} filter${selectedValuesList.length === 1 ? '' : 's'} active`}
+              {isAllSelected
+                ? t('common.dropdown.showingAll')
+                : (selectedValuesList.length === 1
+                    ? t('common.dropdown.filterActive', { count: 1 })
+                    : t('common.dropdown.filtersActive', { count: selectedValuesList.length }))}
             </span>
             <button
               type="button"
               onClick={() => setIsOpen(false)}
               className={`px-3 py-1 rounded-lg text-xs font-semibold cursor-pointer shadow-sm transition-all ${getAccentBgClass()}`}
             >
-              Done
+              {t('common.dropdown.done')}
             </button>
           </div>
         </div>

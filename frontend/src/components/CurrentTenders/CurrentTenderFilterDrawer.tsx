@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Clock } from 'lucide-react';
 import { VALUE_RANGE_OPTIONS } from '../../constants';
 import { TenderFilterDrawer } from '../common';
@@ -96,12 +97,14 @@ export const CurrentTenderFilterDrawer: React.FC<CurrentTenderFilterDrawerProps>
   openCount,
   totalAvailableCount
 }) => {
+  const { t } = useTranslation();
+
   return (
     <TenderFilterDrawer
       isOpen={isOpen}
       onClose={onClose}
-      title="Live Tender Filters"
-      subtitle="Refine in-progress procurement notices by authority, portal, sector, and location"
+      title={t('currentTenders.filterDrawerTitle')}
+      subtitle={t('currentTenders.filterDrawerSubtitle')}
       accentColor="orange"
       activeFiltersCount={activeFiltersCount}
       hasActiveFilters={hasActiveFilters}
@@ -143,10 +146,10 @@ export const CurrentTenderFilterDrawer: React.FC<CurrentTenderFilterDrawerProps>
                   onClick={() => setIncludeClosed(!includeClosed)}
                 >
                   <Clock className="w-3.5 h-3.5 text-amber-400" />
-                  <span>Include Closed / Expired Notices</span>
+                  <span>{t('currentTenders.includeClosedExpired')}</span>
                 </label>
                 <p className="text-[11px] text-slate-400 mt-1 leading-relaxed">
-                  Include notices whose bid submission deadline has elapsed (under technical & financial evaluation).
+                  {t('currentTenders.includeClosedDesc')}
                 </p>
               </div>
               <button
@@ -167,10 +170,10 @@ export const CurrentTenderFilterDrawer: React.FC<CurrentTenderFilterDrawerProps>
             </div>
             <div className="flex items-center gap-2 pt-1.5 border-t border-slate-700/60 text-[10px] text-slate-300">
               <span className={`px-2 py-0.5 rounded font-semibold ${!includeClosed ? 'bg-emerald-950/80 text-emerald-300 border border-emerald-800' : 'bg-slate-900 text-slate-400'}`}>
-                Open Bids: {openCount.toLocaleString()}
+                {t('currentTenders.openBidsCount',  { count: openCount })}
               </span>
               <span className={`px-2 py-0.5 rounded font-semibold ${includeClosed ? 'bg-orange-950/80 text-orange-300 border border-orange-800' : 'bg-slate-900 text-slate-400'}`}>
-                All Notices: {totalAvailableCount.toLocaleString()}
+                {t('currentTenders.allNoticesCount',  { count: totalAvailableCount })}
               </span>
             </div>
           </div>
@@ -180,7 +183,7 @@ export const CurrentTenderFilterDrawer: React.FC<CurrentTenderFilterDrawerProps>
             <div className="flex items-center justify-between">
               <label className="text-xs font-bold text-slate-200 flex items-center gap-1.5">
                 <Clock className="w-3.5 h-3.5 text-yellow-400" />
-                <span>Estimated Value & Urgency</span>
+                <span>{t('currentTenders.estimatedValueUrgency')}</span>
               </label>
             </div>
             <select
@@ -200,3 +203,4 @@ export const CurrentTenderFilterDrawer: React.FC<CurrentTenderFilterDrawerProps>
     />
   );
 };
+

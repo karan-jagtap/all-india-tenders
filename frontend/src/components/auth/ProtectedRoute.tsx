@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { useAuthContext } from '../../context/AuthContext';
 import { Lock, LogIn } from 'lucide-react';
 
@@ -10,10 +11,14 @@ export interface ProtectedRouteProps {
 
 export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   children,
-  title = 'Protected Feature',
-  description = 'This section requires an authenticated account to access.',
+  title,
+  description,
 }) => {
+  const { t } = useTranslation();
   const { isSignedIn, openSignIn } = useAuthContext();
+
+  const displayTitle = title || t('auth.protectedFeature');
+  const displayDescription = description || t('auth.accessRestricted');
 
   if (isSignedIn) {
     return <>{children}</>;
@@ -25,16 +30,16 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
         <div className="w-12 h-12 rounded-2xl bg-amber-500/10 text-amber-500 flex items-center justify-center mx-auto border border-amber-500/30">
           <Lock className="w-6 h-6" />
         </div>
-        <h2 className="text-xl font-bold text-slate-900 dark:text-white">{title}</h2>
+        <h2 className="text-xl font-bold text-slate-900 dark:text-white">{displayTitle}</h2>
         <p className="text-xs text-slate-500 dark:text-slate-400 max-w-sm mx-auto leading-relaxed">
-          {description}
+          {displayDescription}
         </p>
         <button
           onClick={openSignIn}
           className="px-6 py-2.5 bg-orange-600 hover:bg-orange-500 text-white font-bold text-xs rounded-xl shadow-md transition-all cursor-pointer inline-flex items-center gap-2"
         >
           <LogIn className="w-4 h-4" />
-          <span>Sign In to Continue</span>
+          <span>{t('auth.signInToContinue')}</span>
         </button>
       </div>
     </div>
