@@ -7,7 +7,6 @@ Live In-Progress Tenders, and Historical Awarded Bids into the Persistent Databa
 import os
 import re
 import json
-import sqlite3
 import asyncio
 import logging
 from typing import Dict, Any, List
@@ -578,40 +577,6 @@ async def seed_live_tenders(session):
     logger.info(f"Seeded {len(catalog)} Live Tenders across all 34 portals.")
 
 
-async def migrate_existing_feedback(session):
-    """Migrates existing feedback submissions from legacy feedback.db SQLite file into the unified database."""
-    legacy_db_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "data", "feedback.db"))
-    if not os.path.exists(legacy_db_path):
-        return
-
-    logger.info("Migrating existing feedback submissions from legacy feedback.db...")
-    try:
-        conn = sqlite3.connect(legacy_db_path)
-        conn.row_factory = sqlite3.Row
-        cursor = conn.cursor()
-        rows = cursor.execute("SELECT * FROM feedback_submissions").fetchall()
-        for r in rows:
-            sub_id = r["id"]
-            existing = await session.get(FeedbackSubmission, sub_id)
-            if not existing:
-                session.add(FeedbackSubmission(
-                    id=sub_id,
-                    name=r["name"],
-                    email=r["email"],
-                    phone=r["phone"],
-                    subject=r["subject"],
-                    message=r["message"],
-                    email_recipient=r["email_recipient"] or "kmessilj@gmail.com",
-                    email_status=r["email_status"] or "SENT",
-                    email_error=r["email_error"]
-                ))
-        conn.close()
-        await session.flush()
-        logger.info(f"Migrated {len(rows)} feedback submissions.")
-    except Exception as e:
-        logger.warning(f"Notice during feedback migration: {e}")
-
-
 async def run_seed():
     logger.info("Initializing database...")
     await init_db()
@@ -625,7 +590,6 @@ async def run_seed():
         await seed_contractor_pools(session)
         await seed_awarded_tenders(session)
         await seed_live_tenders(session)
-        await migrate_existing_feedback(session)
         await session.commit()
 
     logger.info("Database seeding successfully completed!")

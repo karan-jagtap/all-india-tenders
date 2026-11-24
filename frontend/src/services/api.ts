@@ -34,45 +34,67 @@ export interface AcceptedTendersResponse {
   totalCount: number;
 }
 
-export async function listAcceptedTenders(filters?: AcceptedTenderFilters): Promise<AcceptedTendersResponse> {
-  const params = new URLSearchParams();
-  if (filters?.category && filters.category !== 'ALL') params.append('category', filters.category);
-  if (filters?.year && String(filters.year) !== 'ALL') params.append('year', String(filters.year));
-  if (filters?.source_portal && filters.source_portal !== 'ALL') params.append('source_portal', filters.source_portal);
-  if (filters?.organization && filters.organization !== 'ALL') params.append('organization', filters.organization);
-  if (filters?.state && filters.state !== 'ALL') params.append('state', filters.state);
-  if (filters?.city && filters.city !== 'ALL') params.append('city', filters.city);
-  if (filters?.search) params.append('search', filters.search);
-  if (filters?.sort_by) params.append('sort_by', filters.sort_by);
-  if (filters?.limit !== undefined) params.append('limit', String(filters.limit));
-  if (filters?.offset !== undefined) params.append('offset', String(filters.offset));
-  params.append('_t', String(Date.now()));
+function getFilterDedupeKey(filters?: any): string {
+  if (!filters) return '{}';
+  const sorted: Record<string, any> = {};
+  for (const k of Object.keys(filters).sort()) {
+    const val = filters[k];
+    if (val !== undefined) sorted[k] = val;
+  }
+  return JSON.stringify(sorted);
+}
 
-  try {
-    const res = await fetch(`${API_BASE}/accepted-tenders?${params.toString()}`, {
-      cache: 'no-store',
-      headers: {
-        'Cache-Control': 'no-cache',
-        'Pragma': 'no-cache'
-      }
-    });
-    const contentType = res.headers.get('content-type') || '';
-    if (res.ok && contentType.includes('application/json')) {
-      const rawCountHeader = res.headers.get('X-Total-Count');
-      const tenders: AcceptedTender[] = await res.json();
-      const totalCount = rawCountHeader ? parseInt(rawCountHeader, 10) : tenders.length;
-      return { tenders, totalCount };
-    }
-  } catch {
-    // Backend API unreachable, falling back to static catalog
+const inFlightAcceptedTenders = new Map<string, Promise<AcceptedTendersResponse>>();
+const inFlightCurrentTenders = new Map<string, Promise<CurrentTendersResponse>>();
+
+export async function listAcceptedTenders(
+  filters?: AcceptedTenderFilters
+): Promise<AcceptedTendersResponse> {
+  const cacheKey = getFilterDedupeKey(filters);
+  const existing = inFlightAcceptedTenders.get(cacheKey);
+  if (existing) {
+    return existing;
   }
 
-  // Fallback to static catalog for Netlify / serverless deployment
-  try {
-    const fallbackRes = await fetch(`/data/all_sources_accepted_catalog.json?_v=${Date.now()}`, {
-      cache: 'no-cache',
-      headers: { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' }
-    });
+  const fetchPromise = (async () => {
+    const params = new URLSearchParams();
+    if (filters?.category && filters.category !== 'ALL') params.append('category', filters.category);
+    if (filters?.year && String(filters.year) !== 'ALL') params.append('year', String(filters.year));
+    if (filters?.source_portal && filters.source_portal !== 'ALL') params.append('source_portal', filters.source_portal);
+    if (filters?.organization && filters.organization !== 'ALL') params.append('organization', filters.organization);
+    if (filters?.state && filters.state !== 'ALL') params.append('state', filters.state);
+    if (filters?.city && filters.city !== 'ALL') params.append('city', filters.city);
+    if (filters?.search) params.append('search', filters.search);
+    if (filters?.sort_by) params.append('sort_by', filters.sort_by);
+    if (filters?.limit !== undefined) params.append('limit', String(filters.limit));
+    if (filters?.offset !== undefined) params.append('offset', String(filters.offset));
+    params.append('_t', String(Date.now()));
+
+    try {
+      const res = await fetch(`${API_BASE}/accepted-tenders?${params.toString()}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache',
+          'Pragma': 'no-cache'
+        }
+      });
+      const contentType = res.headers.get('content-type') || '';
+      if (res.ok && contentType.includes('application/json')) {
+        const rawCountHeader = res.headers.get('X-Total-Count');
+        const tenders: AcceptedTender[] = await res.json();
+        const totalCount = rawCountHeader ? parseInt(rawCountHeader, 10) : tenders.length;
+        return { tenders, totalCount };
+      }
+    } catch {
+      // Backend API unreachable, falling back to static catalog
+    }
+
+    // Fallback to static catalog for Netlify / serverless deployment
+    try {
+      const fallbackRes = await fetch(`/data/all_sources_accepted_catalog.json?_v=${Date.now()}`, {
+        cache: 'no-cache',
+        headers: { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' }
+      });
     if (fallbackRes.ok) {
       let catalog: AcceptedTender[] = await fallbackRes.json();
       if (filters?.category && filters.category !== 'ALL') {
@@ -158,6 +180,14 @@ export async function listAcceptedTenders(filters?: AcceptedTenderFilters): Prom
   }
 
   throw new Error('Failed to load accepted tenders');
+  })();
+
+  inFlightAcceptedTenders.set(cacheKey, fetchPromise);
+  fetchPromise.finally(() => {
+    inFlightAcceptedTenders.delete(cacheKey);
+  });
+
+  return fetchPromise;
 }
 
 export interface CurrentTenderFilters {
@@ -184,48 +214,57 @@ export interface CurrentTendersResponse {
   totalCount: number;
 }
 
-export async function listCurrentTenders(filters?: CurrentTenderFilters): Promise<CurrentTendersResponse> {
-  const params = new URLSearchParams();
-  if (filters?.source_portal && filters.source_portal !== 'ALL') params.append('source_portal', filters.source_portal);
-  if (filters?.organization && filters.organization !== 'ALL') params.append('organization', filters.organization);
-  if (filters?.state && filters.state !== 'ALL') params.append('state', filters.state);
-  if (filters?.city && filters.city !== 'ALL') params.append('city', filters.city);
-  if (filters?.category && filters.category !== 'ALL') params.append('category', filters.category);
-  if (filters?.search) params.append('search', filters.search);
-  if (filters?.min_cost) params.append('min_cost', String(filters.min_cost));
-  if (filters?.max_cost) params.append('max_cost', String(filters.max_cost));
-  if (filters?.include_closed !== undefined) params.append('include_closed', String(filters.include_closed));
-  if (filters?.sort_by) params.append('sort_by', filters.sort_by);
-  if (filters?.limit !== undefined) params.append('limit', String(filters.limit));
-  if (filters?.offset !== undefined) params.append('offset', String(filters.offset));
-  params.append('_t', String(Date.now()));
-
-  try {
-    const res = await fetch(`${API_BASE}/current-tenders?${params.toString()}`, {
-      cache: 'no-store',
-      headers: {
-        'Cache-Control': 'no-cache',
-        'Pragma': 'no-cache'
-      }
-    });
-
-    const contentType = res.headers.get('content-type') || '';
-    if (res.ok && contentType.includes('application/json')) {
-      const rawCountHeader = res.headers.get('X-Total-Count');
-      const tenders: CurrentTender[] = await res.json();
-      const totalCount = rawCountHeader ? parseInt(rawCountHeader, 10) : tenders.length;
-      return { tenders, totalCount };
-    }
-  } catch {
-    // Backend API unreachable or static host (Netlify), falling back to static catalog
+export async function listCurrentTenders(
+  filters?: CurrentTenderFilters
+): Promise<CurrentTendersResponse> {
+  const cacheKey = getFilterDedupeKey(filters);
+  const existing = inFlightCurrentTenders.get(cacheKey);
+  if (existing) {
+    return existing;
   }
 
-  // Fallback to static catalog for Netlify / serverless deployment
-  try {
-    const fallbackRes = await fetch(`/data/all_sources_current_catalog.json?_v=${Date.now()}`, {
-      cache: 'no-cache',
-      headers: { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' }
-    });
+  const fetchPromise = (async () => {
+    const params = new URLSearchParams();
+    if (filters?.source_portal && filters.source_portal !== 'ALL') params.append('source_portal', filters.source_portal);
+    if (filters?.organization && filters.organization !== 'ALL') params.append('organization', filters.organization);
+    if (filters?.state && filters.state !== 'ALL') params.append('state', filters.state);
+    if (filters?.city && filters.city !== 'ALL') params.append('city', filters.city);
+    if (filters?.category && filters.category !== 'ALL') params.append('category', filters.category);
+    if (filters?.search) params.append('search', filters.search);
+    if (filters?.min_cost) params.append('min_cost', String(filters.min_cost));
+    if (filters?.max_cost) params.append('max_cost', String(filters.max_cost));
+    if (filters?.include_closed !== undefined) params.append('include_closed', String(filters.include_closed));
+    if (filters?.sort_by) params.append('sort_by', filters.sort_by);
+    if (filters?.limit !== undefined) params.append('limit', String(filters.limit));
+    if (filters?.offset !== undefined) params.append('offset', String(filters.offset));
+    params.append('_t', String(Date.now()));
+
+    try {
+      const res = await fetch(`${API_BASE}/current-tenders?${params.toString()}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache',
+          'Pragma': 'no-cache'
+        }
+      });
+
+      const contentType = res.headers.get('content-type') || '';
+      if (res.ok && contentType.includes('application/json')) {
+        const rawCountHeader = res.headers.get('X-Total-Count');
+        const tenders: CurrentTender[] = await res.json();
+        const totalCount = rawCountHeader ? parseInt(rawCountHeader, 10) : tenders.length;
+        return { tenders, totalCount };
+      }
+    } catch {
+      // Backend API unreachable or static host (Netlify), falling back to static catalog
+    }
+
+    // Fallback to static catalog for Netlify / serverless deployment
+    try {
+      const fallbackRes = await fetch(`/data/all_sources_current_catalog.json?_v=${Date.now()}`, {
+        cache: 'no-cache',
+        headers: { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' }
+      });
     if (fallbackRes.ok) {
       let catalog: CurrentTender[] = await fallbackRes.json();
       const todayStr = new Date().toISOString().split('T')[0];
@@ -355,6 +394,14 @@ export async function listCurrentTenders(filters?: CurrentTenderFilters): Promis
   }
 
   throw new Error('Failed to load current tenders catalog');
+  })();
+
+  inFlightCurrentTenders.set(cacheKey, fetchPromise);
+  fetchPromise.finally(() => {
+    inFlightCurrentTenders.delete(cacheKey);
+  });
+
+  return fetchPromise;
 }
 
 export function getCurrentTenderPdfUrl(id: string): string {

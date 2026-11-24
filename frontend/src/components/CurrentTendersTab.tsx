@@ -93,6 +93,7 @@ export const CurrentTendersTab: React.FC = () => {
   const [isVoiceSearching, setIsVoiceSearching] = useState<boolean>(false);
   const voiceSearchRef = useRef<any>(null);
   const dossierRef = useRef<HTMLDivElement>(null);
+  const searchQueryRef = useRef<string>(searchQuery);
 
   // Overlapping Filter Sidebar Drawer State
   const [isFilterSidebarOpen, setIsFilterSidebarOpen] = useState<boolean>(false);
@@ -108,8 +109,9 @@ export const CurrentTendersTab: React.FC = () => {
   }, []);
 
   useEffect(() => {
+    if (!isFilterSidebarOpen) return;
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && isFilterSidebarOpen) {
+      if (e.key === 'Escape') {
         setIsFilterSidebarOpen(false);
       }
     };
@@ -234,9 +236,14 @@ export const CurrentTendersTab: React.FC = () => {
           setTotalDbCount(totalCount);
           const enriched = enrichTenderList(data);
           setTenders(enriched);
-          if (enriched.length > 0 && (!selectedTenderId || !enriched.some((t) => t.id === selectedTenderId))) {
-            setSelectedTenderId(enriched[0].id);
-          } else if (enriched.length === 0) {
+          if (enriched.length > 0) {
+            setSelectedTenderId((prevId) => {
+              if (!prevId || !enriched.some((t) => t.id === prevId)) {
+                return enriched[0].id;
+              }
+              return prevId;
+            });
+          } else {
             setSelectedTenderId('');
           }
           setLoading(false);
@@ -246,7 +253,7 @@ export const CurrentTendersTab: React.FC = () => {
           setLoading(false);
         });
     },
-    [buildApiFilters, selectedTenderId]
+    [buildApiFilters]
   );
 
   const handleRunLiveScraper = async () => {
@@ -281,7 +288,14 @@ export const CurrentTendersTab: React.FC = () => {
 
   // Debounced server-side DB search for target tender IDs or keywords
   useEffect(() => {
+    // Prevent duplicate load on initial mount when searchQuery hasn't changed from empty string
+    if (searchQuery === searchQueryRef.current) {
+      return;
+    }
+    const prevQ = searchQueryRef.current.trim();
+    searchQueryRef.current = searchQuery;
     const q = searchQuery.trim();
+
     if (q.length >= 3) {
       const timer = setTimeout(() => {
         loadData(q);
@@ -290,10 +304,14 @@ export const CurrentTendersTab: React.FC = () => {
         }
       }, 350);
       return () => clearTimeout(timer);
-    } else if (q.length === 0) {
+    } else if (q.length === 0 && prevQ.length > 0) {
+      // Only reload if user previously searched and then cleared the search input
       loadData('');
+      if (listContainerRef.current) {
+        listContainerRef.current.scrollTop = 0;
+      }
     }
-  }, [searchQuery]);
+  }, [searchQuery, loadData]);
 
   const query = searchQuery.toLowerCase().trim();
   const todayStr = useMemo(() => new Date().toISOString().split('T')[0], []);

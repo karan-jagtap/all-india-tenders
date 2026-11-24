@@ -132,43 +132,38 @@ def build_bidders_catalog() -> List[Dict[str, Any]]:
     return catalog
 
 def load_contractors_from_db() -> List[Dict[str, Any]]:
-    """Loads registered contractors and their complete won contract history directly from the persistent database."""
-    import os
-    import sqlite3
-    db_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "data", "all_india_tenders.db"))
-    if not os.path.exists(db_path):
-        return []
+    """Loads registered contractors and their complete won contract history directly from PostgreSQL."""
     try:
-        conn = sqlite3.connect(db_path)
-        conn.row_factory = sqlite3.Row
-        c_rows = conn.execute("SELECT * FROM contractors").fetchall()
-        if not c_rows:
-            conn.close()
-            return []
+        from app.db.postgres_pool import get_pg_cursor
+        with get_pg_cursor() as cur:
+            cur.execute("SELECT * FROM contractors")
+            c_rows = cur.fetchall()
+            if not c_rows:
+                return []
 
-        contracts_rows = conn.execute("SELECT * FROM contractor_contracts ORDER BY award_date DESC").fetchall()
-        contracts_by_contractor: Dict[str, list] = {}
-        for cr in contracts_rows:
-            cid = cr["contractor_id"]
-            if cid not in contracts_by_contractor:
-                contracts_by_contractor[cid] = []
-            contracts_by_contractor[cid].append({
-                "tender_id": cr["tender_id"],
-                "title": cr["title"],
-                "category": cr["category_name"],
-                "year": cr["award_year"],
-                "award_date": cr["award_date"],
-                "contract_value_inr": cr["contract_value_inr"],
-                "estimated_cost_inr": cr["estimated_cost_inr"],
-                "discount_pct": cr["discount_pct"],
-                "ranking": cr["ranking"],
-                "authority": cr["authority"],
-                "portal": cr["portal"],
-                "loa_number": cr["loa_number"],
-                "nit_number": cr["nit_number"],
-                "scope_summary": cr["scope_summary"]
-            })
-        conn.close()
+            cur.execute("SELECT * FROM contractor_contracts ORDER BY award_date DESC")
+            contracts_rows = cur.fetchall()
+            contracts_by_contractor: Dict[str, list] = {}
+            for cr in contracts_rows:
+                cid = cr["contractor_id"]
+                if cid not in contracts_by_contractor:
+                    contracts_by_contractor[cid] = []
+                contracts_by_contractor[cid].append({
+                    "tender_id": cr["tender_id"],
+                    "title": cr["title"],
+                    "category": cr["category_name"],
+                    "year": cr["award_year"],
+                    "award_date": cr["award_date"],
+                    "contract_value_inr": cr["contract_value_inr"],
+                    "estimated_cost_inr": cr["estimated_cost_inr"],
+                    "discount_pct": cr["discount_pct"],
+                    "ranking": cr["ranking"],
+                    "authority": cr["authority"],
+                    "portal": cr["portal"],
+                    "loa_number": cr["loa_number"],
+                    "nit_number": cr["nit_number"],
+                    "scope_summary": cr["scope_summary"]
+                })
 
         bidders = []
         for r in c_rows:
@@ -297,46 +292,47 @@ def get_contractor_pools_from_db(category: Optional[str] = None) -> Dict[str, Li
     Retrieves category-indexed contractor pools directly from the persistent database (contractor_pools table).
     Supports exact, case-insensitive, and token-based fuzzy matching against DB category records.
     """
-    import os
     import re
-    import sqlite3
     from app.constants.contractor_pools import CONTRACTOR_POOLS_DATA
+    from app.db.postgres_pool import get_pg_cursor
 
-    db_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "data", "all_india_tenders.db"))
     pools: Dict[str, List[Dict[str, Any]]] = {}
 
-    if os.path.exists(db_path):
-        try:
-            conn = sqlite3.connect(db_path)
-            conn.row_factory = sqlite3.Row
-            cursor = conn.cursor()
+    try:
+        with get_pg_cursor() as cursor:
+            rows = []
             if category and category != "ALL":
                 # 1. Exact match
-                query = "SELECT category, contractor_name, hq, contractor_class, turnover_cr FROM contractor_pools WHERE is_active=1 AND category=? ORDER BY display_order"
-                rows = cursor.execute(query, (category,)).fetchall()
+                query = "SELECT category, contractor_name, hq, contractor_class, turnover_cr FROM contractor_pools WHERE is_active=TRUE AND category=%s ORDER BY display_order"
+                cursor.execute(query, (category,))
+                rows = cursor.fetchall()
 
                 # 2. Case-insensitive match
                 if not rows:
-                    query = "SELECT category, contractor_name, hq, contractor_class, turnover_cr FROM contractor_pools WHERE is_active=1 AND LOWER(category)=LOWER(?) ORDER BY display_order"
-                    rows = cursor.execute(query, (category.strip(),)).fetchall()
+                    query = "SELECT category, contractor_name, hq, contractor_class, turnover_cr FROM contractor_pools WHERE is_active=TRUE AND LOWER(category)=LOWER(%s) ORDER BY display_order"
+                    cursor.execute(query, (category.strip(),))
+                    rows = cursor.fetchall()
 
                 # 3. Partial substring match
                 if not rows:
-                    query = "SELECT category, contractor_name, hq, contractor_class, turnover_cr FROM contractor_pools WHERE is_active=1 AND category LIKE ? ORDER BY display_order"
-                    rows = cursor.execute(query, (f"%{category.strip()}%",)).fetchall()
+                    query = "SELECT category, contractor_name, hq, contractor_class, turnover_cr FROM contractor_pools WHERE is_active=TRUE AND category ILIKE %s ORDER BY display_order"
+                    cursor.execute(query, (f"%{category.strip()}%",))
+                    rows = cursor.fetchall()
 
                 # 4. Token overlap match
                 if not rows:
                     tokens = [w for w in re.split(r'[\s,&/]+', category) if len(w) >= 3]
                     for token in tokens:
-                        query = "SELECT category, contractor_name, hq, contractor_class, turnover_cr FROM contractor_pools WHERE is_active=1 AND category LIKE ? ORDER BY display_order"
-                        token_rows = cursor.execute(query, (f"%{token}%",)).fetchall()
+                        query = "SELECT category, contractor_name, hq, contractor_class, turnover_cr FROM contractor_pools WHERE is_active=TRUE AND category ILIKE %s ORDER BY display_order"
+                        cursor.execute(query, (f"%{token}%",))
+                        token_rows = cursor.fetchall()
                         if token_rows:
                             rows = token_rows
                             break
             else:
-                query = "SELECT category, contractor_name, hq, contractor_class, turnover_cr FROM contractor_pools WHERE is_active=1 ORDER BY category, display_order"
-                rows = cursor.execute(query).fetchall()
+                query = "SELECT category, contractor_name, hq, contractor_class, turnover_cr FROM contractor_pools WHERE is_active=TRUE ORDER BY category, display_order"
+                cursor.execute(query)
+                rows = cursor.fetchall()
 
             for r in rows:
                 cat = r["category"]
@@ -348,9 +344,9 @@ def get_contractor_pools_from_db(category: Optional[str] = None) -> Dict[str, Li
                     "cls": r["contractor_class"],
                     "turnoverCr": float(r["turnover_cr"])
                 })
-            conn.close()
-        except Exception:
-            pass
+            return pools
+    except Exception as e:
+        print(f"[Contractor Pools] PG load error: {e}")
 
     if not pools:
         if category and category != "ALL":

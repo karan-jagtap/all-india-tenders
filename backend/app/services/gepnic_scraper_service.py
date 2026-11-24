@@ -854,33 +854,53 @@ def resolve_and_ingest_tender_by_id(tender_id: str) -> Optional[Dict[str, Any]]:
                 if to_add:
                     cts.ALL_CURRENT_TENDERS = to_add + cts.ALL_CURRENT_TENDERS
 
-                    # Upsert directly into SQLite persistent database
+                    # Upsert directly into PostgreSQL persistent database
                     try:
-                        import os, sqlite3, json
-                        db_p = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "data", "all_india_tenders.db"))
-                        if os.path.exists(db_p):
-                            now_str = datetime.now().isoformat()
-                            conn = sqlite3.connect(db_p)
+                        import json
+                        from datetime import datetime
+                        from app.db.postgres_pool import get_pg_cursor
+                        now_dt = datetime.now()
+                        with get_pg_cursor() as cur:
                             for item in to_add:
-                                conn.execute("""
-                                    INSERT OR REPLACE INTO tenders (
+                                cur.execute("""
+                                    INSERT INTO tenders (
                                         id, nit_number, title, source_portal, category,
                                         organisation, state, city, estimated_cost_inr,
                                         emd_amount_inr, publish_date, close_date, opening_date,
                                         days_left, status, document_url, scope_summary,
                                         raw_data, created_at, updated_at
-                                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                                    ) VALUES (
+                                        %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s
+                                    )
+                                    ON CONFLICT (id) DO UPDATE SET
+                                        nit_number = EXCLUDED.nit_number,
+                                        title = EXCLUDED.title,
+                                        source_portal = EXCLUDED.source_portal,
+                                        category = EXCLUDED.category,
+                                        organisation = EXCLUDED.organisation,
+                                        state = EXCLUDED.state,
+                                        city = EXCLUDED.city,
+                                        estimated_cost_inr = EXCLUDED.estimated_cost_inr,
+                                        emd_amount_inr = EXCLUDED.emd_amount_inr,
+                                        publish_date = EXCLUDED.publish_date,
+                                        close_date = EXCLUDED.close_date,
+                                        opening_date = EXCLUDED.opening_date,
+                                        days_left = EXCLUDED.days_left,
+                                        status = EXCLUDED.status,
+                                        document_url = EXCLUDED.document_url,
+                                        scope_summary = EXCLUDED.scope_summary,
+                                        raw_data = EXCLUDED.raw_data,
+                                        updated_at = EXCLUDED.updated_at
                                 """, (
-                                    item["id"], item["nit_number"], item["title"], item["source_portal"], item["category"],
-                                    item["organization"], item["state"], item["city"], item["estimated_cost_inr"],
-                                    item["emd_amount_inr"], item["published_date"], item["closing_date"], item["opening_date"],
-                                    item["days_left"], item["status"], item["document_url"], item["scope_summary"],
-                                    json.dumps(item), now_str, now_str
+                                    item.get("id"), item.get("nit_number"), item.get("title", ""), item.get("source_portal", ""), item.get("category", ""),
+                                    item.get("organization", item.get("organisation", "")), item.get("state", ""), item.get("city", ""),
+                                    float(item.get("estimated_cost_inr", 0.0)), float(item.get("emd_amount_inr", 0.0)),
+                                    str(item.get("published_date", "")), str(item.get("closing_date", "")), str(item.get("opening_date", "")),
+                                    int(item.get("days_left", 0)), str(item.get("status", "OPEN")), str(item.get("document_url", "")),
+                                    str(item.get("scope_summary", "")), json.dumps(item), now_dt, now_dt
                                 ))
-                            conn.commit()
-                            conn.close()
                     except Exception as e:
-                        logger.warning(f"[GePNIC Resolver] DB persist error: {e}")
+                        logger.warning(f"[GePNIC Resolver] PostgreSQL persist error: {e}")
 
             if target_record:
                 return target_record

@@ -281,6 +281,7 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
   const [isVoiceSearching, setIsVoiceSearching] = useState<boolean>(false);
   const voiceSearchRef = useRef<any>(null);
   const dossierRef = useRef<HTMLDivElement>(null);
+  const searchQueryRef = useRef<string>(searchQuery);
 
   // Overlapping Filter Sidebar Drawer State
   const [isFilterSidebarOpen, setIsFilterSidebarOpen] = useState<boolean>(false);
@@ -296,8 +297,9 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
   }, []);
 
   useEffect(() => {
+    if (!isFilterSidebarOpen) return;
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && isFilterSidebarOpen) {
+      if (e.key === 'Escape') {
         setIsFilterSidebarOpen(false);
       }
     };
@@ -407,9 +409,14 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
             };
           });
           setTenders(enriched);
-          if (enriched.length > 0 && (!selectedTenderId || !enriched.some((t) => t.id === selectedTenderId))) {
-            setSelectedTenderId(enriched[0].id);
-          } else if (enriched.length === 0) {
+          if (enriched.length > 0) {
+            setSelectedTenderId((prevId) => {
+              if (!prevId || !enriched.some((t) => t.id === prevId)) {
+                return enriched[0].id;
+              }
+              return prevId;
+            });
+          } else {
             setSelectedTenderId('');
           }
           setLoading(false);
@@ -419,13 +426,8 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
           setLoading(false);
         });
     },
-    [buildApiFilters, selectedTenderId]
+    [buildApiFilters]
   );
-
-  // Initial load
-  useEffect(() => {
-    loadData();
-  }, []);
 
   // When filters change (category, source, org, state, city, year, sortBy), reload first 12 items and reset scroll
   useEffect(() => {
@@ -445,7 +447,14 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
 
   // Debounced server search
   useEffect(() => {
+    // Prevent duplicate load on initial mount when searchQuery hasn't changed from empty string
+    if (searchQuery === searchQueryRef.current) {
+      return;
+    }
+    const prevQ = searchQueryRef.current.trim();
+    searchQueryRef.current = searchQuery;
     const q = searchQuery.trim();
+
     if (q.length >= 3) {
       const timer = setTimeout(() => {
         loadData(q);
@@ -454,10 +463,13 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
         }
       }, 350);
       return () => clearTimeout(timer);
-    } else if (q.length === 0) {
+    } else if (q.length === 0 && prevQ.length > 0) {
       loadData('');
+      if (listContainerRef.current) {
+        listContainerRef.current.scrollTop = 0;
+      }
     }
-  }, [searchQuery]);
+  }, [searchQuery, loadData]);
 
   const formatINR = (val?: number) => {
     if (!val) return 'N/A';

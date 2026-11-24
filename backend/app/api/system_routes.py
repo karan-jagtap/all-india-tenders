@@ -11,7 +11,7 @@ from app.services.current_tenders_service import (
     STATE_CITY_MAP,
     run_pure_scraping_sync
 )
-from app.services.accepted_tenders_service import ACCEPTED_TENDERS_CATALOG
+from app.services.accepted_tenders_service import ACCEPTED_TENDERS_CATALOG, get_accepted_tenders_count
 from app.services.bidders_service import ALL_BIDDERS_CATALOG
 from app.services.db_sync_service import sync_scraped_data_to_db
 from app.services.cron_scheduler_service import (
@@ -34,11 +34,11 @@ async def health_check():
     return {
         "status": "healthy",
         "app": "All India Tenders",
-        "database_engine": "PostgreSQL 16 (pgvector)" if IS_POSTGRES else "SQLite (aiosqlite)",
+        "database_engine": "PostgreSQL 16 (pgvector)",
         "vector_db_ready": True,
-        "storage_mode": "Enterprise Hybrid (PostgreSQL/SQLite Persistent DB + In-Memory RAM Streaming)",
+        "storage_mode": "Enterprise PostgreSQL 16 (pgvector) + In-Memory RAM Streaming",
         "current_in_progress_count": len(ALL_CURRENT_TENDERS),
-        "accepted_tenders_count": len(ACCEPTED_TENDERS_CATALOG),
+        "accepted_tenders_count": get_accepted_tenders_count(),
         "cron_sync": {
             "schedule": cron_info["schedule"],
             "next_run": cron_info["next_scheduled_run"],
@@ -160,16 +160,12 @@ async def get_overview_stats():
     """
     active_count = len(ALL_CURRENT_TENDERS)
     try:
-        import os, sqlite3
-        db_p = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "data", "all_india_tenders.db"))
-        if os.path.exists(db_p):
-            conn = sqlite3.connect(db_p)
-            c = conn.cursor()
-            c.execute("SELECT COUNT(*) FROM tenders")
-            row = c.fetchone()
-            if row and row[0] > 0:
-                active_count = row[0]
-            conn.close()
+        from app.db.postgres_pool import get_pg_cursor
+        with get_pg_cursor() as cur:
+            cur.execute("SELECT COUNT(*) AS total FROM tenders")
+            row = cur.fetchone()
+            if row and row["total"] > 0:
+                active_count = row["total"]
     except Exception:
         pass
 
@@ -185,11 +181,11 @@ async def get_overview_stats():
     cron_info = get_cron_status()
     return {
         "active_tenders_count": active_count,
-        "accepted_tenders_count": len(ACCEPTED_TENDERS_CATALOG),
+        "accepted_tenders_count": get_accepted_tenders_count(),
         "registered_bidders_count": len(ALL_BIDDERS_CATALOG),
-        "database_engine": "PostgreSQL 16 (pgvector)" if IS_POSTGRES else "SQLite (aiosqlite)",
+        "database_engine": "PostgreSQL 16 (pgvector)",
         "vector_ready": True,
-        "architecture": "Enterprise Hybrid (PostgreSQL/SQLite Persistent DB + In-Memory RAM Stream)",
+        "architecture": "Enterprise PostgreSQL 16 (pgvector) + In-Memory RAM Stream",
         "cooldown_remaining_seconds": cron_info.get("cooldown_remaining_seconds", 0),
         "cooldown_seconds_total": cron_info.get("cooldown_seconds_total", 300),
         "is_sync_in_progress": cron_info.get("is_sync_in_progress", False),

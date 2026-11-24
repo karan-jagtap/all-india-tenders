@@ -890,23 +890,20 @@ OFFICIAL_OPEN_DATA_FEEDS: List[Dict[str, Any]] = [
 
 
 def get_all_current_tenders_catalog() -> List[Dict[str, Any]]:
-    """Returns the unified live catalog of in-progress tenders retrieved directly from the persistent database."""
-    db_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "data", "all_india_tenders.db"))
-    if os.path.exists(db_path):
-        try:
-            import sqlite3
-            conn = sqlite3.connect(db_path)
-            conn.row_factory = sqlite3.Row
-            rows = conn.execute("SELECT raw_data FROM tenders WHERE raw_data IS NOT NULL").fetchall()
-            conn.close()
+    """Returns the unified live catalog of in-progress tenders retrieved directly from PostgreSQL."""
+    try:
+        from app.db.postgres_pool import get_pg_cursor
+        with get_pg_cursor() as cur:
+            cur.execute("SELECT raw_data FROM tenders WHERE raw_data IS NOT NULL")
+            rows = cur.fetchall()
             if rows:
                 db_tenders = [json.loads(r["raw_data"]) if isinstance(r["raw_data"], str) else r["raw_data"] for r in rows]
                 for t in db_tenders:
                     if "tender_documents" not in t:
                         t["tender_documents"] = build_tender_documents(t)
                 return db_tenders
-        except Exception as e:
-            print(f"[Current Tenders] DB load notice: {e}")
+    except Exception as e:
+        logger.warning(f"[Current Tenders] PostgreSQL load notice: {e}")
 
     path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "data", "all_sources_current_catalog.json"))
     raw_catalog = None
@@ -1045,35 +1042,52 @@ def run_pure_scraping_sync() -> Dict[str, Any]:
     merged_catalog = new_tenders + baseline
     ALL_CURRENT_TENDERS = merged_catalog
 
-    # 5. Persist new tenders directly to SQLite persistent database (0 reliance on 300MB JSON)
+    # 5. Persist new tenders directly to PostgreSQL persistent database
     if new_tenders:
         try:
-            import sqlite3
-            db_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "data", "all_india_tenders.db"))
-            if os.path.exists(db_path):
-                now_str = datetime.now().isoformat()
-                conn = sqlite3.connect(db_path)
+            from app.db.postgres_pool import get_pg_cursor
+            now_dt = datetime.now()
+            with get_pg_cursor() as cur:
                 for item in new_tenders:
-                    conn.execute("""
-                        INSERT OR REPLACE INTO tenders (
+                    cur.execute("""
+                        INSERT INTO tenders (
                             id, nit_number, title, source_portal, category,
                             organisation, state, city, estimated_cost_inr,
                             emd_amount_inr, publish_date, close_date, opening_date,
                             days_left, status, document_url, scope_summary,
                             raw_data, created_at, updated_at
-                        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                        ) VALUES (
+                            %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s
+                        )
+                        ON CONFLICT (id) DO UPDATE SET
+                            nit_number = EXCLUDED.nit_number,
+                            title = EXCLUDED.title,
+                            source_portal = EXCLUDED.source_portal,
+                            category = EXCLUDED.category,
+                            organisation = EXCLUDED.organisation,
+                            state = EXCLUDED.state,
+                            city = EXCLUDED.city,
+                            estimated_cost_inr = EXCLUDED.estimated_cost_inr,
+                            emd_amount_inr = EXCLUDED.emd_amount_inr,
+                            publish_date = EXCLUDED.publish_date,
+                            close_date = EXCLUDED.close_date,
+                            opening_date = EXCLUDED.opening_date,
+                            days_left = EXCLUDED.days_left,
+                            status = EXCLUDED.status,
+                            document_url = EXCLUDED.document_url,
+                            scope_summary = EXCLUDED.scope_summary,
+                            raw_data = EXCLUDED.raw_data,
+                            updated_at = EXCLUDED.updated_at
                     """, (
                         item.get("id"), item.get("nit_number"), item.get("title", ""), item.get("source_portal", ""), item.get("category", ""),
                         item.get("organization", item.get("organisation", "")), item.get("state", ""), item.get("city", ""),
                         float(item.get("estimated_cost_inr", 0.0)), float(item.get("emd_amount_inr", 0.0)),
                         str(item.get("published_date", "")), str(item.get("closing_date", "")), str(item.get("opening_date", "")),
                         int(item.get("days_left", 0)), str(item.get("status", "OPEN")), str(item.get("document_url", "")),
-                        str(item.get("scope_summary", "")), json.dumps(item), now_str, now_str
+                        str(item.get("scope_summary", "")), json.dumps(item), now_dt, now_dt
                     ))
-                conn.commit()
-                conn.close()
         except Exception as save_err:
-            print(f"[Current Tenders] Direct DB persist notice: {save_err}")
+            logger.warning(f"[Current Tenders] Direct PostgreSQL persist notice: {save_err}")
 
     elapsed_ms = round((time.time() - start_time) * 1000, 2)
 
@@ -1117,16 +1131,11 @@ def list_current_tenders(
     limit: Optional[int] = None,
     offset: int = 0
 ) -> Tuple[List[Dict[str, Any]], int]:
-    """Queries current tenders directly from the indexed persistent database (SQLite / PostgreSQL)
-    with B-tree indexes, FTS5 full-text search, and pagination support.
+    """Queries current tenders directly from PostgreSQL with B-tree indexes, GIN full-text search, and pagination support.
     Returns (tenders, total_count)."""
-    db_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "data", "all_india_tenders.db"))
-    if os.path.exists(db_path):
-        try:
-            import sqlite3
-            conn = sqlite3.connect(db_path)
-            c = conn.cursor()
-
+    try:
+        from app.db.postgres_pool import get_pg_cursor
+        with get_pg_cursor() as cur:
             clauses = []
             params = []
 
@@ -1138,68 +1147,69 @@ def list_current_tenders(
             if source_portal and source_portal != "ALL":
                 portals = [p.strip() for p in source_portal.split(",") if p.strip() and p.strip() != "ALL"]
                 if len(portals) == 1:
-                    clauses.append("source_portal = ?")
+                    clauses.append("source_portal = %s")
                     params.append(portals[0])
                 elif len(portals) > 1:
-                    placeholders = ",".join("?" for _ in portals)
+                    placeholders = ",".join("%s" for _ in portals)
                     clauses.append(f"source_portal IN ({placeholders})")
                     params.extend(portals)
 
             if organization and organization != "ALL":
                 orgs = [o.strip() for o in organization.split(",") if o.strip() and o.strip() != "ALL"]
                 if len(orgs) == 1:
-                    clauses.append("organisation = ?")
+                    clauses.append("organisation = %s")
                     params.append(orgs[0])
                 elif len(orgs) > 1:
-                    placeholders = ",".join("?" for _ in orgs)
+                    placeholders = ",".join("%s" for _ in orgs)
                     clauses.append(f"organisation IN ({placeholders})")
                     params.extend(orgs)
 
             if state and state != "ALL":
                 states = [s.strip() for s in state.split(",") if s.strip() and s.strip() != "ALL"]
                 if len(states) == 1:
-                    clauses.append("state = ?")
+                    clauses.append("state = %s")
                     params.append(states[0])
                 elif len(states) > 1:
-                    placeholders = ",".join("?" for _ in states)
+                    placeholders = ",".join("%s" for _ in states)
                     clauses.append(f"state IN ({placeholders})")
                     params.extend(states)
 
             if city and city != "ALL":
                 cities = [ct.strip() for ct in city.split(",") if ct.strip() and ct.strip() != "ALL"]
                 if len(cities) == 1:
-                    clauses.append("city = ?")
+                    clauses.append("city = %s")
                     params.append(cities[0])
                 elif len(cities) > 1:
-                    placeholders = ",".join("?" for _ in cities)
+                    placeholders = ",".join("%s" for _ in cities)
                     clauses.append(f"city IN ({placeholders})")
                     params.extend(cities)
 
             if category and category != "ALL":
                 cats = [c.strip() for c in category.split(",") if c.strip() and c.strip() != "ALL"]
                 if len(cats) == 1:
-                    clauses.append("category = ?")
+                    clauses.append("category = %s")
                     params.append(cats[0])
                 elif len(cats) > 1:
-                    placeholders = ",".join("?" for _ in cats)
+                    placeholders = ",".join("%s" for _ in cats)
                     clauses.append(f"category IN ({placeholders})")
                     params.extend(cats)
 
             if min_cost is not None:
-                clauses.append("estimated_cost_inr >= ?")
+                clauses.append("estimated_cost_inr >= %s")
                 params.append(min_cost)
 
             if max_cost is not None:
-                clauses.append("estimated_cost_inr <= ?")
+                clauses.append("estimated_cost_inr <= %s")
                 params.append(max_cost)
 
             if search:
                 q_clean = search.strip()
                 # 1. Exact ID / NIT index lookup (< 1ms)
-                c.execute("SELECT raw_data FROM tenders WHERE id = ? OR nit_number = ? LIMIT 1", (q_clean, q_clean))
-                exact_row = c.fetchone()
+                cur.execute("SELECT raw_data FROM tenders WHERE id = %s OR nit_number = %s LIMIT 1", (q_clean, q_clean))
+                exact_row = cur.fetchone()
                 if exact_row:
-                    t_item = json.loads(exact_row[0]) if isinstance(exact_row[0], str) else exact_row[0]
+                    raw_val = exact_row["raw_data"]
+                    t_item = json.loads(raw_val) if isinstance(raw_val, str) else raw_val
                     days_val = max(1, t_item.get("days_left") or 14)
                     t_item["days_left"] = days_val
                     today_dt = date.today()
@@ -1207,34 +1217,18 @@ def list_current_tenders(
                     t_item["published_date"] = (today_dt - timedelta(days=max(1, 25 - days_val))).strftime("%Y-%m-%d")
                     if "tender_documents" not in t_item:
                         t_item["tender_documents"] = build_tender_documents(t_item)
-                    conn.close()
                     return [t_item], 1
 
-                # 2. Try FTS5 MATCH
-                fts_ids = []
-                try:
-                    fts_q = re.sub(r'[^a-zA-Z0-9_\s]', ' ', q_clean).strip()
-                    if fts_q:
-                        c.execute("SELECT id FROM tenders_fts WHERE tenders_fts MATCH ? LIMIT 300", (f'"{fts_q}"*',))
-                        fts_ids = [r[0] for r in c.fetchall()]
-                except Exception:
-                    pass
-
-                if fts_ids:
-                    placeholders = ','.join('?' for _ in fts_ids)
-                    clauses.append(f"id IN ({placeholders})")
-                    params.extend(fts_ids)
-                else:
-                    q_like = f"%{q_clean}%"
-                    clauses.append("(id LIKE ? OR nit_number LIKE ? OR title LIKE ? OR organisation LIKE ? OR state LIKE ? OR city LIKE ?)")
-                    params.extend([q_like, q_like, q_like, q_like, q_like, q_like])
+                # 2. PostgreSQL GIN full text search
+                clauses.append("to_tsvector('english', title || ' ' || COALESCE(nit_number, '') || ' ' || COALESCE(organisation, '') || ' ' || COALESCE(state, '') || ' ' || COALESCE(city, '')) @@ plainto_tsquery('english', %s)")
+                params.append(q_clean)
 
             where = "WHERE " + " AND ".join(clauses) if clauses else ""
 
             # Instant COUNT(*) query from indexed database
-            count_sql = f"SELECT COUNT(*) FROM tenders {where}"
-            c.execute(count_sql, params)
-            total_count = c.fetchone()[0]
+            count_sql = f"SELECT COUNT(*) AS total FROM tenders {where}"
+            cur.execute(count_sql, params)
+            total_count = cur.fetchone()["total"]
 
             order_clause = "ORDER BY days_left ASC, estimated_cost_inr DESC"
             if sort_by == "CLOSING_LATEST":
@@ -1254,21 +1248,20 @@ def list_current_tenders(
             elif sort_by == "CLOSING_SOONEST":
                 order_clause = "ORDER BY days_left ASC, estimated_cost_inr DESC"
 
-            sql = f"""
-                SELECT raw_data FROM tenders
-                {where}
-                {order_clause}
-            """
+            query_params = list(params)
             if limit is not None:
-                sql += f" LIMIT {int(limit)} OFFSET {int(offset)}"
+                paged_sql = f"SELECT raw_data FROM tenders {where} {order_clause} LIMIT %s OFFSET %s"
+                query_params.extend([int(limit), int(offset)])
+            else:
+                paged_sql = f"SELECT raw_data FROM tenders {where} {order_clause}"
 
-            c.execute(sql, params)
-            rows = c.fetchall()
+            cur.execute(paged_sql, query_params)
+            rows = cur.fetchall()
             tenders = []
             today_dt = date.today()
             for r in rows:
-                item = json.loads(r[0]) if isinstance(r[0], str) else r[0]
-                # Ensure closing_date and published_date are consistently fresh relative to today's date
+                raw_val = r["raw_data"]
+                item = json.loads(raw_val) if isinstance(raw_val, str) else raw_val
                 days_val = max(1, item.get("days_left") or 14)
                 item["days_left"] = days_val
                 item["closing_date"] = (today_dt + timedelta(days=days_val)).strftime("%Y-%m-%d")
@@ -1276,21 +1269,10 @@ def list_current_tenders(
                 if "tender_documents" not in item:
                     item["tender_documents"] = build_tender_documents(item)
                 tenders.append(item)
-            conn.close()
-
-            if not tenders and search and ("_" in search or "cur-" in search or "gem" in search or len(search) >= 6):
-                try:
-                    from app.services.gepnic_scraper_service import resolve_and_ingest_tender_by_id
-                    resolved = resolve_and_ingest_tender_by_id(search.strip())
-                    if resolved:
-                        tenders = [resolved]
-                        total_count = 1
-                except Exception as e:
-                    print(f"[Current Tenders] Dynamic live resolution error: {e}")
 
             return tenders, total_count
-        except Exception as e:
-            print(f"[Current Tenders] Direct DB query fallback to memory: {e}")
+    except Exception as e:
+        print(f"[Current Tenders] PG query error: {e}")
 
     today_str = date.today().strftime("%Y-%m-%d")
     if include_closed:
@@ -1365,22 +1347,22 @@ def list_current_tenders(
 
 
 def get_current_tender_by_id(tender_id: str) -> Optional[Dict[str, Any]]:
-    db_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "data", "all_india_tenders.db"))
-    if os.path.exists(db_path):
-        try:
-            import sqlite3
-            conn = sqlite3.connect(db_path)
-            c = conn.cursor()
-            c.execute("SELECT raw_data FROM tenders WHERE id = ? OR nit_number = ? LIMIT 1", (tender_id.strip(), tender_id.strip()))
-            row = c.fetchone()
-            conn.close()
+    if not tender_id or not tender_id.strip():
+        return None
+
+    try:
+        from app.db.postgres_pool import get_pg_cursor
+        with get_pg_cursor() as cur:
+            cur.execute("SELECT raw_data FROM tenders WHERE id = %s OR nit_number = %s LIMIT 1", (tender_id.strip(), tender_id.strip()))
+            row = cur.fetchone()
             if row:
-                t = json.loads(row[0]) if isinstance(row[0], str) else row[0]
+                raw_val = row["raw_data"]
+                t = json.loads(raw_val) if isinstance(raw_val, str) else raw_val
                 if "tender_documents" not in t:
                     t["tender_documents"] = build_tender_documents(t)
                 return t
-        except Exception as e:
-            print(f"[Current Tenders] Direct DB tender lookup error: {e}")
+    except Exception as e:
+        print(f"[Current Tenders] PG tender lookup error: {e}")
 
     for t in ALL_CURRENT_TENDERS:
         if t["id"] == tender_id or t["nit_number"] == tender_id:

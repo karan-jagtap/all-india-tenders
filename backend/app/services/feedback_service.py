@@ -1,10 +1,9 @@
 """
 Feedback and Contact Us Service
-Stores feedback submissions in SQLite database and dispatches email notifications to kmessilj@gmail.com.
+Stores feedback submissions in PostgreSQL database and dispatches email notifications to kmessilj@gmail.com.
 """
 
 import os
-import sqlite3
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
@@ -19,40 +18,9 @@ try:
 except ImportError:
     pass
 
-DB_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "data", "all_india_tenders.db"))
+from app.db.postgres_pool import get_pg_cursor
+
 RECIPIENT_EMAIL = "kmessilj@gmail.com"
-
-def get_db_connection() -> sqlite3.Connection:
-    os.makedirs(os.path.dirname(DB_PATH), exist_ok=True)
-    conn = sqlite3.connect(DB_PATH)
-    conn.row_factory = sqlite3.Row
-    return conn
-
-def init_feedback_db():
-    """Initializes the feedback SQLite database and tables."""
-    conn = get_db_connection()
-    try:
-        with conn:
-            conn.execute("""
-                CREATE TABLE IF NOT EXISTS feedback_submissions (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    name TEXT NOT NULL,
-                    email TEXT NOT NULL,
-                    phone TEXT,
-                    subject TEXT,
-                    message TEXT NOT NULL,
-                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                    email_recipient TEXT DEFAULT 'kmessilj@gmail.com',
-                    email_status TEXT DEFAULT 'PENDING',
-                    email_error TEXT
-                )
-            """)
-            conn.execute("CREATE INDEX IF NOT EXISTS idx_feedback_created ON feedback_submissions(created_at)")
-    finally:
-        conn.close()
-
-# Initialize database schema on module load
-init_feedback_db()
 
 def send_notification_email(
     name: str,
@@ -195,17 +163,16 @@ def save_feedback(
     subject: Optional[str] = None
 ) -> Dict[str, Any]:
     """
-    Saves a feedback submission to the SQLite database and triggers email notification.
+    Saves a feedback submission to PostgreSQL and triggers email notification.
     """
-    conn = get_db_connection()
-    try:
-        cursor = conn.cursor()
+    with get_pg_cursor() as cursor:
         cursor.execute("""
             INSERT INTO feedback_submissions (name, email, phone, subject, message, email_recipient)
-            VALUES (?, ?, ?, ?, ?, ?)
+            VALUES (%s, %s, %s, %s, %s, %s)
+            RETURNING id
         """, (name.strip(), email.strip(), (phone or "").strip() or None, (subject or "").strip() or None, message.strip(), RECIPIENT_EMAIL))
-        submission_id = cursor.lastrowid
-        conn.commit()
+        row = cursor.fetchone()
+        submission_id = row["id"]
 
         # Attempt to dispatch notification
         success, email_status = send_notification_email(name, email, phone, subject, message, submission_id)
@@ -213,10 +180,9 @@ def save_feedback(
         # Update email status in database
         cursor.execute("""
             UPDATE feedback_submissions
-            SET email_status = ?, email_error = ?
-            WHERE id = ?
+            SET email_status = %s, email_error = %s
+            WHERE id = %s
         """, (email_status, None if success else email_status, submission_id))
-        conn.commit()
 
         return {
             "id": submission_id,
@@ -227,22 +193,22 @@ def save_feedback(
             "email_status": email_status,
             "created_at": datetime.now().isoformat()
         }
-    finally:
-        conn.close()
 
 
 def list_recent_feedback(limit: int = 50) -> List[Dict[str, Any]]:
-    """Returns recent feedback submissions from the SQLite database."""
-    conn = get_db_connection()
-    try:
-        cursor = conn.cursor()
+    """Returns recent feedback submissions from PostgreSQL."""
+    with get_pg_cursor() as cursor:
         cursor.execute("""
             SELECT id, name, email, phone, subject, message, created_at, email_recipient, email_status
             FROM feedback_submissions
             ORDER BY id DESC
-            LIMIT ?
+            LIMIT %s
         """, (limit,))
         rows = cursor.fetchall()
-        return [dict(row) for row in rows]
-    finally:
-        conn.close()
+        results = []
+        for row in rows:
+            d = dict(row)
+            if isinstance(d.get("created_at"), datetime):
+                d["created_at"] = d["created_at"].isoformat()
+            results.append(d)
+        return results

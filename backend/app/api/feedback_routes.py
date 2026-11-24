@@ -1,6 +1,6 @@
 """
 Feedback & Contact Us API Routes
-Accepts user feedback, stores in SQLite database, and triggers notification to kmessilj@gmail.com.
+Accepts user feedback, stores in PostgreSQL database, and triggers notification to kmessilj@gmail.com.
 """
 
 import re
@@ -24,7 +24,7 @@ class FeedbackSubmissionRequest(BaseModel):
 async def submit_feedback(payload: FeedbackSubmissionRequest):
     """
     Submits user feedback / contact inquiry.
-    Stores record in SQLite database and dispatches notification to kmessilj@gmail.com.
+    Stores record in PostgreSQL database and dispatches notification to kmessilj@gmail.com.
     """
     # Basic email format validation
     email_regex = r"^[^@\s]+@[^@\s]+\.[^@\s]+$"

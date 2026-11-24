@@ -1466,28 +1466,14 @@ def load_live_cppp_accepted_tenders() -> List[Dict[str, Any]]:
 
 
 def load_all_sources_accepted_tenders() -> List[Dict[str, Any]]:
-    """Loads awarded tenders directly from the persistent database."""
-    db_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "data", "all_india_tenders.db"))
-    if os.path.exists(db_path):
-        try:
-            import sqlite3
-            conn = sqlite3.connect(db_path)
-            conn.row_factory = sqlite3.Row
-            rows = conn.execute("SELECT raw_data FROM awarded_tenders WHERE raw_data IS NOT NULL").fetchall()
-            conn.close()
-            if rows:
-                return [json.loads(r["raw_data"]) if isinstance(r["raw_data"], str) else r["raw_data"] for r in rows]
-        except Exception as e:
-            print(f"[Accepted Tenders] DB load notice: {e}")
-
-    # Fallback to catalog file if DB is empty
+    """Loads curated fallback awarded tenders from local JSON catalog (fast startup, low RAM)."""
     path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "data", "all_sources_accepted_catalog.json"))
     if os.path.exists(path):
         try:
             with open(path, "r", encoding="utf-8") as f:
                 return json.load(f)
-        except Exception:
-            pass
+        except Exception as e:
+            print(f"[Accepted Tenders] JSON catalog load notice: {e}")
     return []
 
 
@@ -1562,6 +1548,150 @@ def _matches_filter_csv(val: Optional[str], filter_str: Optional[str]) -> bool:
     return any(item in val_clean or val_clean in item for item in items)
 
 
+def _slugify(text: str) -> str:
+    s = re.sub(r'[^a-zA-Z0-9]+', '-', str(text).strip().lower()).strip('-')
+    return s[:80]
+
+
+def get_accepted_tenders_count() -> int:
+    """Returns the total number of historical awarded contracts directly from PostgreSQL."""
+    try:
+        from app.db.postgres_pool import get_pg_cursor
+        with get_pg_cursor() as cur:
+            cur.execute("SELECT COUNT(*) AS total FROM awarded_tenders")
+            return cur.fetchone()["total"]
+    except Exception as e:
+        print(f"[Accepted Tenders] PG count error: {e}")
+        return len(ACCEPTED_TENDERS_CATALOG)
+
+
+def _query_db_accepted_tenders(
+    category: Optional[str] = None,
+    year: Optional[int] = None,
+    source_portal: Optional[str] = None,
+    organization: Optional[str] = None,
+    state: Optional[str] = None,
+    city: Optional[str] = None,
+    search: Optional[str] = None,
+    sort_by: Optional[str] = None,
+    limit: Optional[int] = None,
+    offset: int = 0
+) -> Optional[Tuple[List[Dict[str, Any]], int]]:
+    """Direct indexed SQL execution against PostgreSQL awarded_tenders table."""
+    try:
+        from app.db.postgres_pool import get_pg_cursor
+        with get_pg_cursor() as cur:
+            clauses = []
+            params = []
+
+            if category and category.strip().upper() != "ALL":
+                cats = [x.strip() for x in category.split(",") if x.strip() and x.strip().upper() != "ALL"]
+                sub_c = []
+                for cat in cats:
+                    sub_c.append("(category ILIKE %s OR category_id = %s)")
+                    params.extend([f"%{cat}%", _slugify(cat)])
+                if sub_c:
+                    clauses.append(f"({' OR '.join(sub_c)})")
+
+            if year and str(year).strip().upper() != "ALL":
+                try:
+                    yr_int = int(year)
+                    clauses.append("year = %s")
+                    params.append(yr_int)
+                except Exception:
+                    pass
+
+            if source_portal and source_portal.strip().upper() != "ALL":
+                srcs = [x.strip() for x in source_portal.split(",") if x.strip() and x.strip().upper() != "ALL"]
+                sub_s = []
+                for src in srcs:
+                    sub_s.append("(source_portal ILIKE %s OR source_portal_id = %s)")
+                    params.extend([f"%{src}%", _slugify(src)])
+                if sub_s:
+                    clauses.append(f"({' OR '.join(sub_s)})")
+
+            if organization and organization.strip().upper() != "ALL":
+                orgs = [x.strip() for x in organization.split(",") if x.strip() and x.strip().upper() != "ALL"]
+                sub_o = []
+                for o in orgs:
+                    sub_o.append("(organisation ILIKE %s OR organisation_id = %s)")
+                    params.extend([f"%{o}%", _slugify(o)])
+                if sub_o:
+                    clauses.append(f"({' OR '.join(sub_o)})")
+
+            if state and state.strip().upper() != "ALL":
+                sts = [x.strip() for x in state.split(",") if x.strip() and x.strip().upper() != "ALL"]
+                sub_st = []
+                for s in sts:
+                    sub_st.append("(state ILIKE %s OR state_id = %s)")
+                    params.extend([s, _slugify(s)])
+                if sub_st:
+                    clauses.append(f"({' OR '.join(sub_st)})")
+
+            if city and city.strip().upper() != "ALL":
+                cts = [x.strip() for x in city.split(",") if x.strip() and x.strip().upper() != "ALL"]
+                sub_ct = []
+                for ct in cts:
+                    sub_ct.append("city ILIKE %s")
+                    params.append(ct)
+                if sub_ct:
+                    clauses.append(f"({' OR '.join(sub_ct)})")
+
+            if search and search.strip():
+                q_clean = search.strip()
+                # 1. Exact lookup
+                cur.execute("SELECT raw_data FROM awarded_tenders WHERE LOWER(id) = %s OR LOWER(loa_number) = %s LIMIT 1", (q_clean.lower(), q_clean.lower()))
+                exact = cur.fetchone()
+                if exact:
+                    raw_item = json.loads(exact["raw_data"]) if isinstance(exact["raw_data"], str) else exact["raw_data"]
+                    return [raw_item], 1
+
+                # 2. GIN / tsvector full text search
+                clauses.append("to_tsvector('english', title || ' ' || COALESCE(winning_company, '') || ' ' || COALESCE(organisation, '') || ' ' || COALESCE(state, '') || ' ' || COALESCE(city, '')) @@ plainto_tsquery('english', %s)")
+                params.append(q_clean)
+
+            where = "WHERE " + " AND ".join(clauses) if clauses else ""
+
+            order_clause = "ORDER BY award_date DESC, id DESC"
+            if sort_by:
+                sb = sort_by.upper()
+                if sb == "AWARD_DATE_DESC":
+                    order_clause = "ORDER BY award_date DESC, id DESC"
+                elif sb == "AWARD_DATE_ASC":
+                    order_clause = "ORDER BY award_date ASC, id ASC"
+                elif sb == "VALUE_DESC":
+                    order_clause = "ORDER BY awarded_contract_value_inr DESC"
+                elif sb == "VALUE_ASC":
+                    order_clause = "ORDER BY awarded_contract_value_inr ASC"
+                elif sb == "DISCOUNT_DESC":
+                    order_clause = "ORDER BY quoted_discount_pct DESC"
+                elif sb == "CONTRACTOR_ASC":
+                    order_clause = "ORDER BY winning_company ASC"
+                elif sb == "TITLE_ASC":
+                    order_clause = "ORDER BY title ASC"
+
+            # Count query
+            cur.execute(f"SELECT COUNT(*) AS total FROM awarded_tenders {where}", params)
+            total_count = cur.fetchone()["total"]
+
+            # Paged query
+            query_params = list(params)
+            if limit is not None:
+                paged_sql = f"SELECT raw_data FROM awarded_tenders {where} {order_clause} LIMIT %s OFFSET %s"
+                query_params.extend([limit, offset])
+            else:
+                paged_sql = f"SELECT raw_data FROM awarded_tenders {where} {order_clause}"
+
+            cur.execute(paged_sql, query_params)
+            rows = cur.fetchall()
+
+            results = [json.loads(r["raw_data"]) if isinstance(r["raw_data"], str) else r["raw_data"] for r in rows]
+            return results, total_count
+    except Exception as e:
+        print(f"[Accepted Tenders] PG query error: {e}")
+        return None
+
+
 def list_accepted_tenders(
     category: Optional[str] = None,
     year: Optional[int] = None,
@@ -1575,6 +1705,21 @@ def list_accepted_tenders(
     offset: int = 0
 ) -> Tuple[List[Dict[str, Any]], int]:
     """Filters accepted tenders across sector, fiscal year, portal, authority, state, and search terms with sorting and pagination."""
+    db_result = _query_db_accepted_tenders(
+        category=category,
+        year=year,
+        source_portal=source_portal,
+        organization=organization,
+        state=state,
+        city=city,
+        search=search,
+        sort_by=sort_by,
+        limit=limit,
+        offset=offset
+    )
+    if db_result is not None:
+        return db_result
+
     results = ACCEPTED_TENDERS_CATALOG
 
     if category and category.strip().upper() != "ALL":
@@ -1711,6 +1856,17 @@ def list_accepted_tenders(
 
 def get_accepted_tender_by_id(tender_id: str) -> Optional[Dict[str, Any]]:
     target = tender_id.lower().strip()
+    try:
+        from app.db.postgres_pool import get_pg_cursor
+        with get_pg_cursor() as cur:
+            cur.execute("SELECT raw_data FROM awarded_tenders WHERE LOWER(id) = %s OR LOWER(loa_number) = %s LIMIT 1", (target, target))
+            row = cur.fetchone()
+            if row:
+                raw = row["raw_data"]
+                return json.loads(raw) if isinstance(raw, str) else raw
+    except Exception as e:
+        print(f"[Accepted Tenders] PG get_by_id error: {e}")
+
     for t in ACCEPTED_TENDERS_CATALOG:
         if t["id"].lower() == target or t.get("og_tender", {}).get("nit_number", "").lower() == target:
             return t
