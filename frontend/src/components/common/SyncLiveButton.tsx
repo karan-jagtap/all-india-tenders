@@ -1,11 +1,18 @@
 import React, { useMemo } from "react";
 import { useTranslation } from "react-i18next";
-import { RefreshCw, Clock, ShieldAlert, Lock, Zap, CheckCircle2 } from "lucide-react";
+import {
+  RefreshCw,
+  Clock,
+  ShieldAlert,
+  Lock,
+  Zap,
+  CheckCircle2,
+} from "lucide-react";
 import { UserQuotaInfo } from "../../types";
 import {
   formatCooldownTime,
   formatQuotaCountdown,
-  formatSyncTimestamp
+  formatSyncTimestamp,
 } from "../../utils/syncTime";
 
 export interface SyncLiveButtonProps {
@@ -41,7 +48,8 @@ export const SyncLiveButton: React.FC<SyncLiveButtonProps> = ({
   const isQuotaLocked = !isLocked && !!quotaInfo?.is_locked;
   const isAnyLocked = isLocked || isQuotaLocked;
   const isInCooldown = !isQuotaLocked && cooldownRemaining > 0;
-  const isDisabled = !isLocked && (isSyncing || isInCooldown || isQuotaLocked || isQuotaLoading);
+  const isDisabled =
+    !isLocked && (isSyncing || isInCooldown || isQuotaLocked || isQuotaLoading);
 
   const syncsRemaining = quotaInfo?.syncs_remaining ?? 2;
   const syncsUsed = quotaInfo?.syncs_used_24h ?? 0;
@@ -69,26 +77,26 @@ export const SyncLiveButton: React.FC<SyncLiveButtonProps> = ({
   // Native title attribute for accessibility
   const nativeTitle = useMemo(() => {
     if (isLocked) {
-      return t('sync.nativeTitleLoggedOut');
+      return t("sync.nativeTitleLoggedOut");
     }
     if (isQuotaLocked) {
-      return t('sync.nativeTitleLimitReached', {
-        time: formattedQuotaCountdownStr
+      return t("sync.nativeTitleLimitReached", {
+        time: formattedQuotaCountdownStr,
       });
     }
     if (isSyncing) {
-      return t('sync.nativeTitleSyncing');
+      return t("sync.nativeTitleSyncing");
     }
     if (isInCooldown) {
-      return t('sync.nativeTitleCooldown', {
+      return t("sync.nativeTitleCooldown", {
         time: formattedCooldown,
         remaining: syncsRemaining,
-        total: 2
+        total: 2,
       });
     }
-    return t('sync.nativeTitleReady', {
+    return t("sync.nativeTitleReady", {
       remaining: syncsRemaining,
-      total: 2
+      total: 2,
     });
   }, [
     isLocked,
@@ -98,7 +106,7 @@ export const SyncLiveButton: React.FC<SyncLiveButtonProps> = ({
     formattedCooldown,
     formattedQuotaCountdownStr,
     syncsRemaining,
-    t
+    t,
   ]);
 
   const tooltipPositionClass = useMemo(() => {
@@ -188,21 +196,21 @@ export const SyncLiveButton: React.FC<SyncLiveButtonProps> = ({
           <div className="flex items-center gap-1.5">
             <span className="hidden xs:inline">
               {isSyncing
-                ? t('sync.syncing')
+                ? t("sync.syncing")
                 : isQuotaLocked
-                  ? t('sync.syncLimitReached')
+                  ? t("sync.syncLimitReached")
                   : isInCooldown
-                    ? `${t('sync.sync')} (${formattedCooldown})`
-                    : t('sync.syncLive')}
+                    ? `${t("sync.sync")} (${formattedCooldown})`
+                    : t("sync.syncLive")}
             </span>
             <span className="xs:hidden">
               {isSyncing
                 ? "..."
                 : isQuotaLocked
-                  ? t('sync.locked')
+                  ? t("sync.locked")
                   : isInCooldown
                     ? formattedCooldown
-                    : t('sync.sync')}
+                    : t("sync.sync")}
             </span>
             {isAnyLocked && (
               <Lock className="w-3.5 h-3.5 text-amber-400 shrink-0" />
@@ -215,14 +223,16 @@ export const SyncLiveButton: React.FC<SyncLiveButtonProps> = ({
           <div className="flex items-center gap-2 justify-center">
             <span>
               {isSyncing
-                ? t('sync.syncRealPortals')
+                ? t("sync.syncRealPortals")
                 : isQuotaLocked
-                  ? t('sync.dailyLimitReached')
+                  ? t("sync.dailyLimitReached")
                   : isInCooldown
-                    ? t('sync.syncAvailableIn', { time: formattedCooldown })
-                    : t('sync.syncLiveNotices')}
+                    ? t("sync.syncAvailableIn", { time: formattedCooldown })
+                    : t("sync.syncliveTenders")}
             </span>
-            {isAnyLocked && <Lock className="w-4 h-4 text-amber-400 shrink-0" />}
+            {isAnyLocked && (
+              <Lock className="w-4 h-4 text-amber-400 shrink-0" />
+            )}
           </div>
         )}
 
@@ -231,21 +241,21 @@ export const SyncLiveButton: React.FC<SyncLiveButtonProps> = ({
           <div className="flex items-center gap-1.5">
             <span className="hidden sm:inline">
               {isSyncing
-                ? t('sync.scrapingLive')
+                ? t("sync.scrapingLive")
                 : isQuotaLocked
-                  ? t('sync.syncLimitReached')
+                  ? t("sync.syncLimitReached")
                   : isInCooldown
-                    ? `${t('sync.sync')} (${formattedCooldown})`
-                    : t('sync.syncLiveScraper')}
+                    ? `${t("sync.sync")} (${formattedCooldown})`
+                    : t("sync.syncLiveScraper")}
             </span>
             <span className="sm:hidden">
               {isSyncing
                 ? "..."
                 : isQuotaLocked
-                  ? t('sync.locked')
+                  ? t("sync.locked")
                   : isInCooldown
                     ? formattedCooldown
-                    : t('sync.sync')}
+                    : t("sync.sync")}
             </span>
             {isAnyLocked && (
               <Lock className="w-3.5 h-3.5 text-amber-400 shrink-0" />
@@ -263,23 +273,19 @@ export const SyncLiveButton: React.FC<SyncLiveButtonProps> = ({
           <div className="flex items-center gap-2 mb-1.5 pb-1.5 border-b border-slate-800">
             <Lock className="w-4 h-4 text-amber-400 shrink-0" />
             <span className="font-bold text-xs text-amber-300">
-              {t('sync.loginPromptTitle')}
+              {t("sync.loginPromptTitle")}
             </span>
           </div>
           <div className="space-y-1.5 text-[11px] leading-relaxed text-slate-300">
-            <p>
-              {t('sync.loginPromptDesc1')}
-            </p>
-            <p className="text-slate-400">
-              {t('sync.loginPromptDesc2')}
-            </p>
+            <p>{t("sync.loginPromptDesc1")}</p>
+            <p className="text-slate-400">{t("sync.loginPromptDesc2")}</p>
           </div>
           <div className="mt-2.5 pt-2 border-t border-slate-800 flex items-center justify-between text-[11px]">
             <span className="text-amber-400 font-semibold flex items-center gap-1">
-              {t('sync.clickToLogIn')}
+              {t("sync.clickToLogIn")}
             </span>
             <span className="font-mono text-[10px] text-slate-400 bg-slate-800 px-1.5 py-0.5 rounded">
-              {t('sync.loginRequiredBadge')}
+              {t("sync.loginRequiredBadge")}
             </span>
           </div>
         </div>
@@ -295,17 +301,17 @@ export const SyncLiveButton: React.FC<SyncLiveButtonProps> = ({
             <div className="flex items-center gap-1.5">
               <Lock className="w-4 h-4 text-amber-400 shrink-0" />
               <span className="font-bold text-xs text-amber-300">
-                {t('sync.limitReachedTitle')}
+                {t("sync.limitReachedTitle")}
               </span>
             </div>
             <span className="font-mono text-[10px] text-amber-300 bg-amber-950/80 border border-amber-800/80 px-1.5 py-0.5 rounded">
-              {t('sync.lockActiveBadge')}
+              {t("sync.lockActiveBadge")}
             </span>
           </div>
 
           {(userEmail || userName) && (
             <div className="text-[10px] text-slate-300 bg-slate-800/60 rounded px-2 py-1 mb-2 border border-slate-700/50 flex items-center justify-between">
-              <span className="text-slate-400">{t('sync.accountLabel')}</span>
+              <span className="text-slate-400">{t("sync.accountLabel")}</span>
               <span className="font-medium text-slate-200 truncate max-w-[190px]">
                 {userEmail || userName}
               </span>
@@ -313,11 +319,9 @@ export const SyncLiveButton: React.FC<SyncLiveButtonProps> = ({
           )}
 
           <div className="space-y-1.5 text-[11px] leading-relaxed text-slate-300">
-            <p>
-              {t('sync.limitExplanation')}
-            </p>
+            <p>{t("sync.limitExplanation")}</p>
             <p className="text-slate-400">
-              {t('sync.lockDurationExplanation')}
+              {t("sync.lockDurationExplanation")}
             </p>
           </div>
 
@@ -325,7 +329,7 @@ export const SyncLiveButton: React.FC<SyncLiveButtonProps> = ({
             <div className="flex items-center justify-between text-[11px]">
               <span className="text-slate-300 flex items-center gap-1 font-medium">
                 <Clock className="w-3.5 h-3.5 text-amber-400 animate-pulse shrink-0" />
-                <span>{t('sync.nextSyncAvailableIn')}</span>
+                <span>{t("sync.nextSyncAvailableIn")}</span>
               </span>
               <span className="font-mono font-black text-amber-300 bg-slate-900 border border-amber-500/50 px-2 py-0.5 rounded text-[11px] tracking-wide">
                 {formattedQuotaCountdownStr}
@@ -333,16 +337,21 @@ export const SyncLiveButton: React.FC<SyncLiveButtonProps> = ({
             </div>
             {formattedLastSync && (
               <div className="text-[10px] text-slate-400 flex items-center justify-between pt-1 border-t border-amber-900/40">
-                <span>{t('sync.lastSyncRecorded')}</span>
-                <span className="text-slate-300 font-mono">{formattedLastSync}</span>
+                <span>{t("sync.lastSyncRecorded")}</span>
+                <span className="text-slate-300 font-mono">
+                  {formattedLastSync}
+                </span>
               </div>
             )}
           </div>
 
           <div className="mt-2 pt-2 border-t border-slate-800/80 flex items-center justify-between text-[10px] text-slate-400">
-            <span>{t('nav.automatedCronFooter')}</span>
+            <span>{t("nav.automatedCronFooter")}</span>
             <span className="font-mono text-amber-400/90 font-semibold">
-              {t('sync.usedCount', { used: syncsUsed, total: quotaInfo?.sync_limit ?? 2 })}
+              {t("sync.usedCount", {
+                used: syncsUsed,
+                total: quotaInfo?.sync_limit ?? 2,
+              })}
             </span>
           </div>
         </div>
@@ -359,14 +368,14 @@ export const SyncLiveButton: React.FC<SyncLiveButtonProps> = ({
               <>
                 <RefreshCw className="w-4 h-4 text-emerald-400 animate-spin shrink-0" />
                 <span className="font-bold text-xs text-emerald-300">
-                  {t('sync.syncInProgressTitle')}
+                  {t("sync.syncInProgressTitle")}
                 </span>
               </>
             ) : (
               <>
                 <ShieldAlert className="w-4 h-4 text-amber-400 shrink-0" />
                 <span className="font-bold text-xs text-amber-300">
-                  {t('sync.cooldownTitle')}
+                  {t("sync.cooldownTitle")}
                 </span>
               </>
             )}
@@ -374,10 +383,10 @@ export const SyncLiveButton: React.FC<SyncLiveButtonProps> = ({
 
           <div className="space-y-1.5 text-[11px] leading-relaxed text-slate-300">
             <p>
-              <strong className="text-white">{t('sync.whyDisabled')}</strong>{" "}
+              <strong className="text-white">{t("sync.whyDisabled")}</strong>{" "}
               {isSyncing
-                ? t('sync.whyDisabledSyncing')
-                : t('sync.whyDisabledCooldown')}
+                ? t("sync.whyDisabledSyncing")
+                : t("sync.whyDisabledCooldown")}
             </p>
           </div>
 
@@ -387,17 +396,17 @@ export const SyncLiveButton: React.FC<SyncLiveButtonProps> = ({
                 <>
                   <span className="text-slate-400 flex items-center gap-1 font-medium">
                     <RefreshCw className="w-3.5 h-3.5 text-emerald-400 animate-spin shrink-0" />
-                    <span>{t('sync.syncStatusLabel')}</span>
+                    <span>{t("sync.syncStatusLabel")}</span>
                   </span>
                   <span className="font-mono font-bold text-emerald-300 bg-emerald-950/80 border border-emerald-800/80 px-2 py-0.5 rounded text-[11px]">
-                    {t('sync.syncingActiveStatus')}
+                    {t("sync.syncingActiveStatus")}
                   </span>
                 </>
               ) : (
                 <>
                   <span className="text-slate-400 flex items-center gap-1 font-medium">
                     <Clock className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                    <span>{t('sync.availableAgain')}</span>
+                    <span>{t("sync.availableAgain")}</span>
                   </span>
                   <span className="font-mono font-bold text-amber-300 bg-amber-950/80 border border-amber-800/80 px-2 py-0.5 rounded text-[11px]">
                     {`In ${formattedCooldown}`}
@@ -406,9 +415,12 @@ export const SyncLiveButton: React.FC<SyncLiveButtonProps> = ({
               )}
             </div>
             <div className="flex items-center justify-between text-[10px] text-slate-400 pt-1">
-              <span>{t('sync.dailyQuotaLabel')}</span>
+              <span>{t("sync.dailyQuotaLabel")}</span>
               <span className="text-emerald-400 font-medium">
-                {t('sync.remainingWindow', { remaining: syncsRemaining, total: 2 })}
+                {t("sync.remainingWindow", {
+                  remaining: syncsRemaining,
+                  total: 2,
+                })}
               </span>
             </div>
           </div>
@@ -425,17 +437,17 @@ export const SyncLiveButton: React.FC<SyncLiveButtonProps> = ({
             <div className="flex items-center gap-1.5">
               <Zap className="w-4 h-4 text-emerald-400 shrink-0" />
               <span className="font-bold text-xs text-emerald-300">
-                {t('sync.livePortalSyncTitle')}
+                {t("sync.livePortalSyncTitle")}
               </span>
             </div>
             <span className="font-mono text-[10px] text-emerald-300 bg-emerald-950/80 border border-emerald-800/80 px-1.5 py-0.5 rounded">
-              {t('sync.readyBadge')}
+              {t("sync.readyBadge")}
             </span>
           </div>
 
           {(userEmail || userName) && (
             <div className="text-[10px] text-slate-300 bg-slate-800/60 rounded px-2 py-1 mb-2 border border-slate-700/50 flex items-center justify-between">
-              <span className="text-slate-400">{t('sync.signedInLabel')}</span>
+              <span className="text-slate-400">{t("sync.signedInLabel")}</span>
               <span className="font-medium text-slate-200 truncate max-w-[190px]">
                 {userEmail || userName}
               </span>
@@ -443,25 +455,28 @@ export const SyncLiveButton: React.FC<SyncLiveButtonProps> = ({
           )}
 
           <div className="space-y-1.5 text-[11px] leading-relaxed text-slate-300">
-            <p>
-              {t('sync.whyDisabledSyncing')}
-            </p>
+            <p>{t("sync.whyDisabledSyncing")}</p>
           </div>
 
           <div className="mt-2.5 pt-2 border-t border-slate-800 space-y-1 text-[11px]">
             <div className="flex items-center justify-between">
               <span className="text-slate-300 flex items-center gap-1 font-medium">
                 <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                <span>{t('sync.dailyQuotaLabel')}</span>
+                <span>{t("sync.dailyQuotaLabel")}</span>
               </span>
               <span className="font-mono font-bold text-emerald-300 bg-emerald-950/80 border border-emerald-800/80 px-2 py-0.5 rounded text-[11px]">
-                {t('sync.remainingCount', { remaining: syncsRemaining, total: 2 })}
+                {t("sync.remainingCount", {
+                  remaining: syncsRemaining,
+                  total: 2,
+                })}
               </span>
             </div>
             {formattedLastSync && (
               <div className="text-[10px] text-slate-400 flex items-center justify-between pt-1">
-                <span>{t('sync.lastSyncLabel')}</span>
-                <span className="text-slate-300 font-mono">{formattedLastSync}</span>
+                <span>{t("sync.lastSyncLabel")}</span>
+                <span className="text-slate-300 font-mono">
+                  {formattedLastSync}
+                </span>
               </div>
             )}
           </div>
