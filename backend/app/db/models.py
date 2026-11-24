@@ -5,6 +5,7 @@ Live In-Progress Tenders, Awarded Bids, and Feedback Submissions.
 """
 
 from typing import List, Optional, Dict, Any
+from datetime import datetime
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import (
     String, Integer, Float, Boolean, Text, JSON, DateTime, ForeignKey, 
@@ -347,6 +348,12 @@ class CronSyncLog(Base, TimestampMixin):
     user_id: Mapped[Optional[str]] = mapped_column(String(100), nullable=True, index=True)
     user_email: Mapped[Optional[str]] = mapped_column(String(255), nullable=True, index=True)
     user_name: Mapped[Optional[str]] = mapped_column(String(150), nullable=True)
+    sync_number: Mapped[int] = mapped_column(Integer, default=1)
+    is_locked: Mapped[bool] = mapped_column(Boolean, default=False)
+    syncs_remaining: Mapped[int] = mapped_column(Integer, default=1)
+    next_sync_available_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
+    cooldown_until: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
+    completed_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True), nullable=True)
     details: Mapped[Optional[Dict[str, Any]]] = mapped_column(JSON, nullable=True)
     error_message: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
 

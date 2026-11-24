@@ -18,6 +18,7 @@ export interface SyncLiveButtonProps {
   isLocked?: boolean; // Auth lock: true when user is signed out
   onLockedClick?: () => void;
   quotaInfo?: UserQuotaInfo | null;
+  isQuotaLoading?: boolean;
   userEmail?: string | null;
   userName?: string | null;
 }
@@ -32,6 +33,7 @@ export const SyncLiveButton: React.FC<SyncLiveButtonProps> = ({
   isLocked = false,
   onLockedClick,
   quotaInfo,
+  isQuotaLoading = false,
   userEmail,
   userName,
 }) => {
@@ -39,7 +41,7 @@ export const SyncLiveButton: React.FC<SyncLiveButtonProps> = ({
   const isQuotaLocked = !isLocked && !!quotaInfo?.is_locked;
   const isAnyLocked = isLocked || isQuotaLocked;
   const isInCooldown = !isQuotaLocked && cooldownRemaining > 0;
-  const isDisabled = !isLocked && (isSyncing || isInCooldown || isQuotaLocked);
+  const isDisabled = !isLocked && (isSyncing || isInCooldown || isQuotaLocked || isQuotaLoading);
 
   const syncsRemaining = quotaInfo?.syncs_remaining ?? 2;
   const syncsUsed = quotaInfo?.syncs_used_24h ?? 0;
@@ -71,8 +73,7 @@ export const SyncLiveButton: React.FC<SyncLiveButtonProps> = ({
     }
     if (isQuotaLocked) {
       return t('sync.nativeTitleLimitReached', {
-        time: formattedQuotaCountdownStr,
-        defaultValue: `Daily sync limit reached (2/2 used within 24h). Next sync available in ${formattedQuotaCountdownStr}.`
+        time: formattedQuotaCountdownStr
       });
     }
     if (isSyncing) {
@@ -82,14 +83,12 @@ export const SyncLiveButton: React.FC<SyncLiveButtonProps> = ({
       return t('sync.nativeTitleCooldown', {
         time: formattedCooldown,
         remaining: syncsRemaining,
-        total: 2,
-        defaultValue: `Sync disabled: 5-minute safety cooldown active. Available again in ${formattedCooldown}. (${syncsRemaining} of 2 syncs remaining)`
+        total: 2
       });
     }
     return t('sync.nativeTitleReady', {
       remaining: syncsRemaining,
-      total: 2,
-      defaultValue: `Runs live scraper sync across all 28+ government portals. Daily Quota: ${syncsRemaining} of 2 syncs remaining.`
+      total: 2
     });
   }, [
     isLocked,
@@ -220,7 +219,7 @@ export const SyncLiveButton: React.FC<SyncLiveButtonProps> = ({
                 : isQuotaLocked
                   ? t('sync.dailyLimitReached')
                   : isInCooldown
-                    ? t('sync.syncAvailableIn', { time: formattedCooldown, defaultValue: `Sync Available in ${formattedCooldown}` })
+                    ? t('sync.syncAvailableIn', { time: formattedCooldown })
                     : t('sync.syncLiveNotices')}
             </span>
             {isAnyLocked && <Lock className="w-4 h-4 text-amber-400 shrink-0" />}
@@ -343,7 +342,7 @@ export const SyncLiveButton: React.FC<SyncLiveButtonProps> = ({
           <div className="mt-2 pt-2 border-t border-slate-800/80 flex items-center justify-between text-[10px] text-slate-400">
             <span>{t('nav.automatedCronFooter')}</span>
             <span className="font-mono text-amber-400/90 font-semibold">
-              {t('sync.usedCount', { used: syncsUsed, total: quotaInfo?.sync_limit ?? 2, defaultValue: `${syncsUsed} of ${quotaInfo?.sync_limit ?? 2} used` })}
+              {t('sync.usedCount', { used: syncsUsed, total: quotaInfo?.sync_limit ?? 2 })}
             </span>
           </div>
         </div>
@@ -384,18 +383,32 @@ export const SyncLiveButton: React.FC<SyncLiveButtonProps> = ({
 
           <div className="mt-2.5 pt-2 border-t border-slate-800 space-y-1 text-[11px]">
             <div className="flex items-center justify-between">
-              <span className="text-slate-400 flex items-center gap-1 font-medium">
-                <Clock className="w-3.5 h-3.5 text-slate-400" />
-                <span>{t('sync.availableAgain')}</span>
-              </span>
-              <span className="font-mono font-bold text-amber-300 bg-amber-950/80 border border-amber-800/80 px-2 py-0.5 rounded text-[11px]">
-                {isSyncing ? t('sync.inTwoSeconds') : `In ${formattedCooldown}`}
-              </span>
+              {isSyncing ? (
+                <>
+                  <span className="text-slate-400 flex items-center gap-1 font-medium">
+                    <RefreshCw className="w-3.5 h-3.5 text-emerald-400 animate-spin shrink-0" />
+                    <span>{t('sync.syncStatusLabel')}</span>
+                  </span>
+                  <span className="font-mono font-bold text-emerald-300 bg-emerald-950/80 border border-emerald-800/80 px-2 py-0.5 rounded text-[11px]">
+                    {t('sync.syncingActiveStatus')}
+                  </span>
+                </>
+              ) : (
+                <>
+                  <span className="text-slate-400 flex items-center gap-1 font-medium">
+                    <Clock className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                    <span>{t('sync.availableAgain')}</span>
+                  </span>
+                  <span className="font-mono font-bold text-amber-300 bg-amber-950/80 border border-amber-800/80 px-2 py-0.5 rounded text-[11px]">
+                    {`In ${formattedCooldown}`}
+                  </span>
+                </>
+              )}
             </div>
             <div className="flex items-center justify-between text-[10px] text-slate-400 pt-1">
               <span>{t('sync.dailyQuotaLabel')}</span>
               <span className="text-emerald-400 font-medium">
-                {t('sync.remainingWindow', { remaining: syncsRemaining, total: 2, defaultValue: `${syncsRemaining} of 2 syncs remaining (24h window)` })}
+                {t('sync.remainingWindow', { remaining: syncsRemaining, total: 2 })}
               </span>
             </div>
           </div>
@@ -442,7 +455,7 @@ export const SyncLiveButton: React.FC<SyncLiveButtonProps> = ({
                 <span>{t('sync.dailyQuotaLabel')}</span>
               </span>
               <span className="font-mono font-bold text-emerald-300 bg-emerald-950/80 border border-emerald-800/80 px-2 py-0.5 rounded text-[11px]">
-                {t('sync.remainingCount', { remaining: syncsRemaining, total: 2, defaultValue: `${syncsRemaining} of 2 syncs remaining` })}
+                {t('sync.remainingCount', { remaining: syncsRemaining, total: 2 })}
               </span>
             </div>
             {formattedLastSync && (

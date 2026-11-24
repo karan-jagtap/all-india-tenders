@@ -86,12 +86,18 @@ async def init_db():
         # Create all tables registered in Base metadata
         await conn.run_sync(Base.metadata.create_all)
 
-        # Ensure user columns exist on cron_sync_logs for user quota tracking
+        # Ensure user columns and sync quota state exist on cron_sync_logs
         try:
             if IS_POSTGRES:
                 await conn.execute(text("ALTER TABLE cron_sync_logs ADD COLUMN IF NOT EXISTS user_id VARCHAR(100)"))
                 await conn.execute(text("ALTER TABLE cron_sync_logs ADD COLUMN IF NOT EXISTS user_email VARCHAR(255)"))
                 await conn.execute(text("ALTER TABLE cron_sync_logs ADD COLUMN IF NOT EXISTS user_name VARCHAR(150)"))
+                await conn.execute(text("ALTER TABLE cron_sync_logs ADD COLUMN IF NOT EXISTS sync_number INTEGER DEFAULT 1"))
+                await conn.execute(text("ALTER TABLE cron_sync_logs ADD COLUMN IF NOT EXISTS is_locked BOOLEAN DEFAULT FALSE"))
+                await conn.execute(text("ALTER TABLE cron_sync_logs ADD COLUMN IF NOT EXISTS syncs_remaining INTEGER DEFAULT 1"))
+                await conn.execute(text("ALTER TABLE cron_sync_logs ADD COLUMN IF NOT EXISTS next_sync_available_at TIMESTAMP WITH TIME ZONE"))
+                await conn.execute(text("ALTER TABLE cron_sync_logs ADD COLUMN IF NOT EXISTS cooldown_until TIMESTAMP WITH TIME ZONE"))
+                await conn.execute(text("ALTER TABLE cron_sync_logs ADD COLUMN IF NOT EXISTS completed_at TIMESTAMP WITH TIME ZONE"))
                 await conn.execute(text("CREATE INDEX IF NOT EXISTS ix_cron_sync_logs_user_id ON cron_sync_logs (user_id)"))
                 await conn.execute(text("CREATE INDEX IF NOT EXISTS ix_cron_sync_logs_user_email ON cron_sync_logs (user_email)"))
             else:
@@ -104,6 +110,18 @@ async def init_db():
                     await conn.execute(text("ALTER TABLE cron_sync_logs ADD COLUMN user_email VARCHAR(255)"))
                 if "user_name" not in existing_cols:
                     await conn.execute(text("ALTER TABLE cron_sync_logs ADD COLUMN user_name VARCHAR(150)"))
+                if "sync_number" not in existing_cols:
+                    await conn.execute(text("ALTER TABLE cron_sync_logs ADD COLUMN sync_number INTEGER DEFAULT 1"))
+                if "is_locked" not in existing_cols:
+                    await conn.execute(text("ALTER TABLE cron_sync_logs ADD COLUMN is_locked BOOLEAN DEFAULT 0"))
+                if "syncs_remaining" not in existing_cols:
+                    await conn.execute(text("ALTER TABLE cron_sync_logs ADD COLUMN syncs_remaining INTEGER DEFAULT 1"))
+                if "next_sync_available_at" not in existing_cols:
+                    await conn.execute(text("ALTER TABLE cron_sync_logs ADD COLUMN next_sync_available_at DATETIME"))
+                if "cooldown_until" not in existing_cols:
+                    await conn.execute(text("ALTER TABLE cron_sync_logs ADD COLUMN cooldown_until DATETIME"))
+                if "completed_at" not in existing_cols:
+                    await conn.execute(text("ALTER TABLE cron_sync_logs ADD COLUMN completed_at DATETIME"))
                 await conn.execute(text("CREATE INDEX IF NOT EXISTS ix_cron_sync_logs_user_id ON cron_sync_logs (user_id)"))
                 await conn.execute(text("CREATE INDEX IF NOT EXISTS ix_cron_sync_logs_user_email ON cron_sync_logs (user_email)"))
         except Exception as col_err:

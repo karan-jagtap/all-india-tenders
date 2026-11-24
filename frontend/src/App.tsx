@@ -24,6 +24,7 @@ import {
   getPlatformStats,
   triggerLiveScrape,
   getUserSyncQuota,
+  getCachedUserQuota,
   PlatformStats,
   ScrapeReport,
   UserQuotaInfo
@@ -42,12 +43,44 @@ export const App: React.FC = () => {
   const { isSignedIn, userId, user, openSignIn, showSetupGuide, setShowSetupGuide } = useAuthContext();
   const [activeTab, setActiveTab] = useState<NavigationTab>(NavigationTab.HOME);
   const [stats, setStats] = useState<PlatformStats | null>(null);
-  const [isSyncing, setIsSyncing] = useState<boolean>(false);
-  const [cooldownRemaining, setCooldownRemaining] = useState<number>(0);
+  const [isSyncing, setIsSyncing] = useState<boolean>(() => {
+    try {
+      const inProgress = localStorage.getItem('ait_sync_in_progress') === 'true';
+      const activeUntil = Number(localStorage.getItem('ait_sync_active_until') || '0');
+      return inProgress || activeUntil > Date.now();
+    } catch {
+      return false;
+    }
+  });
+  const [cooldownRemaining, setCooldownRemaining] = useState<number>(() => {
+    try {
+      const expiry = Number(localStorage.getItem('ait_cooldown_expiry_epoch') || '0');
+      const diff = Math.ceil((expiry - Date.now()) / 1000);
+      return diff > 0 ? diff : 0;
+    } catch {
+      return 0;
+    }
+  });
   const [syncNotice, setSyncNotice] = useState<string | null>(null);
   const [syncKey, setSyncKey] = useState<number>(0);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState<boolean>(false);
-  const [userQuota, setUserQuota] = useState<UserQuotaInfo | null>(null);
+  const [userQuota, setUserQuota] = useState<UserQuotaInfo | null>(() => {
+    try {
+      const lastId = localStorage.getItem('ait_last_user_id');
+      if (lastId) {
+        return getCachedUserQuota(lastId);
+      }
+    } catch {}
+    return null;
+  });
+  const [isQuotaLoading, setIsQuotaLoading] = useState<boolean>(() => {
+    try {
+      const lastId = localStorage.getItem('ait_last_user_id');
+      return !lastId || !localStorage.getItem(`ait_user_quota_${lastId}`);
+    } catch {
+      return false;
+    }
+  });
 
   // User details derived from Clerk session
   const userEmail = useMemo(() => {
@@ -62,25 +95,58 @@ export const App: React.FC = () => {
     return user?.fullName || user?.firstName || user?.username || null;
   }, [user]);
 
-  // Fetch 24-hour sync quota for signed-in user
+  // Fetch 24-hour sync quota for signed-in user directly from database
   const fetchUserQuota = useCallback(async () => {
     if (!userId) {
       setUserQuota(null);
+      setIsQuotaLoading(false);
       return;
     }
     try {
       const quota = await getUserSyncQuota(userId);
       setUserQuota(quota);
+      setIsQuotaLoading(false);
+
+      if (quota.is_sync_in_progress) {
+        setIsSyncing(true);
+        localStorage.setItem('ait_sync_in_progress', 'true');
+        const currentUntil = Number(localStorage.getItem('ait_sync_active_until') || '0');
+        if (currentUntil <= Date.now()) {
+          localStorage.setItem('ait_sync_active_until', String(Date.now() + 45000));
+        }
+      } else {
+        localStorage.removeItem('ait_sync_in_progress');
+        const activeUntil = Number(localStorage.getItem('ait_sync_active_until') || '0');
+        if (activeUntil <= Date.now()) {
+          setIsSyncing(false);
+          localStorage.removeItem('ait_sync_active_until');
+        }
+      }
+
+      if (quota.cooldown_remaining_seconds && quota.cooldown_remaining_seconds > 0) {
+        setCooldownRemaining(quota.cooldown_remaining_seconds);
+        localStorage.setItem('ait_cooldown_expiry_epoch', String(Date.now() + quota.cooldown_remaining_seconds * 1000));
+      }
     } catch (err) {
       console.warn('Failed to load user sync quota', err);
+      setIsQuotaLoading(false);
     }
   }, [userId]);
 
   useEffect(() => {
     if (isSignedIn && userId) {
+      localStorage.setItem('ait_last_user_id', userId);
+      const cached = getCachedUserQuota(userId);
+      if (cached) {
+        setUserQuota(cached);
+        if (cached.is_sync_in_progress) {
+          setIsSyncing(true);
+        }
+      }
       fetchUserQuota();
     } else {
       setUserQuota(null);
+      setIsQuotaLoading(false);
     }
   }, [isSignedIn, userId, fetchUserQuota]);
 
@@ -129,24 +195,42 @@ export const App: React.FC = () => {
     }
   }, [isSignedIn, activeTab]);
 
-  const fetchStats = () => {
+  const fetchStats = useCallback(() => {
     getPlatformStats()
       .then((data) => {
         setStats(data);
+        if (data?.is_sync_in_progress) {
+          setIsSyncing(true);
+          const currentUntil = Number(localStorage.getItem('ait_sync_active_until') || '0');
+          if (currentUntil <= Date.now()) {
+            localStorage.setItem('ait_sync_active_until', String(Date.now() + 45000));
+          }
+        } else {
+          const activeUntil = Number(localStorage.getItem('ait_sync_active_until') || '0');
+          if (activeUntil <= Date.now()) {
+            setIsSyncing(false);
+            localStorage.removeItem('ait_sync_active_until');
+          }
+        }
         if (data?.cooldown_remaining_seconds && data.cooldown_remaining_seconds > 0) {
           setCooldownRemaining(data.cooldown_remaining_seconds);
+          localStorage.setItem('ait_cooldown_expiry_epoch', String(Date.now() + data.cooldown_remaining_seconds * 1000));
         }
       })
       .catch((err) => console.warn('Failed to load platform stats', err));
-  };
+  }, []);
 
-  // Live 1-second countdown interval for 5-minute cooldown
+  // Live 1-second countdown interval for safety cooldown (persisted across refresh)
   useEffect(() => {
-    if (cooldownRemaining <= 0) return;
+    if (cooldownRemaining <= 0) {
+      localStorage.removeItem('ait_cooldown_expiry_epoch');
+      return;
+    }
     const timer = setInterval(() => {
       setCooldownRemaining((prev) => {
         if (prev <= 1) {
           clearInterval(timer);
+          localStorage.removeItem('ait_cooldown_expiry_epoch');
           return 0;
         }
         return prev - 1;
@@ -155,13 +239,44 @@ export const App: React.FC = () => {
     return () => clearInterval(timer);
   }, [cooldownRemaining]);
 
+  // Active poller while synchronization is in progress (survives page refresh)
+  useEffect(() => {
+    if (!isSyncing) return;
+
+    const pollInterval = setInterval(async () => {
+      const activeUntil = Number(localStorage.getItem('ait_sync_active_until') || '0');
+      if (activeUntil <= Date.now()) {
+        setIsSyncing(false);
+        localStorage.removeItem('ait_sync_active_until');
+        fetchStats();
+        fetchUserQuota();
+        return;
+      }
+
+      try {
+        const data = await getPlatformStats();
+        setStats(data);
+        if (data?.is_sync_in_progress === false && (activeUntil - Date.now() < 50000)) {
+          setIsSyncing(false);
+          localStorage.removeItem('ait_sync_active_until');
+          setSyncKey((prev) => prev + 1);
+          fetchUserQuota();
+        }
+      } catch {
+        // Static hosting fallback
+      }
+    }, 2000);
+
+    return () => clearInterval(pollInterval);
+  }, [isSyncing, fetchStats, fetchUserQuota]);
+
   useEffect(() => {
     fetchStats();
     loadContractorPools();
     loadPortalSources();
     loadMasterFilters();
     loadUiFilters();
-  }, []);
+  }, [fetchStats]);
 
   // Close mobile hamburger menu on Escape key
   useEffect(() => {
@@ -204,6 +319,56 @@ export const App: React.FC = () => {
     if (isSyncing || cooldownRemaining > 0) return;
     setIsSyncing(true);
     setSyncNotice(null);
+    localStorage.setItem('ait_sync_in_progress', 'true');
+    localStorage.setItem('ait_sync_active_until', String(Date.now() + 60000));
+
+    if (userId) {
+      localStorage.setItem('ait_last_user_id', userId);
+      // Optimistically update quota in state & persistent storage immediately
+      const currentUsed = userQuota?.syncs_used_24h ?? 0;
+      const nextUsed = Math.min(2, currentUsed + 1);
+      const isNowLocked = nextUsed >= 2;
+      const unlockAt = isNowLocked ? new Date(Date.now() + 24 * 3600 * 1000).toISOString() : null;
+      const optimisticQuota: UserQuotaInfo = {
+        ...(userQuota || {
+          user_id: userId,
+          sync_limit: 2,
+          syncs_used_24h: 0,
+          syncs_remaining: 2,
+          is_locked: false,
+          is_sync_in_progress: true,
+          next_sync_available_seconds: 0,
+          next_sync_available_formatted: 'Available now',
+          next_sync_available_at: null,
+          last_sync_at: null
+        }),
+        syncs_used_24h: nextUsed,
+        syncs_remaining: isNowLocked ? 0 : Math.max(0, 2 - nextUsed),
+        is_locked: isNowLocked,
+        is_sync_in_progress: true,
+        next_sync_available_seconds: isNowLocked ? 86400 : 0,
+        next_sync_available_formatted: isNowLocked ? '24h 0m 0s' : 'Available now',
+        next_sync_available_at: unlockAt,
+        last_sync_at: new Date().toISOString()
+      };
+      setUserQuota(optimisticQuota);
+      try {
+        localStorage.setItem(`ait_user_quota_${userId}`, JSON.stringify(optimisticQuota));
+      } catch {}
+
+      // Optimistically record sync timestamp so that immediate refresh reflects usage
+      const key = `ait_sync_timestamps_${userId}`;
+      try {
+        let timestamps: number[] = [];
+        const raw = localStorage.getItem(key);
+        if (raw) timestamps = JSON.parse(raw);
+        const lastTs = timestamps.length > 0 ? timestamps[timestamps.length - 1] : 0;
+        if (Date.now() - lastTs > 45000) {
+          timestamps.push(Date.now());
+        }
+        localStorage.setItem(key, JSON.stringify(timestamps));
+      } catch {}
+    }
 
     try {
       const report: ScrapeReport = await triggerLiveScrape({
@@ -222,10 +387,14 @@ export const App: React.FC = () => {
 
       if (report.status === 'quota_exceeded') {
         setSyncNotice(report.message || 'Daily sync limit reached (2 of 2 syncs used within 24 hours).');
-      } else if (report.status === 'cooldown' || report.status === 'in_progress') {
+      } else if (report.status === 'in_progress') {
+        setSyncNotice(report.message || 'A synchronization is actively in progress.');
+        localStorage.setItem('ait_sync_active_until', String(Date.now() + 30000));
+      } else if (report.status === 'cooldown') {
         setSyncNotice(report.message || 'Synchronization is currently in cooldown to protect portals.');
-        if (report.cooldown_remaining_seconds) {
+        if (report.cooldown_remaining_seconds && report.cooldown_remaining_seconds > 0) {
           setCooldownRemaining(report.cooldown_remaining_seconds);
+          localStorage.setItem('ait_cooldown_expiry_epoch', String(Date.now() + report.cooldown_remaining_seconds * 1000));
         }
       } else {
         const portalCount = report.portals_scraped?.length || 28;
@@ -233,6 +402,11 @@ export const App: React.FC = () => {
         const duration = report.execution_time_ms ? `${Math.round(report.execution_time_ms)}ms` : '2.3s';
         const quotaRemaining = report.user_quota?.syncs_remaining ?? (userQuota ? Math.max(0, userQuota.syncs_remaining - 1) : 1);
         setSyncNotice(`Synced ${count} live notices across ${portalCount} portals in ${duration} • ${quotaRemaining} of 2 daily syncs remaining`);
+
+        if (report.cooldown_remaining_seconds && report.cooldown_remaining_seconds > 0) {
+          setCooldownRemaining(report.cooldown_remaining_seconds);
+          localStorage.setItem('ait_cooldown_expiry_epoch', String(Date.now() + report.cooldown_remaining_seconds * 1000));
+        }
       }
 
       setTimeout(() => {
@@ -243,7 +417,10 @@ export const App: React.FC = () => {
       setSyncNotice('Sync failed. Please check network.');
       setTimeout(() => setSyncNotice(null), 4000);
     } finally {
+      localStorage.removeItem('ait_sync_in_progress');
+      localStorage.removeItem('ait_sync_active_until');
       setIsSyncing(false);
+      fetchUserQuota();
     }
   };
 
@@ -353,6 +530,7 @@ export const App: React.FC = () => {
               isLocked={!isSignedIn}
               onLockedClick={openSignIn}
               quotaInfo={userQuota}
+              isQuotaLoading={isQuotaLoading}
               userEmail={userEmail}
               userName={userName}
             />
@@ -608,6 +786,7 @@ export const App: React.FC = () => {
                   openSignIn();
                 }}
                 quotaInfo={userQuota}
+                isQuotaLoading={isQuotaLoading}
                 userEmail={userEmail}
                 userName={userName}
               />

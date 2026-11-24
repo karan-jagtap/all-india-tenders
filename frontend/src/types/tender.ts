@@ -267,6 +267,8 @@ export interface UserQuotaInfo {
   last_sync_at?: string | null;
   last_user_name?: string | null;
   last_user_email?: string | null;
+  is_sync_in_progress?: boolean;
+  cooldown_remaining_seconds?: number;
 }
 
 export interface ScrapeReport {

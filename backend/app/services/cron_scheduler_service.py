@@ -13,6 +13,7 @@ from typing import Dict, Any, Optional
 
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
+from sqlalchemy import select
 
 from app.services.db_sync_service import sync_scraped_data_to_db
 from app.db.session import async_session_factory
@@ -93,12 +94,46 @@ async def get_user_sync_quota(user_id: Optional[str]) -> Dict[str, Any]:
     try:
         from sqlalchemy import select
         async with async_session_factory() as session:
+            # 1. Clean up any stale RUNNING logs (> 2.5 minutes)
+            stale_stmt = (
+                select(CronSyncLog)
+                .where(
+                    CronSyncLog.user_id == user_id,
+                    CronSyncLog.status == "RUNNING",
+                    CronSyncLog.created_at < (now_utc - timedelta(minutes=2, seconds=30))
+                )
+            )
+            stale_res = await session.execute(stale_stmt)
+            stale_logs = stale_res.scalars().all()
+            if stale_logs:
+                for sl in stale_logs:
+                    sl.status = "FAILED"
+                    sl.error_message = "Execution timed out"
+                    sl.completed_at = now_utc
+                await session.commit()
+
+            # 2. Check for actively RUNNING sync for this user in DB
+            active_running_stmt = (
+                select(CronSyncLog)
+                .where(
+                    CronSyncLog.user_id == user_id,
+                    CronSyncLog.status == "RUNNING",
+                    CronSyncLog.created_at >= (now_utc - timedelta(minutes=5))
+                )
+                .order_by(CronSyncLog.created_at.desc())
+                .limit(1)
+            )
+            active_res = await session.execute(active_running_stmt)
+            active_running_log = active_res.scalar_one_or_none()
+            is_user_syncing = bool(active_running_log) or SYNC_LOCK.locked()
+
+            # 3. Query all syncs within last 24h (both SUCCESS and actively RUNNING)
             stmt = (
                 select(CronSyncLog)
                 .where(
                     CronSyncLog.user_id == user_id,
                     CronSyncLog.trigger_type == "MANUAL_BUTTON",
-                    CronSyncLog.status == "SUCCESS",
+                    CronSyncLog.status.in_(["SUCCESS", "RUNNING"]),
                     CronSyncLog.created_at >= cutoff_24h
                 )
                 .order_by(CronSyncLog.created_at.desc())
@@ -109,7 +144,7 @@ async def get_user_sync_quota(user_id: Optional[str]) -> Dict[str, Any]:
             syncs_used = len(logs)
             last_24h_log = logs[0] if logs else None
 
-            # Get user's absolute latest sync ever (or latest overall sync) for display
+            # Get user's absolute latest completed sync ever (or latest overall sync) for display
             latest_stmt = (
                 select(CronSyncLog)
                 .where(
@@ -136,31 +171,43 @@ async def get_user_sync_quota(user_id: Optional[str]) -> Dict[str, Any]:
             recent_stmt = (
                 select(CronSyncLog)
                 .where(
-                    CronSyncLog.user_id == user_id,
-                    CronSyncLog.status == "SUCCESS"
+                    CronSyncLog.user_id == user_id
                 )
                 .order_by(CronSyncLog.created_at.desc())
                 .limit(5)
             )
             recent_res = await session.execute(recent_stmt)
             recent_logs = list(recent_res.scalars().all())
-            if not recent_logs:
-                recent_logs = list(logs[:5])
 
             display_log = latest_user_log or last_24h_log
             last_sync_time = display_log.created_at if display_log else None
 
-            if syncs_used >= USER_DAILY_SYNC_LIMIT and last_24h_log and last_24h_log.created_at:
-                # Locked until 24 hours have elapsed from last sync
-                unlock_time = last_24h_log.created_at + timedelta(hours=24)
-                remaining_seconds = max(0, int((unlock_time - now_utc).total_seconds()))
-                is_locked = remaining_seconds > 0
-                syncs_remaining = 0 if is_locked else USER_DAILY_SYNC_LIMIT
+            # 4. Quota lock calculation
+            is_locked = False
+            remaining_seconds = 0
+            unlock_time = None
+
+            if syncs_used >= USER_DAILY_SYNC_LIMIT and last_24h_log:
+                unlock_time = (
+                    getattr(last_24h_log, "next_sync_available_at", None)
+                    or (last_24h_log.created_at + timedelta(hours=24))
+                )
+                if unlock_time:
+                    remaining_seconds = max(0, int((unlock_time - now_utc).total_seconds()))
+                    is_locked = remaining_seconds > 0
+                if not is_locked:
+                    syncs_remaining = USER_DAILY_SYNC_LIMIT
+                else:
+                    syncs_remaining = 0
             else:
-                unlock_time = None
-                remaining_seconds = 0
-                is_locked = False
                 syncs_remaining = max(0, USER_DAILY_SYNC_LIMIT - syncs_used)
+
+            # 5. Safety cooldown calculation from database
+            cooldown_remaining_seconds = 0
+            if last_24h_log and getattr(last_24h_log, "cooldown_until", None):
+                cd_diff = int((last_24h_log.cooldown_until - now_utc).total_seconds())
+                if cd_diff > 0:
+                    cooldown_remaining_seconds = cd_diff
 
             hrs = remaining_seconds // 3600
             mins = (remaining_seconds % 3600) // 60
@@ -178,9 +225,11 @@ async def get_user_sync_quota(user_id: Optional[str]) -> Dict[str, Any]:
                 "syncs_used_24h": syncs_used,
                 "syncs_remaining": syncs_remaining,
                 "is_locked": is_locked,
+                "is_sync_in_progress": is_user_syncing,
                 "next_sync_available_seconds": remaining_seconds,
                 "next_sync_available_formatted": time_formatted if is_locked else "Available now",
                 "next_sync_available_at": to_utc_iso(unlock_time) if (unlock_time and is_locked) else None,
+                "cooldown_remaining_seconds": cooldown_remaining_seconds,
                 "last_sync_at": to_utc_iso(last_sync_time) if last_sync_time else None,
                 "last_user_name": display_log.user_name if display_log else None,
                 "last_user_email": display_log.user_email if display_log else None,
@@ -188,6 +237,9 @@ async def get_user_sync_quota(user_id: Optional[str]) -> Dict[str, Any]:
                     {
                         "id": l.id,
                         "created_at": to_utc_iso(l.created_at) if l.created_at else None,
+                        "completed_at": to_utc_iso(l.completed_at) if getattr(l, "completed_at", None) else None,
+                        "status": l.status,
+                        "sync_number": getattr(l, "sync_number", 1),
                         "execution_time_ms": l.execution_time_ms,
                         "user_name": l.user_name,
                         "user_email": l.user_email
@@ -227,6 +279,7 @@ async def run_statutory_sources_sync(
     global _LAST_COMPLETED_TIME
 
     # 1. Enforce user quota if initiated by an authenticated user
+    user_quota = None
     if trigger_type == "MANUAL_BUTTON" and user_id:
         user_quota = await get_user_sync_quota(user_id)
         if user_quota.get("is_locked"):
@@ -246,10 +299,23 @@ async def run_statutory_sources_sync(
                 "sync_limit": USER_DAILY_SYNC_LIMIT,
                 "syncs_remaining": 0,
                 "is_locked": True,
+                "is_sync_in_progress": False,
                 "next_sync_available_seconds": user_quota.get("next_sync_available_seconds", 86400),
                 "next_sync_available_formatted": time_formatted,
                 "next_sync_available_at": user_quota.get("next_sync_available_at"),
                 "last_sync_at": user_quota.get("last_sync_at"),
+                "total_in_progress_tenders": LAST_CRON_RUN_INFO.get("total_in_progress_tenders", 3293),
+                "timestamp": datetime.now(IST).isoformat(),
+                "next_cron_run": get_next_cron_run_iso()
+            }
+
+        if user_quota.get("is_sync_in_progress"):
+            logger.info(f"[CronJob] User {user_id} already has a sync actively in progress in DB.")
+            return {
+                "status": "in_progress",
+                "message": "A synchronization is already actively in progress across real portals. Please wait a moment.",
+                "is_sync_in_progress": True,
+                "user_quota": user_quota,
                 "total_in_progress_tenders": LAST_CRON_RUN_INFO.get("total_in_progress_tenders", 3293),
                 "timestamp": datetime.now(IST).isoformat(),
                 "next_cron_run": get_next_cron_run_iso()
@@ -261,8 +327,7 @@ async def run_statutory_sources_sync(
         return {
             "status": "in_progress",
             "message": "A synchronization is already actively in progress across real portals. Please wait a moment.",
-            "cooldown_remaining_seconds": 2,
-            "cooldown_total_seconds": int(_COOLDOWN_SECONDS),
+            "is_sync_in_progress": True,
             "total_in_progress_tenders": LAST_CRON_RUN_INFO.get("total_in_progress_tenders", 3293),
             "timestamp": datetime.now(IST).isoformat(),
             "next_cron_run": get_next_cron_run_iso()
@@ -289,12 +354,50 @@ async def run_statutory_sources_sync(
     async with SYNC_LOCK:
         start_time = time.perf_counter()
         start_dt = datetime.now(IST)
+        now_utc = datetime.now(timezone.utc).replace(tzinfo=None)
         display_initiator = initiated_by or (f"{user_name or 'User'} ({user_email})" if user_email else "Scheduled Cron")
         logger.info(f"[CronJob] Starting statutory sources sync (Trigger: {trigger_type}, By: {display_initiator}) at {start_dt.isoformat()}")
 
         LAST_CRON_RUN_INFO["status"] = "RUNNING"
         LAST_CRON_RUN_INFO["last_trigger_type"] = trigger_type
         LAST_CRON_RUN_INFO["error"] = None
+
+        # Pre-calculate sync number and quota lock values for this run
+        prior_syncs = (user_quota.get("syncs_used_24h", 0) if user_quota else 0) if (trigger_type == "MANUAL_BUTTON" and user_id) else 0
+        current_sync_number = min(2, prior_syncs + 1)
+        is_lock_now = (current_sync_number >= USER_DAILY_SYNC_LIMIT) if (trigger_type == "MANUAL_BUTTON" and user_id) else False
+        next_avail_dt = (now_utc + timedelta(hours=24)) if is_lock_now else None
+        cd_until_dt = now_utc + timedelta(seconds=_COOLDOWN_SECONDS)
+
+        # 4. IMMEDIATELY INSERT RUNNING AUDIT LOG IN DB BEFORE SCRAPING STARTS
+        running_log_id = None
+        try:
+            async with async_session_factory() as session:
+                init_log = CronSyncLog(
+                    trigger_type=trigger_type,
+                    status="RUNNING",
+                    sync_number=current_sync_number,
+                    is_locked=is_lock_now,
+                    syncs_remaining=max(0, USER_DAILY_SYNC_LIMIT - current_sync_number) if user_id else 0,
+                    next_sync_available_at=next_avail_dt,
+                    cooldown_until=cd_until_dt,
+                    initiated_by=display_initiator,
+                    user_id=user_id,
+                    user_email=user_email,
+                    user_name=user_name,
+                    details={
+                        "trigger_type": trigger_type,
+                        "status": "INGESTION_RUNNING",
+                        "initiated_at": start_dt.isoformat()
+                    }
+                )
+                session.add(init_log)
+                await session.commit()
+                await session.refresh(init_log)
+                running_log_id = init_log.id
+                logger.info(f"[CronJob] Inserted initial RUNNING log (ID: {running_log_id}) for user {user_id} into DB.")
+        except Exception as init_db_err:
+            logger.warning(f"[CronJob] Could not insert initial RUNNING sync log: {init_db_err}")
 
         try:
             # Run live scraping and DB upsert
@@ -308,6 +411,9 @@ async def run_statutory_sources_sync(
             portals_count = len(portals_scraped) if portals_scraped else 28
 
             _LAST_COMPLETED_TIME = time.time()
+            now_comp_utc = datetime.now(timezone.utc).replace(tzinfo=None)
+            cd_completed_dt = now_comp_utc + timedelta(seconds=_COOLDOWN_SECONDS)
+
             LAST_CRON_RUN_INFO["status"] = "SUCCESS"
             LAST_CRON_RUN_INFO["last_run_time"] = start_dt.isoformat()
             LAST_CRON_RUN_INFO["execution_time_ms"] = elapsed_ms
@@ -315,31 +421,51 @@ async def run_statutory_sources_sync(
             LAST_CRON_RUN_INFO["db_upserted"] = db_upserted
             LAST_CRON_RUN_INFO["portals_scraped_count"] = portals_count
 
-            # Persist audit record in database including user tracking details
+            # Persist / update audit record in database
             try:
                 async with async_session_factory() as session:
-                    log_entry = CronSyncLog(
-                        trigger_type=trigger_type,
-                        status="SUCCESS",
-                        portals_scraped_count=portals_count,
-                        total_in_progress_count=total_in_prog,
-                        db_upserted_count=db_upserted,
-                        execution_time_ms=elapsed_ms,
-                        initiated_by=display_initiator,
-                        user_id=user_id,
-                        user_email=user_email,
-                        user_name=user_name,
-                        details={
-                            "portals_scraped": portals_scraped,
-                            "sync_summary": sync_details.get("message", "Sync successful"),
-                            "timestamp": start_dt.isoformat(),
-                            "user_id": user_id,
-                            "user_email": user_email,
-                            "user_name": user_name
-                        }
-                    )
-                    session.add(log_entry)
-                    await session.commit()
+                    if running_log_id:
+                        stmt = select(CronSyncLog).where(CronSyncLog.id == running_log_id)
+                        res = await session.execute(stmt)
+                        existing_entry = res.scalar_one_or_none()
+                        if existing_entry:
+                            existing_entry.status = "SUCCESS"
+                            existing_entry.portals_scraped_count = portals_count
+                            existing_entry.total_in_progress_count = total_in_prog
+                            existing_entry.db_upserted_count = db_upserted
+                            existing_entry.execution_time_ms = elapsed_ms
+                            existing_entry.completed_at = now_comp_utc
+                            existing_entry.cooldown_until = cd_completed_dt
+                            existing_entry.details = {
+                                "portals_scraped": portals_scraped,
+                                "sync_summary": sync_details.get("message", "Sync successful"),
+                                "timestamp": start_dt.isoformat(),
+                                "user_id": user_id,
+                                "user_email": user_email,
+                                "user_name": user_name
+                            }
+                            await session.commit()
+                    else:
+                        log_entry = CronSyncLog(
+                            trigger_type=trigger_type,
+                            status="SUCCESS",
+                            sync_number=current_sync_number,
+                            is_locked=is_lock_now,
+                            syncs_remaining=max(0, USER_DAILY_SYNC_LIMIT - current_sync_number) if user_id else 0,
+                            next_sync_available_at=next_avail_dt,
+                            cooldown_until=cd_completed_dt,
+                            completed_at=now_comp_utc,
+                            portals_scraped_count=portals_count,
+                            total_in_progress_count=total_in_prog,
+                            db_upserted_count=db_upserted,
+                            execution_time_ms=elapsed_ms,
+                            initiated_by=display_initiator,
+                            user_id=user_id,
+                            user_email=user_email,
+                            user_name=user_name,
+                        )
+                        session.add(log_entry)
+                        await session.commit()
             except Exception as db_err:
                 logger.warning(f"[CronJob] Could not write audit log to DB: {db_err}")
 
@@ -378,20 +504,33 @@ async def run_statutory_sources_sync(
             LAST_CRON_RUN_INFO["error"] = err_msg
 
             # Persist error audit in database
+            now_fail_utc = datetime.now(timezone.utc).replace(tzinfo=None)
             try:
                 async with async_session_factory() as session:
-                    log_entry = CronSyncLog(
-                        trigger_type=trigger_type,
-                        status="FAILED",
-                        execution_time_ms=elapsed_ms,
-                        initiated_by=display_initiator,
-                        user_id=user_id,
-                        user_email=user_email,
-                        user_name=user_name,
-                        error_message=err_msg
-                    )
-                    session.add(log_entry)
-                    await session.commit()
+                    if running_log_id:
+                        stmt = select(CronSyncLog).where(CronSyncLog.id == running_log_id)
+                        res = await session.execute(stmt)
+                        existing_entry = res.scalar_one_or_none()
+                        if existing_entry:
+                            existing_entry.status = "FAILED"
+                            existing_entry.execution_time_ms = elapsed_ms
+                            existing_entry.error_message = err_msg
+                            existing_entry.completed_at = now_fail_utc
+                            await session.commit()
+                    else:
+                        log_entry = CronSyncLog(
+                            trigger_type=trigger_type,
+                            status="FAILED",
+                            execution_time_ms=elapsed_ms,
+                            initiated_by=display_initiator,
+                            user_id=user_id,
+                            user_email=user_email,
+                            user_name=user_name,
+                            error_message=err_msg,
+                            completed_at=now_fail_utc
+                        )
+                        session.add(log_entry)
+                        await session.commit()
             except Exception:
                 pass
 

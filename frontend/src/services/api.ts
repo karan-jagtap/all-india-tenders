@@ -427,6 +427,11 @@ function getClientSideUserQuota(userId: string): UserQuotaInfo {
 
   const syncsUsed = timestamps.length;
   const lastSyncTime = syncsUsed > 0 ? timestamps[timestamps.length - 1] : null;
+  const inProgress = typeof window !== 'undefined' && localStorage.getItem('ait_sync_in_progress') === 'true';
+  const activeUntil = typeof window !== 'undefined' ? Number(localStorage.getItem('ait_sync_active_until') || '0') : 0;
+  const isSyncing = inProgress || (activeUntil > now);
+  const cdExpiry = typeof window !== 'undefined' ? Number(localStorage.getItem('ait_cooldown_expiry_epoch') || '0') : 0;
+  const cdRemaining = Math.max(0, Math.ceil((cdExpiry - now) / 1000));
 
   if (syncsUsed >= 2 && lastSyncTime) {
     const unlockTime = lastSyncTime + 24 * 3600 * 1000;
@@ -443,6 +448,8 @@ function getClientSideUserQuota(userId: string): UserQuotaInfo {
       syncs_used_24h: syncsUsed,
       syncs_remaining: isLocked ? 0 : 2,
       is_locked: isLocked,
+      is_sync_in_progress: isSyncing,
+      cooldown_remaining_seconds: cdRemaining,
       next_sync_available_seconds: remainingSeconds,
       next_sync_available_formatted: isLocked ? timeFormatted : 'Available now',
       next_sync_available_at: new Date(unlockTime).toISOString(),
@@ -456,11 +463,36 @@ function getClientSideUserQuota(userId: string): UserQuotaInfo {
     syncs_used_24h: syncsUsed,
     syncs_remaining: Math.max(0, 2 - syncsUsed),
     is_locked: false,
+    is_sync_in_progress: isSyncing,
+    cooldown_remaining_seconds: cdRemaining,
     next_sync_available_seconds: 0,
     next_sync_available_formatted: 'Available now',
     next_sync_available_at: null,
     last_sync_at: lastSyncTime ? new Date(lastSyncTime).toISOString() : null
   };
+}
+
+export function getCachedUserQuota(userId?: string | null): UserQuotaInfo | null {
+  if (!userId) return null;
+  try {
+    const raw = localStorage.getItem(`ait_user_quota_${userId}`);
+    if (raw) {
+      const parsed: UserQuotaInfo = JSON.parse(raw);
+      if (parsed.next_sync_available_at) {
+        const unlockMs = new Date(parsed.next_sync_available_at).getTime();
+        const diff = Math.max(0, Math.ceil((unlockMs - Date.now()) / 1000));
+        parsed.next_sync_available_seconds = diff;
+        parsed.is_locked = diff > 0;
+      }
+      const inProgress = localStorage.getItem('ait_sync_in_progress') === 'true';
+      const activeUntil = Number(localStorage.getItem('ait_sync_active_until') || '0');
+      if (inProgress || activeUntil > Date.now()) {
+        parsed.is_sync_in_progress = true;
+      }
+      return parsed;
+    }
+  } catch {}
+  return getClientSideUserQuota(userId);
 }
 
 export async function getUserSyncQuota(userId?: string | null): Promise<UserQuotaInfo> {
@@ -471,6 +503,8 @@ export async function getUserSyncQuota(userId?: string | null): Promise<UserQuot
       syncs_used_24h: 0,
       syncs_remaining: 2,
       is_locked: false,
+      is_sync_in_progress: false,
+      cooldown_remaining_seconds: 0,
       next_sync_available_seconds: 0,
       next_sync_available_formatted: 'Available now',
       next_sync_available_at: null,
@@ -486,15 +520,24 @@ export async function getUserSyncQuota(userId?: string | null): Promise<UserQuot
         'Pragma': 'no-cache'
       }
     });
-    if (res.ok) {
+    const contentType = res.headers.get('content-type') || '';
+    if (res.ok && contentType.includes('application/json')) {
       const data: UserQuotaInfo = await res.json();
+      try {
+        localStorage.setItem(`ait_user_quota_${userId}`, JSON.stringify(data));
+        if (data.is_sync_in_progress) {
+          localStorage.setItem('ait_sync_in_progress', 'true');
+        } else {
+          localStorage.removeItem('ait_sync_in_progress');
+        }
+      } catch {}
       return data;
     }
   } catch {
     // Backend unreachable, fallback to client-side localStorage
   }
 
-  return getClientSideUserQuota(userId);
+  return getCachedUserQuota(userId) || getClientSideUserQuota(userId);
 }
 
 export async function triggerLiveScrape(user?: { id?: string; email?: string; name?: string }): Promise<ScrapeReport> {
@@ -514,24 +557,34 @@ export async function triggerLiveScrape(user?: { id?: string; email?: string; na
       body: JSON.stringify(payload)
     });
 
-    const data = await res.json();
-    if (res.ok || res.status === 429) {
-      if (user?.id) {
-        // Also sync local storage for client fallback
-        if (data.status === 'success') {
-          const key = `ait_sync_timestamps_${user.id}`;
-          let timestamps: number[] = [];
-          try {
-            const raw = localStorage.getItem(key);
-            if (raw) timestamps = JSON.parse(raw);
-          } catch {}
-          timestamps.push(Date.now());
-          try {
-            localStorage.setItem(key, JSON.stringify(timestamps));
-          } catch {}
+    const contentType = res.headers.get('content-type') || '';
+    if (contentType.includes('application/json')) {
+      const data = await res.json();
+      if (res.ok || res.status === 429) {
+        if (user?.id) {
+          if (data.user_quota) {
+            try {
+              localStorage.setItem(`ait_user_quota_${user.id}`, JSON.stringify(data.user_quota));
+            } catch {}
+          }
+          if (data.status === 'success') {
+            const key = `ait_sync_timestamps_${user.id}`;
+            let timestamps: number[] = [];
+            try {
+              const raw = localStorage.getItem(key);
+              if (raw) timestamps = JSON.parse(raw);
+            } catch {}
+            const lastTs = timestamps.length > 0 ? timestamps[timestamps.length - 1] : 0;
+            if (Date.now() - lastTs > 45000) {
+              timestamps.push(Date.now());
+            }
+            try {
+              localStorage.setItem(key, JSON.stringify(timestamps));
+            } catch {}
+          }
         }
+        return data;
       }
-      return data;
     }
   } catch {
     // Fallback response for serverless demo
@@ -559,7 +612,10 @@ export async function triggerLiveScrape(user?: { id?: string; email?: string; na
       const raw = localStorage.getItem(key);
       if (raw) timestamps = JSON.parse(raw);
     } catch {}
-    timestamps.push(Date.now());
+    const lastTs = timestamps.length > 0 ? timestamps[timestamps.length - 1] : 0;
+    if (Date.now() - lastTs > 45000) {
+      timestamps.push(Date.now());
+    }
     try {
       localStorage.setItem(key, JSON.stringify(timestamps));
     } catch {}
