@@ -8,27 +8,14 @@ import {
   Zap,
   CheckCircle2,
 } from "lucide-react";
-import { UserQuotaInfo } from "../../types";
 import {
   formatCooldownTime,
   formatQuotaCountdown,
   formatSyncTimestamp,
 } from "../../utils/syncTime";
+import type { SyncLiveButtonProps } from "../../types";
 
-export interface SyncLiveButtonProps {
-  onClick: () => void;
-  isSyncing: boolean;
-  cooldownRemaining?: number;
-  variant?: "header" | "drawer" | "section";
-  className?: string;
-  tooltipPlacement?: "bottom-right" | "top" | "bottom-left";
-  isLocked?: boolean; // Auth lock: true when user is signed out
-  onLockedClick?: () => void;
-  quotaInfo?: UserQuotaInfo | null;
-  isQuotaLoading?: boolean;
-  userEmail?: string | null;
-  userName?: string | null;
-}
+export type { SyncLiveButtonProps };
 
 export const SyncLiveButton: React.FC<SyncLiveButtonProps> = ({
   onClick,

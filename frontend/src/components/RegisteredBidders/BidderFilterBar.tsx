@@ -3,24 +3,11 @@ import { useTranslation } from 'react-i18next';
 import {
   FilterSearchBar,
   TopFilterActionBar,
-  ActiveFilterChipsBar,
-  FilterChipItem
+  ActiveFilterChipsBar
 } from '../common';
+import type { BidderFilterBarProps } from '../../types';
 
-export interface BidderFilterBarProps {
-  searchQuery: string;
-  setSearchQuery: (query: string) => void;
-  isVoiceSearching: boolean;
-  toggleVoiceSearch: () => void;
-  onOpenFilterDrawer: () => void;
-  activeFiltersCount: number;
-  hasActiveFilters: boolean;
-  resetFilters: () => void;
-  onReload: () => void;
-  isLoading: boolean;
-  totalBidders: number;
-  chips: FilterChipItem[];
-}
+export type { BidderFilterBarProps };
 
 export const BidderFilterBar: React.FC<BidderFilterBarProps> = ({
   searchQuery,

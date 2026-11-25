@@ -11,59 +11,11 @@ import {
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { QUICK_PORTAL_PILLS } from '../../constants';
-import { FilterAccentColor } from '../../types';
 import { DropdownOption } from './SearchableDropdown';
 import { MultiSelectDropdown } from './MultiSelectDropdown';
+import type { TenderFilterDrawerProps } from '../../types';
 
-export interface TenderFilterDrawerProps {
-  isOpen: boolean;
-  onClose: () => void;
-  title?: string;
-  subtitle?: string;
-  accentColor?: FilterAccentColor;
-  activeFiltersCount: number;
-  hasActiveFilters: boolean;
-  resetAllFilters: () => void;
-  totalFilteredCount: number;
-
-  // 1. Work Category / Sector
-  selectedCategory: string | string[];
-  setSelectedCategory: (cat: string[]) => void;
-  availableCategories: string[];
-  categoryCounts: Map<string, number>;
-  contextCategoryCount: number;
-
-  // 2. Procurement Portal / Source
-  selectedSource: string | string[];
-  setSelectedSource: (src: string[]) => void;
-  availableSources: string[];
-  sourceCounts: Map<string, number>;
-  contextSourceCount: number;
-
-  // 3. Procuring Organization
-  selectedOrg: string | string[];
-  setSelectedOrg: (org: string[]) => void;
-  availableOrgs: string[];
-  orgCounts: Map<string, number>;
-  contextOrgCount: number;
-
-  // 4. State
-  selectedState: string | string[];
-  setSelectedState: (st: string[]) => void;
-  availableStates: string[];
-  stateCounts: Map<string, number>;
-  contextStateCount: number;
-
-  // 5. City
-  selectedCity: string | string[];
-  setSelectedCity: (ct: string[]) => void;
-  availableCities: string[];
-  cityCounts: Map<string, number>;
-  contextCityCount: number;
-
-  // Custom Extra Filters Slot (e.g. Value Range in Current Tenders, or Award Year in Accepted Tenders)
-  extraFilters?: React.ReactNode;
-}
+export type { TenderFilterDrawerProps };
 
 export const TenderFilterDrawer: React.FC<TenderFilterDrawerProps> = ({
   isOpen,

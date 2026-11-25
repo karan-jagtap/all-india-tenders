@@ -1,13 +1,10 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { ServerOff, ExternalLink } from 'lucide-react';
-import { EnrichedCurrentTender } from '../../../types';
+import type { ScrapingArchSubTabProps } from '../../../types';
 import { formatDate } from '../../../utils';
 
-export interface ScrapingArchSubTabProps {
-  selectedTender: EnrichedCurrentTender;
-  onOpenPortalBridge: (tender: EnrichedCurrentTender, e?: React.MouseEvent) => void;
-}
+export type { ScrapingArchSubTabProps };
 
 export const ScrapingArchSubTab: React.FC<ScrapingArchSubTabProps> = ({
   selectedTender,

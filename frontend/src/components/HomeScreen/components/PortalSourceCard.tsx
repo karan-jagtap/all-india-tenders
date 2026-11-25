@@ -1,13 +1,9 @@
 import React from 'react';
 import { ExternalLink, ChevronRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { PortalSourceInfo } from '../../../constants/portalSources';
-import { NavigableTab } from '../../../types';
+import type { PortalSourceCardProps } from '../../../types';
 
-export interface PortalSourceCardProps {
-  portal: PortalSourceInfo;
-  onNavigate: (tab: NavigableTab) => void;
-}
+export type { PortalSourceCardProps };
 
 export const PortalSourceCard: React.FC<PortalSourceCardProps> = ({ portal, onNavigate }) => {
   const { t } = useTranslation();

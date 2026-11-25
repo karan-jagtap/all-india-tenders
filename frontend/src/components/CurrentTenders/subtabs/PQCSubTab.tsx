@@ -10,11 +10,9 @@ import {
   FileText, 
   ShieldCheck 
 } from 'lucide-react';
-import { EnrichedCurrentTender } from '../../../types';
+import type { PQCSubTabProps } from '../../../types';
 
-export interface PQCSubTabProps {
-  selectedTender: EnrichedCurrentTender;
-}
+export type { PQCSubTabProps };
 
 export const PQCSubTab: React.FC<PQCSubTabProps> = ({ selectedTender }) => {
   const { t } = useTranslation();

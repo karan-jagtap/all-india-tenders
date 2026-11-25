@@ -7,15 +7,10 @@ import {
   FileCheck,
   BookOpen
 } from 'lucide-react';
-import { DeepDocumentRAGReport, EnrichedCurrentTender } from '../../../types';
+import type { DeepRAGClauseSubTabProps } from '../../../types';
 import { formatINR } from '../../../utils';
 
-export interface DeepRAGClauseSubTabProps {
-  deepRAGReport: DeepDocumentRAGReport;
-  selectedTender: EnrichedCurrentTender;
-  sbdUrl: string;
-  boqUrl: string;
-}
+export type { DeepRAGClauseSubTabProps };
 
 export const DeepRAGClauseSubTab: React.FC<DeepRAGClauseSubTabProps> = ({
   deepRAGReport,

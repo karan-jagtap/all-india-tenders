@@ -9,12 +9,10 @@ import {
   AlertCircle,
   ShieldAlert
 } from 'lucide-react';
-import { PreBidSimulationReport } from '../../../types';
+import type { CompetitorPredictionSubTabProps } from '../../../types';
 import { formatINR } from '../../../utils';
 
-export interface CompetitorPredictionSubTabProps {
-  preBidPrediction: PreBidSimulationReport;
-}
+export type { CompetitorPredictionSubTabProps };
 
 export const CompetitorPredictionSubTab: React.FC<CompetitorPredictionSubTabProps> = ({
   preBidPrediction

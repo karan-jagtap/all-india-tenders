@@ -9,20 +9,12 @@ import {
   PORTAL_CATEGORY_OPTIONS,
   PORTAL_REGION_OPTIONS
 } from '../../../constants/portalSources';
-import { NavigableTab, UserQuotaInfo } from '../../../types';
+import type { HomeSourcesDirectoryProps } from '../../../types';
 import { PortalSourceCard } from './PortalSourceCard';
 import { FilterSearchBar, SyncLiveButton } from '../../common';
 import { useAuthContext } from '../../../context/AuthContext';
 
-export interface HomeSourcesDirectoryProps {
-  onNavigate: (tab: NavigableTab) => void;
-  onTriggerSync: () => void;
-  isSyncing: boolean;
-  cooldownRemaining?: number;
-  quotaInfo?: UserQuotaInfo | null;
-  userEmail?: string | null;
-  userName?: string | null;
-}
+export type { HomeSourcesDirectoryProps };
 
 export const HomeSourcesDirectory: React.FC<HomeSourcesDirectoryProps> = ({
   onNavigate,

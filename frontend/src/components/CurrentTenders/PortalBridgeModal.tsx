@@ -1,15 +1,9 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Globe, X, Building2, CheckCircle, Copy, Check, ShieldAlert, Search, Sparkles, ChevronDown, ChevronUp } from 'lucide-react';
-import { EnrichedCurrentTender } from '../../types';
+import type { PortalBridgeModalProps } from '../../types';
 
-export interface PortalBridgeModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  tender: EnrichedCurrentTender | null;
-  copiedNit: string | null;
-  onCopyNit: (nit: string) => void;
-}
+export type { PortalBridgeModalProps };
 
 export const PortalBridgeModal: React.FC<PortalBridgeModalProps> = ({
   isOpen,

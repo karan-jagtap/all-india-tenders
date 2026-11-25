@@ -1,11 +1,9 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Languages } from 'lucide-react';
+import type { LanguageSelectorProps } from '../../types';
 
-export interface LanguageSelectorProps {
-  variant?: 'header' | 'drawer';
-  className?: string;
-}
+export type { LanguageSelectorProps };
 
 export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
   variant = 'header',

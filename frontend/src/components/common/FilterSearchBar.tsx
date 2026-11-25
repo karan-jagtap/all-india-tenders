@@ -1,18 +1,9 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Search, Mic, MicOff, X } from 'lucide-react';
-import { FilterAccentColor, ComponentVariant } from '../../types';
+import type { FilterSearchBarProps } from '../../types';
 
-export interface FilterSearchBarProps {
-  searchQuery: string;
-  setSearchQuery: (query: string) => void;
-  placeholder?: string;
-  isVoiceSearching?: boolean;
-  toggleVoiceSearch?: () => void;
-  accentColor?: FilterAccentColor;
-  className?: string;
-  variant?: ComponentVariant;
-}
+export type { FilterSearchBarProps };
 
 export const FilterSearchBar: React.FC<FilterSearchBarProps> = ({
   searchQuery,

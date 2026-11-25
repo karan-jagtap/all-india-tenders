@@ -1,12 +1,10 @@
 import React from 'react';
 import { Radio, Award, Users, Lock } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { NavigableTab } from '../../../types';
+import type { HomeCtaBannerProps } from '../../../types';
 import { useAuthContext } from '../../../context/AuthContext';
 
-export interface HomeCtaBannerProps {
-  onNavigate: (tab: NavigableTab) => void;
-}
+export type { HomeCtaBannerProps };
 
 export const HomeCtaBanner: React.FC<HomeCtaBannerProps> = ({ onNavigate }) => {
   const { t } = useTranslation();

@@ -5,6 +5,7 @@ audited financials, corporate identifiers, and complete portfolio of public cont
 """
 
 import re
+import hashlib
 from typing import List, Dict, Any, Optional, Tuple
 from app.services.accepted_tenders_service import ACCEPTED_TENDERS_CATALOG
 
@@ -101,7 +102,7 @@ def build_bidders_catalog() -> List[Dict[str, Any]]:
 
         val = b["total_awarded_value_inr"]
         turnover = b.get("audited_turnover_inr", 1500000000.0)
-        seed = abs(hash(b["slug"])) % 100
+        seed = int(hashlib.md5(b["slug"].encode()).hexdigest()[:8], 16) % 100
 
         # Credit Rating & Financial Standing
         if turnover > 300000000000 or val > 300000000000:
@@ -181,7 +182,7 @@ def load_contractors_from_db() -> List[Dict[str, Any]]:
 
             val = float(r["total_awarded_value_inr"] or 0.0)
             turnover = float(r["audited_turnover_inr"] or 1500000000.0)
-            seed = abs(hash(cid)) % 100
+            seed = int(hashlib.md5(str(cid).encode()).hexdigest()[:8], 16) % 100
 
             if turnover > 300000000000 or val > 300000000000:
                 rating = "CRISIL AAA (Stable / Highest Financial Safety)"

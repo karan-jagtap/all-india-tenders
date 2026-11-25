@@ -1,15 +1,9 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Radio, Award, Users, Globe, ArrowRight } from 'lucide-react';
-import { NavigableTab } from '../../../types';
+import type { HomeHeroSectionProps } from '../../../types';
 
-export interface HomeHeroSectionProps {
-  activeTenders: number;
-  acceptedTenders: number;
-  biddersCount: number;
-  onNavigate: (tab: NavigableTab) => void;
-  onScrollToSources: () => void;
-}
+export type { HomeHeroSectionProps };
 
 export const HomeHeroSection: React.FC<HomeHeroSectionProps> = ({
   activeTenders,

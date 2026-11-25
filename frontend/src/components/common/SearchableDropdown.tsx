@@ -1,27 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Search, ChevronDown, Check, X } from 'lucide-react';
-import { FilterAccentColor } from '../../types';
+import type { DropdownOption, SearchableDropdownProps } from '../../types';
 
-export interface DropdownOption {
-  value: string;
-  label: string;
-  count?: number;
-  countSuffix?: string;
-}
-
-export interface SearchableDropdownProps {
-  value: string;
-  onChange: (value: string) => void;
-  options: DropdownOption[];
-  allOptionLabel: string;
-  allOptionCount?: number;
-  placeholder?: string;
-  icon?: React.ReactNode;
-  accentColor?: FilterAccentColor;
-  emptyMessage?: string;
-  className?: string;
-}
+export type { DropdownOption, SearchableDropdownProps };
 
 export const SearchableDropdown: React.FC<SearchableDropdownProps> = ({
   value,

@@ -1,5 +1,5 @@
 import React from 'react';
-import { PlatformStats, NavigableTab, UserQuotaInfo } from '../../types';
+import type { HomeScreenProps } from '../../types';
 import {
   HomeHeroSection,
   HomeMetricsBar,
@@ -9,16 +9,7 @@ import {
   HomeFeedbackContactSection
 } from './components';
 
-export interface HomeScreenProps {
-  stats: PlatformStats | null;
-  onNavigate: (tab: NavigableTab) => void;
-  onTriggerSync: () => void;
-  isSyncing: boolean;
-  cooldownRemaining?: number;
-  quotaInfo?: UserQuotaInfo | null;
-  userEmail?: string | null;
-  userName?: string | null;
-}
+export type { HomeScreenProps };
 
 export const HomeScreen: React.FC<HomeScreenProps> = ({
   stats,

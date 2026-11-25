@@ -1,12 +1,10 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { FileText } from 'lucide-react';
-import { EnrichedCurrentTender } from '../../../types';
+import type { ScopeAndSpecsSubTabProps } from '../../../types';
 import { formatDate } from '../../../utils';
 
-export interface ScopeAndSpecsSubTabProps {
-  selectedTender: EnrichedCurrentTender;
-}
+export type { ScopeAndSpecsSubTabProps };
 
 export const ScopeAndSpecsSubTab: React.FC<ScopeAndSpecsSubTabProps> = ({ selectedTender }) => {
   const { t } = useTranslation();

@@ -2,12 +2,9 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuthContext } from '../../context/AuthContext';
 import { Lock, LogIn } from 'lucide-react';
+import type { ProtectedRouteProps } from '../../types';
 
-export interface ProtectedRouteProps {
-  children: React.ReactNode;
-  title?: string;
-  description?: string;
-}
+export type { ProtectedRouteProps };
 
 export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   children,

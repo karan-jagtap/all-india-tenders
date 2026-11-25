@@ -1,14 +1,10 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { MapPin } from 'lucide-react';
-import { RegisteredBidder } from '../../types';
+import type { BidderCardProps } from '../../types';
 import { formatCr } from '../../utils';
 
-export interface BidderCardProps {
-  bidder: RegisteredBidder;
-  isSelected: boolean;
-  onSelect: () => void;
-}
+export type { BidderCardProps };
 
 export const BidderCard: React.FC<BidderCardProps> = ({
   bidder,

@@ -1,17 +1,10 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Layers, Download, ExternalLink, Eye } from 'lucide-react';
-import { EnrichedCurrentTender, TenderDocType } from '../../../types';
+import { TenderDocType, TenderDocsSubTabProps } from '../../../types';
 import { formatINR } from '../../../utils';
 
-export interface TenderDocsSubTabProps {
-  selectedTender: EnrichedCurrentTender;
-  sbdUrl: string;
-  pdfUrl: string;
-  boqUrl: string;
-  onOpenPortalBridge: (tender: EnrichedCurrentTender, e?: React.MouseEvent) => void;
-  onOpenWholeDoc?: () => void;
-}
+export type { TenderDocsSubTabProps };
 
 export const TenderDocsSubTab: React.FC<TenderDocsSubTabProps> = ({
   selectedTender,

@@ -15,8 +15,12 @@ import type {
   SubTabType,
   FilterAccentColor,
   PlatformStats,
-  UserQuotaInfo
+  UserQuotaInfo,
+  ComponentVariant,
+  NavigableTab,
+  BidderWonContract
 } from './index';
+import type { PortalSourceInfo } from '../constants/portalSources';
 
 // ============================================================================
 // 1. COMMON UI CONTROLS & DROPDOWNS
@@ -32,40 +36,45 @@ export interface DropdownOption {
 }
 
 export interface SearchableDropdownProps {
-  label: string;
-  icon?: React.ReactNode;
-  options: DropdownOption[];
-  selectedValue: string;
+  value: string;
   onChange: (value: string) => void;
+  options: DropdownOption[];
+  allOptionLabel: string;
+  allOptionCount?: number;
   placeholder?: string;
-  searchPlaceholder?: string;
+  icon?: React.ReactNode;
   accentColor?: FilterAccentColor;
+  emptyMessage?: string;
   className?: string;
+  label?: string;
   disabled?: boolean;
 }
 
 export interface MultiSelectDropdownProps {
-  label: string;
-  icon?: React.ReactNode;
-  options: DropdownOption[];
-  selectedValues: string[];
+  values: string[];
   onChange: (values: string[]) => void;
+  options: DropdownOption[];
+  allOptionLabel: string;
+  allOptionCount?: number;
   placeholder?: string;
-  searchPlaceholder?: string;
+  icon?: React.ReactNode;
   accentColor?: FilterAccentColor;
+  emptyMessage?: string;
   className?: string;
+  maxPreviewCount?: number;
+  label?: string;
   disabled?: boolean;
-  maxDisplayCount?: number;
 }
 
 export interface FilterSearchBarProps {
   searchQuery: string;
-  setSearchQuery: (q: string) => void;
+  setSearchQuery: (query: string) => void;
   placeholder?: string;
-  accentColor?: FilterAccentColor;
   isVoiceSearching?: boolean;
   toggleVoiceSearch?: () => void;
+  accentColor?: FilterAccentColor;
   className?: string;
+  variant?: ComponentVariant;
   id?: string;
 }
 
@@ -74,10 +83,14 @@ export interface TopFilterActionBarProps {
   activeFiltersCount: number;
   hasActiveFilters: boolean;
   onResetFilters: () => void;
-  onReload: () => void;
+  onReload?: () => void;
+  isLoading?: boolean;
+  totalCount?: number;
   totalFilteredCount?: number;
+  reloadLabel?: string;
   accentColor?: FilterAccentColor;
   className?: string;
+  sortControl?: React.ReactNode;
   showReload?: boolean;
   reloadTooltip?: string;
 }
@@ -102,40 +115,82 @@ export interface FilterChipItem {
   id: string;
   label: string;
   value: string;
-  onRemove: () => void;
+  icon?: React.ReactNode;
   color?: FilterAccentColor;
+  onRemove: () => void;
 }
 
 export interface ActiveFilterChipsBarProps {
   chips: FilterChipItem[];
-  onClearAll?: () => void;
-  accentColor?: FilterAccentColor;
+  onClearAll: () => void;
+  hasActiveFilters?: boolean;
   className?: string;
+  accentColor?: FilterAccentColor;
   totalResultsCount?: number;
 }
 
 export interface TenderFilterDrawerProps {
   isOpen: boolean;
   onClose: () => void;
-  activeFiltersCount: number;
-  hasActiveFilters: boolean;
-  onResetAll: () => void;
-  title: string;
+  title?: string;
   subtitle?: string;
   accentColor?: FilterAccentColor;
-  children: React.ReactNode;
+  activeFiltersCount: number;
+  hasActiveFilters: boolean;
+  resetAllFilters: () => void;
+  totalFilteredCount: number;
+
+  // 1. Work Category / Sector
+  selectedCategory: string | string[];
+  setSelectedCategory: (cat: string[]) => void;
+  availableCategories: string[];
+  categoryCounts: Map<string, number>;
+  contextCategoryCount: number;
+
+  // 2. Procurement Portal / Source
+  selectedSource: string | string[];
+  setSelectedSource: (src: string[]) => void;
+  availableSources: string[];
+  sourceCounts: Map<string, number>;
+  contextSourceCount: number;
+
+  // 3. Procuring Organization
+  selectedOrg: string | string[];
+  setSelectedOrg: (org: string[]) => void;
+  availableOrgs: string[];
+  orgCounts: Map<string, number>;
+  contextOrgCount: number;
+
+  // 4. State
+  selectedState: string | string[];
+  setSelectedState: (st: string[]) => void;
+  availableStates: string[];
+  stateCounts: Map<string, number>;
+  contextStateCount: number;
+
+  // 5. City
+  selectedCity: string | string[];
+  setSelectedCity: (ct: string[]) => void;
+  availableCities: string[];
+  cityCounts: Map<string, number>;
+  contextCityCount: number;
+
+  // Custom Extra Filters Slot
+  extraFilters?: React.ReactNode;
+  children?: React.ReactNode;
 }
 
 export interface SyncLiveButtonProps {
   onClick: () => void;
   isSyncing: boolean;
   cooldownRemaining?: number;
-  variant?: 'header' | 'hero' | 'drawer' | 'compact';
+  variant?: 'header' | 'hero' | 'drawer' | 'compact' | 'section';
   className?: string;
-  tooltipPlacement?: 'top' | 'bottom' | 'left' | 'right';
+  tooltipPlacement?: 'top' | 'bottom' | 'left' | 'right' | 'bottom-right' | 'bottom-left';
   isLocked?: boolean;
   onLockedClick?: () => void;
   quotaInfo?: UserQuotaInfo | null;
+  isQuotaLoading?: boolean;
   userEmail?: string | null;
   userName?: string | null;
 }
@@ -161,14 +216,14 @@ export interface CurrentTendersTopBarProps {
   toggleVoiceSearch: () => void;
   selectedCategory: string[] | string;
   setSelectedCategory: (c: string[]) => void;
-  availableCategories: string[];
-  categoryCounts: Map<string, number>;
-  contextCategoryCount: number;
+  availableCategories?: string[];
+  categoryCounts?: Map<string, number>;
+  contextCategoryCount?: number;
   selectedSource: string[] | string;
   setSelectedSource: (s: string[]) => void;
-  availableSources: string[];
-  sourceCounts: Map<string, number>;
-  contextSourceCount: number;
+  availableSources?: string[];
+  sourceCounts?: Map<string, number>;
+  contextSourceCount?: number;
   selectedOrg: string[] | string;
   setSelectedOrg: (o: string[]) => void;
   selectedState: string[] | string;
@@ -195,97 +250,129 @@ export interface CurrentTenderFilterDrawerProps {
   hasActiveFilters: boolean;
   resetAllFilters: () => void;
   totalFilteredCount: number;
-  selectedSource: string[];
+
+  // Source
+  selectedSource: string[] | string;
   setSelectedSource: (s: string[]) => void;
-  allSources: string[];
+  availableSources: string[];
   sourceCounts: Map<string, number>;
-  selectedOrg: string[];
+  contextSourceCount: number;
+
+  // Org
+  selectedOrg: string[] | string;
   setSelectedOrg: (o: string[]) => void;
-  allOrgs: string[];
+  availableOrgs: string[];
   orgCounts: Map<string, number>;
-  selectedState: string[];
+  contextOrgCount: number;
+
+  // State
+  selectedState: string[] | string;
   setSelectedState: (s: string[]) => void;
-  allStates: string[];
+  availableStates: string[];
   stateCounts: Map<string, number>;
-  selectedCity: string[];
+  contextStateCount: number;
+
+  // City
+  selectedCity: string[] | string;
   setSelectedCity: (c: string[]) => void;
   availableCities: string[];
   cityCounts: Map<string, number>;
-  selectedCategory: string[];
+  contextCityCount: number;
+
+  // Category
+  selectedCategory: string[] | string;
   setSelectedCategory: (c: string[]) => void;
-  allCategories: string[];
+  availableCategories: string[];
   categoryCounts: Map<string, number>;
+  contextCategoryCount: number;
+
+  // Value Range
   selectedValueRange: string;
   setSelectedValueRange: (v: string) => void;
-  sortBy: CurrentTenderSortOption;
-  setSortBy: (s: CurrentTenderSortOption) => void;
+
+  // Closed / Expired Toggle
   includeClosed: boolean;
-  setIncludeClosed: (c: boolean) => void;
+  setIncludeClosed: (inc: boolean) => void;
+  openCount: number;
+  totalAvailableCount: number;
+
+  sortBy?: CurrentTenderSortOption;
+  setSortBy?: (s: CurrentTenderSortOption) => void;
 }
 
 export interface CurrentTenderCardProps {
   tender: EnrichedCurrentTender;
   isSelected: boolean;
-  onSelect: (id: string) => void;
-  onOpenPortalBridge: (tender: EnrichedCurrentTender, e?: React.MouseEvent) => void;
+  onSelect: () => void;
+  onCopyNit: (nit: string, e: React.MouseEvent) => void;
+  copiedNit: string | null;
 }
 
 export interface CurrentTenderHeaderProps {
-  tender: EnrichedCurrentTender;
+  selectedTender: EnrichedCurrentTender;
+  onCopyNit: (nit: string, e?: React.MouseEvent) => void;
+  copiedNit: string | null;
+  onOpenPortalBridge: (tender: EnrichedCurrentTender, e?: React.MouseEvent) => void;
+  onOpenWholeDoc: () => void;
   activeSubTab: SubTabType;
   setActiveSubTab: (tab: SubTabType) => void;
-  onOpenPortalBridge: (tender: EnrichedCurrentTender) => void;
-  onOpenWholeDocModal: () => void;
-  copiedNit: string | null;
-  onCopyNit: (nit: string, e?: React.MouseEvent) => void;
+  sbdUrl: string;
+  nitPdfUrl: string;
+  boqUrl: string;
 }
 
 export interface PortalBridgeModalProps {
   isOpen: boolean;
   onClose: () => void;
-  tender: EnrichedCurrentTender;
+  tender: EnrichedCurrentTender | null;
   copiedNit: string | null;
-  onCopyNit: (nit: string, e?: React.MouseEvent) => void;
+  onCopyNit: (nit: string) => void;
 }
 
 export interface WholeTenderDocModalProps {
   isOpen: boolean;
   onClose: () => void;
-  tender: EnrichedCurrentTender;
+  tender: EnrichedCurrentTender | null;
+  sbdUrl: string;
 }
 
 // Subtab Props
 export interface ScopeAndSpecsSubTabProps {
-  tender: EnrichedCurrentTender;
+  selectedTender: EnrichedCurrentTender;
 }
 
 export interface PQCSubTabProps {
-  tender: EnrichedCurrentTender;
+  selectedTender: EnrichedCurrentTender;
+  onOpenPortalBridge?: (tender: EnrichedCurrentTender, e?: React.MouseEvent) => void;
 }
 
 export interface MSMESubTabProps {
-  tender: EnrichedCurrentTender;
+  selectedTender?: EnrichedCurrentTender;
 }
 
 export interface TenderDocsSubTabProps {
-  tender: EnrichedCurrentTender;
-  onOpenWholeDocModal: () => void;
+  selectedTender: EnrichedCurrentTender;
+  sbdUrl: string;
+  pdfUrl: string;
+  boqUrl: string;
+  onOpenPortalBridge: (tender: EnrichedCurrentTender, e?: React.MouseEvent) => void;
+  onOpenWholeDoc?: () => void;
 }
 
 export interface ScrapingArchSubTabProps {
-  tender: EnrichedCurrentTender;
-  onRunLiveScraper?: () => void;
-  isScrapingLive?: boolean;
+  selectedTender: EnrichedCurrentTender;
+  onOpenPortalBridge: (tender: EnrichedCurrentTender, e?: React.MouseEvent) => void;
 }
 
 export interface CompetitorPredictionSubTabProps {
-  tender: EnrichedCurrentTender;
-  predictionReport: PreBidSimulationReport;
+  preBidPrediction: PreBidSimulationReport;
 }
 
 export interface DeepRAGClauseSubTabProps {
-  tender: EnrichedCurrentTender;
-  ragReport: DeepDocumentRAGReport;
+  deepRAGReport: DeepDocumentRAGReport;
+  selectedTender: EnrichedCurrentTender;
+  sbdUrl: string;
+  boqUrl: string;
 }
 
 // ============================================================================
@@ -294,22 +381,18 @@ export interface DeepRAGClauseSubTabProps {
 
 export interface BidderFilterBarProps {
   searchQuery: string;
-  setSearchQuery: (q: string) => void;
-  selectedCategory: string[];
-  setSelectedCategory: (cat: string[]) => void;
-  selectedState: string[];
-  setSelectedState: (st: string[]) => void;
-  sortBy: BidderSortOption;
-  setSortBy: (s: BidderSortOption) => void;
-  onResetFilters: () => void;
+  setSearchQuery: (query: string) => void;
+  isVoiceSearching: boolean;
+  toggleVoiceSearch: () => void;
   onOpenFilterDrawer: () => void;
-  hasActiveFilters: boolean;
   activeFiltersCount: number;
-  totalFilteredCount: number;
-  totalBiddersCount: number;
+  hasActiveFilters: boolean;
+  resetFilters: () => void;
   onReload: () => void;
-  isVoiceSearching?: boolean;
-  toggleVoiceSearch?: () => void;
+  isLoading: boolean;
+  totalBidders: number;
+  chips: FilterChipItem[];
+  totalResultsCount?: number;
 }
 
 export interface BidderFilterDrawerProps {
@@ -335,19 +418,30 @@ export interface BidderFilterDrawerProps {
 export interface BidderCardProps {
   bidder: RegisteredBidder;
   isSelected: boolean;
-  onSelect: (bidder: RegisteredBidder) => void;
+  onSelect: () => void;
 }
 
 export interface BidderBannerProps {
-  bidder: RegisteredBidder;
+  totalBidders: number;
+  totalContractsSum: number;
+  totalValueSumCr: string;
+  onSyncLive?: () => void;
 }
 
 export interface BidderDossierProps {
-  bidder: RegisteredBidder;
+  selectedBidder: RegisteredBidder;
+  onCopy: (text: string, e: React.MouseEvent) => void;
+  copiedText: string | null;
+  onClose?: () => void;
+  onOpenAcceptedTenderModal?: (tenderId: string) => void;
 }
 
 export interface BidderContractsTableProps {
-  bidder: RegisteredBidder;
+  totalContractsCount: number;
+  contractSearchQuery: string;
+  setContractSearchQuery: (q: string) => void;
+  filteredContracts: BidderWonContract[];
+  onOpenAcceptedTenderModal?: (tenderId: string) => void;
 }
 
 export interface BidderSortOptionItem {
@@ -392,48 +486,55 @@ export interface OrganizationsDirectoryModalProps {
 // ============================================================================
 
 export interface HomeScreenProps {
-  onNavigateTab: (tab: any) => void;
-  onOpenSignIn: () => void;
+  stats: PlatformStats | null;
+  onNavigate: (tab: NavigableTab) => void;
   onTriggerSync: () => void;
   isSyncing: boolean;
-  cooldownRemaining: number;
-  stats: PlatformStats | null;
-  userQuota?: UserQuotaInfo | null;
+  cooldownRemaining?: number;
+  quotaInfo?: UserQuotaInfo | null;
+  userEmail?: string | null;
+  userName?: string | null;
 }
 
 export interface HomeHeroSectionProps {
-  onExploreCurrent: () => void;
-  onExploreAccepted: () => void;
-  onTriggerSync: () => void;
-  isSyncing: boolean;
-  cooldownRemaining: number;
-  userQuota?: UserQuotaInfo | null;
+  activeTenders: number;
+  acceptedTenders: number;
+  biddersCount: number;
+  onNavigate: (tab: NavigableTab) => void;
+  onScrollToSources: () => void;
 }
 
 export interface HomeMetricsBarProps {
-  stats: PlatformStats | null;
+  activeTenders: number;
+  totalValueCr: string;
+  acceptedTenders: number;
+  biddersCount: number;
+  onNavigate: (tab: NavigableTab) => void;
+  onScrollToSources: () => void;
+  stats?: PlatformStats | null;
 }
 
 export interface HomeCapabilitiesSectionProps {
-  onExploreCurrent: () => void;
-  onExploreAccepted: () => void;
-  onExploreBidders: () => void;
+  onNavigate: (tab: NavigableTab) => void;
 }
 
 export interface HomeSourcesDirectoryProps {
-  onSelectPortal: (portalName: string) => void;
+  onNavigate: (tab: NavigableTab) => void;
+  onTriggerSync: () => void;
+  isSyncing: boolean;
+  cooldownRemaining?: number;
+  quotaInfo?: UserQuotaInfo | null;
+  userEmail?: string | null;
+  userName?: string | null;
 }
 
 export interface HomeCtaBannerProps {
-  onTriggerSync: () => void;
-  isSyncing: boolean;
-  cooldownRemaining: number;
-  userQuota?: UserQuotaInfo | null;
+  onNavigate: (tab: NavigableTab) => void;
 }
 
 export interface PortalSourceCardProps {
-  portal: any;
-  onSelect: (portalName: string) => void;
+  portal: PortalSourceInfo;
+  onNavigate: (tab: NavigableTab) => void;
 }
 
 export interface ProtectedRouteProps {
@@ -449,10 +550,13 @@ export interface ClerkSetupModalProps {
 }
 
 export interface SignInViewProps {
+  onNavigateHome: () => void;
+  onSuccess?: () => void;
   onBackToOverview?: () => void;
 }
 
 export interface AuthHeaderControlsProps {
+  onNavigateToSignIn?: () => void;
   className?: string;
 }
 

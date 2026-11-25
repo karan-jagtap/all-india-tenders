@@ -5,10 +5,9 @@ import { UserButton, SignInButton } from '@clerk/react';
 import { dark } from '@clerk/themes';
 import { useAuthContext } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
+import type { AuthHeaderControlsProps } from '../../types';
 
-export interface AuthHeaderControlsProps {
-  onNavigateToSignIn?: () => void;
-}
+export type { AuthHeaderControlsProps };
 
 export const AuthHeaderControls: React.FC<AuthHeaderControlsProps> = ({ onNavigateToSignIn }) => {
   const { t } = useTranslation();

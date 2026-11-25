@@ -5,10 +5,9 @@ import { dark } from '@clerk/themes';
 import { Shield, Key, ArrowLeft, Terminal, Copy, Check } from 'lucide-react';
 import { useAuthContext } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
+import type { SignInViewProps } from '../../types';
 
-export interface SignInViewProps {
-  onNavigateHome: () => void;
-}
+export type { SignInViewProps };
 
 export const SignInView: React.FC<SignInViewProps> = ({ onNavigateHome }) => {
   const { t } = useTranslation();

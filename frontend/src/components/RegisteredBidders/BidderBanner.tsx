@@ -1,12 +1,9 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { ShieldCheck } from 'lucide-react';
+import type { BidderBannerProps } from '../../types';
 
-export interface BidderBannerProps {
-  totalBidders: number;
-  totalContractsSum: number;
-  totalValueSumCr: string;
-}
+export type { BidderBannerProps };
 
 export const BidderBanner: React.FC<BidderBannerProps> = ({
   totalBidders,

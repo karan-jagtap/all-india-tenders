@@ -22,6 +22,7 @@ from reportlab.platypus import (
     Table,
     TableStyle
 )
+from app.i18n import t
 from app.services.accepted_tenders_history import HISTORICAL_ACCEPTED_TENDERS_2017_2024
 from app.services.current_tenders_service import (
     STATUTORY_PORTAL_STATE_BINDINGS,
@@ -1965,7 +1966,7 @@ def generate_accepted_bid_pdf(tender_data: Dict[str, Any]) -> bytes:
             Paragraph("<b>GOVERNMENT OF INDIA • PUBLIC PROCUREMENT e-PORTAL</b>", header_sub_style),
         ],
         [
-            Paragraph("<b>[RAG] OFFICIAL ACCEPTED TENDER & AWARDED BID DOSSIER</b>", title_style),
+            Paragraph(f"<b>{t('common.ai')} OFFICIAL ACCEPTED TENDER & AWARDED BID DOSSIER</b>", title_style),
         ],
         [
             Paragraph(f"Tender Ref: <b>{tender_data['og_tender']['nit_number']}</b> • Award Date: <b>{format_date_dmy(tender_data['award_date'])}</b>", header_sub_style)

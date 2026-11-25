@@ -17,11 +17,9 @@ import {
 } from 'lucide-react';
 import { fetchSyncLogs, SyncLogsResponse, SyncLogItem } from '../../services/api';
 import { formatDate } from '../../utils';
+import type { SyncHistoryModalProps } from '../../types';
 
-export interface SyncHistoryModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-}
+export type { SyncHistoryModalProps };
 
 export const SyncHistoryModal: React.FC<SyncHistoryModalProps> = ({
   isOpen,

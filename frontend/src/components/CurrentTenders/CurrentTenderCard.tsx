@@ -1,16 +1,10 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Calendar, Building2, MapPin, Copy, Check, Download } from 'lucide-react';
-import { EnrichedCurrentTender } from '../../types';
+import type { CurrentTenderCardProps } from '../../types';
 import { formatINR, getUrgencyBadge, formatDate } from '../../utils';
 
-export interface CurrentTenderCardProps {
-  tender: EnrichedCurrentTender;
-  isSelected: boolean;
-  onSelect: () => void;
-  onCopyNit: (nit: string, e: React.MouseEvent) => void;
-  copiedNit: string | null;
-}
+export type { CurrentTenderCardProps };
 
 export const CurrentTenderCard: React.FC<CurrentTenderCardProps> = ({
   tender,

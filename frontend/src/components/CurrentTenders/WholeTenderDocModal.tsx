@@ -10,15 +10,10 @@ import {
   Layers,
   Clock
 } from 'lucide-react';
-import { EnrichedCurrentTender } from '../../types';
+import type { WholeTenderDocModalProps } from '../../types';
 import { formatINR, formatDate } from '../../utils';
 
-export interface WholeTenderDocModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  tender: EnrichedCurrentTender | null;
-  sbdUrl: string;
-}
+export type { WholeTenderDocModalProps };
 
 export const WholeTenderDocModal: React.FC<WholeTenderDocModalProps> = ({
   isOpen,
@@ -155,7 +150,7 @@ export const WholeTenderDocModal: React.FC<WholeTenderDocModalProps> = ({
         <div className="flex-1 w-full bg-slate-200 dark:bg-slate-900 relative overflow-hidden">
           <iframe
             src={sbdUrl}
-            title={`[RAG] Whole Tender Document Preview - ${tender.nit_number}`}
+            title={t('wholeTenderDoc.previewTitle', { nitNumber: tender.nit_number })}
             className="w-full h-full border-0"
           />
         </div>

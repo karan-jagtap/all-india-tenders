@@ -1,11 +1,9 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { X, Key, ShieldCheck, Terminal, Copy, Check, ExternalLink } from 'lucide-react';
+import type { ClerkSetupModalProps } from '../../types';
 
-export interface ClerkSetupModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-}
+export type { ClerkSetupModalProps };
 
 export const ClerkSetupModal: React.FC<ClerkSetupModalProps> = ({ isOpen, onClose }) => {
   const { t } = useTranslation();

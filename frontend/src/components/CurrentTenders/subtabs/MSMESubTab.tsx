@@ -1,6 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { ShieldAlert, CheckCircle } from 'lucide-react';
+import { renderBulletPoint } from '../../../utils';
 
 export const MSMESubTab: React.FC = () => {
   const { t } = useTranslation();
@@ -34,9 +35,9 @@ export const MSMESubTab: React.FC = () => {
             {t('currentTenders.msme.checklistTitle')}
           </div>
           <ul className="list-disc list-inside text-slate-700 dark:text-slate-300 space-y-1">
-            <li>{t('currentTenders.msme.check1')}</li>
-            <li>{t('currentTenders.msme.check2')}</li>
-            <li>{t('currentTenders.msme.check3')}</li>
+            <li>{renderBulletPoint(t('currentTenders.msme.check1'))}</li>
+            <li>{renderBulletPoint(t('currentTenders.msme.check2'))}</li>
+            <li>{renderBulletPoint(t('currentTenders.msme.check3'))}</li>
           </ul>
         </div>
       </div>

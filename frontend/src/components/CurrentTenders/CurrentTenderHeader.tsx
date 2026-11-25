@@ -19,24 +19,11 @@ import {
   Globe
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { EnrichedCurrentTender, SubTabType, CurrentTenderSubTab } from '../../types';
+import { SubTabType, CurrentTenderSubTab, CurrentTenderHeaderProps } from '../../types';
 import { formatINR, formatDate } from '../../utils';
 
-export type { SubTabType };
+export type { SubTabType, CurrentTenderHeaderProps };
 export { CurrentTenderSubTab };
-
-export interface CurrentTenderHeaderProps {
-  selectedTender: EnrichedCurrentTender;
-  onCopyNit: (nit: string, e?: React.MouseEvent) => void;
-  copiedNit: string | null;
-  onOpenPortalBridge: (tender: EnrichedCurrentTender, e?: React.MouseEvent) => void;
-  onOpenWholeDoc: () => void;
-  activeSubTab: SubTabType;
-  setActiveSubTab: (tab: SubTabType) => void;
-  sbdUrl: string;
-  nitPdfUrl: string;
-  boqUrl: string;
-}
 
 export const CurrentTenderHeader: React.FC<CurrentTenderHeaderProps> = ({
   selectedTender,

@@ -3,60 +3,9 @@ import { useTranslation } from 'react-i18next';
 import { Clock } from 'lucide-react';
 import { VALUE_RANGE_OPTIONS } from '../../constants';
 import { TenderFilterDrawer } from '../common';
+import type { CurrentTenderFilterDrawerProps } from '../../types';
 
-export interface CurrentTenderFilterDrawerProps {
-  isOpen: boolean;
-  onClose: () => void;
-  activeFiltersCount: number;
-  hasActiveFilters: boolean;
-  resetAllFilters: () => void;
-  totalFilteredCount: number;
-
-  // Source
-  selectedSource: string[] | string;
-  setSelectedSource: (s: string[]) => void;
-  availableSources: string[];
-  sourceCounts: Map<string, number>;
-  contextSourceCount: number;
-
-  // Org
-  selectedOrg: string[] | string;
-  setSelectedOrg: (o: string[]) => void;
-  availableOrgs: string[];
-  orgCounts: Map<string, number>;
-  contextOrgCount: number;
-
-  // State
-  selectedState: string[] | string;
-  setSelectedState: (s: string[]) => void;
-  availableStates: string[];
-  stateCounts: Map<string, number>;
-  contextStateCount: number;
-
-  // City
-  selectedCity: string[] | string;
-  setSelectedCity: (c: string[]) => void;
-  availableCities: string[];
-  cityCounts: Map<string, number>;
-  contextCityCount: number;
-
-  // Category
-  selectedCategory: string[] | string;
-  setSelectedCategory: (c: string[]) => void;
-  availableCategories: string[];
-  categoryCounts: Map<string, number>;
-  contextCategoryCount: number;
-
-  // Value Range
-  selectedValueRange: string;
-  setSelectedValueRange: (v: string) => void;
-
-  // Closed / Expired Toggle
-  includeClosed: boolean;
-  setIncludeClosed: (inc: boolean) => void;
-  openCount: number;
-  totalAvailableCount: number;
-}
+export type { CurrentTenderFilterDrawerProps };
 
 export const CurrentTenderFilterDrawer: React.FC<CurrentTenderFilterDrawerProps> = ({
   isOpen,

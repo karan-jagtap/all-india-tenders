@@ -1,23 +1,9 @@
 import React from 'react';
 import { X, RotateCcw } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { FilterAccentColor } from '../../types';
+import { FilterChipItem, ActiveFilterChipsBarProps } from '../../types';
 
-export interface FilterChipItem {
-  id: string;
-  label: string;
-  value: string;
-  icon?: React.ReactNode;
-  color?: FilterAccentColor;
-  onRemove: () => void;
-}
-
-export interface ActiveFilterChipsBarProps {
-  chips: FilterChipItem[];
-  onClearAll: () => void;
-  hasActiveFilters?: boolean;
-  className?: string;
-}
+export type { FilterChipItem, ActiveFilterChipsBarProps };
 
 export const ActiveFilterChipsBar: React.FC<ActiveFilterChipsBarProps> = ({
   chips,

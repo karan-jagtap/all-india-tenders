@@ -9,17 +9,10 @@ import {
   ChevronRight,
   Lock,
 } from "lucide-react";
-import { NavigableTab } from "../../../types";
+import type { HomeMetricsBarProps } from "../../../types";
 import { useAuthContext } from "../../../context/AuthContext";
 
-export interface HomeMetricsBarProps {
-  activeTenders: number;
-  totalValueCr: string;
-  acceptedTenders: number;
-  biddersCount: number;
-  onNavigate: (tab: NavigableTab) => void;
-  onScrollToSources: () => void;
-}
+export type { HomeMetricsBarProps };
 
 export const HomeMetricsBar: React.FC<HomeMetricsBarProps> = ({
   activeTenders,

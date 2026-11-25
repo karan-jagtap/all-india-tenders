@@ -21,6 +21,7 @@ from reportlab.lib.pagesizes import letter
 from reportlab.lib import colors
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, PageBreak, KeepTogether
+from app.i18n import t
 
 # Statutory state portals bound to sovereign states
 STATUTORY_PORTAL_STATE_BINDINGS = {
@@ -1447,7 +1448,7 @@ def generate_current_tender_nit_pdf(tender: Dict[str, Any]) -> bytes:
 
     # Header Tricolor bar
     elements.append(Paragraph("<b>GOVERNMENT OF INDIA & STATE PROCUREMENT AUTHORITIES</b>", title_style))
-    elements.append(Paragraph(f"<b>[RAG] NOTICE INVITING TENDER (NIT) — {tender['source_portal'].upper()}</b>", ParagraphStyle(
+    elements.append(Paragraph(f"<b>{t('common.ai')} NOTICE INVITING TENDER (NIT) — {tender['source_portal'].upper()}</b>", ParagraphStyle(
         'SubHeader', parent=title_style, fontSize=11, leading=14, textColor=colors.HexColor('#059669')
     )))
     elements.append(Spacer(1, 10))
@@ -1579,7 +1580,7 @@ def generate_detailed_tender_document_pdf(tender: Dict[str, Any]) -> bytes:
     elements.append(Paragraph("<b>GOVERNMENT OF INDIA & STATE PUBLIC PROCUREMENT</b>", ParagraphStyle('HeaderTop', parent=title_style, fontSize=11, textColor=colors.HexColor('#64748b'))))
     elements.append(Spacer(1, 4))
     elements.append(Paragraph(f"<b>{tender.get('organization', 'PUBLIC PROCURING AUTHORITY').upper()}</b>", title_style))
-    elements.append(Paragraph("<b>[RAG] STANDARD BIDDING DOCUMENT (SBD) / REQUEST FOR PROPOSAL (RFP)</b>", ParagraphStyle('SubT', parent=title_style, fontSize=12, leading=16, textColor=colors.HexColor('#b45309'))))
+    elements.append(Paragraph(f"<b>{t('common.ai')} STANDARD BIDDING DOCUMENT (SBD) / REQUEST FOR PROPOSAL (RFP)</b>", ParagraphStyle('SubT', parent=title_style, fontSize=12, leading=16, textColor=colors.HexColor('#b45309'))))
     elements.append(Paragraph("<b>TWO-COVER ELECTRONIC BIDDING SYSTEM (COVER 1: TECHNICAL & ELIGIBILITY; COVER 2: FINANCIAL BOQ)</b>", ParagraphStyle('CoverType', parent=title_style, fontSize=8.5, textColor=colors.HexColor('#047857'))))
     elements.append(Spacer(1, 10))
 
@@ -1807,7 +1808,7 @@ def generate_boq_schedule_pdf(tender: Dict[str, Any]) -> bytes:
 
     elements = []
     elements.append(Paragraph("<b>GOVERNMENT E-PROCUREMENT SYSTEM (GePNIC / GeM)</b>", ParagraphStyle('TopSub', parent=title_style, fontSize=10, textColor=colors.HexColor('#047857'))))
-    elements.append(Paragraph("<b>[RAG] BILL OF QUANTITIES (BOQ) — SCHEDULE OF RATES & FINANCIAL BID</b>", title_style))
+    elements.append(Paragraph(f"<b>{t('common.ai')} BILL OF QUANTITIES (BOQ) — SCHEDULE OF RATES & FINANCIAL BID</b>", title_style))
     elements.append(Paragraph(f"<b>Tender Ref: {tender['nit_number']} • {tender['organization']}</b>", ParagraphStyle('OrgLine', parent=title_style, fontSize=9, textColor=colors.HexColor('#b45309'))))
     elements.append(Spacer(1, 8))
 

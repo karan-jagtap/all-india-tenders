@@ -1,22 +1,9 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Search, ChevronDown, Check, X, RotateCcw } from 'lucide-react';
-import { FilterAccentColor } from '../../types';
-import { DropdownOption } from './SearchableDropdown';
+import type { DropdownOption, MultiSelectDropdownProps } from '../../types';
 
-export interface MultiSelectDropdownProps {
-  values: string[];
-  onChange: (values: string[]) => void;
-  options: DropdownOption[];
-  allOptionLabel: string;
-  allOptionCount?: number;
-  placeholder?: string;
-  icon?: React.ReactNode;
-  accentColor?: FilterAccentColor;
-  emptyMessage?: string;
-  className?: string;
-  maxPreviewCount?: number;
-}
+export type { MultiSelectDropdownProps };
 
 export const MultiSelectDropdown: React.FC<MultiSelectDropdownProps> = ({
   values,

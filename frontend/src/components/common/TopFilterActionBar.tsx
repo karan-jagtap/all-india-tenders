@@ -1,21 +1,9 @@
 import React from 'react';
 import { SlidersHorizontal, RotateCcw, RefreshCw } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { FilterAccentColor } from '../../types';
+import type { TopFilterActionBarProps } from '../../types';
 
-export interface TopFilterActionBarProps {
-  onOpenFilters: () => void;
-  activeFiltersCount: number;
-  hasActiveFilters: boolean;
-  onResetFilters: () => void;
-  onReload?: () => void;
-  isLoading?: boolean;
-  totalCount?: number;
-  reloadLabel?: string;
-  accentColor?: FilterAccentColor;
-  className?: string;
-  sortControl?: React.ReactNode;
-}
+export type { TopFilterActionBarProps };
 
 export const TopFilterActionBar: React.FC<TopFilterActionBarProps> = ({
   onOpenFilters,

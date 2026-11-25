@@ -1,15 +1,10 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Award, Search, ChevronLeft, ChevronRight } from 'lucide-react';
-import { BidderWonContract } from '../../types';
+import type { BidderContractsTableProps } from '../../types';
 import { formatCr, formatINR, formatDate } from '../../utils';
 
-export interface BidderContractsTableProps {
-  totalContractsCount: number;
-  contractSearchQuery: string;
-  setContractSearchQuery: (q: string) => void;
-  filteredContracts: BidderWonContract[];
-}
+export type { BidderContractsTableProps };
 
 export const BidderContractsTable: React.FC<BidderContractsTableProps> = ({
   totalContractsCount,

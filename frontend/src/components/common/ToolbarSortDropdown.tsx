@@ -1,23 +1,9 @@
 import { useState, useRef, useEffect } from 'react';
 import { ArrowUpDown, Check, ChevronDown } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { FilterAccentColor } from '../../types';
+import type { ToolbarSortOption, ToolbarSortDropdownProps } from '../../types';
 
-export interface ToolbarSortOption<T extends string = string> {
-  value: T;
-  label: string;
-  shortLabel?: string;
-  desc?: string;
-}
-
-export interface ToolbarSortDropdownProps<T extends string = string> {
-  value: T;
-  onChange: (value: T) => void;
-  options: ToolbarSortOption<T>[];
-  defaultValue?: T;
-  accentColor?: FilterAccentColor;
-  className?: string;
-}
+export type { ToolbarSortOption, ToolbarSortDropdownProps };
 
 export function ToolbarSortDropdown<T extends string = string>({
   value,

@@ -41,7 +41,7 @@ import {
   AcceptedTenderFilters
 } from '../services/api';
 import { DetailModalTab, AcceptedTenderModalTab, AcceptedTenderSortOption, EnrichedAcceptedTender } from '../types';
-import { formatDate } from '../utils';
+import { formatDate, renderBulletPoint } from '../utils';
 import { AllBidsEvaluationSubTab } from './AcceptedTenders/AllBidsEvaluationSubTab';
 import {
   ALL_CANONICAL_CATEGORIES,
@@ -1820,7 +1820,7 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
                             {selectedTender.bid_submission?.cover_1?.items.map((item, idx) => (
                               <li key={idx} className="flex items-start gap-2">
                                 <CheckCircle2 className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
-                                <span className="leading-snug">{item}</span>
+                                <span className="leading-snug">{renderBulletPoint(item)}</span>
                               </li>
                             ))}
                           </ul>
@@ -1838,7 +1838,7 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
                             {selectedTender.bid_submission?.cover_2?.items.map((item, idx) => (
                               <li key={idx} className="flex items-start gap-2">
                                 <CheckCircle2 className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400 shrink-0 mt-0.5" />
-                                <span className="leading-snug">{item}</span>
+                                <span className="leading-snug">{renderBulletPoint(item)}</span>
                               </li>
                             ))}
                           </ul>
@@ -1856,7 +1856,7 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
                             {selectedTender.bid_submission?.cover_3?.items.map((item, idx) => (
                               <li key={idx} className="flex items-start gap-2">
                                 <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
-                                <span className="leading-snug">{item}</span>
+                                <span className="leading-snug">{renderBulletPoint(item)}</span>
                               </li>
                             ))}
                           </ul>
@@ -2378,7 +2378,7 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
                   <div className="w-full h-[620px] rounded-lg border border-slate-300 dark:border-slate-700 overflow-hidden bg-slate-100 dark:bg-slate-900 shadow-inner">
                     <iframe
                       src={pdfUrl}
-                      title="[RAG] Accepted Tender Dossier PDF Preview"
+                      title={t('acceptedTenders.dossier.pdfPreviewTitle')}
                       className="w-full h-full border-0"
                     />
                   </div>

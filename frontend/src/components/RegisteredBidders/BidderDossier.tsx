@@ -6,14 +6,10 @@ import {
   Check,
   Copy
 } from 'lucide-react';
-import { RegisteredBidder } from '../../types';
+import type { BidderDossierProps } from '../../types';
 import { formatCr } from '../../utils';
 
-export interface BidderDossierProps {
-  selectedBidder: RegisteredBidder;
-  onCopy: (text: string, e: React.MouseEvent) => void;
-  copiedText: string | null;
-}
+export type { BidderDossierProps };
 
 export const BidderDossier: React.FC<BidderDossierProps> = ({
   selectedBidder,
