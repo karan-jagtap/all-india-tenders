@@ -465,7 +465,7 @@ export const App: React.FC = () => {
       iconColor: 'text-blue-500',
       activeClasses: 'bg-blue-600 text-white shadow-sm',
       mobileActiveBg: 'bg-gradient-to-r from-blue-950/80 to-slate-800 border-blue-500/50',
-      badge: stats?.registered_bidders_count || 87,
+      badge: stats?.registered_bidders_count || 234,
       badgeColor: 'bg-blue-700 text-white'
     }
   ];

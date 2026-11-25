@@ -5,7 +5,7 @@ audited financials, corporate identifiers, and complete portfolio of public cont
 """
 
 import re
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any, Optional, Tuple
 from app.services.accepted_tenders_service import ACCEPTED_TENDERS_CATALOG
 
 def slugify(text: str) -> str:
@@ -236,15 +236,98 @@ def load_contractors_from_db() -> List[Dict[str, Any]]:
         return []
 
 # Global catalog initialized directly from the persistent database
-ALL_BIDDERS_CATALOG = load_contractors_from_db() or build_bidders_catalog()
+ALL_BIDDERS_CATALOG: List[Dict[str, Any]] = []
+
+def get_bidder_filters() -> Dict[str, Any]:
+    """Returns aggregated metadata for bidder filter categories and states with accurate counts."""
+    cat_counts: Dict[str, int] = {}
+    state_counts: Dict[str, int] = {}
+
+    for b in ALL_BIDDERS_CATALOG:
+        for c in b.get("categories", []):
+            if c:
+                cat_counts[c] = cat_counts.get(c, 0) + 1
+        for s in b.get("states", []):
+            if s:
+                state_counts[s] = state_counts.get(s, 0) + 1
+
+    return {
+        "categories": sorted(list(cat_counts.keys())),
+        "states": sorted(list(state_counts.keys())),
+        "category_counts": cat_counts,
+        "state_counts": state_counts,
+        "total_count": len(ALL_BIDDERS_CATALOG)
+    }
+
+def export_bidders_to_json(catalog: Optional[List[Dict[str, Any]]] = None) -> bool:
+    """Exports the live PostgreSQL bidders catalog to frontend/public/data/registered_bidders.json for offline/static resilience."""
+    import os
+    import json
+    data = catalog or ALL_BIDDERS_CATALOG
+    if not data:
+        return False
+    paths = [
+        os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..", "frontend", "public", "data", "registered_bidders.json")),
+        os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..", "frontend", "dist", "data", "registered_bidders.json"))
+    ]
+    for p in paths:
+        try:
+            os.makedirs(os.path.dirname(p), exist_ok=True)
+            with open(p, "w", encoding="utf-8") as f:
+                json.dump(data, f, ensure_ascii=False, indent=2)
+        except Exception:
+            pass
+
+    filter_paths = [
+        os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..", "frontend", "public", "data", "bidder_filters.json")),
+        os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..", "frontend", "dist", "data", "bidder_filters.json"))
+    ]
+    filters_data = get_bidder_filters()
+    for fp in filter_paths:
+        try:
+            os.makedirs(os.path.dirname(fp), exist_ok=True)
+            with open(fp, "w", encoding="utf-8") as f:
+                json.dump(filters_data, f, ensure_ascii=False, indent=2)
+        except Exception:
+            pass
+    return True
+
+def get_registered_bidders_count() -> int:
+    """Returns the true live count of registered contractors directly from PostgreSQL."""
+    try:
+        from app.db.postgres_pool import get_pg_cursor
+        with get_pg_cursor() as cur:
+            cur.execute("SELECT COUNT(*) AS total FROM contractors WHERE is_active = TRUE")
+            row = cur.fetchone()
+            if row and row["total"] > 0:
+                return row["total"]
+    except Exception:
+        pass
+    return len(ALL_BIDDERS_CATALOG)
+
+def refresh_bidders_catalog() -> List[Dict[str, Any]]:
+    """Reloads registered contractors and dossiers directly from PostgreSQL."""
+    global ALL_BIDDERS_CATALOG
+    loaded = load_contractors_from_db()
+    if loaded:
+        ALL_BIDDERS_CATALOG = loaded
+    elif not ALL_BIDDERS_CATALOG:
+        ALL_BIDDERS_CATALOG = build_bidders_catalog()
+    export_bidders_to_json(ALL_BIDDERS_CATALOG)
+    return ALL_BIDDERS_CATALOG
+
+# Initial load on service startup
+ALL_BIDDERS_CATALOG = refresh_bidders_catalog()
 
 def list_registered_bidders(
     search: Optional[str] = None,
     category: Optional[str] = None,
     state: Optional[str] = None,
-    sort_by: Optional[str] = "NAME_ASC"
-) -> List[Dict[str, Any]]:
-    """Filters registered contractors by search query, sector specialization, or home state.
+    sort_by: Optional[str] = "NAME_ASC",
+    limit: Optional[int] = None,
+    offset: int = 0
+) -> Tuple[List[Dict[str, Any]], int]:
+    """Filters registered contractors by search query, sector specialization, or home state, with server-side pagination.
     Defaults to sorting ALPHABETICALLY (A–Z)."""
     items = ALL_BIDDERS_CATALOG
 
@@ -253,32 +336,54 @@ def list_registered_bidders(
         items = [
             b for b in items
             if q in b["name"].lower()
-            or q in b["cin"].lower()
-            or q in b["gstin"].lower()
-            or q in b["pan"].lower()
-            or q in b["registered_office"].lower()
-            or any(q in c.lower() for c in b["categories"])
-            or any(q in a.lower() for a in b["authorities"])
+            or q in b.get("cin", "").lower()
+            or q in b.get("gstin", "").lower()
+            or q in b.get("pan", "").lower()
+            or q in b.get("registered_office", "").lower()
+            or any(q in c.lower() for c in b.get("categories", []))
+            or any(q in a.lower() for a in b.get("authorities", []))
+            or any(q in st.lower() for st in b.get("states", []))
         ]
 
     if category and category != "ALL":
-        items = [b for b in items if category in b["categories"]]
+        cats = [c.strip().lower() for c in category.split(",") if c.strip() and c.strip().upper() != "ALL"]
+        if cats:
+            items = [
+                b for b in items
+                if any(any(c in bc.lower() or bc.lower() in c for bc in b.get("categories", [])) for c in cats)
+            ]
 
     if state and state != "ALL":
-        items = [b for b in items if state in b["states"]]
+        sts = [s.strip().lower() for s in state.split(",") if s.strip() and s.strip().upper() != "ALL"]
+        if sts:
+            items = [
+                b for b in items
+                if any(
+                    any(s in bs.lower() or bs.lower() in s for bs in b.get("states", [])) or
+                    any(s in b.get("registered_office", "").lower() for s in sts)
+                    for s in sts
+                )
+            ]
 
     if sort_by == "NAME_ASC":
         items = sorted(items, key=lambda x: x["name"].lower())
     elif sort_by == "NAME_DESC":
         items = sorted(items, key=lambda x: x["name"].lower(), reverse=True)
     elif sort_by == "CONTRACTS_DESC":
-        items = sorted(items, key=lambda x: (-x["total_contracts_won"], -x["total_awarded_value_inr"]))
+        items = sorted(items, key=lambda x: (-x.get("total_contracts_won", 0), -x.get("total_awarded_value_inr", 0.0)))
     elif sort_by == "VALUE_DESC":
-        items = sorted(items, key=lambda x: -x["total_awarded_value_inr"])
+        items = sorted(items, key=lambda x: -x.get("total_awarded_value_inr", 0.0))
     elif sort_by == "TURNOVER_DESC":
-        items = sorted(items, key=lambda x: -x.get("audited_turnover_inr", 0))
+        items = sorted(items, key=lambda x: -x.get("audited_turnover_inr", 0.0))
 
-    return items
+    total_count = len(items)
+
+    if limit is not None and limit > 0:
+        paged_items = items[offset : offset + limit]
+    else:
+        paged_items = items[offset:]
+
+    return paged_items, total_count
 
 def get_bidder_by_slug(slug: str) -> Optional[Dict[str, Any]]:
     """Returns complete profile dossier of a specific registered contractor."""

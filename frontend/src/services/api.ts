@@ -437,7 +437,7 @@ export async function getPlatformStats(): Promise<PlatformStats> {
   return {
     active_tenders_count: 112261,
     accepted_tenders_count: 5224,
-    registered_bidders_count: 103,
+    registered_bidders_count: 234,
     database_required: true,
     architecture: 'Enterprise Hybrid (PostgreSQL 16 / SQLite Persistent DB + In-Memory RAM Stream)',
     total_portals_monitored: 58,
@@ -693,56 +693,170 @@ export async function triggerLiveScrape(user?: { id?: string; email?: string; na
   };
 }
 
-export async function listRegisteredBidders(params?: {
+export interface RegisteredBidderFilters {
   search?: string;
   category?: string;
   state?: string;
   sort_by?: string;
-}): Promise<RegisteredBidder[]> {
-  const query = new URLSearchParams();
-  if (params?.search) query.append('search', params.search);
-  if (params?.category && params.category !== 'ALL') query.append('category', params.category);
-  if (params?.state && params.state !== 'ALL') query.append('state', params.state);
-  if (params?.sort_by) query.append('sort_by', params.sort_by);
-  query.append('_t', String(Date.now()));
+  limit?: number;
+  offset?: number;
+}
 
-  try {
-    const res = await fetch(`${API_BASE}/bidders?${query.toString()}`, {
-      cache: 'no-store',
-      headers: {
-        'Cache-Control': 'no-cache',
-        'Pragma': 'no-cache'
+export interface RegisteredBiddersResponse {
+  bidders: RegisteredBidder[];
+  totalCount: number;
+}
+
+export interface BidderFiltersMetadata {
+  categories: string[];
+  states: string[];
+  category_counts: Record<string, number>;
+  state_counts: Record<string, number>;
+  total_count: number;
+}
+
+const inFlightRegisteredBidders = new Map<string, Promise<RegisteredBiddersResponse>>();
+
+export async function listRegisteredBidders(
+  filters?: RegisteredBidderFilters
+): Promise<RegisteredBiddersResponse> {
+  const cacheKey = getFilterDedupeKey(filters);
+  const existing = inFlightRegisteredBidders.get(cacheKey);
+  if (existing) {
+    return existing;
+  }
+
+  const fetchPromise = (async () => {
+    const params = new URLSearchParams();
+    if (filters?.search) params.append('search', filters.search);
+    if (filters?.category && filters.category !== 'ALL') params.append('category', filters.category);
+    if (filters?.state && filters.state !== 'ALL') params.append('state', filters.state);
+    if (filters?.sort_by) params.append('sort_by', filters.sort_by);
+    if (filters?.limit !== undefined) params.append('limit', String(filters.limit));
+    if (filters?.offset !== undefined) params.append('offset', String(filters.offset));
+    params.append('_t', String(Date.now()));
+
+    try {
+      const res = await fetch(`${API_BASE}/bidders?${params.toString()}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache',
+          'Pragma': 'no-cache'
+        }
+      });
+      const contentType = res.headers.get('content-type') || '';
+      if (res.ok && contentType.includes('application/json')) {
+        const rawCountHeader = res.headers.get('X-Total-Count');
+        const bidders: RegisteredBidder[] = await res.json();
+        const totalCount = rawCountHeader ? parseInt(rawCountHeader, 10) : bidders.length;
+        return { bidders, totalCount };
       }
+    } catch {
+      // Backend API unreachable, falling back to static catalog
+    }
+
+    // Fallback to static bidders list for Netlify / serverless deployment
+    try {
+      const fallbackRes = await fetch(`/data/registered_bidders.json?_v=${Date.now()}`, {
+        cache: 'no-cache',
+        headers: { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' }
+      });
+      if (fallbackRes.ok) {
+        let catalog: RegisteredBidder[] = await fallbackRes.json();
+
+        if (filters?.search && filters.search.trim()) {
+          const q = filters.search.toLowerCase().trim();
+          catalog = catalog.filter(
+            (b) =>
+              b.name?.toLowerCase().includes(q) ||
+              b.registered_office?.toLowerCase().includes(q) ||
+              b.cin?.toLowerCase().includes(q) ||
+              b.gstin?.toLowerCase().includes(q) ||
+              b.pan?.toLowerCase().includes(q) ||
+              b.categories?.some((c) => c.toLowerCase().includes(q)) ||
+              b.authorities?.some((a) => a.toLowerCase().includes(q)) ||
+              b.states?.some((s) => s.toLowerCase().includes(q))
+          );
+        }
+
+        if (filters?.category && filters.category !== 'ALL') {
+          const cats = filters.category.split(',').map((c) => c.trim().toLowerCase());
+          catalog = catalog.filter((b) =>
+            b.categories?.some((c) => cats.some((cat) => c.toLowerCase().includes(cat)))
+          );
+        }
+
+        if (filters?.state && filters.state !== 'ALL') {
+          const states = filters.state.split(',').map((s) => s.trim().toLowerCase());
+          catalog = catalog.filter((b) =>
+            b.states?.some((st) => states.some((s) => st.toLowerCase().includes(s))) ||
+            states.some((s) => b.registered_office?.toLowerCase().includes(s))
+          );
+        }
+
+        const sortBy = filters?.sort_by || 'NAME_ASC';
+        catalog.sort((a, b) => {
+          if (sortBy === 'NAME_ASC') return a.name.localeCompare(b.name);
+          if (sortBy === 'NAME_DESC') return b.name.localeCompare(a.name);
+          if (sortBy === 'CONTRACTS_DESC') return (b.total_contracts_won || 0) - (a.total_contracts_won || 0);
+          if (sortBy === 'VALUE_DESC') return (b.total_awarded_value_inr || 0) - (a.total_awarded_value_inr || 0);
+          if (sortBy === 'TURNOVER_DESC') return (b.audited_turnover_inr || 0) - (a.audited_turnover_inr || 0);
+          return 0;
+        });
+
+        const totalCount = catalog.length;
+        const offset = filters?.offset || 0;
+        const limit = filters?.limit !== undefined ? filters.limit : 12;
+        const paged = catalog.slice(offset, offset + limit);
+        return { bidders: paged, totalCount };
+      }
+    } catch {
+      // Fallback failed
+    }
+
+    throw new Error('Failed to load registered bidders directory');
+  })();
+
+  inFlightRegisteredBidders.set(cacheKey, fetchPromise);
+  fetchPromise.finally(() => {
+    inFlightRegisteredBidders.delete(cacheKey);
+  });
+
+  return fetchPromise;
+}
+
+export async function fetchBidderFilters(): Promise<BidderFiltersMetadata> {
+  try {
+    const res = await fetch(`${API_BASE}/bidders/filters?_t=${Date.now()}`, {
+      cache: 'no-store',
+      headers: { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' }
     });
     if (res.ok) {
       return await res.json();
     }
   } catch {
-    // Fallback to static bidders list
+    // Fallback
   }
 
-  const fallbackRes = await fetch(`/data/registered_bidders.json?_v=${Date.now()}`, {
-    cache: 'no-cache',
-    headers: { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' }
-  });
-  if (!fallbackRes.ok) throw new Error('Failed to load registered bidders directory');
-  let list: RegisteredBidder[] = await fallbackRes.json();
-
-  if (params?.search) {
-    const q = params.search.toLowerCase();
-    list = list.filter(
-      (b) =>
-        b.name?.toLowerCase().includes(q) ||
-        b.registered_office?.toLowerCase().includes(q) ||
-        b.cin?.toLowerCase().includes(q) ||
-        b.pan?.toLowerCase().includes(q)
-    );
-  }
-  if (params?.state && params.state !== 'ALL') {
-    list = list.filter((b) => b.registered_office?.toLowerCase().includes(params.state!.toLowerCase()));
+  try {
+    const fallbackRes = await fetch(`/data/bidder_filters.json?_v=${Date.now()}`, {
+      cache: 'no-cache',
+      headers: { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' }
+    });
+    if (fallbackRes.ok) {
+      return await fallbackRes.json();
+    }
+  } catch {
+    // Fallback failed
   }
 
-  return list;
+  return {
+    categories: [],
+    states: [],
+    category_counts: {},
+    state_counts: {},
+    total_count: 0
+  };
 }
 
 export interface PoolContractorItem {

@@ -1,7 +1,7 @@
 {
   "active_tenders_count": 112261,
   "accepted_tenders_count": 224400,
-  "registered_bidders_count": 103,
+  "registered_bidders_count": 234,
   "database_engine": "PostgreSQL 16 (pgvector)",
   "vector_ready": true,
   "architecture": "Enterprise PostgreSQL 16 (pgvector) + In-Memory RAM Stream",

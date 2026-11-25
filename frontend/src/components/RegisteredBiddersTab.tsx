@@ -1,8 +1,12 @@
-import React, { useState, useEffect, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Building2, AlertCircle, Tag, MapPin, TrendingUp } from 'lucide-react';
+import { Building2, AlertCircle, Tag, MapPin, TrendingUp, RefreshCw } from 'lucide-react';
 import { RegisteredBidder, BidderWonContract } from '../types';
-import { listRegisteredBidders } from '../services/api';
+import {
+  listRegisteredBidders,
+  fetchBidderFilters,
+  RegisteredBidderFilters
+} from '../services/api';
 import { FilterChipItem } from './common';
 import {
   BidderFilterBar,
@@ -15,8 +19,12 @@ import {
 
 export const RegisteredBiddersTab: React.FC = () => {
   const { t } = useTranslation();
+  const PAGE_SIZE = 12;
+
   const [bidders, setBidders] = useState<RegisteredBidder[]>([]);
+  const [totalDbCount, setTotalDbCount] = useState<number>(234);
   const [loading, setLoading] = useState<boolean>(true);
+  const [isLoadingMore, setIsLoadingMore] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
   const [selectedBidderId, setSelectedBidderId] = useState<string>('');
@@ -27,6 +35,12 @@ export const RegisteredBiddersTab: React.FC = () => {
   const [sortBy, setSortBy] = useState<BidderSortOption>('NAME_ASC');
   const [copiedText, setCopiedText] = useState<string | null>(null);
 
+  // Full filter metadata for the drawer
+  const [allCategories, setAllCategories] = useState<string[]>([]);
+  const [allStates, setAllStates] = useState<string[]>([]);
+  const [categoryCounts, setCategoryCounts] = useState<Map<string, number>>(new Map());
+  const [stateCounts, setStateCounts] = useState<Map<string, number>>(new Map());
+
   const [contractSearchQuery, setContractSearchQuery] = useState<string>('');
   const [rightColumnHeight, setRightColumnHeight] = useState<number | null>(null);
   const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState<boolean>(false);
@@ -34,6 +48,34 @@ export const RegisteredBiddersTab: React.FC = () => {
   const voiceSearchRef = useRef<any>(null);
   const dossierRef = useRef<HTMLDivElement>(null);
   const listContainerRef = useRef<HTMLDivElement>(null);
+  const observerRef = useRef<IntersectionObserver | null>(null);
+
+  const isAll = (arr: string[]) => !arr || arr.length === 0 || arr.includes('ALL');
+
+  // Load complete filter options metadata on mount
+  useEffect(() => {
+    fetchBidderFilters()
+      .then((meta) => {
+        if (meta.categories && meta.categories.length > 0) {
+          setAllCategories(meta.categories);
+        }
+        if (meta.states && meta.states.length > 0) {
+          setAllStates(meta.states);
+        }
+        if (meta.category_counts && Object.keys(meta.category_counts).length > 0) {
+          setCategoryCounts(new Map(Object.entries(meta.category_counts)));
+        }
+        if (meta.state_counts && Object.keys(meta.state_counts).length > 0) {
+          setStateCounts(new Map(Object.entries(meta.state_counts)));
+        }
+        if (meta.total_count && meta.total_count > 0) {
+          setTotalDbCount(meta.total_count);
+        }
+      })
+      .catch((err) => {
+        console.warn('Failed to load bidder filter metadata:', err);
+      });
+  }, []);
 
   const toggleVoiceSearch = () => {
     const SpeechRecognition =
@@ -96,24 +138,115 @@ export const RegisteredBiddersTab: React.FC = () => {
     };
   }, []);
 
-  const loadData = () => {
-    setLoading(true);
-    listRegisteredBidders()
-      .then((data) => {
-        setBidders(data);
-        if (data.length > 0 && !selectedBidderId) {
-          setSelectedBidderId(data[0].id);
-        }
-        setLoading(false);
-      })
-      .catch((err) => {
-        setError(err.message || 'Failed to load registered contractors directory');
-        setLoading(false);
-      });
-  };
+  // Build payload for backend API request
+  const buildApiFilters = useCallback(
+    (customOffset: number = 0, customSearch?: string): RegisteredBidderFilters => {
+      const q = customSearch !== undefined ? customSearch : (searchQuery.trim() || undefined);
+      const filters: RegisteredBidderFilters = {
+        sort_by: sortBy,
+        limit: PAGE_SIZE,
+        offset: customOffset
+      };
 
+      if (q) filters.search = q;
+      if (!isAll(selectedCategory)) filters.category = selectedCategory.join(',');
+      if (!isAll(selectedState)) filters.state = selectedState.join(',');
+
+      return filters;
+    },
+    [searchQuery, sortBy, selectedCategory, selectedState]
+  );
+
+  // Fetch initial batch (page 1, offset 0) from API with payload
+  const loadData = useCallback(
+    (searchParam?: string) => {
+      setLoading(true);
+      const filters = buildApiFilters(0, searchParam);
+      listRegisteredBidders(filters)
+        .then(({ bidders: data, totalCount }) => {
+          setTotalDbCount(totalCount);
+          setBidders(data);
+          if (data.length > 0) {
+            setSelectedBidderId((prevId) => {
+              if (!prevId || !data.some((b) => b.id === prevId)) {
+                return data[0].id;
+              }
+              return prevId;
+            });
+          } else {
+            setSelectedBidderId('');
+          }
+          setLoading(false);
+        })
+        .catch((err) => {
+          setError(err.message || 'Failed to load registered contractors directory');
+          setLoading(false);
+        });
+    },
+    [buildApiFilters]
+  );
+
+  // Reload data from offset 0 whenever any filter or search query changes
   useEffect(() => {
     loadData();
+    if (listContainerRef.current) {
+      listContainerRef.current.scrollTop = 0;
+    }
+  }, [selectedCategory, selectedState, sortBy, searchQuery]);
+
+  // Infinite scroll: fetch next page with offset payload from backend
+  const hasMore = bidders.length < totalDbCount;
+
+  const loadMore = useCallback(() => {
+    if (isLoadingMore || loading || !hasMore) return;
+    setIsLoadingMore(true);
+
+    const filters = buildApiFilters(bidders.length);
+    listRegisteredBidders(filters)
+      .then(({ bidders: nextBatch }) => {
+        if (nextBatch.length > 0) {
+          setBidders((prev) => [...prev, ...nextBatch]);
+        }
+        setIsLoadingMore(false);
+      })
+      .catch((err) => {
+        console.error('Failed to stream next registered contractors batch:', err);
+        setIsLoadingMore(false);
+      });
+  }, [isLoadingMore, loading, hasMore, buildApiFilters, bidders.length]);
+
+  // Observe the 2nd-to-last card to trigger loading the next batch of 12
+  const secondLastCardRef = useCallback(
+    (node: HTMLDivElement | null) => {
+      if (observerRef.current) {
+        observerRef.current.disconnect();
+      }
+      if (!node || !hasMore) return;
+
+      observerRef.current = new IntersectionObserver(
+        (entries) => {
+          if (entries[0]?.isIntersecting) {
+            loadMore();
+          }
+        },
+        {
+          root: listContainerRef.current || null,
+          rootMargin: '100px 0px',
+          threshold: 0.05,
+        }
+      );
+
+      observerRef.current.observe(node);
+    },
+    [hasMore, loadMore]
+  );
+
+  useEffect(() => {
+    return () => {
+      if (observerRef.current) {
+        observerRef.current.disconnect();
+      }
+    };
   }, []);
 
   const handleCopy = (text: string, e: React.MouseEvent) => {
@@ -125,106 +258,10 @@ export const RegisteredBiddersTab: React.FC = () => {
     }, 2500);
   };
 
-  const allCategories = useMemo(() => {
-    const s = new Set<string>();
-    bidders.forEach((b) => b.categories.forEach((c) => s.add(c)));
-    return Array.from(s).sort();
-  }, [bidders]);
-
-  const categoryCounts = useMemo(() => {
-    const map = new Map<string, number>();
-    bidders.forEach((b) => {
-      if (b.categories) {
-        b.categories.forEach((c) => {
-          map.set(c, (map.get(c) || 0) + 1);
-        });
-      }
-    });
-    return map;
-  }, [bidders]);
-
-  const allStates = useMemo(() => {
-    const s = new Set<string>();
-    bidders.forEach((b) => {
-      if (b.states) b.states.forEach((st) => s.add(st));
-    });
-    return Array.from(s).sort();
-  }, [bidders]);
-
-  const stateCounts = useMemo(() => {
-    const map = new Map<string, number>();
-    bidders.forEach((b) => {
-      if (b.states) {
-        b.states.forEach((st) => {
-          map.set(st, (map.get(st) || 0) + 1);
-        });
-      }
-    });
-    return map;
-  }, [bidders]);
-
-  const filteredBidders = useMemo(() => {
-    const q = searchQuery.toLowerCase().trim();
-
-    return bidders
-      .filter((b) => {
-        if (q) {
-          const matchName = b.name.toLowerCase().includes(q);
-          const matchCin = b.cin.toLowerCase().includes(q);
-          const matchGstin = b.gstin.toLowerCase().includes(q);
-          const matchPan = b.pan.toLowerCase().includes(q);
-          const matchOffice = b.registered_office.toLowerCase().includes(q);
-          const matchStates = b.states ? b.states.some((st) => st.toLowerCase().includes(q)) : false;
-          const matchCat = b.categories.some((c) => c.toLowerCase().includes(q));
-          const matchPortals = b.portals ? b.portals.some((p) => p.toLowerCase().includes(q)) : false;
-          if (!matchName && !matchCin && !matchGstin && !matchPan && !matchOffice && !matchStates && !matchCat && !matchPortals) {
-            return false;
-          }
-        }
-
-        const isAll = (arr: string[]) => !arr || arr.length === 0 || arr.includes('ALL');
-
-        if (!isAll(selectedCategory) && !b.categories.some((c) => selectedCategory.includes(c))) {
-          return false;
-        }
-
-        if (!isAll(selectedState) && (!b.states || !b.states.some((st) => selectedState.includes(st)))) {
-          return false;
-        }
-
-        return true;
-      })
-      .sort((a, b) => {
-        if (sortBy === 'NAME_ASC') {
-          return a.name.localeCompare(b.name);
-        } else if (sortBy === 'NAME_DESC') {
-          return b.name.localeCompare(a.name);
-        } else if (sortBy === 'CONTRACTS_DESC') {
-          return b.total_contracts_won - a.total_contracts_won;
-        } else if (sortBy === 'VALUE_DESC') {
-          return b.total_awarded_value_inr - a.total_awarded_value_inr;
-        } else if (sortBy === 'TURNOVER_DESC') {
-          return b.audited_turnover_inr - a.audited_turnover_inr;
-        }
-        return 0;
-      });
-  }, [bidders, searchQuery, selectedCategory, selectedState, sortBy]);
-
-  // Whenever ANY filter is reset or changed, automatically select the first record in the refreshed list
-  const currentFilterKey = `${selectedCategory.slice().sort().join(',')}|${selectedState.slice().sort().join(',')}|${sortBy}|${searchQuery.trim()}`;
-  const [prevFilterKey, setPrevFilterKey] = useState<string>(currentFilterKey);
-
-  if (prevFilterKey !== currentFilterKey) {
-    setPrevFilterKey(currentFilterKey);
-    const firstBidder = filteredBidders[0];
-    const targetId = firstBidder ? firstBidder.id : '';
-    setSelectedBidderId(targetId);
-  }
-
   const selectedBidder = useMemo(() => {
-    if (!filteredBidders.length) return null;
-    return filteredBidders.find((b) => b.id === selectedBidderId) || filteredBidders[0];
-  }, [filteredBidders, selectedBidderId]);
+    if (!bidders.length) return null;
+    return bidders.find((b) => b.id === selectedBidderId) || bidders[0];
+  }, [bidders, selectedBidderId]);
 
   const filteredContracts = useMemo(() => {
     if (!selectedBidder) return [];
@@ -271,37 +308,14 @@ export const RegisteredBiddersTab: React.FC = () => {
     };
   }, [selectedBidderId, contractSearchQuery, filteredContracts?.length]);
 
-  const selectFirstBidderRecord = (bidderList: RegisteredBidder[]) => {
-    const firstBidder = bidderList[0];
-    const targetId = firstBidder ? firstBidder.id : '';
-    setSelectedBidderId(targetId);
-  };
-
-  const resetFilterStateValues = () => {
+  const resetFilters = () => {
     setSearchQuery('');
     setSelectedCategory(['ALL']);
     setSelectedState(['ALL']);
     setSortBy('NAME_ASC');
-  };
-
-  const scrollListContainerToTop = () => {
     if (listContainerRef.current) {
       listContainerRef.current.scrollTop = 0;
     }
-  };
-
-  const handleFilterChangeScrollTop = () => {
-    scrollListContainerToTop();
-  };
-
-  useEffect(() => {
-    handleFilterChangeScrollTop();
-  }, [currentFilterKey]);
-
-  const resetFilters = () => {
-    resetFilterStateValues();
-    selectFirstBidderRecord(bidders);
-    scrollListContainerToTop();
   };
 
   const handleSelectBidderCard = (bidder: RegisteredBidder) => {
@@ -337,8 +351,6 @@ export const RegisteredBiddersTab: React.FC = () => {
   const handleRemoveSearchChip = () => {
     setSearchQuery('');
   };
-
-  const isAll = (arr: string[]) => !arr || arr.length === 0 || arr.includes('ALL');
 
   const activeChips: FilterChipItem[] = useMemo(() => {
     const list: FilterChipItem[] = [];
@@ -423,9 +435,9 @@ export const RegisteredBiddersTab: React.FC = () => {
         activeFiltersCount={activeFiltersCount}
         hasActiveFilters={hasActiveFilters}
         resetFilters={resetFilters}
-        onReload={loadData}
+        onReload={() => loadData()}
         isLoading={loading}
-        totalBidders={bidders.length}
+        totalBidders={totalDbCount}
         chips={activeChips}
       />
 
@@ -436,12 +448,12 @@ export const RegisteredBiddersTab: React.FC = () => {
         activeFiltersCount={activeFiltersCount}
         hasActiveFilters={hasActiveFilters}
         resetAllFilters={resetFilters}
-        totalFilteredCount={filteredBidders.length}
+        totalFilteredCount={totalDbCount}
         selectedCategory={selectedCategory}
         setSelectedCategory={setSelectedCategory}
         allCategories={allCategories}
         categoryCounts={categoryCounts}
-        totalBidders={bidders.length}
+        totalBidders={totalDbCount}
         selectedState={selectedState}
         setSelectedState={setSelectedState}
         allStates={allStates}
@@ -470,7 +482,11 @@ export const RegisteredBiddersTab: React.FC = () => {
           }}
         >
           <div className="text-xs text-slate-500 dark:text-slate-400 font-semibold px-1 flex items-center justify-between">
-            <span>{t('bidders.registeredContractorsCount', { count: filteredBidders.length })}</span>
+            <span>
+              {bidders.length < totalDbCount
+                ? `Showing ${bidders.length} of ${totalDbCount} Registered Contractors`
+                : t('bidders.registeredContractorsCount', { count: totalDbCount })}
+            </span>
           </div>
 
           {loading ? (
@@ -478,7 +494,7 @@ export const RegisteredBiddersTab: React.FC = () => {
               <div className="inline-block animate-spin w-6 h-6 border-2 border-blue-600 border-t-transparent rounded-full mb-2" />
               <p className="text-xs text-slate-500 dark:text-slate-400">{t('bidders.loadingInRam')}</p>
             </div>
-          ) : filteredBidders.length === 0 ? (
+          ) : bidders.length === 0 ? (
             <div className="p-8 text-center bg-white dark:bg-[#0E1422] rounded-xl border border-slate-200/90 dark:border-slate-800">
               <Building2 className="w-8 h-8 text-slate-300 dark:text-slate-600 mx-auto mb-2" />
               <h3 className="text-sm font-bold text-slate-700 dark:text-slate-200">{t('bidders.noContractorsFound')}</h3>
@@ -491,17 +507,49 @@ export const RegisteredBiddersTab: React.FC = () => {
               </button>
             </div>
           ) : (
-            filteredBidders.map((b) => {
-              const isSelected = selectedBidder ? b.id === selectedBidder.id : false;
-              return (
-                <BidderCard
-                  key={b.id}
-                  bidder={b}
-                  isSelected={isSelected}
-                  onSelect={() => handleSelectBidderCard(b)}
-                />
-              );
-            })
+            <>
+              {bidders.map((b, index) => {
+                const isSelected = selectedBidder ? b.id === selectedBidder.id : false;
+                const secondLastIndex = bidders.length >= 2 ? bidders.length - 2 : 0;
+                const isSecondLast = hasMore && index === secondLastIndex;
+
+                return (
+                  <div key={b.id} ref={isSecondLast ? secondLastCardRef : undefined}>
+                    <BidderCard
+                      bidder={b}
+                      isSelected={isSelected}
+                      onSelect={() => handleSelectBidderCard(b)}
+                    />
+                  </div>
+                );
+              })}
+
+              {/* Infinite Scroll / Batch Loading Indicator */}
+              {isLoadingMore && (
+                <div className="py-3 text-center text-xs text-slate-500 dark:text-slate-400 flex items-center justify-center gap-2 bg-slate-50/80 dark:bg-slate-900/60 rounded-xl border border-dashed border-slate-200 dark:border-slate-800">
+                  <RefreshCw className="w-3.5 h-3.5 animate-spin text-blue-600 dark:text-blue-400" />
+                  <span>Loading next 12 contractors...</span>
+                </div>
+              )}
+
+              {/* Load More Button for Direct Click Navigation */}
+              {hasMore && !isLoadingMore && (
+                <div className="pt-1 pb-1 text-center">
+                  <button
+                    onClick={loadMore}
+                    className="w-full py-2 px-3 text-xs font-semibold text-blue-600 dark:text-blue-400 bg-blue-50/70 dark:bg-blue-950/40 hover:bg-blue-100 dark:hover:bg-blue-900/60 border border-blue-200/80 dark:border-blue-800/80 rounded-xl transition-all cursor-pointer flex items-center justify-center gap-1.5"
+                  >
+                    <span>Load more ({totalDbCount - bidders.length} remaining)</span>
+                  </button>
+                </div>
+              )}
+
+              {!hasMore && bidders.length > 0 && (
+                <div className="py-2.5 text-center text-[11px] text-slate-400 dark:text-slate-500 font-medium">
+                  Showing all {totalDbCount} registered contractors
+                </div>
+              )}
+            </>
           )}
         </div>
 

@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Award, Search } from 'lucide-react';
+import { Award, Search, ChevronLeft, ChevronRight } from 'lucide-react';
 import { BidderWonContract } from '../../types';
 import { formatCr, formatINR, formatDate } from '../../utils';
 
@@ -18,6 +18,20 @@ export const BidderContractsTable: React.FC<BidderContractsTableProps> = ({
   filteredContracts
 }) => {
   const { t } = useTranslation();
+  const CONTRACTS_PER_PAGE = 10;
+  const [currentPage, setCurrentPage] = useState<number>(1);
+
+  // Reset to first page when search query or selected contractor changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [contractSearchQuery, totalContractsCount]);
+
+  const totalPages = Math.max(1, Math.ceil(filteredContracts.length / CONTRACTS_PER_PAGE));
+
+  const paginatedContracts = useMemo(() => {
+    const start = (currentPage - 1) * CONTRACTS_PER_PAGE;
+    return filteredContracts.slice(start, start + CONTRACTS_PER_PAGE);
+  }, [filteredContracts, currentPage]);
 
   return (
     <div className="bg-white dark:bg-[#0E1422] rounded-xl border border-slate-200/90 dark:border-slate-800 p-5 shadow-xs space-y-3 transition-colors">
@@ -59,14 +73,14 @@ export const BidderContractsTable: React.FC<BidderContractsTableProps> = ({
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-200 dark:divide-slate-800 bg-white dark:bg-[#0E1422]">
-            {filteredContracts.length === 0 ? (
+            {paginatedContracts.length === 0 ? (
               <tr>
                 <td colSpan={6} className="py-8 text-center text-slate-400 dark:text-slate-500">
                   {t('bidders.table.noProjectsFound')}
                 </td>
               </tr>
             ) : (
-              filteredContracts.map((c) => (
+              paginatedContracts.map((c) => (
                 <tr key={c.tender_id || c.loa_number} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/50 transition-colors">
                   <td className="py-2.5 px-3 max-w-sm">
                     <div className="font-bold text-slate-900 dark:text-white leading-snug line-clamp-2">{c.title}</div>
@@ -107,6 +121,43 @@ export const BidderContractsTable: React.FC<BidderContractsTableProps> = ({
           </tbody>
         </table>
       </div>
+
+      {/* Pagination Controls */}
+      {filteredContracts.length > CONTRACTS_PER_PAGE && (
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-2 pt-2 px-1 text-xs text-slate-500 dark:text-slate-400 border-t border-slate-100 dark:border-slate-800/60">
+          <span className="text-[11px]">
+            Showing <span className="font-semibold text-slate-700 dark:text-slate-200">{(currentPage - 1) * CONTRACTS_PER_PAGE + 1}</span> to{' '}
+            <span className="font-semibold text-slate-700 dark:text-slate-200">
+              {Math.min(currentPage * CONTRACTS_PER_PAGE, filteredContracts.length)}
+            </span>{' '}
+            of <span className="font-semibold text-slate-700 dark:text-slate-200">{filteredContracts.length}</span> contracts
+          </span>
+
+          <div className="flex items-center gap-1.5">
+            <button
+              onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
+              disabled={currentPage === 1}
+              className="px-2.5 py-1 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors flex items-center gap-1 font-medium cursor-pointer text-xs"
+            >
+              <ChevronLeft className="w-3.5 h-3.5" />
+              <span>Previous</span>
+            </button>
+
+            <span className="px-2 text-[11px] font-semibold text-slate-700 dark:text-slate-200">
+              {currentPage} / {totalPages}
+            </span>
+
+            <button
+              onClick={() => setCurrentPage((p) => Math.min(p + 1, totalPages))}
+              disabled={currentPage === totalPages}
+              className="px-2.5 py-1 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors flex items-center gap-1 font-medium cursor-pointer text-xs"
+            >
+              <span>Next</span>
+              <ChevronRight className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

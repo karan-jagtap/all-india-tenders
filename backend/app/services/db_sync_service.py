@@ -26,9 +26,19 @@ async def sync_scraped_data_to_db() -> Dict[str, Any]:
     new_count = sync_result.get("new_tenders_found", 0) if isinstance(sync_result, dict) else 0
     logger.info(f"[DBSync] Ingestion complete. In-memory count: {len(all_tenders)}, new upserted: {new_count}")
 
+    # 2. Run dynamic contractor & award harvesting non-blocking in worker thread
+    aoc_stats = {}
+    try:
+        from app.services.aoc_ingestion_service import dynamic_harvest_all_catalog_awards
+        aoc_stats = await asyncio.to_thread(dynamic_harvest_all_catalog_awards)
+        logger.info(f"[DBSync] Dynamic contractor harvest complete: {aoc_stats}")
+    except Exception as e:
+        logger.warning(f"[DBSync] Dynamic contractor harvest notice: {e}")
+
     return {
         "status": "success",
         "total_in_memory": len(all_tenders),
         "db_upserted": new_count,
-        "sync_details": sync_result
+        "sync_details": sync_result,
+        "contractor_sync": aoc_stats
     }

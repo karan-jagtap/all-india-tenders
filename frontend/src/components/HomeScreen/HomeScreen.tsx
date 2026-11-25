@@ -32,7 +32,7 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({
 }) => {
   const activeTenders = stats?.active_tenders_count || 112261;
   const acceptedTenders = stats?.accepted_tenders_count || 4393;
-  const biddersCount = stats?.registered_bidders_count || 87;
+  const biddersCount = stats?.registered_bidders_count || 234;
   const totalValueCr = stats?.total_active_procurement_value_inr
     ? (stats.total_active_procurement_value_inr / 10000000).toLocaleString('en-IN', { maximumFractionDigits: 1 })
     : '6,730.6';

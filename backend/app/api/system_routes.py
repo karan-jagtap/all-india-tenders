@@ -12,7 +12,7 @@ from app.services.current_tenders_service import (
     run_pure_scraping_sync
 )
 from app.services.accepted_tenders_service import ACCEPTED_TENDERS_CATALOG, get_accepted_tenders_count
-from app.services.bidders_service import ALL_BIDDERS_CATALOG
+from app.services.bidders_service import ALL_BIDDERS_CATALOG, get_registered_bidders_count
 from app.services.db_sync_service import sync_scraped_data_to_db
 from app.services.cron_scheduler_service import (
     run_statutory_sources_sync,
@@ -39,6 +39,7 @@ async def health_check():
         "storage_mode": "Enterprise PostgreSQL 16 (pgvector) + In-Memory RAM Streaming",
         "current_in_progress_count": len(ALL_CURRENT_TENDERS),
         "accepted_tenders_count": get_accepted_tenders_count(),
+        "registered_bidders_count": get_registered_bidders_count(),
         "cron_sync": {
             "schedule": cron_info["schedule"],
             "next_run": cron_info["next_scheduled_run"],
@@ -182,7 +183,7 @@ async def get_overview_stats():
     return {
         "active_tenders_count": active_count,
         "accepted_tenders_count": get_accepted_tenders_count(),
-        "registered_bidders_count": len(ALL_BIDDERS_CATALOG),
+        "registered_bidders_count": get_registered_bidders_count(),
         "database_engine": "PostgreSQL 16 (pgvector)",
         "vector_ready": True,
         "architecture": "Enterprise PostgreSQL 16 (pgvector) + In-Memory RAM Stream",
