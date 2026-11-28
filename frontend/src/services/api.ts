@@ -150,16 +150,16 @@ export async function listAcceptedTenders(
             const aD = a.award_date || `${a.year}-01-01`;
             return aD.localeCompare(bD);
           } else if (filters.sort_by === 'VALUE_DESC') {
-            const bV = b.bid_submission?.quoted_amount_inr || b.og_tender?.estimated_cost_inr || 0;
-            const aV = a.bid_submission?.quoted_amount_inr || a.og_tender?.estimated_cost_inr || 0;
+            const bV = b.bid_submission?.quoted_amount_inr ?? b.og_tender?.estimated_cost_inr ?? 0;
+            const aV = a.bid_submission?.quoted_amount_inr ?? a.og_tender?.estimated_cost_inr ?? 0;
             return bV - aV;
           } else if (filters.sort_by === 'VALUE_ASC') {
-            const bV = b.bid_submission?.quoted_amount_inr || b.og_tender?.estimated_cost_inr || 0;
-            const aV = a.bid_submission?.quoted_amount_inr || a.og_tender?.estimated_cost_inr || 0;
+            const bV = b.bid_submission?.quoted_amount_inr ?? b.og_tender?.estimated_cost_inr ?? 0;
+            const aV = a.bid_submission?.quoted_amount_inr ?? a.og_tender?.estimated_cost_inr ?? 0;
             return aV - bV;
           } else if (filters.sort_by === 'DISCOUNT_DESC') {
-            const bD = b.bid_submission?.quoted_discount_pct || 0;
-            const aD = a.bid_submission?.quoted_discount_pct || 0;
+            const bD = b.bid_submission?.quoted_discount_pct ?? 0;
+            const aD = a.bid_submission?.quoted_discount_pct ?? 0;
             return bD - aD;
           } else if (filters.sort_by === 'CONTRACTOR_ASC') {
             return (a.winning_company?.name || '').localeCompare(b.winning_company?.name || '');
@@ -170,7 +170,7 @@ export async function listAcceptedTenders(
         });
       }
       const totalCount = catalog.length;
-      const offset = filters?.offset || 0;
+      const offset = filters?.offset ?? 0;
       const limit = filters?.limit !== undefined ? filters.limit : 12;
       const paged = catalog.slice(offset, offset + limit);
       return { tenders: paged, totalCount };
@@ -341,12 +341,12 @@ export async function listCurrentTenders(
 
       // Min cost
       if (filters?.min_cost) {
-        catalog = catalog.filter((t) => (t.estimated_cost_inr || 0) >= filters.min_cost!);
+        catalog = catalog.filter((t) => (t.estimated_cost_inr ?? 0) >= filters.min_cost!);
       }
 
       // Max cost
       if (filters?.max_cost) {
-        catalog = catalog.filter((t) => (t.estimated_cost_inr || 0) <= filters.max_cost!);
+        catalog = catalog.filter((t) => (t.estimated_cost_inr ?? 0) <= filters.max_cost!);
       }
 
       // Sorting
@@ -366,15 +366,15 @@ export async function listCurrentTenders(
               return (b.closing_date || '').localeCompare(a.closing_date || '');
             }
             case 'VALUE_DESC':
-              return (b.estimated_cost_inr || 0) - (a.estimated_cost_inr || 0);
+              return (b.estimated_cost_inr ?? 0) - (a.estimated_cost_inr ?? 0);
             case 'VALUE_ASC':
-              return (a.estimated_cost_inr || 0) - (b.estimated_cost_inr || 0);
+              return (a.estimated_cost_inr ?? 0) - (b.estimated_cost_inr ?? 0);
             case 'PUBLISHED_DESC':
               return (b.published_date || '').localeCompare(a.published_date || '');
             case 'PUBLISHED_ASC':
               return (a.published_date || '').localeCompare(b.published_date || '');
             case 'EMD_DESC':
-              return (b.emd_amount_inr || 0) - (a.emd_amount_inr || 0);
+              return (b.emd_amount_inr ?? 0) - (a.emd_amount_inr ?? 0);
             case 'TITLE_ASC':
               return (a.title || '').localeCompare(b.title || '');
             default:
@@ -384,7 +384,7 @@ export async function listCurrentTenders(
       }
 
       const totalCount = catalog.length;
-      const offset = filters?.offset || 0;
+      const offset = filters?.offset ?? 0;
       const limit = filters?.limit !== undefined ? filters.limit : 12;
       const paged = catalog.slice(offset, offset + limit);
       return { tenders: paged, totalCount };
@@ -435,12 +435,12 @@ export async function getPlatformStats(): Promise<PlatformStats> {
   }
 
   return {
-    active_tenders_count: 112261,
-    accepted_tenders_count: 5224,
-    registered_bidders_count: 234,
+    active_tenders_count: 0,
+    accepted_tenders_count: 0,
+    registered_bidders_count: 0,
     database_required: true,
     architecture: 'Enterprise Hybrid (PostgreSQL 16 / SQLite Persistent DB + In-Memory RAM Stream)',
-    total_portals_monitored: 58,
+    total_portals_monitored: 0,
     portals_list: [
       'Central Public Procurement Portal (eprocure.gov.in)',
       'Defense Procurement Portal (defproc.gov.in)',
@@ -798,14 +798,14 @@ export async function listRegisteredBidders(
         catalog.sort((a, b) => {
           if (sortBy === 'NAME_ASC') return a.name.localeCompare(b.name);
           if (sortBy === 'NAME_DESC') return b.name.localeCompare(a.name);
-          if (sortBy === 'CONTRACTS_DESC') return (b.total_contracts_won || 0) - (a.total_contracts_won || 0);
-          if (sortBy === 'VALUE_DESC') return (b.total_awarded_value_inr || 0) - (a.total_awarded_value_inr || 0);
-          if (sortBy === 'TURNOVER_DESC') return (b.audited_turnover_inr || 0) - (a.audited_turnover_inr || 0);
+          if (sortBy === 'CONTRACTS_DESC') return (b.total_contracts_won ?? 0) - (a.total_contracts_won ?? 0);
+          if (sortBy === 'VALUE_DESC') return (b.total_awarded_value_inr ?? 0) - (a.total_awarded_value_inr ?? 0);
+          if (sortBy === 'TURNOVER_DESC') return (b.audited_turnover_inr ?? 0) - (a.audited_turnover_inr ?? 0);
           return 0;
         });
 
         const totalCount = catalog.length;
-        const offset = filters?.offset || 0;
+        const offset = filters?.offset ?? 0;
         const limit = filters?.limit !== undefined ? filters.limit : 12;
         const paged = catalog.slice(offset, offset + limit);
         return { bidders: paged, totalCount };

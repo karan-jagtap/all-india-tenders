@@ -187,7 +187,7 @@ export const TenderDocsSubTab: React.FC<TenderDocsSubTabProps> = ({
           <p className="text-[11px] text-slate-500 dark:text-slate-400 line-clamp-2">
             {t(
               'currentTenders.docs.boqDesc', 
-              { amount: formatINR(selectedTender.estimated_cost_inr || 0) }
+              { amount: formatINR(selectedTender.estimated_cost_inr ?? 0) }
             )}
           </p>
           <div className="mt-2.5 pt-2 border-t border-slate-200/60 dark:border-slate-700/60 flex items-center justify-between text-[10px]">

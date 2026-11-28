@@ -18,7 +18,7 @@ export const PQCSubTab: React.FC<PQCSubTabProps> = ({ selectedTender }) => {
   const { t } = useTranslation();
   const [showFullClauses, setShowFullClauses] = useState(false);
 
-  const estCost = selectedTender.estimated_cost_inr || 0;
+  const estCost = selectedTender.estimated_cost_inr ?? 0;
 
   // Extract primary amounts using regex or calculated fallbacks
   const extractAmount = (text?: string, fallbackMultiplier?: number): string => {

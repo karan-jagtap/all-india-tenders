@@ -53,14 +53,14 @@ export const AllBidsEvaluationSubTab: React.FC<AllBidsEvaluationSubTabProps> = (
 
   // Compute all evaluated competitor bids deterministically
   const evaluatedBids: EvaluatedBidder[] = useMemo(() => {
-    const estimatedCost = tender.og_tender?.estimated_cost_inr || 150000000;
-    const l1WinnerName = tender.winning_company?.name || 'L1 Winning Bidder';
+    const estimatedCost = tender.og_tender?.estimated_cost_inr ?? tender.bid_submission?.quoted_amount_inr ?? 0;
+    const l1WinnerName = tender.winning_company?.name ?? 'L1 Winning Bidder';
     const l1Quote =
-      tender.bid_submission?.quoted_amount_inr ||
-      Math.round(estimatedCost * 0.9632);
+      tender.bid_submission?.quoted_amount_inr ??
+      (estimatedCost > 0 ? Math.round(estimatedCost * 0.9632) : 0);
     const l1DiscountPct =
-      tender.bid_submission?.quoted_discount_pct ||
-      Number((((estimatedCost - l1Quote) / estimatedCost) * 100).toFixed(2));
+      tender.bid_submission?.quoted_discount_pct ??
+      (estimatedCost > 0 ? Number((((estimatedCost - l1Quote) / estimatedCost) * 100).toFixed(2)) : 0);
 
     const seed = hashString(tender.id + (tender.og_tender?.nit_number || 'eval-seed'));
 
@@ -128,7 +128,7 @@ export const AllBidsEvaluationSubTab: React.FC<AllBidsEvaluationSubTabProps> = (
         contractorClass: tender.winning_company?.business_type || 'Super Class-I Registered Contractor',
         quotedAmountInr: l1Quote,
         quotedDiscountPct: l1DiscountPct,
-        varianceVsEstimatePct: Number((((l1Quote - estimatedCost) / estimatedCost) * 100).toFixed(2)),
+        varianceVsEstimatePct: estimatedCost > 0 ? Number((((l1Quote - estimatedCost) / estimatedCost) * 100).toFixed(2)) : 0,
         marginOverL1Inr: 0,
         marginOverL1Pct: 0,
         techScore: 97.5,
@@ -144,7 +144,7 @@ export const AllBidsEvaluationSubTab: React.FC<AllBidsEvaluationSubTabProps> = (
         equipmentDeclared: 'Dedicated automated batching plants, sensor pavers, hydraulic piling rigs & transit mixers pledged within site jurisdiction.',
         turnoverCited: tender.winning_company?.audited_turnover_inr
           ? formatCr(tender.winning_company.audited_turnover_inr)
-          : '₹ 3,820 Cr (Avg 3 FYs)'
+          : '—'
       },
 
       // 2. L2 Runner-Up
@@ -155,8 +155,8 @@ export const AllBidsEvaluationSubTab: React.FC<AllBidsEvaluationSubTabProps> = (
         hq: c2.hq,
         contractorClass: c2.cls,
         quotedAmountInr: quoteL2,
-        quotedDiscountPct: Number((((estimatedCost - quoteL2) / estimatedCost) * 100).toFixed(2)),
-        varianceVsEstimatePct: Number((((quoteL2 - estimatedCost) / estimatedCost) * 100).toFixed(2)),
+        quotedDiscountPct: estimatedCost > 0 ? Number((((estimatedCost - quoteL2) / estimatedCost) * 100).toFixed(2)) : 0,
+        varianceVsEstimatePct: estimatedCost > 0 ? Number((((quoteL2 - estimatedCost) / estimatedCost) * 100).toFixed(2)) : 0,
         marginOverL1Inr: quoteL2 - l1Quote,
         marginOverL1Pct: deltaL2Pct,
         techScore: 94.0,
@@ -179,8 +179,8 @@ export const AllBidsEvaluationSubTab: React.FC<AllBidsEvaluationSubTabProps> = (
         hq: c3.hq,
         contractorClass: c3.cls,
         quotedAmountInr: quoteL3,
-        quotedDiscountPct: Number((((estimatedCost - quoteL3) / estimatedCost) * 100).toFixed(2)),
-        varianceVsEstimatePct: Number((((quoteL3 - estimatedCost) / estimatedCost) * 100).toFixed(2)),
+        quotedDiscountPct: estimatedCost > 0 ? Number((((estimatedCost - quoteL3) / estimatedCost) * 100).toFixed(2)) : 0,
+        varianceVsEstimatePct: estimatedCost > 0 ? Number((((quoteL3 - estimatedCost) / estimatedCost) * 100).toFixed(2)) : 0,
         marginOverL1Inr: quoteL3 - l1Quote,
         marginOverL1Pct: deltaL3Pct,
         techScore: 91.5,
@@ -203,8 +203,8 @@ export const AllBidsEvaluationSubTab: React.FC<AllBidsEvaluationSubTabProps> = (
         hq: c4.hq,
         contractorClass: c4.cls,
         quotedAmountInr: quoteL4,
-        quotedDiscountPct: Number((((estimatedCost - quoteL4) / estimatedCost) * 100).toFixed(2)),
-        varianceVsEstimatePct: Number((((quoteL4 - estimatedCost) / estimatedCost) * 100).toFixed(2)),
+        quotedDiscountPct: estimatedCost > 0 ? Number((((estimatedCost - quoteL4) / estimatedCost) * 100).toFixed(2)) : 0,
+        varianceVsEstimatePct: estimatedCost > 0 ? Number((((quoteL4 - estimatedCost) / estimatedCost) * 100).toFixed(2)) : 0,
         marginOverL1Inr: quoteL4 - l1Quote,
         marginOverL1Pct: deltaL4Pct,
         techScore: 88.0,
@@ -227,8 +227,8 @@ export const AllBidsEvaluationSubTab: React.FC<AllBidsEvaluationSubTabProps> = (
         hq: c5.hq,
         contractorClass: c5.cls,
         quotedAmountInr: isL5Disqualified ? 0 : quoteL5,
-        quotedDiscountPct: isL5Disqualified ? 0 : Number((((estimatedCost - quoteL5) / estimatedCost) * 100).toFixed(2)),
-        varianceVsEstimatePct: isL5Disqualified ? 0 : Number((((quoteL5 - estimatedCost) / estimatedCost) * 100).toFixed(2)),
+        quotedDiscountPct: isL5Disqualified ? 0 : (estimatedCost > 0 ? Number((((estimatedCost - quoteL5) / estimatedCost) * 100).toFixed(2)) : 0),
+        varianceVsEstimatePct: isL5Disqualified ? 0 : (estimatedCost > 0 ? Number((((quoteL5 - estimatedCost) / estimatedCost) * 100).toFixed(2)) : 0),
         marginOverL1Inr: isL5Disqualified ? 0 : quoteL5 - l1Quote,
         marginOverL1Pct: isL5Disqualified ? 0 : deltaL5Pct,
         techScore: isL5Disqualified ? 64.0 : 85.0,
@@ -249,7 +249,7 @@ export const AllBidsEvaluationSubTab: React.FC<AllBidsEvaluationSubTabProps> = (
     return list;
   }, [tender, poolsTick, t]);
 
-  const estimatedCost = tender.og_tender?.estimated_cost_inr || 150000000;
+  const estimatedCost = tender.og_tender?.estimated_cost_inr ?? tender.bid_submission?.quoted_amount_inr ?? 0;
   const l1Bid = evaluatedBids[0];
   const l2Bid = evaluatedBids[1];
 

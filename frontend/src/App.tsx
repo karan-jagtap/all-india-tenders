@@ -397,8 +397,8 @@ export const App: React.FC = () => {
           localStorage.setItem('ait_cooldown_expiry_epoch', String(Date.now() + report.cooldown_remaining_seconds * 1000));
         }
       } else {
-        const portalCount = report.portals_scraped?.length || 28;
-        const count = report.total_in_progress_tenders || 2718;
+        const portalCount = report.portals_scraped?.length ?? 0;
+        const count = report.total_in_progress_tenders ?? 0;
         const duration = report.execution_time_ms ? `${Math.round(report.execution_time_ms)}ms` : '2.3s';
         const quotaRemaining = report.user_quota?.syncs_remaining ?? (userQuota ? Math.max(0, userQuota.syncs_remaining - 1) : 1);
         setSyncNotice(`Synced ${count} live notices across ${portalCount} portals in ${duration} • ${quotaRemaining} of 2 daily syncs remaining`);
@@ -443,7 +443,7 @@ export const App: React.FC = () => {
       iconColor: 'text-orange-500',
       activeClasses: 'bg-orange-600 text-white shadow-sm',
       mobileActiveBg: 'bg-gradient-to-r from-orange-950/80 to-slate-800 border-orange-500/50',
-      badge: stats?.active_tenders_count || 112261,
+      badge: stats?.active_tenders_count,
       badgeColor: 'bg-orange-700 text-white'
     },
     {
@@ -454,7 +454,7 @@ export const App: React.FC = () => {
       iconColor: 'text-emerald-500',
       activeClasses: 'bg-emerald-600 text-white shadow-sm',
       mobileActiveBg: 'bg-gradient-to-r from-emerald-950/80 to-slate-800 border-emerald-500/50',
-      badge: stats?.accepted_tenders_count || 4393,
+      badge: stats?.accepted_tenders_count,
       badgeColor: 'bg-emerald-700 text-white'
     },
     {
@@ -465,7 +465,7 @@ export const App: React.FC = () => {
       iconColor: 'text-blue-500',
       activeClasses: 'bg-blue-600 text-white shadow-sm',
       mobileActiveBg: 'bg-gradient-to-r from-blue-950/80 to-slate-800 border-blue-500/50',
-      badge: stats?.registered_bidders_count || 234,
+      badge: stats?.registered_bidders_count,
       badgeColor: 'bg-blue-700 text-white'
     }
   ];

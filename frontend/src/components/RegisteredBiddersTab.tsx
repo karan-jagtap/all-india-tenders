@@ -22,7 +22,7 @@ export const RegisteredBiddersTab: React.FC = () => {
   const PAGE_SIZE = 12;
 
   const [bidders, setBidders] = useState<RegisteredBidder[]>([]);
-  const [totalDbCount, setTotalDbCount] = useState<number>(234);
+  const [totalDbCount, setTotalDbCount] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(true);
   const [isLoadingMore, setIsLoadingMore] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);

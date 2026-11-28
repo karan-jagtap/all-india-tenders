@@ -75,7 +75,7 @@ function enrichTenderList(rawList: CurrentTender[]): EnrichedCurrentTender[] {
 export const CurrentTendersTab: React.FC = () => {
   const { t } = useTranslation();
   const [tenders, setTenders] = useState<EnrichedCurrentTender[]>([]);
-  const [totalDbCount, setTotalDbCount] = useState<number>(112261);
+  const [totalDbCount, setTotalDbCount] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -349,7 +349,7 @@ export const CurrentTendersTab: React.FC = () => {
         return false;
       }
       if (excludeDimension !== 'value' && selectedValueRange !== 'ALL') {
-        const cost = t.estimated_cost_inr || 0;
+        const cost = t.estimated_cost_inr ?? 0;
         if (selectedValueRange === 'UNDER_10CR') {
           if (!(cost > 0 && cost < 100000000)) return false;
         } else if (selectedValueRange === '10CR_50CR') {
@@ -370,7 +370,7 @@ export const CurrentTendersTab: React.FC = () => {
   const sourceCounts = useMemo(() => {
     const map = new Map<string, number>();
     for (const t of contextForSource) {
-      map.set(t.source_portal, (map.get(t.source_portal) || 0) + 1);
+      map.set(t.source_portal, (map.get(t.source_portal) ?? 0) + 1);
     }
     return map;
   }, [contextForSource]);
@@ -390,7 +390,7 @@ export const CurrentTendersTab: React.FC = () => {
   const orgCounts = useMemo(() => {
     const map = new Map<string, number>();
     for (const t of contextForOrg) {
-      map.set(t.organization, (map.get(t.organization) || 0) + 1);
+      map.set(t.organization, (map.get(t.organization) ?? 0) + 1);
     }
     return map;
   }, [contextForOrg]);
@@ -410,7 +410,7 @@ export const CurrentTendersTab: React.FC = () => {
   const stateCounts = useMemo(() => {
     const map = new Map<string, number>();
     for (const t of contextForState) {
-      if (t.state) map.set(t.state, (map.get(t.state) || 0) + 1);
+      if (t.state) map.set(t.state, (map.get(t.state) ?? 0) + 1);
     }
     return map;
   }, [contextForState]);
@@ -430,7 +430,7 @@ export const CurrentTendersTab: React.FC = () => {
   const cityCounts = useMemo(() => {
     const map = new Map<string, number>();
     for (const t of contextForCity) {
-      if (t.city) map.set(t.city, (map.get(t.city) || 0) + 1);
+      if (t.city) map.set(t.city, (map.get(t.city) ?? 0) + 1);
     }
     return map;
   }, [contextForCity]);
@@ -450,7 +450,7 @@ export const CurrentTendersTab: React.FC = () => {
   const categoryCounts = useMemo(() => {
     const map = new Map<string, number>();
     for (const t of contextForCategory) {
-      if (t.category) map.set(t.category, (map.get(t.category) || 0) + 1);
+      if (t.category) map.set(t.category, (map.get(t.category) ?? 0) + 1);
     }
     return map;
   }, [contextForCategory]);

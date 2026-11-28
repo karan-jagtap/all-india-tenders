@@ -105,21 +105,25 @@ export const BidderDossier: React.FC<BidderDossierProps> = ({
         <div className="bg-blue-50/60 dark:bg-blue-950/30 p-3 rounded-xl border border-blue-200 dark:border-blue-900/50">
           <span className="text-[10px] text-blue-700 dark:text-blue-400 uppercase font-semibold block">{t('bidders.card.creditRating')}</span>
           <strong className="text-xs font-bold text-blue-950 dark:text-blue-200 block mt-0.5 break-words" title={selectedBidder.credit_rating}>
-            {selectedBidder.credit_rating?.split('(')[0]?.trim() || 'CRISIL AAA'}
+            {selectedBidder.credit_rating ? selectedBidder.credit_rating.split('(')[0]?.trim() : '—'}
           </strong>
-          <span className="text-[9px] text-blue-700 dark:text-blue-400 block break-words mt-0.5">
-            {t('bidders.agency', { agency: selectedBidder.credit_rating_agency || 'CRISIL / ICRA' })}
-          </span>
+          {selectedBidder.credit_rating_agency && (
+            <span className="text-[9px] text-blue-700 dark:text-blue-400 block break-words mt-0.5">
+              {t('bidders.agency', { agency: selectedBidder.credit_rating_agency })}
+            </span>
+          )}
         </div>
 
         <div className="bg-emerald-50/60 dark:bg-emerald-950/30 p-3 rounded-xl border border-emerald-200 dark:border-emerald-900/50">
           <span className="text-[10px] text-emerald-700 dark:text-emerald-400 uppercase font-semibold block">{t('bidders.historicalWinRate')}</span>
           <strong className="text-sm font-bold text-emerald-900 dark:text-emerald-200 block mt-0.5 font-mono">
-            {selectedBidder.win_rate_pct || 68.4}%
+            {selectedBidder.win_rate_pct !== undefined ? `${selectedBidder.win_rate_pct}%` : '—'}
           </strong>
-          <span className="text-[9px] text-emerald-700 dark:text-emerald-400 block mt-0.5 font-mono">
-            {t('bidders.avgDiscount', { pct: selectedBidder.avg_discount_pct || -6.8 })}
-          </span>
+          {selectedBidder.avg_discount_pct !== undefined && (
+            <span className="text-[9px] text-emerald-700 dark:text-emerald-400 block mt-0.5 font-mono">
+              {t('bidders.avgDiscount', { pct: selectedBidder.avg_discount_pct })}
+            </span>
+          )}
         </div>
 
         <div className="bg-amber-50/60 dark:bg-amber-950/30 p-3 rounded-xl border border-amber-200 dark:border-amber-900/50">
@@ -127,19 +131,23 @@ export const BidderDossier: React.FC<BidderDossierProps> = ({
           <strong className="text-xs font-bold text-amber-950 dark:text-amber-200 block mt-0.5 font-mono">
             {formatCr(selectedBidder.unexecuted_order_book_inr)}
           </strong>
-          <span className="text-[9px] text-amber-800 dark:text-amber-400 block break-words mt-0.5">
-            {t('bidders.fleetAsset', { value: formatCr(selectedBidder.equipment_fleet_val_inr) })}
-          </span>
+          {selectedBidder.equipment_fleet_val_inr !== undefined && (
+            <span className="text-[9px] text-amber-800 dark:text-amber-400 block break-words mt-0.5">
+              {t('bidders.fleetAsset', { value: formatCr(selectedBidder.equipment_fleet_val_inr) })}
+            </span>
+          )}
         </div>
 
         <div className="bg-purple-50/60 dark:bg-purple-950/30 p-3 rounded-xl border border-purple-200 dark:border-purple-900/50">
           <span className="text-[10px] text-purple-700 dark:text-purple-400 uppercase font-semibold block">{t('bidders.pqcStandingTier')}</span>
           <strong className="text-xs font-bold text-purple-950 dark:text-purple-200 block mt-0.5 break-words" title={selectedBidder.pqc_clearance_rating}>
-            {selectedBidder.pqc_clearance_rating || 'Super Class-I National'}
+            {selectedBidder.pqc_clearance_rating ?? '—'}
           </strong>
-          <span className="text-[9px] text-purple-700 dark:text-purple-400 block mt-0.5 font-mono">
-            {t('bidders.solvencyRatio', { ratio: selectedBidder.solvency_ratio || 1.45 })}
-          </span>
+          {selectedBidder.solvency_ratio !== undefined && (
+            <span className="text-[9px] text-purple-700 dark:text-purple-400 block mt-0.5 font-mono">
+              {t('bidders.solvencyRatio', { ratio: selectedBidder.solvency_ratio })}
+            </span>
+          )}
         </div>
       </div>
 

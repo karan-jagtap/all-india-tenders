@@ -36,7 +36,7 @@ def build_bidders_catalog() -> List[Dict[str, Any]]:
                 "msme_status": wc.get("msme_status", "Registered Contractor"),
                 "local_content_pct": wc.get("local_content_pct", 95.0),
                 "local_content_class": wc.get("local_content_class", "Class-I Local Supplier (Make in India)"),
-                "audited_turnover_inr": wc.get("audited_turnover_inr", 1500000000.0),
+                "audited_turnover_inr": wc.get("audited_turnover_inr", 0.0),
                 "ca_udin": wc.get("ca_udin", "24081924UDIN9912"),
                 "solvency_certificate_inr": wc.get("solvency_certificate_inr", 50000000.0),
                 "solvency_bank": wc.get("solvency_bank", "Scheduled Commercial Bank"),
@@ -101,7 +101,7 @@ def build_bidders_catalog() -> List[Dict[str, Any]]:
         b["contracts_won"] = sorted(b["contracts_won"], key=lambda x: str(x.get("award_date", "")), reverse=True)
 
         val = b["total_awarded_value_inr"]
-        turnover = b.get("audited_turnover_inr", 1500000000.0)
+        turnover = b.get("audited_turnover_inr", 0.0)
         seed = int(hashlib.md5(b["slug"].encode()).hexdigest()[:8], 16) % 100
 
         # Credit Rating & Financial Standing
@@ -181,7 +181,7 @@ def load_contractors_from_db() -> List[Dict[str, Any]]:
                     states.add(st)
 
             val = float(r["total_awarded_value_inr"] or 0.0)
-            turnover = float(r["audited_turnover_inr"] or 1500000000.0)
+            turnover = float(r["audited_turnover_inr"] or 0.0)
             seed = int(hashlib.md5(str(cid).encode()).hexdigest()[:8], 16) % 100
 
             if turnover > 300000000000 or val > 300000000000:
@@ -260,39 +260,6 @@ def get_bidder_filters() -> Dict[str, Any]:
         "total_count": len(ALL_BIDDERS_CATALOG)
     }
 
-def export_bidders_to_json(catalog: Optional[List[Dict[str, Any]]] = None) -> bool:
-    """Exports the live PostgreSQL bidders catalog to frontend/public/data/registered_bidders.json for offline/static resilience."""
-    import os
-    import json
-    data = catalog or ALL_BIDDERS_CATALOG
-    if not data:
-        return False
-    paths = [
-        os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..", "frontend", "public", "data", "registered_bidders.json")),
-        os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..", "frontend", "dist", "data", "registered_bidders.json"))
-    ]
-    for p in paths:
-        try:
-            os.makedirs(os.path.dirname(p), exist_ok=True)
-            with open(p, "w", encoding="utf-8") as f:
-                json.dump(data, f, ensure_ascii=False, indent=2)
-        except Exception:
-            pass
-
-    filter_paths = [
-        os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..", "frontend", "public", "data", "bidder_filters.json")),
-        os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", "..", "frontend", "dist", "data", "bidder_filters.json"))
-    ]
-    filters_data = get_bidder_filters()
-    for fp in filter_paths:
-        try:
-            os.makedirs(os.path.dirname(fp), exist_ok=True)
-            with open(fp, "w", encoding="utf-8") as f:
-                json.dump(filters_data, f, ensure_ascii=False, indent=2)
-        except Exception:
-            pass
-    return True
-
 def get_registered_bidders_count() -> int:
     """Returns the true live count of registered contractors directly from PostgreSQL."""
     try:
@@ -314,7 +281,6 @@ def refresh_bidders_catalog() -> List[Dict[str, Any]]:
         ALL_BIDDERS_CATALOG = loaded
     elif not ALL_BIDDERS_CATALOG:
         ALL_BIDDERS_CATALOG = build_bidders_catalog()
-    export_bidders_to_json(ALL_BIDDERS_CATALOG)
     return ALL_BIDDERS_CATALOG
 
 # Initial load on service startup

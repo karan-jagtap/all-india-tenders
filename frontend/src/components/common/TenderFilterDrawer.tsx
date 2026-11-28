@@ -118,7 +118,7 @@ export const TenderFilterDrawer: React.FC<TenderFilterDrawerProps> = ({
     return availableCategories.map((cat) => ({
       value: cat,
       label: cat,
-      count: categoryCounts.get(cat) || 0,
+      count: categoryCounts.get(cat) ?? 0,
       countSuffix: 'notices'
     }));
   }, [availableCategories, categoryCounts]);
@@ -127,7 +127,7 @@ export const TenderFilterDrawer: React.FC<TenderFilterDrawerProps> = ({
     return availableSources.map((src) => ({
       value: src,
       label: src,
-      count: sourceCounts.get(src) || 0,
+      count: sourceCounts.get(src) ?? 0,
       countSuffix: 'notices'
     }));
   }, [availableSources, sourceCounts]);
@@ -136,7 +136,7 @@ export const TenderFilterDrawer: React.FC<TenderFilterDrawerProps> = ({
     return availableOrgs.map((org) => ({
       value: org,
       label: org,
-      count: orgCounts.get(org) || 0,
+      count: orgCounts.get(org) ?? 0,
       countSuffix: 'notices'
     }));
   }, [availableOrgs, orgCounts]);
@@ -145,7 +145,7 @@ export const TenderFilterDrawer: React.FC<TenderFilterDrawerProps> = ({
     return availableStates.map((st) => ({
       value: st,
       label: st,
-      count: stateCounts.get(st) || 0,
+      count: stateCounts.get(st) ?? 0,
       countSuffix: 'notices'
     }));
   }, [availableStates, stateCounts]);
@@ -154,7 +154,7 @@ export const TenderFilterDrawer: React.FC<TenderFilterDrawerProps> = ({
     return availableCities.map((ct) => ({
       value: ct,
       label: ct,
-      count: cityCounts.get(ct) || 0,
+      count: cityCounts.get(ct) ?? 0,
       countSuffix: 'notices'
     }));
   }, [availableCities, cityCounts]);

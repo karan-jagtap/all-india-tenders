@@ -520,7 +520,7 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
     const map = new Map<string, number>();
     for (const t of contextForCategory) {
       if (t._category) {
-        map.set(t._category, (map.get(t._category) || 0) + 1);
+        map.set(t._category, (map.get(t._category) ?? 0) + 1);
       }
     }
     return map;
@@ -545,7 +545,7 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
   const sourceCounts = useMemo(() => {
     const map = new Map<string, number>();
     for (const t of contextForSource) {
-      map.set(t._source, (map.get(t._source) || 0) + 1);
+      map.set(t._source, (map.get(t._source) ?? 0) + 1);
     }
     return map;
   }, [contextForSource]);
@@ -569,7 +569,7 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
   const orgCounts = useMemo(() => {
     const map = new Map<string, number>();
     for (const t of contextForOrg) {
-      map.set(t._org, (map.get(t._org) || 0) + 1);
+      map.set(t._org, (map.get(t._org) ?? 0) + 1);
     }
     return map;
   }, [contextForOrg]);
@@ -594,7 +594,7 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
     const map = new Map<string, number>();
     for (const t of contextForState) {
       if (t._state) {
-        map.set(t._state, (map.get(t._state) || 0) + 1);
+        map.set(t._state, (map.get(t._state) ?? 0) + 1);
       }
     }
     return map;
@@ -620,7 +620,7 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
     const map = new Map<string, number>();
     for (const t of contextForCity) {
       if (t._city) {
-        map.set(t._city, (map.get(t._city) || 0) + 1);
+        map.set(t._city, (map.get(t._city) ?? 0) + 1);
       }
     }
     return map;
@@ -646,7 +646,7 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
     const map = new Map<string, number>();
     for (const t of contextForYear) {
       const yr = String(t.year);
-      map.set(yr, (map.get(yr) || 0) + 1);
+      map.set(yr, (map.get(yr) ?? 0) + 1);
     }
     return map;
   }, [contextForYear]);
@@ -1187,7 +1187,7 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
                 </option>
                 {availableYears.map((yr) => (
                   <option key={yr} value={yr} className="bg-slate-900 text-white">
-                    {t('acceptedTenders.financialYearFormat', { year: yr, count: yearCounts.get(yr) || 0 })}
+                    {t('acceptedTenders.financialYearFormat', { year: yr, count: yearCounts.get(yr) ?? 0 })}
                   </option>
                 ))}
               </select>
@@ -1639,7 +1639,7 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
                         <tr>
                           <td className="py-2.5 px-3 font-semibold text-slate-900 dark:text-slate-100">{t('acceptedTenders.dossier.emd')}</td>
                           <td className="py-2.5 px-3 font-mono text-slate-700 dark:text-slate-300">
-                            ₹ {(selectedTender.og_tender?.emd_amount_inr || 0).toLocaleString('en-IN')}
+                            ₹ {(selectedTender.og_tender?.emd_amount_inr ?? 0).toLocaleString('en-IN')}
                           </td>
                           <td className="py-2.5 px-3">
                             <span className="font-semibold text-slate-900 dark:text-slate-100">{selectedTender.bid_submission?.emd_mode}:</span>
@@ -1889,7 +1889,7 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
                       <div className="bg-white dark:bg-[#141C2E] p-3 rounded-lg border border-amber-200/80 dark:border-amber-900/40 shadow-2xs">
                         <span className="text-[10px] text-amber-700 dark:text-amber-400 font-bold uppercase block">{t('acceptedTenders.dossier.conditionA')}</span>
                         <div className="font-mono font-bold text-slate-900 dark:text-slate-100 text-xs mt-0.5">
-                          ≥ {formatINR((selectedTender.og_tender?.estimated_cost_inr || 0) * 0.4)}
+                          ≥ {formatINR((selectedTender.og_tender?.estimated_cost_inr ?? 0) * 0.4)}
                         </div>
                         <span className="text-[10px] text-slate-500 dark:text-slate-400 block mt-1">{t('acceptedTenders.dossier.conditionADesc')}</span>
                         <span className="inline-block mt-2 px-2 py-0.5 bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 text-[9px] font-bold rounded">
@@ -1900,7 +1900,7 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
                       <div className="bg-white dark:bg-[#141C2E] p-3 rounded-lg border border-amber-200/80 dark:border-amber-900/40 shadow-2xs">
                         <span className="text-[10px] text-amber-700 dark:text-amber-400 font-bold uppercase block">{t('acceptedTenders.dossier.conditionB')}</span>
                         <div className="font-mono font-bold text-slate-900 dark:text-slate-100 text-xs mt-0.5">
-                          ≥ {formatINR((selectedTender.og_tender?.estimated_cost_inr || 0) * 0.5)}
+                          ≥ {formatINR((selectedTender.og_tender?.estimated_cost_inr ?? 0) * 0.5)}
                         </div>
                         <span className="text-[10px] text-slate-500 dark:text-slate-400 block mt-1">{t('acceptedTenders.dossier.conditionBDesc')}</span>
                         <span className="inline-block mt-2 px-2 py-0.5 bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 text-[9px] font-bold rounded">
@@ -1911,7 +1911,7 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
                       <div className="bg-white dark:bg-[#141C2E] p-3 rounded-lg border border-amber-200/80 dark:border-amber-900/40 shadow-2xs">
                         <span className="text-[10px] text-amber-700 dark:text-amber-400 font-bold uppercase block">{t('acceptedTenders.dossier.conditionC')}</span>
                         <div className="font-mono font-bold text-slate-900 dark:text-slate-100 text-xs mt-0.5">
-                          ≥ {formatINR((selectedTender.og_tender?.estimated_cost_inr || 0) * 0.8)}
+                          ≥ {formatINR((selectedTender.og_tender?.estimated_cost_inr ?? 0) * 0.8)}
                         </div>
                         <span className="text-[10px] text-slate-500 dark:text-slate-400 block mt-1">{t('acceptedTenders.dossier.conditionCDesc')}</span>
                         <span className="inline-block mt-2 px-2 py-0.5 bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 text-[9px] font-bold rounded">
@@ -2017,7 +2017,7 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
                     <div className="bg-blue-50 dark:bg-blue-950/30 p-3 rounded-lg border border-blue-200 dark:border-blue-800/50">
                       <span className="text-[10px] uppercase font-semibold text-blue-700 dark:text-blue-300">{t('acceptedTenders.dossier.netSavings')}</span>
                       <div className="font-mono font-bold text-blue-900 dark:text-blue-200 text-sm mt-0.5">
-                        {formatINR((selectedTender.og_tender?.estimated_cost_inr || 0) - (selectedTender.bid_submission?.quoted_amount_inr || 0))}
+                        {formatINR((selectedTender.og_tender?.estimated_cost_inr ?? 0) - (selectedTender.bid_submission?.quoted_amount_inr ?? 0))}
                       </div>
                       <span className="text-[10px] text-blue-600 dark:text-blue-400">{t('acceptedTenders.dossier.savedToTreasury')}</span>
                     </div>
@@ -2087,7 +2087,7 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
                           <span>Afcons Infrastructure / Larsen & Toubro Consortium</span>
                         </div>
                         <div className="text-right font-mono">
-                          <span>{formatINR((selectedTender.bid_submission?.quoted_amount_inr || 0) * 1.026)}</span>
+                          <span>{formatINR((selectedTender.bid_submission?.quoted_amount_inr ?? 0) * 1.026)}</span>
                           <span className="text-[10px] text-slate-500 dark:text-slate-400 ml-1.5">{t('acceptedTenders.dossier.overL1', { pct: 2.6 })}</span>
                         </div>
                       </div>
@@ -2098,7 +2098,7 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
                           <span>NCC Limited / Dilip Buildcon JV</span>
                         </div>
                         <div className="text-right font-mono">
-                          <span>{formatINR((selectedTender.bid_submission?.quoted_amount_inr || 0) * 1.054)}</span>
+                          <span>{formatINR((selectedTender.bid_submission?.quoted_amount_inr ?? 0) * 1.054)}</span>
                           <span className="text-[10px] text-slate-500 dark:text-slate-400 ml-1.5">{t('acceptedTenders.dossier.overL1', { pct: 5.4 })}</span>
                         </div>
                       </div>
@@ -2228,7 +2228,7 @@ export const PreviouslyAcceptedTendersTab: React.FC = () => {
                       },
                       {
                         stage: "Milestone 4",
-                        time: `Months 15–${selectedTender.og_tender?.completion_months || 18}`,
+                        time: selectedTender.og_tender?.completion_months ? `Months 15–${selectedTender.og_tender.completion_months}` : 'Substantial Completion',
                         progress: "100% Substantial Completion",
                         title: "Wearing Surface, Road Safety & Statutory Handover",
                         desc: "Bituminous Concrete (BC) wearing course, thermoplastic lane markings, retro-reflective signages, metal beam crash barriers, street lighting, snag checklist rectification, and joint commissioning.",

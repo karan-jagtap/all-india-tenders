@@ -141,7 +141,7 @@ def dynamic_harvest_all_catalog_awards() -> Dict[str, Any]:
                 updated_contractors += 1
             else:
                 pan, gstin, cin = generate_statutory_identifiers(cleaned_name, state)
-                est_turnover = max(1500000000.0, round(contract_val * 3.5, 2))
+                est_turnover = round(contract_val * 3.5, 2)
                 solvency = round(est_turnover * 0.25, 2)
                 reg_office = f"Registered Corporate Office, {city}, {state} - India"
 
